@@ -1,0 +1,4 @@
+# launch the starter application with minimal  verbosity
+# put this file in same location as BIFF.Marvin.jar, which should be at same level as Widgets directory
+# change name and location of Application XML to suit your needs
+java -jar BIFF.Marvin.jar -i Starter_Application\StarterApplication.xml -v -log %computername%.html

@@ -1,0 +1,49 @@
+/*
+ * Copyright (c) 2015 by Gerrit Grunwald
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.flat-gauge {
+    -bar-color       : #00ffff;
+    -background-color: #ffffff;
+    -title-text-color: #333333;
+    -value-text-color: #333333;
+    -unit-text-color : #333333;
+    -separator-color : #d0d0d0;
+}
+.flat-gauge .border {
+    -fx-fill        : transparent;
+    -fx-stroke      : -border-color;
+    -fx-stroke-width: 0.5px;
+}
+.flat-gauge .separator {
+    -fx-fill        : transparent;
+    -fx-stroke      : -separator-color;
+    -fx-stroke-width: 1px;
+}
+.flat-gauge .bar {
+    -fx-fill: -bar-color;
+}
+.flat-gauge .background {
+    -fx-fill: -background-color;
+}
+.flat-gauge .title-text {
+    -fx-fill: -title-text-color;
+}
+.flat-gauge .value-text {
+    -fx-fill: -value-text-color;
+}
+.flat-gauge .unit-text {
+    -fx-fill: -unit-text-color;
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+##############################################################################
+#  Copyright (c) 2016 Intel Corporation
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+##############################################################################
+#    File Abstract: 
+#
+##############################################################################
+-->
+
+<Widget Type = "SteelGauge">
+    <Style>GaugeIOPsUnder10K.css</Style>
+    <MinValue>0</MinValue>
+    <MaxValue>10000</MaxValue>
+    <UnitText>IOPs</UnitText>
+    <Decimals>0</Decimals>
+    <DialStartAngle>300</DialStartAngle>
+    <DialRangeAngle>240</DialRangeAngle>
+    <MajorTicksSpace>2500</MajorTicksSpace>
+    <MinorTicksSpace>1250</MinorTicksSpace>
+    <TickLableOrientation>Orthogonal</TickLableOrientation>
+    <EnhancedRateText>True</EnhancedRateText>
+    <Shadowed>True</Shadowed>
+    <ShowMaxMeasuredValue>True</ShowMaxMeasuredValue>
+    <ShowMinMeasuredValue>False</ShowMinMeasuredValue>
+    <Sections>
+        <Section start="0" end="3000" />
+        <Section start="3000" end="7000" />
+        <Section start="7000" end="10000" />
+    </Sections>
+</Widget>

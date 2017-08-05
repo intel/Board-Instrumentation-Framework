@@ -1,0 +1,160 @@
+/*
+ * ##############################################################################
+ * #  Copyright (c) 2016 Intel Corporation
+ * # 
+ * # Licensed under the Apache License, Version 2.0 (the "License");
+ * #  you may not use this file except in compliance with the License.
+ * #  You may obtain a copy of the License at
+ * # 
+ * #      http://www.apache.org/licenses/LICENSE-2.0
+ * # 
+ * #  Unless required by applicable law or agreed to in writing, software
+ * #  distributed under the License is distributed on an "AS IS" BASIS,
+ * #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * #  See the License for the specific language governing permissions and
+ * #  limitations under the License.
+ * ##############################################################################
+ * #    File Abstract: 
+ * #
+ * #
+ * ##############################################################################
+ */
+package kutch.biff.marvin.widget;
+
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
+import kutch.biff.marvin.datamanager.DataManager;
+import kutch.biff.marvin.utility.FrameworkNode;
+
+/**
+ *
+ * @author Patrick Kutch
+ */
+public class VideoPlayerWidget extends MediaPlayerWidget
+{
+    private final MediaView _mediaView;
+    private final StackPane _Pane;
+    private boolean _RetainAspectRatio;
+    private static boolean _HasBeenVerified = false;
+    private static boolean _IsValid = true;
+
+    @Override
+    public boolean HasBeenVerified()
+    {
+        return VideoPlayerWidget._HasBeenVerified;
+    }
+
+    @Override
+    public void setHasBeenVerified(boolean _HasBeenVerified)
+    {
+        VideoPlayerWidget._HasBeenVerified = _HasBeenVerified;
+    }
+    
+    @Override
+    public boolean IsValid()
+    {
+        return _IsValid;
+    }
+    
+    @Override
+    public void SetIsValid(boolean flag)
+    {
+        _IsValid = flag;
+    }
+    
+    public static void VideoPlayerWidget(boolean flag)
+    {
+        _IsValid = flag;
+    }
+    
+    /**
+     *
+     */
+    public VideoPlayerWidget()
+    {
+        super("VideoPlayerWidget");
+        _mediaView = new MediaView();
+        _Pane = new StackPane();
+        _RetainAspectRatio = true;
+    }
+
+    @Override
+    protected boolean VerifyMedia(Media objMedia)
+    {
+        return true;
+    }
+    @Override
+    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
+    {
+        return HandleWidgetSpecificSettings(node,"Video");
+    }
+        @Override
+        
+    public boolean Create(GridPane pane, DataManager dataMgr)
+    {
+        ConfigureDimentions();
+        ConfigureAlignment();
+        
+        SetupPeekaboo(dataMgr);
+        _mediaView.setPreserveRatio(_RetainAspectRatio);
+        
+        if (!Create(dataMgr))
+        {
+            return false;
+        }
+        pane.add(_mediaView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+        
+        return true;
+    }
+    
+    @Override
+    protected boolean OnNewMedia(MediaPlayer objMediaPlayer)
+    {
+        _mediaView.setMediaPlayer(objMediaPlayer);
+        
+        return true;
+    }
+
+    public boolean getRetainAspectRatio()
+    {
+        return _RetainAspectRatio;
+    }
+
+    public void setRetainAspectRatio(boolean _RetainAspectRatio)
+    {
+        this._RetainAspectRatio = _RetainAspectRatio;
+    }
+    
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+        return _mediaView.getStyleClass();
+    }
+
+    @Override
+    public Node getStylableObject()
+    {
+        return _mediaView;
+    }
+    
+    @Override
+    protected void ConfigureDimentions()
+    {
+        if (getHeight() > 0)
+        {
+            _mediaView.setFitHeight(getHeight());
+        }
+        if (getWidth() > 0)
+        {
+            _mediaView.setFitWidth(getWidth());
+        }
+    }
+
+
+    
+}

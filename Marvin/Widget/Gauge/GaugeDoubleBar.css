@@ -1,0 +1,55 @@
+/*
+ * Copyright (c) 2015 by Gerrit Grunwald
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.av-gauge {
+    -fx-skin               : "eu.hansolo.enzo.gauge.skin.AvGaugeSkin";
+    -outer-bar-color       : #a71037;
+    -inner-bar-color       : #f06185;
+    -background-color      : #414141;
+    -outer-value-text-color: white;
+    -inner-value-text-color: white;
+    -title-text-color      : white;
+    -border-color          : #414141;
+    -separator-color       : white;
+}
+.av-gauge .border {
+    -fx-fill        : transparent;
+    -fx-stroke      : -border-color;
+    -fx-stroke-width: 0.5px;
+}
+.av-gauge .separator {
+    -fx-fill        : transparent;
+    -fx-stroke      : -separator-color;
+    -fx-stroke-width: 1px;
+}
+.av-gauge .outer-bar {
+    -fx-fill: -outer-bar-color;
+}
+.av-gauge .inner-bar {
+    -fx-fill: -inner-bar-color;
+}
+.av-gauge .background {
+    -fx-fill: -background-color;
+}
+.av-gauge .outer-value-text {
+    -fx-fill: -outer-value-text-color;
+}
+.av-gauge .inner-value-text {
+    -fx-fill: -inner-value-text-color;
+}
+.av-gauge .title-text {
+    -fx-fill: -title-text-color;
+}

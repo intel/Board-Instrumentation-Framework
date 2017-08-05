@@ -1,0 +1,12 @@
+/* 
+Notes: These are Blue and gradient-blue background settings
+*/
+
+#gradient-blue
+{
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 200%, repeat, rgb(0, 113, 197) 0%, rgb(7, 14, 20) 50%);
+}
+#blue
+{
+    -fx-background-color: rgb(0, 113, 197);
+}

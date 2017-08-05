@@ -1,0 +1,155 @@
+/*
+ * Copyright (c) 2013 by Gerrit Grunwald
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.radial {
+    -fx-skin          : "eu.hansolo.enzo.gauge.skin.RadialSkin";
+    -radial-body-color: rgb(50, 50, 50);
+    -outer-frame-color: rgb(132, 132, 132);
+    -main-frame-color : linear-gradient(from 50% 0% to 50% 100%,
+                                        rgb(254, 254, 254) 0%,
+                                        rgb(210, 210, 210) 7%,
+                                        rgb(179, 179, 179) 12%,
+                                        rgb(213, 213, 213) 100%);
+    -background-color : linear-gradient(from 50% 0% to 50% 100%,
+                                        derive(-radial-body-color, -100%) 0%,
+                                        -radial-body-color 39%,
+                                        -radial-body-color 40%,
+                                        derive(-radial-body-color, 60%) 100%);
+    -tick-mark-fill   : white;
+    -tick-label-fill  : white;
+    -knob-frame-color : linear-gradient(from 47% 0% to 47% 106%,
+                                        rgb(92, 95, 101) 0%,
+                                        rgb(46, 49, 53) 47%,
+                                        rgb(22, 23, 26) 100%);
+    -knob-main-color  : linear-gradient(from 46% 0% to 46% 107%,
+                                        rgb(204, 204, 204) 0%,
+                                        rgb(87, 92, 98) 100%);
+    -knob-lower-hl    : radial-gradient(focus-angle 0deg, focus-distance 0%,
+                                        center 50% 100%,
+                                        radius 50%,
+                                        rgba(255, 255, 255, 0.6) 0%,
+                                        transparent 100%);
+    -knob-upper-hl    : radial-gradient(focus-angle 0deg, focus-distance 0%,
+                                        center 50% 0%,
+                                        radius 50%,
+                                        rgba(255, 255, 255, 0.74902) 0%,
+                                        transparent 100%);
+    -led-color        : red;
+
+    -needle-color     : red;
+}
+
+.radial .background {
+    -fx-background-color : -outer-frame-color,
+                           -main-frame-color,
+                           -background-color;
+    -fx-background-insets: 0, 1, 17;
+    -fx-background-radius: 1024;
+}
+
+.radial .knob {
+    -fx-background-color : -knob-frame-color,
+                           -knob-main-color,
+                           -knob-upper-hl,
+                           -knob-lower-hl;
+    -fx-background-insets: 0, 3, 3, 3;
+    -fx-padding          : 0, 0, -8 0 0 0, 0 0 8 0;
+    -fx-background-radius: 1024;
+}
+
+.radial .post {
+    -fx-background-color : -knob-frame-color,
+    -knob-main-color,
+    -knob-upper-hl,
+    -knob-lower-hl;
+    -fx-background-insets: 0, 1, 1, 1;
+    -fx-padding          : 0, 0, -4 0 0 0, 0 0 4 0;
+    -fx-background-radius: 1024;
+}
+
+.radial .led-frame {
+    -fx-background-color : transparent 100%;
+}
+.radial .led-main {
+    -fx-background-color : transparent 100%;
+    -fx-background-radius: 0;
+}
+.radial:led-on .led-main {
+    -fx-background-color: transparent 100%;
+}
+.radial .led-hl {
+    -fx-background-color : transparent 100%;
+}
+
+.radial .title {
+    -fx-fill: ladder(-radial-body-color, derive(white, -20%) 49%, #888888 50%);
+}
+
+.radial .unit {
+    -fx-fill: ladder(-radial-body-color, derive(white, -20%) 49%, #888888 50%);
+}
+
+.radial .lcd-text {
+    -fx-text-fill        : rgb(0, 12, 6);
+    -fx-alignment        : center-right;
+    -fx-background-radius: 5;
+    -fx-padding          : 2px  5px  2px 5px;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-color : lightgray,
+                           linear-gradient(to bottom,
+                                           darkgray 0%,
+                                           gray 2%,
+                                           gray 99%,
+                                           white 100%),
+                           linear-gradient(to bottom,
+                                           rgb(107,107,107) 0%,
+                                           rgb(130,136,117) 1%,
+                                           rgb(185,198,160) 6%,
+                                           rgb(186,199,160) 15%,
+                                           rgb(192,207,162) 27%,
+                                           rgb(200,216,167) 41%,
+                                           rgb(205,220,167) 50%,
+                                           rgb(195,214,154) 50%,
+                                           rgb(230,251,181) 96%,
+                                           rgb(185,207,141) 100%);
+    -fx-effect           : innershadow(gaussian, rgba(0, 0, 0, 0.5), 3, 0, 0, 2);
+}
+
+.radial .needle {
+    -fx-background-color : linear-gradient(from 0% 77% to 100% 77%,
+                                           rgb(50, 50, 50) 0%,
+                                           rgb(102, 102, 102) 48%,
+                                           rgb(50, 50, 50) 100%);
+    -fx-background-insets: 0;
+    -fx-scale-shape      : true;
+    -fx-shape            : "M 99.0 46.0 L 100.0 46.0 L 102.0 87.0 L 97.0 87.0 L 99.0 46.0 ZM 97.0 25.0 L 97.0 36.0 L 94.0 87.0 L 94.0 120.0 L 94.0 120.0 C 94.0 120.0 94.0 120.0 94.0 120.0 C 95.0 121.0 97.0 121.0 100.0 121.0 C 102.0 121.0 104.0 121.0 105.0 120.0 C 105.0 120.0 105.0 120.0 105.0 120.0 L 105.0 120.0 L 105.0 87.0 L 102.0 36.0 L 102.0 25.0 L 97.0 25.0 Z";
+}
+.radial .needle-color-block {
+    -fx-background-color: linear-gradient(to right,
+                                          derive(-needle-color, -30%) 0%,
+                                          -needle-color 50%,
+                                          derive(-needle-color, -30%) 100%);
+}
+
+.radial .foreground {
+    -fx-background-color: radial-gradient(focus-angle 0deg, focus-distance 0%, 
+                                          center 50% 0%, 
+                                          radius 51%, 
+                                          rgba(255, 255, 255, 0.6) 0%, 
+                                          transparent 100%);
+    -fx-scale-shape     : true;
+    -fx-shape           : "M 42.0 48.0 C 56.0 32.0 77.0 22.0 100.0 22.0 C 123.0 22.0 144.0 32.0 158.0 48.0 C 160.0 50.0 160.0 50.0 160.0 50.0 C 160.0 50.0 137.0 78.0 100.0 78.0 C 64.0 78.0 40.0 50.0 40.0 50.0 C 40.0 50.0 40.0 50.0 42.0 48.0 Z";
+}

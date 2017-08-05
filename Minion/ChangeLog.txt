@@ -1,0 +1,43 @@
+Release 17.05
+added PQOS collector
+
+Release 17.04
+Improved performance when 1000's of collectors
+
+Release 17.03
+Added OVSdb parser
+Added 'runonce' as option for Minion Frequency
+Added libvirt collector
+
+
+Release 16.10
+Added 'DefaultValue' as option for <Input> on Operators to be used if the input collector isn't valid yet
+Changed <ModifyCollector> in <DynamicCollector> to be <Modifier> as descriibed in the user doc
+
+Release 16.09
+Fixed bug in DynamicCollector
+Added some additional DynamicCollector tokens (separators): '= ',': ',':',' '
+Added collector to get Minion Uptime and system time/date
+Added Timer collector
+Added <Bound> ability to collectors to optionally restrict the collected data
+Added Min and Max value operators
+Added ManipulateCollector collector to reset Max/Min and Average Operators as a task
+
+Release 16.08
+Added ability to write your own DynamicCollector
+Added a DynamicCollector for collectd data
+
+Release 16.07
+Streamlined how DynamicCollectors are processed
+added <ProcessThread> ability 
+Added Abiltiy in EthtoolParser collector to calculate rates (for a DynamicCollector) using 2 input files from Ethtool -S
+Streamlined the way Actors/Tasks are executed in Minion
+
+Release 16.06
+Added ability to use a file timesamp as the normilization period time using SyncFile key
+
+Release 16.05
+Bug Fixes
+
+Release 16.04
+Initial Open Source Release

@@ -1,0 +1,82 @@
+/* 
+    Document   : nothing yet
+*/
+
+/*******************************************************************************
+ *                                                                             *
+ * Charts                                                                      *
+ *                                                                             *
+ ******************************************************************************/
+
+.chart {
+    -fx-padding: 5px;
+}
+.chart-plot-background {
+    -fx-background-color: -fx-background;
+}
+.chart-content {
+    -fx-padding: 10px;
+}
+.chart-title {
+    -fx-font-size: 1.2em;
+    -fx-text-fill: -fx-text-background-color;
+}
+.chart-legend {
+   -fx-background-color: -fx-shadow-highlight-color,
+        linear-gradient(to bottom, derive(-fx-background, -10%), derive(-fx-background, -5%)),
+        linear-gradient(from 0px 0px to 0px 4px, derive(-fx-background, -4%), derive(-fx-background, 10%));
+   -fx-background-insets: 0 0 -1 0, 0,1;
+   -fx-background-radius: 4,4,3;
+   -fx-padding: 6px;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * ChartPlot                                                                   *
+ *                                                                             *
+ ******************************************************************************/
+
+.chart-vertical-grid-lines {
+    -fx-stroke: null;
+    -fx-stroke-dash-array: null;
+}
+.chart-horizontal-grid-lines {
+    -fx-stroke: -fx-control-inner-background;
+    -fx-stroke-dash-array: 0.25em, 0.25em;
+}
+.chart-alternative-column-fill {
+    -fx-fill: null;
+    -fx-stroke: null;
+}
+.chart-alternative-row-fill {
+    -fx-fill: null;
+    -fx-stroke: null;
+}
+.chart-vertical-zero-line {
+    -fx-stroke: -fx-control-inner-background;
+}
+.chart-horizontal-zero-line {
+    -fx-stroke: -fx-control-inner-background;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Axis                                                                        *
+ *                                                                             *
+ ******************************************************************************/
+
+.axis {
+    AXIS_COLOR: -fx-control-inner-background;
+    -fx-tick-label-font-size: .6em; /* 16px */
+    -fx-tick-label-fill: -fx-text-background-color;
+	}
+
+.default-color0.chart-bar { -fx-bar-fill: CHART_COLOR_1;
+	-fx-background-color:   linear-gradient(to top, 
+										rgb(0,200,0) 0%,
+										rgb(0,255,64) 75%,
+                                        rgb(128,255,64) 85%,
+										rgb(255,204,102) 95%,
+                                        rgb(255,51,00) 100%
+                              );
+   }	

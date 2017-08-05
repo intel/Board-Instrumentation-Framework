@@ -1,0 +1,21 @@
+Release 17.02
+Bug Fix - Specifying log file was not working
+Added -m | -minimize option to run Gui initially minimized
+
+Release 17.01
+Bug fix - playback was not working
+Added Ability to change the Namespaces of data sets
+Added abiltiy for RemotePlay command to specify a file to load and play.
+
+Release 16.12
+Added Shunt ability
+Bug fixes
+
+Release 16.10
+Added ability to have Marvin send a message to add it as a client: <MarvinAutoConnect Key="Identifying Key"/>
+
+Release 16.07
+Removed some print statements I forgot to nuke after some debugging
+
+Release 16.04
+Initial Open Source Release

@@ -1,0 +1,127 @@
+#default_text {
+    -fx-font-family: "Arial Regular";
+	-fx-font-size: 2.5em; /* 14px */
+    -fx-text-fill: white;
+    -fx-wrap-text:true; /* true | false */
+}
+
+#Welcome {
+    -fx-font-family: "Arial Regular";
+    -fx-font-size: 8em; /* 0.8em 80% size of parent node 12px default*/
+    -fx-wrap-text:true; /* true | false */
+    -fx-underline: False;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+
+#Title {
+    -fx-font-family: "Arial Regular";
+    -fx-font-size: 2.5em; /* 0.8em 80% size of parent node 12px default*/
+	-fx-text-fill: white;
+    -fx-wrap-text:true; /* true | false */
+    -fx-underline: False;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+#Description {
+    -fx-font-family: "Arial Regular";
+    -fx-font-size: 1.25em; /* 0.8em 80% size of parent node 12px default*/
+	-fx-text-fill: white;
+    -fx-wrap-text:true; /* true | false */
+    -fx-underline: False;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+
+#Button{
+    -fx-font-family: "Arial Regular";
+    -fx-font-size: 3em; /* 0.8em 80% size of parent node 12px default*/
+    -fx-text-fill: #7ed3f7;
+    -fx-wrap-text:true; /* true | false */
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+
+#14-Bold {
+    -fx-font-family: "Arial Bold";
+    -fx-font-size: 1.166666666666667em; /* 14px */
+    -fx-text-fill: white;
+    -fx-wrap-text:true; /* true | false */
+}
+
+#Subtitle {
+    -fx-font-family: "Arial Regular";
+    -fx-font-size: 1.5em; /* 0.8em 80% size of parent node 12px default*/
+    -fx-text-fill: white;
+    -fx-wrap-text:true; /* true | false */
+}
+#Download-title {
+    -fx-font-family: "Arial Regular";
+    -fx-font-size: 3em; /* 0.8em 80% size of parent node 12px default*/
+    -fx-text-fill: #7ed3f7;
+    -fx-wrap-text:true; /* true | false */
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+#Bold-Italic-title {
+    -fx-font-family: "Arial Bold Italic";
+    -fx-font-size: 2em; /* 0.8em 80% size of parent node 12px default*/
+    -fx-text-fill: #53565a;
+    -fx-wrap-text:true; /* true | false */
+}
+
+#Italic-title {
+    -fx-font-family: "Arial Italic";
+    -fx-font-size: 2em; /* 0.8em 80% size of parent node 12px default*/
+    -fx-text-fill: white;
+    -fx-wrap-text:true; /* true | false */
+}
+
+#Bold-Italic-title-White {
+    -fx-font-family: "Arial Bold Italic";
+    -fx-font-size: 2em; /* 0.8em 80% size of parent node 12px default*/
+    -fx-text-fill: white;
+    -fx-wrap-text:true; /* true | false */
+}
+
+#Awesome-Mix {
+	-fx-font-family: "Bradley hand ITC";
+    -fx-font-size: 2em; /* 0.8em 80% size of parent node 12px default*/
+    -fx-text-fill: black;
+    -fx-wrap-text:true; /* true | false */
+}
+
+/*
+Arial Regular
+Arial Black
+Arial Bold
+Arial Bold Italic
+Arial Italic
+Arial Narrow
+Arial Narrow Bold
+Arial Narrow Italic
+*/
+/* Other Options */
+/*    -fx-underline: false; /* true | false */
+/*    -fx-strikethrough: false; /* true | false */
+/*    -fx-alignment: BOTTOM_LEFT; /* [ top-left | top-center | top-right | center-left | center | center-right bottom-left | bottom-center | bottom-right | baseline-left | baseline-center | baseline-right ] */
+/*    -fx-text-origin: bottom; /* [ baseline | top | bottom ] */
+/*    -fx-text-alignment: left; /*  [ left | center | right | justify ] */
+/*******************************************************************************
+440 *******************************************************************************
+441 **                                                                           **
+442 ** NOTE on em values:  em values are used for padding and other sizing       **
+443 ** throughout this file.  Size values in ems represent fraction of the       **
+444 ** font size in use.  As used in this file, each 1/12th represents a pixel   **
+445 ** based upon the default size of 12px.  Here's a table for quick reference: **
+446 **                                                                           **
+447 ** 1px:    0.083333em                                                       **
+448 ** 2px:    0.166667em                                                        **
+449 ** 3px:    0.25em                                                            **
+450 ** 4px:    0.333333em                                                        **
+451 ** 5px:    0.416667em                                                        **
+452 ** 6px:    0.5em                                                             **
+453 ** 7px:    0.583333em                                                        **
+454 ** 8px:    0.666667em                                                        **
+455 ** 9px:    0.75em                                                            **
+456 ** 10px:   0.833333em                                                        **
+457 ** 11px:   0.916667em                                                        **
+458 ** 12px:   1.0em                                                             **
+459 **                                                                           **
+460 *******************************************************************************
+461 ******************************************************************************/

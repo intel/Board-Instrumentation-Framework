@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+********************************
+Collects various pieces of data on an Ethernet Device, under Linux
+-->
+<ExternalMinionFile>
+    <AliasList>
+        <Alias Dir="/sys/class/net/"/>
+    </AliasList>
+    
+      <Group Frequency="$(Freq)">
+        <Collector ID="$(PassedID).TX.bytes">
+          <Executable>Collectors\FileCollector.py</Executable>
+          <Normalize>$(BytesPerSec2GBPS)</Normalize>
+          <Param>ReadFromFile</Param>
+          <Param>$(Dir)/$(Dev)/statistics/tx_bytes</Param>
+        </Collector>
+
+        <Collector ID="$(PassedID).RX.bytes">
+          <Executable>Collectors\FileCollector.py</Executable>
+          <Normalize>$(BytesPerSec2GBPS)</Normalize>
+          <Param>ReadFromFile</Param>
+          <Param>$(Dir)/$(Dev)/statistics/rx_bytes</Param>
+        </Collector>
+
+        <Collector ID="$(PassedID).BX.bytes"> 
+          <Operator>Addition</Operator>
+          <Input>$(PassedID).TX.bytes</Input>
+          <Input>$(PassedID).RX.bytes</Input>
+        </Collector>
+    </Group>
+</ExternalMinionFile>

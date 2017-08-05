@@ -1,0 +1,51 @@
+<!--
+##############################################################################
+#  Copyright (c) 2016 Intel Corporation
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+##############################################################################
+#    File Abstract: 
+#    Setup lots of default aliases in here for my LCARS Grids
+#
+##############################################################################
+--><MarvinExternalFile>
+	<AliasList>
+		<Import>Widget/LCARS/LCARS-Colors.xml</Import>
+
+		<Alias Default_LeftGap="0" Default_RightGap="0" Default_TopGap="0" Default_BottomGap="0" /> <!-- Space between compound pieces -->
+		<Alias Default_LeftPad="0" Default_RightPad="0" Default_TopPad="0" Default_BottomPad="0" /> <!-- Space around compound grid -->
+		
+		<Alias DEFAULT_HORIZONTAL_BAR_HEIGHT="30" DEFAULT_VERTICAL_BAR_HEIGHT="30" />
+		<Alias DEFAULT_HCAP_WIDTH="$(DEFAULT_VERTICAL_BAR_HEIGHT)" DEFAULT_VCAP_HEIGHT="$(DEFAULT_HORIZONTAL_BAR_HEIGHT)" />
+		<Alias DEFAULT_BUTTON_HEIGHT="$(DEFAULT_HORIZONTAL_BAR_HEIGHT)" DEFAULT_BUTTON_WIDTH="150"/>
+		
+		<Alias LCARS_FONT1="&quot;Swiss911 UCm BT&quot;" LCARS_FONT2="&quot;Swiss911 xCm BT&quot;"/> <!-- 2nd Font seems a bit 'wider' -->
+
+	
+		<DefaultAlias TOP_GAP="$(Default_TopGap)" BOTTOM_GAP="$(Default_BottomGap)" LEFT_GAP="$(Default_LeftGap)" RIGHT_GAP="$(Default_RightGap)" />
+		<DefaultAlias LEFT_PAD="$(Default_LeftPad)" RIGHT_PAD="$(Default_RightPad)" TOP_PAD="$(Default_LeftPad)" BOTTOM_PAD="$(Default_BottomPad)" />
+		
+		<DefaultAlias HORIZONTAL_BAR_HEIGHT="$(DEFAULT_HORIZONTAL_BAR_HEIGHT)" VERTICAL_BAR_WIDTH="$(DEFAULT_VERTICAL_BAR_HEIGHT)" />
+		<DefaultAlias HCAP_WIDTH="$(DEFAULT_HCAP_WIDTH)" VCAP_HEIGHT="$(DEFAULT_VCAP_HEIGHT)"/>
+		
+		<DefaultAlias LCARS_HOVER="NoHover"/>
+		
+		<DefaultAlias LCARS_TEXT_SIZE="1.75em" LCARS_TEXT_FONT="$(LCARS_FONT2)"/>
+		<DefaultAlias LCARS_TASK=""/>
+		<DefaultAlias LCARS_NAMESPACE="unused" LCARS_ID="unused"/>
+		<DefaultAlias LCARS_PEEKABOO_NAMESPACE="unused" LCARS_PEEKABOO_ID="unused"/>
+		<DefaultAlias LCARS_CUSTOM_STYLE=""/> <!-- Basically Custom  Style override srings can be put in here -->
+
+
+	</AliasList>
+</MarvinExternalFile>

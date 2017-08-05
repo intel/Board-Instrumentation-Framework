@@ -1,0 +1,53 @@
+Release 17.05
+Added format options for Text widget - Numeric, Percent and Money
+
+Release 17.04
+Allow AliasList in Widget definition files.
+Added experimental ability to do a for loop through files in a directory.
+Changed the way Grid padding works, now inherits from parent grid/tab.  To go back to old way, use LegacyMode for App level padding option.
+
+Release 17.03
+Dynamic Images all take up same area in grid
+Can do transitions between dynamic images.
+
+Release 17.02
+Added SeriesSet to MultiSource Area Chart
+Added task to open a document or web page with native-associated application
+Added task to launch another program
+Added MarvinMath
+Added ToolTips for many widgets - Images and Charts do NOT support them at this time.
+Added <SelectedStyle> and Ability to 'select' | 'deselect' a widget
+Can now have multiple <Peekaboo> associated with a single widget.
+
+Release 17.01
+Added PDF Viewer
+Allows Parameters (for tasks) to use MinionSrc as inputs in complex string, like an Alias
+
+Release 16.12
+Added Ability to step through Tasklist one task at a time by repeatedly calling task.
+Added MarvinLocalData option to Marvin application options, this generates many internal datapoints usable by widgets, including local time, runtime, etc.
+Added CASE conditional
+added PULSE and MATHEMATIC task
+
+Release 16.10
+Added ability to have Marvin point to an Oscar (via special config entry) and Oscar will add the Marvin as a Target
+Added <DefaultAlias> that will only be used if the alias specified hasn't already been created
+Added SVG Widget
+Added RandomTask task type
+Added A random range for task Postpone
+Tabs now have <Peekaboo> capability
+
+Release 16.09
+Added ability to specify alternate splash image to use via command line parameters
+Added abiltiy for any peekaboo action to be used as 'default' when defining peekaboo
+
+Release 16.08
+Added ability to internally synchronize data for mulit-source charts using <Synchronized> tag in Widget Definition File
+
+Release 16.06
+Added Remove/Insert ability to Peekaboo
+Changed Splash Logo
+
+Release 16.04
+Initial Open Source Release
+

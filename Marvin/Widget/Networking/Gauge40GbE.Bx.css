@@ -1,0 +1,326 @@
+/*
+ * Copyright (c) 2013 by Gerrit Grunwald
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/******************************************************************************
+ * GAUGE class                                                                *
+ *****************************************************************************/
+
+.gauge {
+    -fx-skin           : "eu.hansolo.enzo.gauge.skin.GaugeSkin";
+    -base-color: -fx-base;	
+    -highlight-frame-color: derive(-base-color,75%);
+    -outer-frame-color : linear-gradient(from 50% 0% to 50% 100%,
+                                        derive(-base-color,-75%) 0%,
+                                        derive(-base-color,55%) 7%,
+                                        derive(-base-color,-10%) 12%,
+                                        derive(-base-color,-25%) 100%);
+    -inner-frame-color : linear-gradient(from 50% 0% to 50% 100%,
+                                        derive(-base-color,-25%) 0%,
+                                        derive(-base-color,25%) 7%,
+                                        derive(-base-color,55%) 12%,
+                                        derive(-base-color,-55%) 100%);
+    -background-color : linear-gradient(from 50% 0% to 50% 100%,
+                                        derive(-base-color, -100%) 0%,
+                                        derive(-base-color, -20%) 39%,
+                                        derive(-base-color, -20%) 40%,
+                                        derive(-base-color, 10%) 100%);
+
+    -needle            : derive(-base-color,-75%);
+    -min-measured-value: green;
+    -max-measured-value: green;
+    -threshold         : red;
+	
+    -knob-frame-color : linear-gradient(from 47% 0% to 47% 106%,
+                                        rgba(92, 95, 101, .25) 0%,
+                                        rgba(46, 49, 53, .25) 47%,
+                                        rgba(22, 23, 26, .25) 100%);
+    -knob-main-color  : linear-gradient(from 46% 0% to 46% 107%,
+                                        derive(-base-color,-10%) 0%,
+                                        derive(-base-color,35%) 100%);
+    -knob-lower-hl    : radial-gradient(focus-angle 0deg, focus-distance 0%,
+                                        center 50% 100%,
+                                        radius 50%,
+                                        rgba(255, 255, 255, 0.6) 0%,
+                                        transparent 100%);
+    -knob-upper-hl    : radial-gradient(focus-angle 0deg, focus-distance 0%,
+                                        center 50% 0%,
+                                        radius 50%,
+                                        rgba(255, 255, 255, 0.4) 0%,
+                                        transparent 100%);
+										
+    -tick-mark-fill    : ladder( -base-color, derive(white,-20%) 49%, #000000 50%);
+    -tick-label-fill   : ladder( -base-color, derive(white,-20%) 49%, #000000 50%);
+	
+	
+    -section-fill-0    : linear-gradient(to bottom,
+                                         rgb(0,255,0) 0%,
+                                         rgb(255,255,0) 50%,
+                                         rgb(255,126,0) 100%);
+    -section-fill-1    :  linear-gradient(to bottom,
+                                         rgb(0,255,0) 0%,
+                                         rgb(0,204,0) 26%,
+                                         rgb(0,153,0) 100%);
+    -section-fill-2    : rgba(166,206,57, 0.99);
+    -section-fill-3    : rgba(253,184,19, 0.99);
+    -section-fill-4    : rgba(128, 255,   0, 0.5);
+    -section-fill-5    : rgba(255, 255,   0, 0.5);
+    -section-fill-6    : rgba(255, 191,   0, 0.5);
+    -section-fill-7    : rgba(255, 128,   0, 0.5);
+    -section-fill-8    : rgba(255,  64,   0, 0.5);
+    -section-fill-9    : rgba(255,   0,   0, 0.5);
+    -histogram-fill    : rgba(0, 200,   0, 0.3);
+    -marker-fill-0     : rgb(0, 200,   0);
+    -marker-fill-1     : rgb(200, 200,   0);
+    -marker-fill-2     : rgb(200,   0,   0);
+    -marker-fill-3     : rgb(0,   0, 200);
+    -marker-fill-4     : rgb(0, 200, 200);
+}
+
+/******************************************************************************
+ * GAUGE components                                                           *
+ *****************************************************************************/
+.gauge .background {
+    -fx-background-color : -outer-frame-color, -highlight-frame-color, -inner-frame-color, -background-color;						   
+    -fx-background-Paddings: 0, 6, 7, 13;
+    -fx-background-insets: 0, 1, 17;
+    -fx-background-radius: 1000;
+    -fx-effect           : innershadow(two-pass-box, rgba(0, 0, 0, 0.3), 20, 0.0, 0, 20);
+}
+
+/******************************************************************************
+ * GAUGE min-measured-value                                                   *
+ *****************************************************************************/
+.gauge .min-measured-value {
+    -fx-background-color : derive(-min-measured-value, -20%), -min-measured-value;
+    -fx-background-Paddings: 0, 1;
+    -fx-scale-shape      : true;
+    -fx-shape            : "M 7.6716 5.5503 L 10.5 2.7218 L 19.2782 11.5 L 10.5 20.2782 L 7.6716 17.4497 L 13.6213 11.5 L 7.6716 5.5503 ZM 0 12 C 0 18.6275 5.3725 24 12 24 C 18.6275 24 24 18.6275 24 12 C 24 5.3725 18.6275 0 12 0 C 5.3725 0 0 5.3725 0 12 Z";
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 1, 0.0, 0, 1);
+}
+
+/******************************************************************************
+ * GAUGE max-measured-value                                                   *
+ *****************************************************************************/
+.gauge .max-measured-value {
+    -fx-background-color : derive(-max-measured-value, -20%), -max-measured-value;
+    -fx-background-Paddings: 0, 1;
+    -fx-scale-shape      : true;
+    -fx-shape            : "M 16.2782 5.5503 L 10.3284 11.5 L 16.2782 17.4497 L 13.4497 20.2782 L 4.6716 11.5 L 13.4497 2.7218 L 16.2782 5.5503 ZM 0 12 C 0 18.6275 5.3725 24 12 24 C 18.6275 24 24 18.6275 24 12 C 24 5.3725 18.6275 0 12 0 C 5.3725 0 0 5.3725 0 12 Z";
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 1, 0.0, 0, 1);
+}
+
+/******************************************************************************
+ * GAUGE threshold                                                            *
+ *****************************************************************************/
+.gauge .threshold {
+    -fx-background-color : derive(-threshold, -20%), -threshold;
+    -fx-background-Paddings: 0, 2;
+    -fx-scale-shape      : true;
+    -fx-shape            : "M 22.4905 22 C 23.838 22 24.3851 21.3092 23.7121 20.068 L 13.2214 0.8937 C 12.5484 -0.3492 11.453 -0.2703 10.7799 0.9724 L 0.2879 20.0269 C -0.3851 21.2681 0.1619 22 1.5093 22 L 22.4905 22 Z";
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 1, 0.0, 0, 1);
+}
+
+/******************************************************************************
+ * GAUGE needle                                                               *
+ *****************************************************************************/
+.gauge .needle-standard {
+    -fx-background-color : -needle,
+                           linear-gradient(to bottom,
+                                           derive(-needle, 45%) 0%,
+                                           derive(-needle, -15%) 100%);
+    -fx-background-Paddings: 0, 1;
+    -fx-background-radius: 1024;
+    -fx-padding          : 0;
+    -fx-stroke           : transparent;
+    -fx-scale-shape      : true;
+    -fx-shape            : "M 3.0313 0 L 0 74 L 7.9688 74 L 4.9375 0 L 3.0313 0 Z";
+}
+
+/******************************************************************************
+ * GAUGE knob                                                                 *
+ *****************************************************************************/
+.gauge .knob {
+    -fx-background-color : -knob-frame-color,
+                           -knob-main-color,
+                           -knob-upper-hl,
+                           -knob-lower-hl;
+    -fx-padding          : 0, 0, -8 0 0 0, 0 0 8 0;
+    -fx-background-insets: 0, 3, 3, 3;
+    -fx-background-radius: 1024;
+    -fx-scale-shape      : true;
+    -fx-shape            : "M 0 100 C 0 44.7708 44.7708 0 100 0 C 155.2292 0 200 44.7708 200 100 C 200 155.2292 155.2292 200 100 200 C 44.7708 200 0 155.2292 0 100 Z";
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 7, 0.0, 0, 7);
+}
+
+/******************************************************************************
+ * GAUGE title, unit, value, interactive-text                                 *
+ *****************************************************************************/
+.gauge .title {
+	-fx-fill: ladder(-base-color, white 49%, #000000 50%);
+}
+
+.gauge .unit {
+    -fx-fill: ladder(-base-color, white 49%, #000000 50%);
+}
+
+.gauge .value {
+    -fx-fill: ladder(-base-color, white 49%, #000000 50%);
+}
+
+
+/******************************************************************************
+ * GAUGE sections                                                             *
+ *****************************************************************************/
+.gauge .section0 {
+    -fx-fill: -section-fill-0;
+}
+.gauge:highlighted .section0 {
+    -fx-fill: derive(-section-fill-0, 30%);
+}
+.gauge .section1 {
+    -fx-fill: -section-fill-1;
+}
+.gauge:highlighted .section1 {
+    -fx-fill: derive(-section-fill-1, 30%);
+}
+.gauge .section2 {
+    -fx-fill: -section-fill-2;
+}
+.gauge:highlighted .section2 {
+    -fx-fill: derive(-section-fill-2, 30%);
+}
+.gauge .section3 {
+    -fx-fill: -section-fill-3;
+}
+.gauge:highlighted .section3 {
+    -fx-fill: derive(-section-fill-3, 30%);
+}
+.gauge .section4 {
+    -fx-fill: -section-fill-4;
+}
+.gauge:highlighted .section4 {
+    -fx-fill: derive(-section-fill-4, 30%);
+}
+.gauge .section5 {
+    -fx-fill: -section-fill-5;
+}
+.gauge:highlighted .section5 {
+    -fx-fill: derive(-section-fill-5, 30%);
+}
+.gauge .section6 {
+    -fx-fill: -section-fill-6;
+}
+.gauge:highlighted .section6 {
+    -fx-fill: derive(-section-fill-6, 30%);
+}
+.gauge .section7 {
+    -fx-fill: -section-fill-7;
+}
+.gauge:highlighted .section7 {
+    -fx-fill: derive(-section-fill-7, 30%);
+}
+.gauge .section8 {
+    -fx-fill: -section-fill-8;
+}
+.gauge:highlighted .section8 {
+    -fx-fill: derive(-section-fill-8, 30%);
+}
+.gauge .section9 {
+    -fx-fill: -section-fill-9;
+}
+.gauge:highlighted .section9 {
+    -fx-fill: derive(-section-fill-9, 30%);
+}
+
+
+/******************************************************************************
+ * GAUGE markers                                                              *
+ *****************************************************************************/
+.gauge .marker0 {
+    -fx-background-color : derive(-marker-fill-0, -20%), -marker-fill-0;
+    -fx-background-Paddings: 0, 2;
+    -fx-background-radius: 100;
+    -fx-scale-shape      : true;
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 1, 0.0, 0, 1);
+}
+.gauge:interactive .marker0 {
+    -fx-background-color : derive(-marker-fill-0, -20%),
+                           linear-gradient(to bottom,
+                                           derive(-marker-fill-0, 5%) 0%,
+                                           derive(-marker-fill-0, -10%) 100%);
+    -fx-background-Paddings: -3, -2;
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 4, 0.0, 0, 4);
+}
+.gauge .marker1 {
+    -fx-background-color : derive(-marker-fill-1, -20%), -marker-fill-1;
+    -fx-background-Paddings: 0, 2;
+    -fx-background-radius: 100;
+    -fx-scale-shape      : true;
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 1, 0.0, 0, 1);
+}
+.gauge:interactive .marker1 {
+    -fx-background-color : derive(-marker-fill-1, -20%),
+                           linear-gradient(to bottom,
+                                           derive(-marker-fill-1, 5%) 0%,
+                                           derive(-marker-fill-1, -10%) 100%);
+    -fx-background-Paddings: -3, -2;
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 4, 0.0, 0, 4);
+}
+.gauge .marker2 {
+    -fx-background-color : derive(-marker-fill-2, -20%), -marker-fill-2;
+    -fx-background-Paddings: 0, 2;
+    -fx-background-radius: 100;
+    -fx-scale-shape      : true;
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 1, 0.0, 0, 1);
+}
+.gauge:interactive .marker2 {
+    -fx-background-color : derive(-marker-fill-2, -20%),
+                           linear-gradient(to bottom,
+                                           derive(-marker-fill-2, 5%) 0%,
+                                           derive(-marker-fill-2, -10%) 100%);
+    -fx-background-Paddings: -3, -2;
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 4, 0.0, 0, 4);
+}
+.gauge .marker3 {
+    -fx-background-color : derive(-marker-fill-3, -20%), -marker-fill-3;
+    -fx-background-Paddings: 0, 2;
+    -fx-background-radius: 100;
+    -fx-scale-shape      : true;
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 1, 0.0, 0, 1);
+}
+.gauge:interactive .marker3 {
+    -fx-background-color : derive(-marker-fill-3, -20%),
+                           linear-gradient(to bottom,
+                                           derive(-marker-fill-3, 5%) 0%,
+                                           derive(-marker-fill-3, -10%) 100%);
+    -fx-background-Paddings: -3, -2;
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 4, 0.0, 0, 4);
+}
+.gauge .marker4 {
+    -fx-background-color : derive(-marker-fill-4, -20%), -marker-fill-4;
+    -fx-background-Paddings: 0, 2;
+    -fx-background-radius: 100;
+    -fx-scale-shape      : true;
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 1, 0.0, 0, 1);
+}
+.gauge:interactive .marker4 {
+    -fx-background-color : derive(-marker-fill-4, -20%),
+                           linear-gradient(to bottom,
+                                           derive(-marker-fill-4, 5%) 0%,
+                                           derive(-marker-fill-4, -10%) 100%);
+    -fx-background-Paddings: -3, -2;
+    -fx-effect           : dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 4, 0.0, 0, 4);
+}

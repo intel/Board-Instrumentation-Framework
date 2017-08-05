@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!--
+##############################################################################
+#  Copyright (c) 2016 Intel Corporation
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+##############################################################################
+#    File Abstract: 
+#    Demonstration collectors.  Uses a mix of built-in collectors and ones
+#    that are launched as external processes
+#
+#     Simple external file showing that you can define
+#  	  collectors in a library of files, and pass an alias
+#
+##############################################################################
+--><!--
+********************************
+-->
+<ExternalMinionFile>
+  <AliasList>
+    <Alias Rate3="$(MyFreq"/>
+  </AliasList>
+
+  <Collector ID="CPU" Frequency="$(Rate1)">
+    <Executable>Collectors\RandomVal.py</Executable>
+    <Param>GetBoundedRandomValue</Param>
+    <Param>62</Param>
+    <Param>99</Param>
+  </Collector>
+
+  <Collector ID="LCD.Override.Style.Warning" Frequency="$(Rate1)" OnlySendOnChange="True" OverrideID="LCD.Override" >
+    <Operator>Compare_GE</Operator>
+    <Input>CPU</Input>
+    <Input Constant="True">80</Input>
+    <!-- CPU Usage more than 80%, so set LCD red -->
+    <Input Constant="True">Marvin:[StyleOverride ID="lcd-red"][/StyleOverride]</Input>
+  </Collector>
+
+  <Collector ID="LCD.Override.Title" Frequency="$(Rate1)" OnlySendOnChange="True" OverrideID="LCD.Override">
+    <Operator>Compare_GE</Operator>
+    <Input>CPU</Input>
+    <!-- is CPU more than 80 -->
+    <Input Constant="True">80</Input>
+    <!-- CPU Usage more than 80%, so set Title -->
+    <Input Constant="True">Marvin:[Title]CPU - Warning[/Title]</Input>
+  </Collector>
+
+  <Collector ID="LCD.Override.Style.Normal" Frequency="$(Rate1)" OnlySendOnChange="True" OverrideID="LCD.Override" >
+    <Operator>Compare_LT</Operator>
+    <Input>CPU</Input>
+    <Input Constant="True">80</Input>
+    <!-- CPU is less than 80, so all good -->
+    <Input Constant="True">Marvin:[StyleOverride ID="lcd-standard"][/StyleOverride]</Input>
+  </Collector>
+
+  <Collector ID="LCD.Override.Normal" Frequency="$(Rate1)" OnlySendOnChange="True" OverrideID="LCD.Override">
+    <Operator>Compare_LT</Operator>
+    <Input>CPU</Input>
+    <Input Constant="True">80</Input>
+    <!-- No danger, so set LCD Title back to default-->
+    <Input Constant="True">Marvin:[Title]CPU[/Title]</Input>
+  </Collector>
+
+  <Collector ID="TrafficLight" Frequency="$(Rate2)">
+    <Executable>Collectors\RandomVal.py</Executable>
+    <Param>GetBoundedRandomValue</Param>
+    <Param>1</Param>
+    <Param>3</Param>
+	<!-- Let's change precision on this one - GUI expects 0 -->
+	<Precision>0</Precision>
+  </Collector>
+
+  <Collector ID="GraphSource1" Frequency="$(Rate1)">
+    <Executable>Collectors\RandomVal.py</Executable>
+    <Param>GetBoundedRandomValue</Param>
+    <Param>5</Param>
+    <Param>75</Param>
+  </Collector>
+
+  <Collector ID="GraphSource2" Frequency="$(Rate1)">
+    <Executable>Collectors\RandomVal.py</Executable>
+    <Param>GetBoundedRandomValue</Param>
+    <Param>25</Param>
+    <Param>65</Param>
+  </Collector>
+
+  <Collector ID="GraphSource3" Frequency="$(Rate3)">
+    <Executable>Collectors\RandomVal.py</Executable>
+    <Param>GetBoundedRandomValue</Param>
+    <Param>25</Param>
+    <Param>65</Param>
+  </Collector>
+
+  <Collector ID="GraphSource4" Frequency="$(Rate1)">
+    <Executable>Collectors\RandomVal.py</Executable>
+    <Param>GetBoundedRandomValue</Param>
+    <Param>50</Param>
+    <Param>95</Param>
+  </Collector>
+</ExternalMinionFile>

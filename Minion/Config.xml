@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!--
+##############################################################################
+#  Copyright (c) 2016 Intel Corporation
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+##############################################################################
+#    File Abstract: 
+#    Demonstration collectors.  Uses a mix of built-in collectors and ones
+#    that are launched as external processes
+#
+#     These collectors will run on any system, does not use PSUTIL, is just 
+#     a bunch of random numbers to move widgets in Marvin
+#
+##############################################################################
+-->
+<Minion>
+    <AliasList>
+        <Alias BytesPerSec2MBPS=".00000008"/>
+        <Alias ButesPerSec2GBPS=".000000008"/>
+        <Alias MyFreq="2000"/>
+    </AliasList>
+
+    <Namespace>
+        <Name>DemoNamespace</Name>
+        <DefaultFrequency>$(MyFreq)</DefaultFrequency>
+        <TargetConnection IP="localhost" PORT="5100"/>
+        <DynamicCollector Prefix="betty." SpawnThread="True">
+            <File>Foo.txt</File>
+        </DynamicCollector>
+
+        <DynamicCollector SendOnlyOnChange="true" Prefix="bob">
+			<Plugin>
+				<PythonFile>Collectors\PluginTester.py</PythonFile>
+				<EntryPoint SpawnThread="True">CollectFunction</EntryPoint>
+				<Param>2200</Param>
+			</Plugin>
+		</DynamicCollector>
+
+        <Collector ID="TX-1" Frequency="250">
+            <Executable>Collectors/Network.py</Executable>
+            <Param>GetNetTx</Param>
+            <Param>Local Area Connection</Param>
+        </Collector>
+        <!--        
+
+        <DynamicCollector SendOnlyOnChange="true">
+            <Plugin>
+                <PythonFile>Collectors\PluginTester.py</PythonFile>
+                <EntryPoint SpawnThread="True">CollectFunction</EntryPoint>
+                <Param>1200</Param>
+            </Plugin>
+        </DynamicCollector>
+
+        <DynamicCollector SendOnlyOnChange="true">
+            <Plugin>
+                <PythonFile>Collectors\PluginTester.py</PythonFile>
+                <EntryPoint SpawnThread="True">CollectFunction</EntryPoint>
+                <Param>1200</Param>
+            </Plugin>
+        </DynamicCollector>
+        
+        <Collector ID="CPU" >
+            <Executable>Collectors\PowerShell.py</Executable>
+            <Param>InvokePowerScript_1Param</Param>
+            <Param>test.ps1</Param>
+            <Param>"Name"</Param>
+        </Collector>
+
+        <Collector ID="CombinedSourceStacked" >
+            <Executable>Collectors\RandomVal.py</Executable>
+            <Param>GetBoundedRandomList</Param>
+            <Param>20</Param>
+            <Param>90</Param>
+            <Param>2</Param>
+        </Collector>
+-->
+
+    </Namespace>
+</Minion>

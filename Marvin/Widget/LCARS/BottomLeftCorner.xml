@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+##############################################################################
+#  Copyright (c) 2016 Intel Corporation
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+##############################################################################
+#    File Abstract: 
+#    Bottom Left Corner
+#
+##############################################################################
+-->
+<MarvinExternalFile>
+	<AliasList>
+		<Import>Widget\LCARS\LCARS.xml</Import> 
+
+		<DefaultAlias LCARS_CORNER_HGAP="$(RIGHT_GAP)" LCARS_CORNER_VGAP="$(BOTTOM_GAP)"/>
+
+		<DefaultAlias LCARS_WIDTH="$(HORIZONTAL_BAR_HEIGHT)"/>
+		<DefaultAlias LCARS_HEIGHT="$(HORIZONTAL_BAR_HEIGHT)"/>
+		<DefaultAlias LCARS_TEXT="" />
+		<DefaultAlias LCARS_TEXT_LOC="NE"/>		
+	</AliasList>
+
+	<Grid hgap="0" vgap="0" >
+		<PaddingOverride top="$(TOP_PAD)" bottom="$(BOTTOM_PAD)" right="$(BOTTOM_PAD)" left="$(LEFT_PAD)" /> 
+		<StyleOverride>
+			<Item>-fx-background-color: transparent</Item>
+		</StyleOverride>
+
+		<Widget File="LCARS/LCARSWidget.xml" row="0" column="0" Width="$(LCARS_WIDTH)" Height="$(LCARS_HEIGHT)" Align="$(LCARS_TEXT_LOC)" Task="$(LCARS_TASK)">
+			<InitialValue>$(LCARS_TEXT)</InitialValue>
+			<MinionSrc Namespace="$(LCARS_NAMESPACE)" ID="$(LCARS_ID)" />
+			<Peekaboo Namespace="$(LCARS_PEEKABOO_NAMESPACE)" ID="$(LCARS_PEEKABOO_ID)" />
+			<Shape>M20,20 a20,20 0 0 1 -20,-20 h20  z</Shape>
+			<StyleOverride ID="$(LCARS_HOVER)">
+				<Item>-svg-main-color:$(LCARS_COLOR)</Item>
+				<Item>
+					 -fx-font-size:$(LCARS_TEXT_SIZE);
+					 -fx-text-fill:$(LCARS_TEXT_COLOR);
+					 -fx-font-family:$(LCARS_TEXT_FONT);
+				</Item>							
+				<Item>$(LCARS_CUSTOM_STYLE)</Item>			
+			</StyleOverride>
+		</Widget>		
+	</Grid>
+</MarvinExternalFile>	

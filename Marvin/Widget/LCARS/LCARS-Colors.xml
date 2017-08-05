@@ -1,0 +1,47 @@
+<!--
+##############################################################################
+#  Copyright (c) 2016 Intel Corporation
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+##############################################################################
+#    File Abstract: 
+#    
+#
+##############################################################################
+-->
+<MarvinExternalFile>
+	<AliasList>
+		<DefaultAlias LCARS_BACKGROUND_COLOR="rgb(2,2,3)"/>
+
+		<DefaultAlias LCARS_COLOR1="rgb(255,153,0)" LCARS_COLOR2="rgb(204,153,204)" LCARS_COLOR3="rgb(204,102,102)" LCARS_COLOR4="rgb(153,204,255)" LCARS_COLOR5="rgb(102,102,255)"/>
+		<DefaultAlias LCARS_COLOR6="rgb(102,153,204)" LCARS_COLOR7="rgb(153,102,255)" LCARS_COLOR8="rgb(255,153,102)" LCARS_COLOR9="rgb(204,102,153)" LCARS_COLOR10="rgb(102,104,255)"/>
+		<DefaultAlias LCARS_COLOR11="rgb(153,153,255)" LCARS_COLOR12="rgb(204,153,102)" LCARS_COLOR13="rgb(255,204,102)" LCARS_COLOR14="rgb(102,102,153)" LCARS_COLOR15="rgb(204,204,255)"/>
+		<DefaultAlias LCARS_COLOR16="rgb(255,51,00)" LCARS_COLOR17="rgb(204,51,00)" LCARS_COLOR18="rgb(135,238,255)" LCARS_COLOR19="rgb(163,14,36)"/>
+		<DefaultAlias LCARS_COLOR20="rgb(255,156,00)" LCARS_COLOR21="rgb(247,189,90)" LCARS_COLOR22="rgb(255,204,254)"
+					  LCARS_COLOR23="rgb(247,189,90)" LCARS_COLOR24="rgb(255,255,158)" LCARS_COLOR25="rgb(255,99,99)"
+					  LCARS_COLOR26="rgb(205,99,99)" LCARS_COLOR27="rgb(204,153,204)" LCARS_COLOR28="rgb(255,156,99)"
+					  LCARS_COLOR29="rgb(100,109,204)" LCARS_COLOR30="rgb(156,156,255)" LCARS_COLOR31="rgb(51,153,255)"
+		              LCARS_COLOR32="rgb(153,204,355)" LCARS_COLOR33="rgb(255,255,0204)" LCARS_COLOR34="rgb(117,149,122)"
+					  LCARS_COLOR35="rgb(237,134,76)" LCARS_COLOR36="rgb(245,173,00)" LCARS_COLOR37="rgb(255,156,00)"
+					  LCARS_COLOR38="rgb(221,255,255)" LCARS_COLOR39="rgb(51,5,18)" LCARS_COLOR40="rgb(158,153,147)"
+					  LCARS_COLOR41="rgb(0,153,0)" LCARS_COLOR42="rgb(153,255,102)" LCARS_COLOR43="rgb(255,255,181)"
+					  />
+		
+		<DefaultAlias LCARS_COLOR_ALERT1="$(LCARS_COLOR16)" LCARS_COLOR_ALERT2="$(LCARS_COLOR17)"/>
+		
+		<DefaultAlias LCARS_DEFAULT_COLOR="$(LCARS_COLOR2)" />
+		<DefaultAlias LCARS_COLOR="$(LCARS_DEFAULT_COLOR)"/>
+		<DefaultAlias LCARS_TEXT_COLOR="$(LCARS_BACKGROUND_COLOR)"/>
+		
+	</AliasList>
+</MarvinExternalFile>
