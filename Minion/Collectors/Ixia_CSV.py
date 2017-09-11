@@ -93,8 +93,8 @@ def data_collector(reader, collection_type):
     global DataMap, Headers
 
     starting_line = 1
-	if collection_type == "complex":
-		starting_line = 13
+    if collection_type == "complex":
+        starting_line = 13
 
         # read the next row of data into DataMap
         for row in reader:

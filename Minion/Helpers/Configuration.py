@@ -588,6 +588,22 @@ class Configuration():
             objDynaCollector = DynamicCollector.DynamicCollector(objNamespace,IsInGroup,"DynamicCollectorPlugin")
         else:
             objDynaCollector = DynamicCollector.DynamicCollector(objNamespace,IsInGroup,FileName)
+            ## go see if they have defined specific tokens to use to split up a line
+            defaultTokenList = ['=','= ',': ',':',' '] 
+
+            tokenList = []
+            try:
+                tokenNodeList = node.getElementsByTagName('SplitToken')
+                for token in tokenNodeList:
+                    tokenList.append( Alias.Alias(token.firstChild.nodeValue))
+
+            except Exception as Ex:
+                tokenList = []
+
+            if len(tokenList) < 1:
+                tokenList = defaultTokenList # no tokens defined - so use default
+
+            objDynaCollector.SetParseTokens(tokenList)
 
         if "ProcessThread" in attributes.keys():
             objDynaCollector.SetProcessThreadID(Alias.Alias(attributes["ProcessThread"].nodeValue))

@@ -37,8 +37,12 @@
         <TargetConnection IP="localhost" PORT="5100"/>
         <DynamicCollector Prefix="betty." SpawnThread="True">
             <File>Foo.txt</File>
+            <SplitToken>=</SplitToken>
+            <SplitToken>= </SplitToken>
+            <SplitToken>: </SplitToken>
         </DynamicCollector>
 
+        <!--        
         <DynamicCollector SendOnlyOnChange="true" Prefix="bob">
 			<Plugin>
 				<PythonFile>Collectors\PluginTester.py</PythonFile>
@@ -47,12 +51,6 @@
 			</Plugin>
 		</DynamicCollector>
 
-        <Collector ID="TX-1" Frequency="250">
-            <Executable>Collectors/Network.py</Executable>
-            <Param>GetNetTx</Param>
-            <Param>Local Area Connection</Param>
-        </Collector>
-        <!--        
 
         <DynamicCollector SendOnlyOnChange="true">
             <Plugin>

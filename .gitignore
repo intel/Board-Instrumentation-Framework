@@ -4,3 +4,11 @@
 /Marvin/build.xml
 /marvin/nbproject
 /marvin/release
+/*/*/__pycache__/
+/Minion/minion.pyproj
+/Minion/minion.sln
+/Minion/minion.v12.suo
+/oscar/oscar.pyproj
+/oscar/oscar.sln
+/oscar/oscar.v12.suo
+/Marvin/${store.dir}/

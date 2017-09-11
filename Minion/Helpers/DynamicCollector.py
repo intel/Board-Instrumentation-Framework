@@ -48,7 +48,10 @@ class DynamicCollector(Collector.Collector):
         self.__LockFileName = None
         self.__pluginInfo = None
         self.__LoadWarningSent=False
+        self.__TokenList=['=','= ',': ',':',' ']
         
+    def SetParseTokens(self,tokenList):
+        self.__TokenList = tokenList
 
     def SetPluginInfo(self, pluginFile, pluginFunction, pluginSpawnThread):
         pluginInterface = self.CreatePluginInterfaceObject()
@@ -161,15 +164,13 @@ class DynamicCollector(Collector.Collector):
         self.__PreviousTimestamp = ts
 #        print("File Time Delta: "  + str(timeDelta) + " Elapsed Time: " + str(elapsedTime) + "Entries: " + str(len(lines)))
 
-        altTokens=['= ',': ',':',' ']
+        #altTokens=['= ',': ',':',' ']
         try:
             for line in lines:
-                dataPoint = line.split('=')
-                if len(dataPoint) < 2:
-                    for token in altTokens:
-                        dataPoint = line.split(token)
-                        if len(dataPoint) > 1:
-                            break
+                for firstToken in self.__TokenList:
+                    dataPoint = line.split(firstToken)
+                    if len(dataPoint) > 1:
+                        break
 
                 if len(dataPoint) > 1: # filter out empties
                     ID = dataPoint[0] + self.__SuffixStr
@@ -180,6 +181,7 @@ class DynamicCollector(Collector.Collector):
 
                     if None == objCollector:
                         objCollector = self.__createCollector(ID)
+                        Log.getLogger().debug("Dynamic Collector found with token: '" + firstToken + "'")
 
                     objCollector.SetDynamicData(Value,elapsedTime)
 
