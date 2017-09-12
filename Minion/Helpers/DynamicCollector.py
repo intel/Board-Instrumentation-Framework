@@ -168,7 +168,7 @@ class DynamicCollector(Collector.Collector):
         try:
             for line in lines:
                 for firstToken in self.__TokenList:
-                    dataPoint = line.split(firstToken)
+                    dataPoint = line.split(firstToken,1)
                     if len(dataPoint) > 1:
                         break
 
