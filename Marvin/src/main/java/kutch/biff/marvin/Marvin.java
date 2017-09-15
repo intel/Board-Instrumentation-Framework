@@ -181,11 +181,17 @@ public class Marvin extends Application
     private void DisableWebCerts()
     {
         LOGGER.info("Disabling Web Certificates.");
-        // Create a trust manager that does not validate certificate chains
-        TrustManager[] trustAllCerts = new TrustManager[]
+        // Completely disable, by trusting everything!
+        TrustManager[] myTM = new TrustManager[]
         {
             new X509TrustManager()
             {
+                @Override
+                public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType)
+                {
+                }
+                
                 @Override
                 public java.security.cert.X509Certificate[] getAcceptedIssuers()
                 {
@@ -198,24 +204,18 @@ public class Marvin extends Application
                 {
                 }
 
-                @Override
-                public void checkServerTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType)
-                {
-                }
             }
         };
 
-// Install the all-trusting trust manager
         try
         {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            SSLContext context = SSLContext.getInstance("SSL");
+            context.init(null, myTM, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
         }
-        catch (KeyManagementException | NoSuchAlgorithmException e)
+        catch (Exception ex)
         {
-            LOGGER.severe("Error Disabling Web Certificates: " + e.toString());
+            LOGGER.severe("Error Disabling Web Certificates: " + ex.toString());
         }
     }
 
