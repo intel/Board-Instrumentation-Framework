@@ -120,6 +120,12 @@ public class WidgetBuilder
         fileName = BaseWidget.convertToFileOSSpecific(fileName);
         String fileNameWPath;
         File fCheck = new File(fileName);
+        
+        if (null == fCheck)
+        {
+            return null;
+        }
+        
         if (fCheck.exists())
         {
             fileNameWPath = fileName;  //fully qualified path provided (likely custom widget)
@@ -593,6 +599,11 @@ public class WidgetBuilder
             }
 
             String strWidget = baseNode.getAttribute("Type");
+            if (null == strWidget)
+            {
+                LOGGER.severe("Invalid Widget definition in " + Filename);
+                return null;
+            }
 
             if (strWidget.equalsIgnoreCase("SteelGauge"))
             {

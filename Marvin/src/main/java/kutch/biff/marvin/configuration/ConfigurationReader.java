@@ -109,6 +109,10 @@ public class ConfigurationReader
             return null;
         }
         String fName = BaseWidget.convertToFileOSSpecific(filename);
+        if (null == fName)
+        {
+            return null;
+        }
         File file = new File(fName);
         if (file.exists())
         {
@@ -617,7 +621,7 @@ public class ConfigurationReader
                         if (tabNode.hasAttributes())
                         {
                             String ID = tabNode.getAttribute("ID");
-                            if (ID.length() > 0)
+                            if (ID != null && ID.length() > 0)
                             {
                                 TabList.add(ID);
                             }

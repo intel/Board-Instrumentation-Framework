@@ -52,8 +52,20 @@ public class StackedBarChartWidget extends BarChartWidget
         for (String key : _SeriesOrder)
         {
             SeriesSet objSeriesSet = _SeriesMap.get(key);
+            if (null == objSeriesSet)
+            {
+                LOGGER.severe("Invalid Key in setupListeners");
+                return;
+            }
             XYChart.Series objSeries = new XYChart.Series<>();
-            objSeries.setName(objSeriesSet.getTitle());
+            String strTitle = objSeriesSet.getTitle();
+            if (null == strTitle)
+            {
+                strTitle="untitled";
+            }
+            
+            objSeries.setName(strTitle);
+            
             for (SeriesDataSet objDs : objSeriesSet.getSeriesList())
             {
                 XYChart.Data objData;
@@ -113,11 +125,24 @@ public class StackedBarChartWidget extends BarChartWidget
 
         for (String key : _SeriesOrder)
         {
-            for (SeriesDataSet set : _SeriesMap.get(key).getSeriesList())
+            if (null == _SeriesMap.get(key))
+            {
+                LOGGER.severe("Unexpected probelm in CreateChartObject");
+                break;
+            }
+            
+            ArrayList<SeriesDataSet> setList = _SeriesMap.get(key).getSeriesList();
+            if (null == setList)
+            {
+                LOGGER.severe("Unexpected probelm in CreateChartObject");
+                break;
+            }
+            
+            for (SeriesDataSet set : setList)
             {
                 list.add(set.getTitle());
             }
-            break;
+            break; 
         }
 
         getAxis_X().setCategories(FXCollections.observableArrayList(list));

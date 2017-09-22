@@ -25,8 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
@@ -907,7 +905,12 @@ abstract public class BaseWidget implements Widget
 
     public static boolean HandleCommonDefinitionFileConfig(BaseWidget widget, FrameworkNode node)
     {
-        if (node.getNodeName().equalsIgnoreCase("#Text") | node.getNodeName().equalsIgnoreCase("#comment"))
+        if (null == widget)
+        {
+            return false;
+        }
+        
+        if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
         {
             return true;
         }

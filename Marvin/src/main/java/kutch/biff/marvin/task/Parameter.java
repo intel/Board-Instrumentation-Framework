@@ -49,6 +49,10 @@ public class Parameter
         if (_value.charAt(0)=='@' && null != PromptManager.getPromptManager().getPrompt(_value.substring(1)))
         {
             BasePrompt objPrompt = PromptManager.getPromptManager().getPrompt(_value.substring(1));
+            if (null == objPrompt)
+            {
+                return null;
+            }
             if (objPrompt.PerformPrompt())
             {
                 return objPrompt.GetPromptedValue();

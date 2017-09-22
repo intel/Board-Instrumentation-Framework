@@ -411,9 +411,15 @@ public class Marvin extends Application
         long start = System.currentTimeMillis();
         _DataMgr = new DataManager();
         _Config = new ConfigurationReader();
+        
+        if (null == _Config)
+        {
+            return 0;
+        }
 
         SimpleDoubleProperty complete = new SimpleDoubleProperty();
         appConfig = _Config.ReadAppConfigFile(ConfigFilename, complete);
+        
         
         if (null != appConfig)
         {
@@ -494,8 +500,14 @@ public class Marvin extends Application
         if (null != _Config.getConfiguration().getCSSFile())
         {
             String osIndepFN = BaseWidget.convertToFileOSSpecific(_Config.getConfiguration().getCSSFile());
+            
+            if (null == osIndepFN)
+            {
+                return true;
+            }
             String strCSS = BaseWidget.convertToFileURL(osIndepFN);
-            if (null != _Config.getConfiguration().getCSSFile())
+            
+            if (null != strCSS)
             {
                 try
                 {

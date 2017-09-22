@@ -166,8 +166,14 @@ public class AboutBox
         int appWidth = (int) visualBounds.getWidth();
         int appHeight = (int) visualBounds.getHeight();
 
-        String foo = System.getProperty("java.runtime.version");
-        String[] javaVersionElements = System.getProperty("java.runtime.version").split("\\.|_|-b");
+        String rtv = System.getProperty("java.runtime.version");
+        String[] javaVersionElements;
+        if (null == rtv)
+        {
+            rtv = "1.1.0_11-b32"; // bogus one - should NEVER happen
+        }
+        
+        javaVersionElements = rtv.split("\\.|_|-b");
 
         String discard = javaVersionElements[0];
         String major = javaVersionElements[1];
@@ -201,7 +207,7 @@ public class AboutBox
 
         
         lblAppDimensions = new Label("Screen Size: " + Integer.toString(appWidth) + "x" + Integer.toString(appHeight));
-        lblVersionJVM = new Label("JVM Version - " + foo);
+        lblVersionJVM = new Label("JVM Version - " + rtv);
 
         grid.add(lblTabCount, column, iStartRow++);
         grid.add(lblScaling, column, iStartRow++);

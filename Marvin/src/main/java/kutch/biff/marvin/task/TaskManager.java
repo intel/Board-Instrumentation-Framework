@@ -1156,8 +1156,13 @@ public class TaskManager
         }
         _TasksPerformed++;
         TaskList objTaskList = _TaskMap.get(TaskID.toUpperCase());
-
-        return objTaskList.PerformTasks();
+        
+        if (null != objTaskList)
+        {
+            return objTaskList.PerformTasks();
+        }
+        LOGGER.severe("Tasklist [" + TaskID + "] came back null.");
+        return false;
     }
 
     /**
@@ -1254,6 +1259,12 @@ public class TaskManager
      */
     protected void SendToOscar(String OscarID, byte sendData[])
     {
+        if (null == OscarID)
+        {
+            LOGGER.severe("SendToOscar fn received NULL OscarID.");
+            return;
+        }
+        
         OscarID = OscarID.toLowerCase();
         if (null == _ClientMap || _ClientMap.isEmpty())
         {

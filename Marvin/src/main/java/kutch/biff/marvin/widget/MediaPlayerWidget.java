@@ -194,7 +194,16 @@ public abstract class MediaPlayerWidget extends BaseWidget
 
     public boolean AddMediaFile(String newFile, String ID)
     {
+        if (null == newFile)
+        {
+            return false;
+        }
         String strFileName = BaseWidget.convertToFileOSSpecific(newFile);
+        
+        if (null == strFileName)
+        {
+            return false;
+        }
 
         String uriFile = VerifyFilename(strFileName);
 

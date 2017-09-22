@@ -116,6 +116,7 @@ public class FlipPanelWidgetBuilder
                 if (null == Location || null == StyleFile)
                 {
                     LOGGER.severe("Invalid Flip Panel side definition :" + node.getNodeName());
+                    return null;
                 }
 
                 PanelSideInfo panel = new PanelSideInfo(Location, BtnText, StyleID, StyleFile);

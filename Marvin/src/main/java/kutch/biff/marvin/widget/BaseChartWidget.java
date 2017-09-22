@@ -627,8 +627,17 @@ abstract public class BaseChartWidget extends BaseWidget
         for (String key : _SeriesOrder)
         {
             SeriesSet objSeriesSet = _SeriesMap.get(key);
+            if (null == objSeriesSet)
+            {
+                return;
+            }
             XYChart.Series objSeries = new XYChart.Series();
-            objSeries.setName(objSeriesSet.getTitle());
+            String strTitle = objSeriesSet.getTitle();
+            if (null == strTitle)
+            {
+                return;
+            }
+            objSeries.setName(strTitle);
             
             for (SeriesDataSet objDs : objSeriesSet.getSeriesList())
             {

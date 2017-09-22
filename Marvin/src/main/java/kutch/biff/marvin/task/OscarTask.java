@@ -22,8 +22,6 @@
 package kutch.biff.marvin.task;
 
 import java.util.Random;
-import java.util.logging.Logger;
-import kutch.biff.marvin.logger.MarvinLogger;
 /**
  *
  * @author Patrick Kutch

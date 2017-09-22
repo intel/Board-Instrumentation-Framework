@@ -96,6 +96,7 @@ public class Version
             {
                 props.load(in);
                 Version._Props = props;
+                in.close();
                 return props;
             }
             catch (Exception ex)

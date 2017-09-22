@@ -237,6 +237,10 @@ public class FrameworkNode
             return null;
         }
         File[] listOfFiles = folder.listFiles();
+        if (null == listOfFiles)
+        {
+            return null;
+        }
         Arrays.sort(listOfFiles);
         
         ArrayList<String> extFilter= new ArrayList<>();
@@ -462,7 +466,7 @@ public class FrameworkNode
         if (null == thenNode && null == elseNode)
         {
             LOGGER.severe("If with nothing in Then or Else. Ignoring.");
-            return null;
+            return list;
         }
 
         if (Evaluation)

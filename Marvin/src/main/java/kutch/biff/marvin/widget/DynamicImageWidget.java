@@ -393,7 +393,12 @@ public class DynamicImageWidget extends StaticImageWidget
                 return false;
             }
             String fname = convertToFileOSSpecific(FileName);
+            if (null == fname)
+            {
+                return false;
+            }
             File file = new File(fname);
+            
             if (file.exists())
             {
                 String fn = "file:" + fname;
