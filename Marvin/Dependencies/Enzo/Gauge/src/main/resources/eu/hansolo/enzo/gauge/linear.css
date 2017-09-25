@@ -1,0 +1,190 @@
+/*
+ * Copyright (c) 2015 by Gerrit Grunwald
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.linear {
+    -fx-skin          : "eu.hansolo.enzo.gauge.skin.LinearSkin";
+    -linear-body-color: rgb(50, 50, 50);
+    -outer-frame-color: rgb(132, 132, 132);
+    -main-frame-color : linear-gradient(from 50% 0% to 50% 100%,
+                                        rgb(254, 254, 254) 0%,
+                                        rgb(210, 210, 210) 7%,
+                                        rgb(179, 179, 179) 12%,
+                                        rgb(213, 213, 213) 100%);
+    -background-color : linear-gradient(from 50% 0% to 50% 100%,
+                                        derive(-linear-body-color, -100%) 0%,
+                                        -linear-body-color 39%,
+                                        -linear-body-color 40%,
+                                        derive(-linear-body-color, 60%) 100%);
+    -tick-mark-fill   : white;
+    -tick-label-fill  : white;
+
+    -led-color        : red;
+
+    -bar-color        : red;
+}
+
+.linear .background {
+    -fx-background-color : -outer-frame-color,
+                           -main-frame-color,
+                           -background-color;
+    -fx-background-insets: 0, 1, 17;
+    -fx-background-radius: 5;
+}
+
+.linear .bar-background {
+    -fx-background-color : linear-gradient(to bottom,
+                                           rgba(255,255,255,0.05) 0%,
+                                           rgba(255,255,255,0.15) 50%,
+                                           rgba(255,255,255,0.05) 100%);
+}
+.linear:horizontal .bar-background {
+    -fx-background-color : linear-gradient(to right,
+                                           rgba(255,255,255,0.05) 0%,
+                                           rgba(255,255,255,0.15) 50%,
+                                           rgba(255,255,255,0.05) 100%);
+}
+.linear .bar-background-border {
+    -fx-stroke: linear-gradient(to bottom,
+                                rgba(255,255,255,0.3) 0%,
+                                rgba(255,255,255,0.7) 50%,
+                                rgba(255,255,255,0.4) 100%);
+}
+.linear:horizontal .bar-background-border {
+    -fx-stroke: linear-gradient(to right,
+                                rgba(255,255,255,0.3) 0%,
+                                rgba(255,255,255,0.7) 50%,
+                                rgba(255,255,255,0.4) 100%)
+}
+
+.linear .led-frame {
+    -fx-background-color : linear-gradient(from 14% 14% to 84% 84%,
+                                           rgba(20, 20, 20, 0.64706) 0%,
+                                           rgba(20, 20, 20, 0.64706) 15%,
+                                           rgba(41, 41, 41, 0.64706) 26%,
+                                           rgba(200, 200, 200, 0.40631) 85%,
+                                           rgba(200, 200, 200, 0.3451) 100%);
+    -fx-background-radius: 1024;
+}
+.linear .led-main {
+    -fx-background-color : linear-gradient(from 15% 15% to 83% 83%,
+                                           derive(-led-color, -80%) 0%,
+                                           derive(-led-color, -87%) 49%,
+                                           derive(-led-color, -80) 100%);
+    -fx-background-radius: 1024;
+}
+.linear:led-on .led-main {
+    -fx-background-color: linear-gradient(from 15% 15% to 83% 83%,
+                                          derive(-led-color, -23%) 0%,
+                                          derive(-led-color, -50%) 49%,
+                                          -led-color 100%);
+}
+.linear .led-hl {
+    -fx-background-color : radial-gradient(center 15% 15%, radius 50%,
+                                           white 0%,
+                                           transparent 100%);
+    -fx-background-radius: 1024;
+}
+
+.linear .title {
+    -fx-fill: ladder(-linear-body-color, derive(white, -20%) 49%, #888888 50%);
+}
+
+.linear .unit {
+    -fx-fill: ladder(-linear-body-color, derive(white, -20%) 49%, #888888 50%);
+}
+
+.linear .lcd-text {
+    -fx-text-fill        : rgb(0, 12, 6);
+    -fx-alignment        : center-right;
+    -fx-background-radius: 5;
+    -fx-padding          : 2px  5px  2px 5px;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-color : lightgray,
+                           linear-gradient(to bottom,
+                                           darkgray 0%,
+                                           gray 2%,
+                                           gray 99%,
+                                           white 100%),
+                           linear-gradient(to bottom,
+                                           rgb(107,107,107) 0%,
+                                           rgb(130,136,117) 1%,
+                                           rgb(185,198,160) 6%,
+                                           rgb(186,199,160) 15%,
+                                           rgb(192,207,162) 27%,
+                                           rgb(200,216,167) 41%,
+                                           rgb(205,220,167) 50%,
+                                           rgb(195,214,154) 50%,
+                                           rgb(230,251,181) 96%,
+                                           rgb(185,207,141) 100%);
+    -fx-effect           : innershadow(gaussian, rgba(0, 0, 0, 0.5), 3, 0, 0, 2);
+}
+
+.linear .bar {
+    -fx-background-color : linear-gradient(to right,
+                                           derive(-bar-color, -30%) 0%,
+                                           -bar-color 100%),
+                           linear-gradient(to right,
+                                           rgba(255,255,255,0) 0%,
+                                           rgba(255,255,255,0.7) 1%,
+                                           rgba(255,255,255,0.05) 42%,
+                                           transparent 42%);
+    -fx-background-insets: 0, 0 1 0 1;
+}
+.linear:horizontal .bar {
+    -fx-background-color : linear-gradient(to bottom,
+                                           derive(-bar-color, -30%) 0%,
+                                           -bar-color 100%),
+                           linear-gradient(to bottom,
+                                           rgba(255,255,255,0) 0%,
+                                           rgba(255,255,255,0.7) 1%,
+                                           rgba(255,255,255,0.05) 42%,
+                                           transparent 42%);
+    -fx-background-insets: 0, 1 0 1 0;
+}
+
+.linear .foreground {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%,
+                                          transparent 0%,
+                                          transparent 12%,
+                                          rgba(255, 255, 255, 0.01355) 17%,
+                                          transparent 17%,
+                                          transparent 80%,
+                                          rgba(255, 255, 255, 0.08222) 84%,
+                                          rgba(255, 255, 255, 0.2887) 93%,
+                                          rgba(255, 255, 255, 0.29804) 94%,
+                                          rgba(255, 255, 255, 0.11921) 96%,
+                                          transparent 97%,
+                                          transparent 100%);
+    -fx-scale-shape     : true;
+    -fx-shape           : "M 14.0 14.0 L 14.0 126.0 C 14.0 126.0 42.0 116.0 70.0 116.0 C 100.0 116.0 126.0 126.0 126.0 126.0 L 126.0 14.0 C 126.0 14.0 100.0 24.0 70.0 24.0 C 40.0 24.0 14.0 14.0 14.0 14.0 Z";
+}
+.linear:horizontal .foreground {
+    -fx-background-color: linear-gradient(from 0% 100% to 0% 0%, 
+                                          transparent 0%,
+                                          transparent 12%, 
+                                          rgba(255, 255, 255, 0.01355) 17%, 
+                                          transparent 17%,
+                                          transparent 80%, 
+                                          rgba(255, 255, 255, 0.08222) 84%, 
+                                          rgba(255, 255, 255, 0.2887) 93%, 
+                                          rgba(255, 255, 255, 0.29804) 94%, 
+                                          rgba(255, 255, 255, 0.11921) 96%, 
+                                          transparent 97%, 
+                                          transparent 100%);
+    -fx-scale-shape     : true;
+    -fx-shape           : "M 14.0 126.0 L 126.0 126.0 C 126.0 126.0 116.0 98.0 116.0 70.0 C 116.0 40.0 126.0 14.0 126.0 14.0 L 14.0 14.0 C 14.0 14.0 24.0 40.0 24.0 70.0 C 24.0 100.0 14.0 126.0 14.0 126.0 Z";
+}
+

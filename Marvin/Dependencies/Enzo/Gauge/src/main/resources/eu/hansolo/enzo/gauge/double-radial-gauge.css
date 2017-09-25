@@ -1,0 +1,184 @@
+/*
+ * Copyright (c) 2015 by Gerrit Grunwald
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/******************************************************************************
+ * GAUGE class                                                                *
+ *****************************************************************************/
+.double-radial-gauge {
+    -fx-skin               : "eu.hansolo.enzo.gauge.skin.DoubleRadialGaugeSkin";
+    -base                  : black;
+    -background            : ladder(-base,
+                                    linear-gradient(to bottom, rgb(90, 90, 90) 0%, rgb(70, 70, 70) 100%) 49%,
+                                    linear-gradient(to bottom, rgb(245,245,245) 0%, rgb(235,235,235) 100%) 50%);
+    -background            : ladder(-base, black 49%, white 50%);
+    -outer-border          : linear-gradient(to bottom,
+                                             rgb(224,224,224) 0%,
+                                             rgb(133,133,133) 26%,
+                                             rgb(84,84,84) 100%);
+    -highlight-border      : linear-gradient(to bottom,
+                                             rgb(255,255,255) 0%,
+                                             rgb(146,146,147) 50%,
+                                             rgb(135,136,138) 100%);
+    -inner-border          : linear-gradient(to bottom,
+                                             rgb(71,72,72) 0%,
+                                             rgb(110,106,107) 50%,
+                                             rgb(186,185,187) 100%);
+    -body                  : rgb(240,240,240);
+    -needle-color-one      : #F8907D;
+    -needle-color-two      : #F8907D;
+    -min-measured-value    : cornflowerblue;
+    -max-measured-value    : cornflowerblue;
+    -threshold             : red;
+    -knob                  : linear-gradient(to bottom,
+                                             rgb(224,224,224) 0%,
+                                             rgb(133,133,133) 26%,
+                                             rgb(84,84,84) 100%);
+    -led-color-one         : red;
+    -led-color-two         : red;
+    -tick-mark-fill-one    : black;
+    -tick-label-fill-one   : black;
+    -tick-mark-fill-two    : black;
+    -tick-label-fill-two   : black;
+}
+
+
+/******************************************************************************
+ * GAUGE components                                                           *
+ *****************************************************************************/
+.double-radial-gauge .background {
+    -fx-background-color : -outer-border, -highlight-border, -inner-border, -body;
+    -fx-background-insets: 0, 6, 7, 13;
+    -fx-background-radius: 1000;
+    -fx-effect           : innershadow(two-pass-box, rgba(0, 0, 0, 0.3), 20, 0.0, 0, 20);
+}
+
+
+/******************************************************************************
+ * GAUGE needle                                                               *
+ *****************************************************************************/
+.double-radial-gauge .needle-standard-one {
+    -fx-background-color : derive(-needle-color-one, -10%),
+                                  linear-gradient(to bottom, derive(-needle-color-one, 15%) 0%,
+                                                             derive(-needle-color-one, -15%) 100%);
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0em;
+    -fx-padding          : 0;
+    -fx-stroke           : transparent;
+    -fx-scale-shape      : true;
+    -fx-shape            : "M 3.0313 0 L 0 74 L 7.9688 74 L 4.9375 0 L 3.0313 0 Z";
+}
+.double-radial-gauge .needle-standard-two {
+    -fx-background-color : derive(-needle-color-two, -10%),
+                                  linear-gradient(to bottom, derive(-needle-color-two, 15%) 0%,
+                                                             derive(-needle-color-two, -15%) 100%);
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0em;
+    -fx-padding          : 0;
+    -fx-stroke           : transparent;
+    -fx-scale-shape      : true;
+    -fx-shape            : "M 3.0313 0 L 0 74 L 7.9688 74 L 4.9375 0 L 3.0313 0 Z";
+}
+.double-radial-gauge .needle-highlight {
+    -fx-background-color : linear-gradient(from 0% 0% to 100% 0%,
+                                           transparent 0%,
+                                           transparent 50%,
+                                           rgba(255, 255, 255, 0.2) 50%,
+                                           rgba(255, 255, 255, 0.2) 100%);
+    -fx-scale-shape      : true;
+    -fx-shape            : "M 3.0313 0 L 0 74 L 7.9688 74 L 4.9375 0 L 3.0313 0 Z";
+}
+
+
+/******************************************************************************
+ * GAUGE leds                                                                 *
+ *****************************************************************************/
+.double-radial-gauge .led-frame {
+    -fx-background-color : linear-gradient(from 14% 14% to 84% 84%,
+                                           rgba(20, 20, 20, 0.64706) 0%,
+                                           rgba(20, 20, 20, 0.64706) 15%,
+                                           rgba(41, 41, 41, 0.64706) 26%,
+                                           rgba(200, 200, 200, 0.40631) 85%,
+                                           rgba(200, 200, 200, 0.3451) 100%);
+    -fx-background-radius: 1024;
+}
+.double-radial-gauge .led-main-one {
+    -fx-background-color : linear-gradient(from 15% 15% to 83% 83%,
+                                           derive(-led-color-one, -80%) 0%,
+                                           derive(-led-color-one, -87%) 49%,
+                                           derive(-led-color-one, -80) 100%);
+    -fx-background-radius: 1024;
+}
+.double-radial-gauge:led-on-one .led-main-one {
+    -fx-background-color: linear-gradient(from 15% 15% to 83% 83%,
+                                          derive(-led-color-one, -23%) 0%,
+                                          derive(-led-color-one, -50%) 49%,
+                                          -led-color-one 100%);
+}
+.double-radial-gauge .led-main-two {
+    -fx-background-color : linear-gradient(from 15% 15% to 83% 83%,
+                                           derive(-led-color-two, -80%) 0%,
+                                           derive(-led-color-two, -87%) 49%,
+                                           derive(-led-color-two, -80) 100%);
+    -fx-background-radius: 1024;
+}
+.double-radial-gauge:led-on-two .led-main-two {
+    -fx-background-color: linear-gradient(from 15% 15% to 83% 83%,
+                                          derive(-led-color-two, -23%) 0%,
+                                          derive(-led-color-two, -50%) 49%,
+                                          -led-color-two 100%);
+}
+.double-radial-gauge .led-hl {
+    -fx-background-color : radial-gradient(center 15% 15%, radius 50%,
+                                           white 0%,
+                                           transparent 100%);
+    -fx-background-radius: 1024;
+}
+
+
+/******************************************************************************
+ * GAUGE knob                                                                 *
+ *****************************************************************************/
+.double-radial-gauge .knob {
+    -fx-background-color : linear-gradient(to bottom,
+    white 0%,
+    rgb(133, 133, 133) 52%,
+    rgb(84, 84, 84) 100%),
+    linear-gradient(to bottom,
+            rgb(204,204,204) 0%,
+            rgb(133,133,133) 45%,
+            rgb(84,84,84) 100%);
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 0em;
+    -fx-scale-shape      : true;
+    -fx-shape            : "M 0 100 C 0 44.7708 44.7708 0 100 0 C 155.2292 0 200 44.7708 200 100 C 200 155.2292 155.2292 200 100 200 C 44.7708 200 0 155.2292 0 100 Z";
+}
+
+
+/******************************************************************************
+ * GAUGE title, unit, value, interactive-text                                 *
+ *****************************************************************************/
+.double-radial-gauge .title {
+    -fx-fill: ladder(-body, derive(white, -10%) 49%, #333333 50%);
+}
+
+.double-radial-gauge .unit {
+    -fx-fill: ladder(-body, derive(white, -10%) 49%, #333333 50%);
+}
+
+.double-radial-gauge .value {
+    -fx-fill: ladder(-body, derive(white, -10%) 49%, #333333 50%);
+}
+
