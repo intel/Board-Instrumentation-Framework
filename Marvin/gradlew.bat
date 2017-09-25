@@ -9,11 +9,13 @@ set proxy=proxy-chain.intel.com
 set proxyport=911
 set JAVA_OPTS=-Dhttp.proxyHost=%proxy% -Dhttp.proxyPort=%proxyport% -Dhttps.proxyHost=%proxy% -Dhttps.proxyPort=%proxyport%
 
+
 echo *** ENZO ***
-cd Enzo
+cd Dependencies\Enzo
 call gradlew %1
-cd ..
-copy Enzo\Build\libs\Enzo-0.3.6a.jar Dependencies /y 
+cd ..\..
+copy Dependencies\Enzo\Build\libs\Enzo-0.3.6a.jar Dependencies /y 
+
 echo *** Marvin ***
 
 
