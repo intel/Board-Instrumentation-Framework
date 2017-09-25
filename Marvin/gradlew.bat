@@ -5,6 +5,18 @@
 @rem
 @rem ##########################################################################
 
+set proxy=proxy-chain.intel.com
+set proxyport=911
+set JAVA_OPTS=-Dhttp.proxyHost=%proxy% -Dhttp.proxyPort=%proxyport% -Dhttps.proxyHost=%proxy% -Dhttps.proxyPort=%proxyport%
+
+echo *** ENZO ***
+cd Enzo
+call gradlew %1
+cd ..
+copy Enzo\Build\libs\Enzo-0.3.6a.jar Dependencies /y 
+echo *** Marvin ***
+
+
 @rem Set local scope for the variables with windows NT shell
 if "%OS%"=="Windows_NT" setlocal
 
