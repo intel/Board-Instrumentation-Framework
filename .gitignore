@@ -2,8 +2,9 @@
 /Marvin/dist/
 /BIFF_SampleApp/
 /Marvin/build.xml
-/marvin/nbproject
-/marvin/release
+/Marvin/nbproject
+/Marvin/Dependencies/Enzo*
+/Marvin/release
 /*/*/__pycache__/
 /Minion/minion.pyproj
 /Minion/minion.sln
