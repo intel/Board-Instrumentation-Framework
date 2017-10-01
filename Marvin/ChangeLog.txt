@@ -1,3 +1,6 @@
+Release 17.10
+<For> loops now works better, including within dynamic grids.
+
 Release 17.05
 Added format options for Text widget - Numeric, Percent and Money
 

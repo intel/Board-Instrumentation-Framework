@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import kutch.biff.marvin.logger.MarvinLogger;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -174,17 +175,23 @@ public class FrameworkNode
         }
         return strRet;
     }
-    
+
+    boolean hasChildren()
+    {
+        return _node.hasChildNodes();
+    }
+
+    //void appendChild(FrameworkNode)
     public ArrayList<FrameworkNode> getChildNodes()
     {
-        return getChildNodes(false);
+        return getChildNodes(true);
     }
 
     public ArrayList<FrameworkNode> getChildNodes(boolean fHandleFor)
     {
         NodeList children = _node.getChildNodes();
 
-       ArrayList<FrameworkNode> list = new ArrayList<>();
+        ArrayList<FrameworkNode> list = new ArrayList<>();
         for (int iLoop = 0; iLoop < children.getLength(); iLoop++)
         {
             if (children.item(iLoop).getNodeName().equalsIgnoreCase("#Text") || children.item(iLoop).getNodeName().equalsIgnoreCase("#comment"))
@@ -195,10 +202,11 @@ public class FrameworkNode
             {
                 list.addAll(HandleIf(new FrameworkNode(children.item(iLoop))));
             }
-            
+
             // this doesn't work for everything....
-            else if ( fHandleFor && children.item(iLoop).getNodeName().equalsIgnoreCase("For"))
+            else if (fHandleFor && children.item(iLoop).getNodeName().equalsIgnoreCase("For"))
             {
+                //FrameworkNode.dumpTree(_node);
                 ArrayList<FrameworkNode> tList = HandleRepeat(new FrameworkNode(children.item(iLoop)));
                 if (null != tList)
                 {
@@ -206,10 +214,10 @@ public class FrameworkNode
                 }
                 else
                 {
-                   // System.out.println(children.item(iLoop).getNodeName());
+                    // System.out.println(children.item(iLoop).getNodeName());
                 }
             }
-            
+
             else
             {
                 list.add(new FrameworkNode(children.item(iLoop)));
@@ -220,18 +228,18 @@ public class FrameworkNode
 
     public static ArrayList<String> GetDirScanInfo(String strInput)
     {
-        ArrayList<String> retList=new ArrayList<>();
-        if (! strInput.contains("]"))
+        ArrayList<String> retList = new ArrayList<>();
+        if (!strInput.contains("]"))
         {
             LOGGER.severe("Malformed For loop with DirScan: " + strInput);
             return null;
         }
-        String userData = strInput.substring(9,strInput.indexOf(']'));
+        String userData = strInput.substring(9, strInput.indexOf(']'));
         String[] parts = userData.split(":");
-        
+
         File folder = new File(parts[0]);
-        
-        if (! folder.exists())
+
+        if (!folder.exists())
         {
             LOGGER.severe("Invalid For loop with DirScan directory: " + strInput);
             return null;
@@ -242,8 +250,8 @@ public class FrameworkNode
             return null;
         }
         Arrays.sort(listOfFiles);
-        
-        ArrayList<String> extFilter= new ArrayList<>();
+
+        ArrayList<String> extFilter = new ArrayList<>();
         if (parts.length > 1)
         {
             for (int index = 1; index < parts.length; index++)
@@ -251,7 +259,7 @@ public class FrameworkNode
                 extFilter.add(parts[index]);
             }
         }
-        
+
         for (int index = 0; index < listOfFiles.length; index++)
         {
             File fName = listOfFiles[index];
@@ -259,7 +267,7 @@ public class FrameworkNode
             {
                 continue;
             }
-            if (extFilter.size() > 0) 
+            if (extFilter.size() > 0)
             {
                 for (String ext : extFilter)
                 {
@@ -277,12 +285,13 @@ public class FrameworkNode
                 retList.add(fName.getAbsolutePath());
             }
         }
-        
+
         return retList;
     }
-    
+
     private ArrayList<FrameworkNode> HandleRepeat(FrameworkNode repeatNode)
     {
+        //dumpTree(repeatNode.GetNode());
         ArrayList<FrameworkNode> list = new ArrayList<>();
         ArrayList<String> fnames = null;
         int count, start;
@@ -300,9 +309,9 @@ public class FrameworkNode
             LOGGER.severe("Repeat did not have Count attribute.");
             return null;
         }
-        
+
         String strCount = repeatNode.getAttribute("Count");
-        if (strCount.length() > 10 && strCount.substring(0,9).equalsIgnoreCase("[dirscan:"))
+        if (strCount.length() > 10 && strCount.substring(0, 9).equalsIgnoreCase("[dirscan:"))
         {
             fnames = GetDirScanInfo(strCount);
             if (null == fnames)
@@ -311,7 +320,7 @@ public class FrameworkNode
             }
             if (fnames.size() > 1)
             {
-                count = fnames.size() /2;
+                count = fnames.size() / 2;
             }
             else
             {
@@ -334,7 +343,7 @@ public class FrameworkNode
             LOGGER.severe("Fo> Start value invalid: " + repeatNode.getAttribute("startValue"));
             return null;
         }
-        
+
         if (repeatNode.hasAttribute("CurrentCountAlias"))
         {
             strCountAlias = repeatNode.getAttribute("CurrentCountAlias");
@@ -359,11 +368,11 @@ public class FrameworkNode
             // Always have these aliases
             AliasMgr.getAliasMgr().AddAlias("CurrentValueAlias", Integer.toString(iLoop + start));
             AliasMgr.getAliasMgr().AddAlias("CurrentCountAlias", Integer.toString(iLoop));
-            
+
             if (null != fnames)
             {
-                AliasMgr.getAliasMgr().AddAlias("CurrentFileAlias", fnames.get(2*iLoop));
-                AliasMgr.getAliasMgr().AddAlias("CurrentFileWithPathAlias", fnames.get(2*iLoop+1));
+                AliasMgr.getAliasMgr().AddAlias("CurrentFileAlias", fnames.get(2 * iLoop));
+                AliasMgr.getAliasMgr().AddAlias("CurrentFileWithPathAlias", fnames.get(2 * iLoop + 1));
             }
 
             for (FrameworkNode node : repeatNode.getChildNodes())
@@ -372,10 +381,14 @@ public class FrameworkNode
                 {
                     continue;
                 }
-                node = Resolve(node,strCountAlias,strValueAlias);
+
+                //dumpTree(node.GetNode());
+                node = Resolve(node, strCountAlias, strValueAlias);
+                //System.out.println("^^^After of Resolve^^^^^^^");
+                //dumpTree(node.GetNode());
+
                 //System.out.println(node.getTextContent());
                 //System.out.println(node._node.getTextContent());
-                
                 list.add(node);
             }
             AliasMgr.getAliasMgr().PopAliasList();
@@ -459,7 +472,7 @@ public class FrameworkNode
             }
             else
             {
-                LOGGER.severe( child.getNodeName() + " found within If but outside <Then> or <Else>. Ignoring.");
+                LOGGER.severe(child.getNodeName() + " found within If but outside <Then> or <Else>. Ignoring.");
             }
         }
 
@@ -551,7 +564,7 @@ public class FrameworkNode
         {
             return HandleMarvinMath(strData);
         }
-        
+
         int OutterIndex = strData.indexOf("$(");
         int CloseParenIndex = strData.indexOf(")", OutterIndex);
         int NextStart = strData.indexOf("$(", OutterIndex + 1);
@@ -586,7 +599,7 @@ public class FrameworkNode
         }
         return HandleAlias(retString);
     }
-    
+
     // Allow mathematical operations .... I know what am I thinking?
     private String HandleMarvinMath(String strData)
     {
@@ -595,23 +608,23 @@ public class FrameworkNode
         {
             return strData;
         }
-        
+
         int OutterIndex = strData.toLowerCase().indexOf("marvinmath(");
         int CloseParenIndex = strData.indexOf(")", OutterIndex);
         int NextStart = strData.toLowerCase().indexOf("marvinmath(", OutterIndex + 1);
 
-        if (NextStart >= 0 && CloseParenIndex > 0) 
+        if (NextStart >= 0 && CloseParenIndex > 0)
         {
             if (strData.toLowerCase().indexOf("marvinmath(", NextStart + 1) < CloseParenIndex) // have an embedded MarvinMath
             {
                 retString = strData.substring(0, NextStart);
                 String T = strData.substring(NextStart);
-               
+
                 retString += HandleMarvinMath(T);
             }
             else
             {
-                String Alias = strData.substring(OutterIndex +  "MarvinMath(".length(), CloseParenIndex);
+                String Alias = strData.substring(OutterIndex + "MarvinMath(".length(), CloseParenIndex);
                 retString = strData.substring(0, OutterIndex);
                 retString += AliasMgr.getAliasMgr().GetAlias(Alias);
                 retString += strData.substring(CloseParenIndex + 1);
@@ -626,7 +639,7 @@ public class FrameworkNode
                 return strData;
 
             }
-            double val1,val2;
+            double val1, val2;
             try
             {
                 val1 = Double.parseDouble(OperationSet[0]);
@@ -637,7 +650,7 @@ public class FrameworkNode
                 LOGGER.warning("Something looks like a MarvinMath but is not correctly formed: " + strData);
                 return strData;
             }
-            
+
             String Operator = OperationSet[1];
             double NewVal;
             if (Operator.equalsIgnoreCase("Add") || Operator.equalsIgnoreCase("+"))
@@ -657,10 +670,9 @@ public class FrameworkNode
                 LOGGER.warning("Something looks like a MarvinMath but is not correctly formed: " + strData);
                 return "";
             }
-            
-            
+
             retString = strData.substring(0, OutterIndex);
-            retString += Integer.toString((int)NewVal);
+            retString += Integer.toString((int) NewVal);
             retString += strData.substring(CloseParenIndex + 1);
         }
         else
@@ -688,7 +700,7 @@ public class FrameworkNode
             Node child = docChildren.item(iLoop);
             if (child.getNodeName().equalsIgnoreCase("#Text") || child.getNodeName().equalsIgnoreCase("#Comment"))
             {
-                continue;
+                //continue;
             }
             else
             {
@@ -700,19 +712,19 @@ public class FrameworkNode
 
         return retList;
     }
-    
-     public static String replaceString(String source, String target, String replacement)
+
+    public static String replaceString(String source, String target, String replacement)
     {
         StringBuilder sbSourceStr = new StringBuilder(source);
         StringBuilder sbSourceLower = new StringBuilder(source.toLowerCase());
         String searchString = target.toLowerCase();
 
         int index = 0;
-        while((index = sbSourceLower.indexOf(searchString, index)) != -1) // go through the src string and find the str to replace.
+        while ((index = sbSourceLower.indexOf(searchString, index)) != -1) // go through the src string and find the str to replace.
         {
             sbSourceStr.replace(index, index + searchString.length(), replacement);
             sbSourceLower.replace(index, index + searchString.length(), replacement);
-            index+= replacement.length();
+            index += replacement.length();
         }
         sbSourceLower.setLength(0);
         sbSourceLower.trimToSize();
@@ -721,95 +733,116 @@ public class FrameworkNode
         return sbSourceStr.toString();
     }
 
-    private static String ProcessLoopVars(String strInp,String AliasList[])
+    private static String ProcessLoopVars(String strInp, String AliasList[])
     {
         String strRet = strInp;
         if (AliasMgr.getAliasMgr().IsAliased("CurrentFileAlias")) // fugly little hack to implement iterating files in directory
         {
-                strRet = replaceString(strRet,"$(" + "CurrentFileAlias" + ")",AliasMgr.getAliasMgr().GetAlias("CurrentFileAlias"));
+            strRet = replaceString(strRet, "$(" + "CurrentFileAlias" + ")", AliasMgr.getAliasMgr().GetAlias("CurrentFileAlias"));
         }
         if (AliasMgr.getAliasMgr().IsAliased("CurrentFileWithPathAlias")) // fugly little hack to implement iterating files in directory
         {
-                strRet = replaceString(strRet,"$(" + "CurrentFileWithPathAlias" + ")",AliasMgr.getAliasMgr().GetAlias("CurrentFileWithPathAlias"));
+            strRet = replaceString(strRet, "$(" + "CurrentFileWithPathAlias" + ")", AliasMgr.getAliasMgr().GetAlias("CurrentFileWithPathAlias"));
         }
         for (String strCheck : AliasList)
         {
-            if (null != strCheck && strCheck.length()>0)
+            if (null != strCheck && strCheck.length() > 0)
             {
-                strRet = replaceString(strRet,"$(" + strCheck + ")",AliasMgr.getAliasMgr().GetAlias(strCheck));
+                strRet = replaceString(strRet, "$(" + strCheck + ")", AliasMgr.getAliasMgr().GetAlias(strCheck));
             }
         }
         return strRet;
     }
-    
+
     public static String DumpRawAttributes(FrameworkNode node)
     {
-        String strRet="";
-            int numAttrs = node._attributes.getLength();
+        String strRet = "";
+        int numAttrs = node._attributes.getLength();
 
 //            for (int i = 0; i < numAttrs; i++)
 //            {
 //                String attrName = parentNode._attributes.item(i).getNodeName();
 //                System.out.println(attrName + ": " + parentNode._attributes.item(i).getTextContent());
 //            }
-            
-            for (int i = 0; i < numAttrs; i++)
-            {
-                String attrName = node._attributes.item(i).getNodeName();
-                String strOrig = node._attributes.item(i).getTextContent();
-                strRet += attrName +"="+strOrig+" ";
-            }        
-            return strRet;
+        for (int i = 0; i < numAttrs; i++)
+        {
+            String attrName = node._attributes.item(i).getNodeName();
+            String strOrig = node._attributes.item(i).getTextContent();
+            strRet += attrName + "=" + strOrig + " ";
+        }
+        return strRet;
     }
+
     // goes and replaces contents of nodes with alias.
-    public static FrameworkNode Resolve(FrameworkNode origNode,String strCountAlias, String strValueAlias)
+    public static FrameworkNode Resolve(FrameworkNode origNode, String strCountAlias, String strValueAlias)
     {
-        FrameworkNode parentNode = new FrameworkNode(origNode.GetNode().cloneNode(true));
-        String aliasList[] = {"CurrentValueAlias","CurrentCountAlias",strCountAlias,strValueAlias};
+        FrameworkNode parentNode = new FrameworkNode(origNode.GetNode().cloneNode(true)); // dup node to manipulate
+        
+        String aliasList[] =
+        {
+            "CurrentValueAlias", "CurrentCountAlias", strCountAlias, strValueAlias
+        };
 
         if (parentNode.hasAttributes())
         {
-            
             int numAttrs = parentNode._attributes.getLength();
 
-//            for (int i = 0; i < numAttrs; i++)
-//            {
-//                String attrName = parentNode._attributes.item(i).getNodeName();
-//                System.out.println(attrName + ": " + parentNode._attributes.item(i).getTextContent());
-//            }
-            
             for (int i = 0; i < numAttrs; i++)
             {
-                String attrName = parentNode._attributes.item(i).getNodeName();
                 String strOrig = parentNode._attributes.item(i).getTextContent();
-                String strResolvedVal = ProcessLoopVars(strOrig,aliasList);
+                String strResolvedVal = ProcessLoopVars(strOrig, aliasList);
                 parentNode._attributes.item(i).setNodeValue(strResolvedVal);
             }
-//            for (int i = 0; i < numAttrs; i++)
-//            {
-//                String attrName = parentNode._attributes.item(i).getNodeName();
-//                System.out.println(attrName + ": " + parentNode._attributes.item(i).getTextContent());
-//            }
         }
-        for (FrameworkNode child : parentNode.getChildNodes())
+        // Add current count alias as an attribute = should then be available to grids and things withing a loop
+        if (!parentNode.hasAttribute("CurrentValueAlias"))
         {
-            child._node.setTextContent(ProcessLoopVars(child._node.getTextContent(),aliasList));
-            
+            ((Element) parentNode.GetNode()).setAttribute("CurrentValueAlias", AliasMgr.getAliasMgr().GetAlias("CurrentValueAlias"));                    
         }
-       // System.out.println(parentNode._node.getTextContent());
-        parentNode._node.setTextContent(ProcessLoopVars(parentNode._node.getTextContent(),aliasList));
-        //System.out.println(parentNode._node.getTextContent());
+        if (!parentNode.hasAttribute("CurrentCountAlias"))
+        {
+            ((Element) parentNode.GetNode()).setAttribute("CurrentCountAlias", AliasMgr.getAliasMgr().GetAlias("CurrentCountAlias"));                    
+        }
+
+        if (parentNode.hasChildren())
+        {
+            List<Node> nodeChildrenList = new ArrayList<>();
+            for (FrameworkNode childNode : parentNode.getChildNodes())
+            {
+                FrameworkNode newChild = Resolve(childNode, strCountAlias, strValueAlias);
+                nodeChildrenList.add(newChild.GetNode());
+            }
+        
+            String newContent = ProcessLoopVars(parentNode.getTextContent(),aliasList);
+        
+            parentNode.removeAllChildren();
+            parentNode._node.setTextContent(newContent);
+            
+            for (Node childNode : nodeChildrenList)
+            {
+                parentNode.GetNode().appendChild(childNode);
+            }
+        }
         
         return parentNode;
     }
-    
+
+    public void removeAllChildren()
+    {
+        while (_node.hasChildNodes())
+        {
+            _node.removeChild(_node.getFirstChild());
+        }
+    }
+
+    @Override
     public String toString()
     {
         String strRet;
-        
-        strRet = "Name: "+ getNodeName() +"\n";
+
+        strRet = "Name: " + getNodeName() + "\n";
         strRet += "Attributes: ";
-        
+
         if (!hasAttributes())
         {
             strRet += "None\r";
@@ -817,10 +850,54 @@ public class FrameworkNode
         else
         {
             strRet += " Raw: " + DumpRawAttributes(this);
-            strRet +="\r";
+            strRet += "\r";
         }
         strRet += DumpChildren();
-        strRet +="\r";
+        strRet += "\r";
         return strRet;
     }
+
+    public static void dumpTree(FrameworkNode doc)
+    {
+        dumpTree(doc.GetNode(),"");
+    }
+
+    public static void dumpTree(Node doc)
+    {
+        dumpTree(doc, "");
+    }
+
+    public static void dumpTree(Node doc, String parent)
+    {
+        try
+        {
+            System.out.println(parent + "<" + doc.getNodeName() + ">  " + doc.getTextContent());
+
+            NamedNodeMap cl = doc.getAttributes();
+            for (int i = 0; i < cl.getLength(); i++)
+            {
+                Node node = cl.item(i);
+                System.out.println(
+                        "\t" + node.getNodeName() + " ->" + node.getNodeValue());
+            }
+            NodeList nl = doc.getChildNodes();
+            for (int i = 0; i < nl.getLength(); i++)
+            {
+                Node node = nl.item(i);
+                if (node.getNodeName().equalsIgnoreCase("#Text"))
+                {
+
+                }
+                else
+                {
+                    dumpTree(node, parent + "<" + doc.getNodeName() + ">");
+                }
+            }
+        }
+        catch (Throwable e)
+        {
+            System.out.println("Cannot print!! " + e.getMessage());
+        }
+    }
+
 }
