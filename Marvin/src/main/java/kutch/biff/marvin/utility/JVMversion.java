@@ -30,6 +30,19 @@ public class JVMversion
     public static boolean meetsMinimumVersion()
     {
         String version = System.getProperty("java.version");
+        try
+        {
+            Integer.parseInt(String.valueOf(version.charAt(2)));
+        }
+        catch (Exception ex)
+        {
+            if (Integer.parseInt(version)> 8)
+            {
+                System.out.println("********** JAVA 9 Not yet supported");
+                return false;
+            }
+        }
+        
         int sys_major_version = Integer.parseInt(String.valueOf(version.charAt(2)));
 
         if (sys_major_version < MINIMUM_MAJOR_VERSION)

@@ -52,13 +52,20 @@ public class Utility
                 {
                     if (0 == ValidAttributes[iLoop].compareToIgnoreCase(attribute.getName()) ) // 1st check case independent just for fun
                     {
-                            found = true;
+                        found = true;
                         break;
                     }
                 }
-                if (false == found)
+                if (false == found )
                 {
-                    LOGGER.warning("Unknown XML Attribute for " + node.getNodeName() +" found: " + attribute.getName() + ". Ignoring.");
+                    if (attribute.getName().equalsIgnoreCase("CurrentValueAlias") || attribute.getName().equalsIgnoreCase("CurrentCountAlias"))
+                    {
+                        
+                    }
+                    else
+                    {
+                        LOGGER.warning("Unknown XML Attribute for " + node.getNodeName() +" found: " + attribute.getName() + ". Ignoring.");
+                    }
                 }
             }
         }
