@@ -38,13 +38,17 @@ public class JVMversion
         {
             if (Integer.parseInt(version)> 8)
             {
-                System.out.println("********** JAVA 9 Not yet supported");
-                return false;
+                System.out.println("********** Java 9 is not supported.  Changes made in Java 9 make it incompatible.  Please use Java 8.");
             }
+            return false;
         }
         
         int sys_major_version = Integer.parseInt(String.valueOf(version.charAt(2)));
 
+        if (sys_major_version > MINIMUM_MAJOR_VERSION)
+        {
+            System.out.println("********** Java 9 is not supported.  Changes made in Java 9 make it incompatible.  Please use Java 8.");
+        }
         if (sys_major_version < MINIMUM_MAJOR_VERSION)
         {
             return false;
