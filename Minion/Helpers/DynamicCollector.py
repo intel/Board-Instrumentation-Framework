@@ -202,7 +202,7 @@ class DynamicCollector(Collector.Collector):
             retVal = "HelenKeller"
         return retVal
 
-    def __createCollector(self,ID):
+    def __createCollector(self,ID,fromPlugin=False):
         objCollector = Collector.Collector(self._NamespaceObject,ID,self._InGroup)
         objCollector._OnDemand = self._OnDemand
         objCollector._PollingInterval = self._PollingInterval
@@ -217,13 +217,12 @@ class DynamicCollector(Collector.Collector):
         objCollector.SetLastCollectionTime = objCollector.SetLastCollectionTimeForDynamicWidget
         objCollector.SetProcessThreadID(self.GetProcessThreadID())
 
+        if True == fromPlugin: # bit of a hack, only need this if from a plugin
+            if len(self.__PrefixStr) > 0:
+                objCollector._OverrideID = self.__PrefixStr + ID
 
-        ## Don't need these lines anymore, changed to make the ID include prefix and postfix
-        #if len(self.__PrefixStr) > 0:
-         #   objCollector._OverrideID = self.__PrefixStr + ID
-
-        #if len(self.__SuffixStr) > 0:
-        #    objCollector._OverrideID = ID + self.__SuffixStr
+            if len(self.__SuffixStr) > 0:
+                objCollector._OverrideID = ID + self.__SuffixStr
 
         if float(self.ScaleValue) != 1.0:
             objCollector.SetScaleValue(self.ScaleValue)
@@ -316,7 +315,7 @@ class DynamicCollector(Collector.Collector):
             Log.getLogger().error("User defined DynamicCollector tried to Add a collector with ID that already exists: " + collectorID)
             return False
         
-        objCollector = self.__createCollector(collectorID)
+        objCollector = self.__createCollector(collectorID,True)
 
         if objCollector == None:
             Log.getLogger().error("Error creating collector using User defined DynamicCollector ID: " + collectorID)

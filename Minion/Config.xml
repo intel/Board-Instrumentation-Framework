@@ -42,6 +42,18 @@
             <SplitToken>: </SplitToken>
         </DynamicCollector>
 
+        <DynamicCollector Frequency="500" Prefix="test1">
+            <Plugin>
+                <PythonFile>Collectors\wlSimCollector.py</PythonFile>
+                <EntryPoint SpawnThread="True">CollectFunction</EntryPoint>
+                <Param>127.0.0.1</Param>
+                <Param>3456</Param>
+                <Param>200</Param>
+            </Plugin>
+        </DynamicCollector>
+
+
+
         <!--        
         <DynamicCollector SendOnlyOnChange="true" Prefix="bob">
 			<Plugin>
