@@ -217,11 +217,13 @@ class DynamicCollector(Collector.Collector):
         objCollector.SetLastCollectionTime = objCollector.SetLastCollectionTimeForDynamicWidget
         objCollector.SetProcessThreadID(self.GetProcessThreadID())
 
-        if len(self.__PrefixStr) > 0:
-            objCollector._OverrideID = self.__PrefixStr + ID
 
-        if len(self.__SuffixStr) > 0:
-            objCollector._OverrideID = ID + self.__SuffixStr
+        ## Don't need these lines anymore, changed to make the ID include prefix and postfix
+        #if len(self.__PrefixStr) > 0:
+         #   objCollector._OverrideID = self.__PrefixStr + ID
+
+        #if len(self.__SuffixStr) > 0:
+        #    objCollector._OverrideID = ID + self.__SuffixStr
 
         if float(self.ScaleValue) != 1.0:
             objCollector.SetScaleValue(self.ScaleValue)
