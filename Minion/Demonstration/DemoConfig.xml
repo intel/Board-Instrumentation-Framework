@@ -368,14 +368,6 @@
                 <Input DefaultValue="2">Val$(val)</Input>
             </Repeat>
         </Collector>
-        <Collector ID="ALLCores" >
-            <Operator>MakeList</Operator>
-            <Input>cpu0</Input>
-            <Input>cpu1</Input>
-            		<Repeat Count="$(CoreCount)" CurrentValueAlias="val">
-				<Input>cpu$(val)</Input>
-			</Repeat> -->
-        </Collector>
 
     </Namespace>
 </Minion>

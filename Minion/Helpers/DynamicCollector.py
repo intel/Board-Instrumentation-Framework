@@ -173,10 +173,11 @@ class DynamicCollector(Collector.Collector):
                         break
 
                 if len(dataPoint) > 1: # filter out empties
-                    ID = dataPoint[0] + self.__SuffixStr
+                    ID = dataPoint[0]
                     Value = dataPoint[1]
                     ID = ID.strip()
                     Value = Value.strip()
+                    ID = self.__PrefixStr + ID + self.__SuffixStr
                     objCollector = self._NamespaceObject.GetCollector(ID)
 
                     if None == objCollector:

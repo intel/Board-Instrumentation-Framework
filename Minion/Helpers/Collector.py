@@ -109,7 +109,7 @@ class Collector:
         return self._OverrideID
 
     def GetID(self):
-        return self._MinionID
+        return self._MinionID 
 
     def SetScaleValue(self,newVal):
         try:
