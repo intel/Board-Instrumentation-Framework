@@ -87,7 +87,7 @@ public class AboutBox
         Label With = new Label("with Brian Johnson");
        
         Label Where = new Label("https://github.com/PatrickKutch");
-        Label strJVM = new Label(System.getProperty("java.version"));
+        
         Label DataCount = new Label("Datapoints: " + Integer.toString(DataManager.getDataManager().NumberOfRegisteredDatapoints()));
 
         Author.setAlignment(Pos.CENTER);
@@ -167,20 +167,11 @@ public class AboutBox
         int appHeight = (int) visualBounds.getHeight();
 
         String rtv = System.getProperty("java.runtime.version");
-        String[] javaVersionElements;
         if (null == rtv)
         {
             rtv = "1.1.0_11-b32"; // bogus one - should NEVER happen
         }
         
-        javaVersionElements = rtv.split("\\.|_|-b");
-
-        String discard = javaVersionElements[0];
-        String major = javaVersionElements[1];
-        String minor = javaVersionElements[2];
-        String update = javaVersionElements[3];
-//String build   = javaVersionElements[4];        
-
         lblTabCount = new Label("Number of Tabs: " + Integer.toString(CONFIG.getTabs().size()));
         String scalingString = "Scaling: ";
         if (CONFIG.getConfiguration().isAutoScale())

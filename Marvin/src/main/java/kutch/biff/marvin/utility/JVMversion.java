@@ -30,25 +30,23 @@ public class JVMversion
     public static boolean meetsMinimumVersion()
     {
         String version = System.getProperty("java.version");
+        
+        if (version.charAt(0) == '9' ) // tweak to support java 9 - format of version string changed between 8 and 9
+        {
+            return true;
+        }
         try
         {
             Integer.parseInt(String.valueOf(version.charAt(2)));
         }
         catch (Exception ex)
         {
-            if (Integer.parseInt(version)> 8)
-            {
-                System.out.println("********** Java 9 is not supported.  Changes made in Java 9 make it incompatible.  Please use Java 8.");
-            }
+            System.out.println("********** Unknown version of Java: " + version);
             return false;
         }
         
         int sys_major_version = Integer.parseInt(String.valueOf(version.charAt(2)));
 
-        if (sys_major_version > MINIMUM_MAJOR_VERSION)
-        {
-            System.out.println("********** Java 9 is not supported.  Changes made in Java 9 make it incompatible.  Please use Java 8.");
-        }
         if (sys_major_version < MINIMUM_MAJOR_VERSION)
         {
             return false;
