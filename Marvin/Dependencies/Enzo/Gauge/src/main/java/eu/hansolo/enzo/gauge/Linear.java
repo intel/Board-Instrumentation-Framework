@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.gauge;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.gauge.skin.LinearSkin;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.*;
@@ -380,7 +379,7 @@ public class Linear extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<Linear, Paint> TICK_MARK_FILL =
-                new CssMetaData<Linear, Paint>("-tick-mark-fill", PaintConverter.getInstance(), Color.BLACK) {
+                new CssMetaData<Linear, Paint>("-tick-mark-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
 
                     @Override public boolean isSettable(Linear gauge) {
                         return null == gauge.tickMarkFill || !gauge.tickMarkFill.isBound();
@@ -392,7 +391,7 @@ public class Linear extends Control {
                 };
 
         private static final CssMetaData<Linear, Paint> TICK_LABEL_FILL =
-                new CssMetaData<Linear, Paint>("-tick-label-fill", PaintConverter.getInstance(), Color.BLACK) {
+                new CssMetaData<Linear, Paint>("-tick-label-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
 
                     @Override public boolean isSettable(Linear gauge) {
                         return null == gauge.tickLabelFill || !gauge.tickLabelFill.isBound();

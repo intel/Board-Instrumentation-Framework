@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.onoffswitch;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.onoffswitch.skin.OnOffSwitchSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
@@ -24,6 +23,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -214,7 +214,7 @@ public class OnOffSwitch extends Control implements Toggle {
 
     private static class StyleableProperties {
         private static final CssMetaData<OnOffSwitch, Paint> SWITCH_COLOR =
-            new CssMetaData<OnOffSwitch, Paint>("-switch-color", PaintConverter.getInstance(), DEFAULT_SWITCH_COLOR) {
+            new CssMetaData<OnOffSwitch, Paint>("-switch-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SWITCH_COLOR) {
                 @Override public boolean isSettable(OnOffSwitch onOffSwitch) {
                     return null == onOffSwitch.switchColor || !onOffSwitch.switchColor.isBound();
                 }
@@ -229,7 +229,7 @@ public class OnOffSwitch extends Control implements Toggle {
             };
 
         private static final CssMetaData<OnOffSwitch, Paint> TEXT_COLOR_ON =
-            new CssMetaData<OnOffSwitch, Paint>("-text-color-on", PaintConverter.getInstance(), DEFAULT_TEXT_COLOR_ON) {
+            new CssMetaData<OnOffSwitch, Paint>("-text-color-on", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_TEXT_COLOR_ON) {
                 @Override public boolean isSettable(OnOffSwitch onOffSwitch) {
                     return null == onOffSwitch.textColorOn || !onOffSwitch.textColorOn.isBound();
                 }
@@ -244,7 +244,7 @@ public class OnOffSwitch extends Control implements Toggle {
             };
 
         private static final CssMetaData<OnOffSwitch, Paint> TEXT_COLOR_OFF =
-            new CssMetaData<OnOffSwitch, Paint>("-text-color-off", PaintConverter.getInstance(), DEFAULT_TEXT_COLOR_OFF) {
+            new CssMetaData<OnOffSwitch, Paint>("-text-color-off", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_TEXT_COLOR_OFF) {
                 @Override public boolean isSettable(OnOffSwitch onOffSwitch) {
                     return null == onOffSwitch.textColorOff || !onOffSwitch.textColorOff.isBound();
                 }
@@ -259,7 +259,7 @@ public class OnOffSwitch extends Control implements Toggle {
             };
 
         private static final CssMetaData<OnOffSwitch, Paint> THUMB_COLOR =
-            new CssMetaData<OnOffSwitch, Paint>("-thumb-color", PaintConverter.getInstance(), DEFAULT_THUMB_COLOR) {
+            new CssMetaData<OnOffSwitch, Paint>("-thumb-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_THUMB_COLOR) {
                 @Override public boolean isSettable(OnOffSwitch onOffSwitch) {
                     return null == onOffSwitch.thumbColor || !onOffSwitch.thumbColor.isBound();
                 }

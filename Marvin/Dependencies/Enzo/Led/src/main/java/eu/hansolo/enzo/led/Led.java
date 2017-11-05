@@ -16,8 +16,6 @@
 
 package eu.hansolo.enzo.led;
 
-import com.sun.javafx.css.converters.EnumConverter;
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.led.skin.LedSkin;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -29,6 +27,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -96,7 +95,7 @@ public class Led extends Control {
 
     // ******************** Constructors **************************************
     public Led() {
-        getStyleClass().add("led");    
+        getStyleClass().add("led");
     }
 
 
@@ -258,7 +257,7 @@ public class Led extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<Led, Paint> LED_COLOR =
-            new CssMetaData<Led, Paint>("-led-color", PaintConverter.getInstance(), DEFAULT_LED_COLOR) {
+            new CssMetaData<Led, Paint>("-led-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_LED_COLOR) {
 
                 @Override public boolean isSettable(Led led) {
                     return null == led.ledColor || !led.ledColor.isBound();
@@ -273,22 +272,15 @@ public class Led extends Control {
                 }
             };
 
-        private static final CssMetaData<Led, LedType> LED_TYPE =
-            new CssMetaData<Led, LedType>("-led-type", new EnumConverter<>(LedType.class)) {
-
-                @Override public boolean isSettable(Led led) {
-                    return null == led.ledType || !led.ledType.isBound();
-                }
-
-                @Override public StyleableProperty<LedType> getStyleableProperty(Led led) {
-                    return (StyleableProperty) led.ledTypeProperty();
-                }
-
-                @Override public LedType getInitialValue(Led led) {
-                    return led.getLedType();
-                }
-            };
-
+        private static final CssMetaData<Led, LedType> LED_TYPE = new CssMetaData<Led, LedType>("-led-type", (StyleConverter<?,LedType>) StyleConverter.getEnumConverter(LedType.class)) {
+            @Override public boolean isSettable(final Led led) {
+                return null == led.ledType || !led.ledType.isBound();
+            }
+            @Override public StyleableProperty<LedType> getStyleableProperty(final Led led) {
+                return (StyleableProperty) led.ledTypeProperty();
+            }
+            @Override public LedType getInitialValue(final Led led) { return led.getLedType(); }
+        };
 
         private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
         static {

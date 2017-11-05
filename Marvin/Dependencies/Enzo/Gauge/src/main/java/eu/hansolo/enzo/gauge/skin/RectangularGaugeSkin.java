@@ -313,6 +313,7 @@ public class RectangularGaugeSkin extends SkinBase<RectangularGauge> implements 
         double  tmpMinValue  = smallRange ? getSkinnable().getMinValue() * 10 : getSkinnable().getMinValue();
         double  tmpMaxValue  = smallRange ? getSkinnable().getMaxValue() * 10 : getSkinnable().getMaxValue();
         double  tmpAngleStep = smallRange ? angleStep / 10 : angleStep;
+
         for (double angle = 0, counter = tmpMinValue ; Double.compare(counter, tmpMaxValue) <= 0 ; angle -= tmpAngleStep, counter++) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));

@@ -16,8 +16,6 @@
 
 package eu.hansolo.enzo.charts;
 
-import com.sun.javafx.css.converters.ColorConverter;
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.charts.skin.SimpleRadarChartSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -33,6 +31,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -401,7 +400,7 @@ public class SimpleRadarChart extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<SimpleRadarChart, Color> CHART_BACKGROUND =
-            new CssMetaData<SimpleRadarChart, Color>("-chart-background", ColorConverter.getInstance(), DEFAULT_CHART_BACKGROUND) {
+            new CssMetaData<SimpleRadarChart, Color>("-chart-background", (StyleConverter<?, Color>) StyleConverter.getColorConverter(), DEFAULT_CHART_BACKGROUND) {
 
                 @Override public boolean isSettable(SimpleRadarChart chart) {
                     return null == chart.chartBackground || !chart.chartBackground.isBound();
@@ -417,7 +416,7 @@ public class SimpleRadarChart extends Control {
             };
 
         private static final CssMetaData<SimpleRadarChart, Color> CHART_FOREGROUND =
-            new CssMetaData<SimpleRadarChart, Color>("-chart-foreground", ColorConverter.getInstance(), DEFAULT_CHART_FOREGROUND) {
+            new CssMetaData<SimpleRadarChart, Color>("-chart-foreground", (StyleConverter<?,Color>) StyleConverter.getColorConverter(), DEFAULT_CHART_FOREGROUND) {
 
                 @Override public boolean isSettable(SimpleRadarChart chart) {
                     return null == chart.chartForeground || !chart.chartForeground.isBound();
@@ -433,7 +432,7 @@ public class SimpleRadarChart extends Control {
             };
 
         private static final CssMetaData<SimpleRadarChart, Color> CHART_TEXT =
-            new CssMetaData<SimpleRadarChart, Color>("-chart-text", ColorConverter.getInstance(), DEFAULT_CHART_TEXT) {
+            new CssMetaData<SimpleRadarChart, Color>("-chart-text", (StyleConverter<?, Color>) StyleConverter.getColorConverter(), DEFAULT_CHART_TEXT) {
 
                 @Override public boolean isSettable(SimpleRadarChart chart) {
                     return null == chart.chartText || !chart.chartText.isBound();
@@ -449,7 +448,7 @@ public class SimpleRadarChart extends Control {
             };
 
         private static final CssMetaData<SimpleRadarChart, Paint> CHART_FILL =
-            new CssMetaData<SimpleRadarChart, Paint>("-chart-fill", PaintConverter.getInstance(), DEFAULT_CHART_FILL) {
+            new CssMetaData<SimpleRadarChart, Paint>("-chart-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_CHART_FILL) {
 
                 @Override public boolean isSettable(SimpleRadarChart chart) {
                     return null == chart.chartFill || !chart.chartFill.isBound();
@@ -464,7 +463,7 @@ public class SimpleRadarChart extends Control {
                 }
             };
 
-        private static final CssMetaData<SimpleRadarChart, Color> CHART_STROKE = new CssMetaData<SimpleRadarChart, Color>("-chart-stroke", ColorConverter.getInstance(), DEFAULT_CHART_STROKE) {
+        private static final CssMetaData<SimpleRadarChart, Color> CHART_STROKE = new CssMetaData<SimpleRadarChart, Color>("-chart-stroke", (StyleConverter<?, Color>) StyleConverter.getColorConverter(), DEFAULT_CHART_STROKE) {
             @Override public boolean isSettable(SimpleRadarChart chart) {
                 return null == chart.chartStroke || chart.chartStroke.isBound();
             }
@@ -479,7 +478,7 @@ public class SimpleRadarChart extends Control {
         };
 
         private static final CssMetaData<SimpleRadarChart, Color> ZERO_LINE_COLOR =
-            new CssMetaData<SimpleRadarChart, Color>("-zero-line-color", ColorConverter.getInstance(), DEFAULT_ZERO_LINE_COLOR) {
+            new CssMetaData<SimpleRadarChart, Color>("-zero-line-color", (StyleConverter<?, Color>) StyleConverter.getColorConverter(), DEFAULT_ZERO_LINE_COLOR) {
 
                 @Override public boolean isSettable(SimpleRadarChart chart) {
                     return null == chart.zeroLineColor || !chart.zeroLineColor.isBound();

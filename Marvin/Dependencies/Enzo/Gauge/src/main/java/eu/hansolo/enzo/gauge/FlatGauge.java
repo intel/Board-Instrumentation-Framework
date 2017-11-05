@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.gauge;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.common.GradientLookup;
 import eu.hansolo.enzo.fonts.Fonts;
 import eu.hansolo.enzo.gauge.skin.FlatGaugeSkin;
@@ -26,6 +25,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.property.*;
 import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -411,7 +411,7 @@ public class FlatGauge extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<FlatGauge, Paint> BAR_COLOR =
-            new CssMetaData<FlatGauge, Paint>("-bar-color", PaintConverter.getInstance(), DEFAULT_BAR_COLOR) {
+            new CssMetaData<FlatGauge, Paint>("-bar-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_BAR_COLOR) {
                 @Override public boolean isSettable(FlatGauge node) {
                     return null == node.barColor || !node.barColor.isBound();
                 }
@@ -422,7 +422,7 @@ public class FlatGauge extends Control {
             };
 
         private static final CssMetaData<FlatGauge, Paint> BACKGROUND_COLOR =
-            new CssMetaData<FlatGauge, Paint>("-background-color", PaintConverter.getInstance(), DEFAULT_BACKGROUND_COLOR) {
+            new CssMetaData<FlatGauge, Paint>("-background-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_BACKGROUND_COLOR) {
                 @Override public boolean isSettable(FlatGauge node) {
                     return null == node.backgroundColor || !node.backgroundColor.isBound();
                 }
@@ -433,7 +433,7 @@ public class FlatGauge extends Control {
             };
 
         private static final CssMetaData<FlatGauge, Paint> TITLE_TEXT_COLOR =
-            new CssMetaData<FlatGauge, Paint>("-title-text-color", PaintConverter.getInstance(), DEFAULT_TITLE_TEXT_COLOR) {
+            new CssMetaData<FlatGauge, Paint>("-title-text-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_TITLE_TEXT_COLOR) {
                 @Override public boolean isSettable(FlatGauge node) {
                     return null == node.titleTextColor || !node.titleTextColor.isBound();
                 }
@@ -444,7 +444,7 @@ public class FlatGauge extends Control {
             };
 
         private static final CssMetaData<FlatGauge, Paint> VALUE_TEXT_COLOR =
-            new CssMetaData<FlatGauge, Paint>("-value-text-color", PaintConverter.getInstance(), DEFAULT_VALUE_TEXT_COLOR) {
+            new CssMetaData<FlatGauge, Paint>("-value-text-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_VALUE_TEXT_COLOR) {
                 @Override public boolean isSettable(FlatGauge node) {
                     return null == node.valueTextColor || !node.valueTextColor.isBound();
                 }
@@ -455,7 +455,7 @@ public class FlatGauge extends Control {
             };
 
         private static final CssMetaData<FlatGauge, Paint> UNIT_TEXT_COLOR =
-            new CssMetaData<FlatGauge, Paint>("-unit-text-color", PaintConverter.getInstance(), DEFAULT_UNIT_TEXT_COLOR) {
+            new CssMetaData<FlatGauge, Paint>("-unit-text-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_UNIT_TEXT_COLOR) {
                 @Override public boolean isSettable(FlatGauge node) {
                     return null == node.unitTextColor || !node.unitTextColor.isBound();
                 }
@@ -466,7 +466,7 @@ public class FlatGauge extends Control {
             };
 
         private static final CssMetaData<FlatGauge, Paint> SEPARATOR_COLOR =
-            new CssMetaData<FlatGauge, Paint>("-separator-color", PaintConverter.getInstance(), DEFAULT_SEPARATOR_COLOR) {
+            new CssMetaData<FlatGauge, Paint>("-separator-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SEPARATOR_COLOR) {
                 @Override public boolean isSettable(FlatGauge node) {
                     return null == node.separatorColor || !node.separatorColor.isBound();
                 }

@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.gauge;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.common.Marker;
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.gauge.skin.RadialBargraphSkin;
@@ -41,6 +40,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -1193,7 +1193,7 @@ public class RadialBargraph extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<RadialBargraph, Paint> TICK_MARK_FILL =
-            new CssMetaData<RadialBargraph, Paint>("-tick-mark-fill", PaintConverter.getInstance(), Color.BLACK) {
+            new CssMetaData<RadialBargraph, Paint>("-tick-mark-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.tickMarkFill || !radialBargraph.tickMarkFill.isBound();
@@ -1205,7 +1205,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> SECTION_FILL_0 =
-            new CssMetaData<RadialBargraph, Paint>("-section-fill-0", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_0) {
+            new CssMetaData<RadialBargraph, Paint>("-section-fill-0", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_0) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.sectionFill0 || !radialBargraph.sectionFill0.isBound();
@@ -1221,7 +1221,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> SECTION_FILL_1 =
-            new CssMetaData<RadialBargraph, Paint>("-section-fill-1", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_1) {
+            new CssMetaData<RadialBargraph, Paint>("-section-fill-1", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_1) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.sectionFill1 || !radialBargraph.sectionFill1.isBound();
@@ -1237,7 +1237,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> SECTION_FILL_2 =
-            new CssMetaData<RadialBargraph, Paint>("-section-fill-2", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_2) {
+            new CssMetaData<RadialBargraph, Paint>("-section-fill-2", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_2) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.sectionFill2 || !radialBargraph.sectionFill2.isBound();
@@ -1253,7 +1253,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> SECTION_FILL_3 =
-            new CssMetaData<RadialBargraph, Paint>("-section-fill-3", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_3) {
+            new CssMetaData<RadialBargraph, Paint>("-section-fill-3", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_3) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.sectionFill3 || !radialBargraph.sectionFill3.isBound();
@@ -1269,7 +1269,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> SECTION_FILL_4 =
-            new CssMetaData<RadialBargraph, Paint>("-section-fill-4", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_4) {
+            new CssMetaData<RadialBargraph, Paint>("-section-fill-4", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_4) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.sectionFill4 || !radialBargraph.sectionFill4.isBound();
@@ -1285,7 +1285,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> SECTION_FILL_5 =
-            new CssMetaData<RadialBargraph, Paint>("-section-fill-5", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_5) {
+            new CssMetaData<RadialBargraph, Paint>("-section-fill-5", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_5) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.sectionFill5 || !radialBargraph.sectionFill5.isBound();
@@ -1301,7 +1301,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> SECTION_FILL_6 =
-            new CssMetaData<RadialBargraph, Paint>("-section-fill-6", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_6) {
+            new CssMetaData<RadialBargraph, Paint>("-section-fill-6", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_6) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.sectionFill6 || !radialBargraph.sectionFill6.isBound();
@@ -1317,7 +1317,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> SECTION_FILL_7 =
-            new CssMetaData<RadialBargraph, Paint>("-section-fill-7", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_7) {
+            new CssMetaData<RadialBargraph, Paint>("-section-fill-7", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_7) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.sectionFill7 || !radialBargraph.sectionFill7.isBound();
@@ -1333,7 +1333,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> SECTION_FILL_8 =
-            new CssMetaData<RadialBargraph, Paint>("-section-fill-8", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_8) {
+            new CssMetaData<RadialBargraph, Paint>("-section-fill-8", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_8) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.sectionFill8 || !radialBargraph.sectionFill8.isBound();
@@ -1349,7 +1349,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> SECTION_FILL_9 =
-            new CssMetaData<RadialBargraph, Paint>("-section-fill-9", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_9) {
+            new CssMetaData<RadialBargraph, Paint>("-section-fill-9", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_9) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.sectionFill9 || !radialBargraph.sectionFill9.isBound();
@@ -1365,7 +1365,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> MARKER_FILL_0 =
-            new CssMetaData<RadialBargraph, Paint>("-marker-fill-0", PaintConverter.getInstance(), DEFAULT_MARKER_FILL_0) {
+            new CssMetaData<RadialBargraph, Paint>("-marker-fill-0", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_MARKER_FILL_0) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.markerFill0 || !radialBargraph.markerFill0.isBound();
@@ -1381,7 +1381,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> MARKER_FILL_1 =
-            new CssMetaData<RadialBargraph, Paint>("-marker-fill-1", PaintConverter.getInstance(), DEFAULT_MARKER_FILL_1) {
+            new CssMetaData<RadialBargraph, Paint>("-marker-fill-1", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_MARKER_FILL_1) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.markerFill1 || !radialBargraph.markerFill1.isBound();
@@ -1397,7 +1397,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> MARKER_FILL_2 =
-            new CssMetaData<RadialBargraph, Paint>("-marker-fill-2", PaintConverter.getInstance(), DEFAULT_MARKER_FILL_2) {
+            new CssMetaData<RadialBargraph, Paint>("-marker-fill-2", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_MARKER_FILL_2) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.markerFill2 || !radialBargraph.markerFill2.isBound();
@@ -1413,7 +1413,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> MARKER_FILL_3 =
-            new CssMetaData<RadialBargraph, Paint>("-marker-fill-3", PaintConverter.getInstance(), DEFAULT_MARKER_FILL_3) {
+            new CssMetaData<RadialBargraph, Paint>("-marker-fill-3", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_MARKER_FILL_3) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.markerFill3 || !radialBargraph.markerFill3.isBound();
@@ -1429,7 +1429,7 @@ public class RadialBargraph extends Control {
             };
 
         private static final CssMetaData<RadialBargraph, Paint> MARKER_FILL_4 =
-            new CssMetaData<RadialBargraph, Paint>("-marker-fill-4", PaintConverter.getInstance(), DEFAULT_MARKER_FILL_4) {
+            new CssMetaData<RadialBargraph, Paint>("-marker-fill-4", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_MARKER_FILL_4) {
 
                 @Override public boolean isSettable(RadialBargraph radialBargraph) {
                     return null == radialBargraph.markerFill4 || !radialBargraph.markerFill4.isBound();

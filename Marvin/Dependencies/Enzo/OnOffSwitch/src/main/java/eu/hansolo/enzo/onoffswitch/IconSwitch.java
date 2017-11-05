@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.onoffswitch;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.common.Symbol;
 import eu.hansolo.enzo.common.SymbolType;
 import eu.hansolo.enzo.onoffswitch.skin.IconSwitchSkin;
@@ -28,6 +27,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -224,7 +224,7 @@ public class IconSwitch extends Control implements Toggle {
 
     private static class StyleableProperties {
         private static final CssMetaData<IconSwitch, Paint> SWITCH_COLOR =
-            new CssMetaData<IconSwitch, Paint>("-switch-color", PaintConverter.getInstance(), DEFAULT_SWITCH_COLOR) {
+            new CssMetaData<IconSwitch, Paint>("-switch-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SWITCH_COLOR) {
                 @Override public boolean isSettable(IconSwitch iconSwitch) {
                     return null == iconSwitch.switchColor || !iconSwitch.switchColor.isBound();
                 }
@@ -239,7 +239,7 @@ public class IconSwitch extends Control implements Toggle {
             };
 
         private static final CssMetaData<IconSwitch, Paint> THUMB_COLOR =
-            new CssMetaData<IconSwitch, Paint>("-thumb-color", PaintConverter.getInstance(), DEFAULT_THUMB_COLOR) {
+            new CssMetaData<IconSwitch, Paint>("-thumb-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_THUMB_COLOR) {
                 @Override public boolean isSettable(IconSwitch iconSwitch) {
                     return null == iconSwitch.thumbColor || !iconSwitch.thumbColor.isBound();
                 }

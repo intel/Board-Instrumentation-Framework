@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.gauge;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.gauge.skin.DoubleRadialGaugeSkin;
 import javafx.animation.AnimationTimer;
@@ -37,6 +36,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -1334,7 +1334,7 @@ public class DoubleRadialGauge extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<DoubleRadialGauge, Paint> TICK_MARK_FILL_ONE =
-            new CssMetaData<DoubleRadialGauge, Paint>("-tick-mark-fill-one", PaintConverter.getInstance(), Color.BLACK) {
+            new CssMetaData<DoubleRadialGauge, Paint>("-tick-mark-fill-one", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
 
                 @Override public boolean isSettable(DoubleRadialGauge gauge) {
                     return null == gauge.tickMarkFillOne || !gauge.tickMarkFillOne.isBound();
@@ -1346,7 +1346,7 @@ public class DoubleRadialGauge extends Control {
             };
 
         private static final CssMetaData<DoubleRadialGauge, Paint> TICK_LABEL_FILL_ONE =
-            new CssMetaData<DoubleRadialGauge, Paint>("-tick-label-fill-one", PaintConverter.getInstance(), Color.BLACK) {
+            new CssMetaData<DoubleRadialGauge, Paint>("-tick-label-fill-one", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
 
                 @Override public boolean isSettable(DoubleRadialGauge gauge) {
                     return null == gauge.tickLabelFillOne || !gauge.tickLabelFillOne.isBound();
@@ -1358,7 +1358,7 @@ public class DoubleRadialGauge extends Control {
             };
 
         private static final CssMetaData<DoubleRadialGauge, Paint> TICK_MARK_FILL_TWO =
-            new CssMetaData<DoubleRadialGauge, Paint>("-tick-mark-fill-two", PaintConverter.getInstance(), Color.BLACK) {
+            new CssMetaData<DoubleRadialGauge, Paint>("-tick-mark-fill-two", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
                 @Override public boolean isSettable(DoubleRadialGauge gauge) {
                     return null == gauge.tickMarkFillTwo || !gauge.tickMarkFillTwo.isBound();
                 }
@@ -1368,7 +1368,7 @@ public class DoubleRadialGauge extends Control {
             };
 
         private static final CssMetaData<DoubleRadialGauge, Paint> TICK_LABEL_FILL_TWO =
-            new CssMetaData<DoubleRadialGauge, Paint>("-tick-label-fill-two", PaintConverter.getInstance(), Color.BLACK) {
+            new CssMetaData<DoubleRadialGauge, Paint>("-tick-label-fill-two", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
 
                 @Override public boolean isSettable(DoubleRadialGauge gauge) {
                     return null == gauge.tickLabelFillTwo || !gauge.tickLabelFillTwo.isBound();

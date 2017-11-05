@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.radialmenu;
 
-import com.sun.javafx.css.converters.ColorConverter;
 import eu.hansolo.enzo.common.SymbolType;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
@@ -30,6 +29,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -400,7 +400,7 @@ public class RadialMenuItem extends Region {
     private static class StyleableProperties {
         private static final CssMetaData<RadialMenuItem, Color> BACKGROUND_COLOR =
             new CssMetaData<RadialMenuItem, Color>("-item-background",
-                                                   ColorConverter.getInstance(),
+                                                   (StyleConverter<?, Color>) StyleConverter.getColorConverter(),
                                                    DEFAULT_BACKGROUND_COLOR) {
 
                 @Override public boolean isSettable(RadialMenuItem node) {
@@ -417,7 +417,7 @@ public class RadialMenuItem extends Region {
             };
 
         private static final CssMetaData<RadialMenuItem, Color> BORDER_COLOR =
-            new CssMetaData<RadialMenuItem, Color>("-item-border", ColorConverter.getInstance(), DEFAULT_BORDER_COLOR) {
+            new CssMetaData<RadialMenuItem, Color>("-item-border", (StyleConverter<?, Color>) StyleConverter.getColorConverter(), DEFAULT_BORDER_COLOR) {
 
                 @Override public boolean isSettable(RadialMenuItem node) {
                     return null == node.borderColor || !node.borderColor.isBound();
@@ -434,7 +434,7 @@ public class RadialMenuItem extends Region {
 
         private static final CssMetaData<RadialMenuItem, Color> FOREGROUND_COLOR =
             new CssMetaData<RadialMenuItem, Color>("-item-foreground",
-                                                   ColorConverter.getInstance(),
+                                                   (StyleConverter<?, Color>) StyleConverter.getColorConverter(),
                                                    DEFAULT_FOREGROUND_COLOR) {
 
                 @Override public boolean isSettable(RadialMenuItem node) {
@@ -452,7 +452,7 @@ public class RadialMenuItem extends Region {
 
         private static final CssMetaData<RadialMenuItem, Color> SELECTED_BACKGROUND_COLOR =
             new CssMetaData<RadialMenuItem, Color>("-item-selected-background",
-                                                   ColorConverter.getInstance(),
+                                                   (StyleConverter<?, Color>) StyleConverter.getColorConverter(),
                                                    DEFAULT_SELECTED_BACKGROUND_COLOR) {
 
                 @Override public boolean isSettable(RadialMenuItem node) {
@@ -470,7 +470,7 @@ public class RadialMenuItem extends Region {
 
         private static final CssMetaData<RadialMenuItem, Color> SELECTED_FOREGROUND_COLOR =
             new CssMetaData<RadialMenuItem, Color>("-item-selected-foreground",
-                                                   ColorConverter.getInstance(),
+                                                   (StyleConverter<?, Color>) StyleConverter.getColorConverter(),
                                                    DEFAULT_SELECTED_FOREGROUND_COLOR) {
 
                 @Override public boolean isSettable(RadialMenuItem node) {

@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.gauge;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.gauge.skin.AvGaugeSkin;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -24,6 +23,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.property.*;
 import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableProperty;
 import javafx.css.StyleableObjectProperty;
@@ -508,7 +508,7 @@ public class AvGauge extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<AvGauge, Paint> OUTER_BAR_COLOR =
-            new CssMetaData<AvGauge, Paint>("-outer-bar-color", PaintConverter.getInstance(), DEFAULT_OUTER_BAR_COLOR) {
+            new CssMetaData<AvGauge, Paint>("-outer-bar-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_OUTER_BAR_COLOR) {
                 @Override public boolean isSettable(AvGauge node) {
                     return null == node.outerBarColor || !node.outerBarColor.isBound();
                 }
@@ -519,7 +519,7 @@ public class AvGauge extends Control {
             };
 
         private static final CssMetaData<AvGauge, Paint> INNER_BAR_COLOR =
-            new CssMetaData<AvGauge, Paint>("-inner-bar-color", PaintConverter.getInstance(), DEFAULT_INNER_BAR_COLOR) {
+            new CssMetaData<AvGauge, Paint>("-inner-bar-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_INNER_BAR_COLOR) {
                 @Override public boolean isSettable(AvGauge node) {
                     return null == node.innerBarColor || !node.innerBarColor.isBound();
                 }
@@ -530,7 +530,7 @@ public class AvGauge extends Control {
             };
 
         private static final CssMetaData<AvGauge, Paint> BACKGROUND_COLOR =
-            new CssMetaData<AvGauge, Paint>("-background-color", PaintConverter.getInstance(), DEFAULT_BACKGROUND_COLOR) {
+            new CssMetaData<AvGauge, Paint>("-background-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_BACKGROUND_COLOR) {
                 @Override public boolean isSettable(AvGauge node) {
                     return null == node.backgroundColor || !node.backgroundColor.isBound();
                 }
@@ -541,7 +541,7 @@ public class AvGauge extends Control {
             };
 
         private static final CssMetaData<AvGauge, Paint> OUTER_VALUE_TEXT_COLOR =
-            new CssMetaData<AvGauge, Paint>("-outer-value-text-color", PaintConverter.getInstance(), DEFAULT_OUTER_VALUE_TEXT_COLOR) {
+            new CssMetaData<AvGauge, Paint>("-outer-value-text-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_OUTER_VALUE_TEXT_COLOR) {
                 @Override public boolean isSettable(AvGauge node) {
                     return null == node.outerValueTextColor || !node.outerValueTextColor.isBound();
                 }
@@ -552,7 +552,7 @@ public class AvGauge extends Control {
             };
 
         private static final CssMetaData<AvGauge, Paint> INNER_VALUE_TEXT_COLOR =
-            new CssMetaData<AvGauge, Paint>("-inner-value-text-color", PaintConverter.getInstance(), DEFAULT_INNER_VALUE_TEXT_COLOR) {
+            new CssMetaData<AvGauge, Paint>("-inner-value-text-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_INNER_VALUE_TEXT_COLOR) {
                 @Override public boolean isSettable(AvGauge node) {
                     return null == node.innerValueTextColor || !node.innerValueTextColor.isBound();
                 }
@@ -563,7 +563,7 @@ public class AvGauge extends Control {
             };
 
         private static final CssMetaData<AvGauge, Paint> TITLE_TEXT_COLOR =
-            new CssMetaData<AvGauge, Paint>("-title-text-color", PaintConverter.getInstance(), DEFAULT_TITLE_TEXT_COLOR) {
+            new CssMetaData<AvGauge, Paint>("-title-text-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_TITLE_TEXT_COLOR) {
                 @Override public boolean isSettable(AvGauge node) {
                     return null == node.titleTextColor || !node.titleTextColor.isBound();
                 }
@@ -574,7 +574,7 @@ public class AvGauge extends Control {
             };
 
         private static final CssMetaData<AvGauge, Paint> BORDER_COLOR =
-            new CssMetaData<AvGauge, Paint>("-border-color", PaintConverter.getInstance(), DEFAULT_BORDER_COLOR) {
+            new CssMetaData<AvGauge, Paint>("-border-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_BORDER_COLOR) {
                 @Override public boolean isSettable(AvGauge node) {
                     return null == node.borderColor || !node.borderColor.isBound();
                 }
@@ -585,7 +585,7 @@ public class AvGauge extends Control {
             };
 
         private static final CssMetaData<AvGauge, Paint> SEPARATOR_COLOR =
-            new CssMetaData<AvGauge, Paint>("-separator-color", PaintConverter.getInstance(), DEFAULT_SEPARATOR_COLOR) {
+            new CssMetaData<AvGauge, Paint>("-separator-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SEPARATOR_COLOR) {
                 @Override public boolean isSettable(AvGauge node) {
                     return null == node.separatorColor || !node.separatorColor.isBound();
                 }

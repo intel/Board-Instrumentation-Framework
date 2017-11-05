@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.heatcontrol;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.heatcontrol.skin.HeatControlSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -30,6 +29,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -346,7 +346,7 @@ public class HeatControl extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<HeatControl, Paint> TICK_MARK_FILL =
-            new CssMetaData<HeatControl, Paint>("-tick-mark-fill", PaintConverter.getInstance(), Color.WHITE) {
+            new CssMetaData<HeatControl, Paint>("-tick-mark-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.WHITE) {
 
                 @Override public boolean isSettable(HeatControl heatControl) {
                     return null == heatControl.tickMarkFill || !heatControl.tickMarkFill.isBound();

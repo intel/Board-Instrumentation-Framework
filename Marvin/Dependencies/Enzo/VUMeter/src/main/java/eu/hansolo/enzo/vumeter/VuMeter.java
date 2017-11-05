@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.vumeter;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.vumeter.skin.VuMeterSkin;
 import javafx.beans.property.BooleanProperty;
@@ -32,6 +31,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -372,7 +372,7 @@ public class VuMeter extends Control {
     private static class StyleableProperties {        
         private static final CssMetaData<VuMeter, Paint> SECTION_FILL_0 =
             new CssMetaData<VuMeter, Paint>("-section-fill-0",
-                                                PaintConverter.getInstance(),
+                                                (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                 DEFAULT_SECTION_FILL_0) {
 
                 @Override public boolean isSettable(VuMeter gauge) {
@@ -390,7 +390,7 @@ public class VuMeter extends Control {
 
         private static final CssMetaData<VuMeter, Paint> SECTION_FILL_1 =
             new CssMetaData<VuMeter, Paint>("-section-fill-1",
-                                                PaintConverter.getInstance(),
+                                                (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                 DEFAULT_SECTION_FILL_1) {
 
                 @Override public boolean isSettable(VuMeter gauge) {
@@ -408,7 +408,7 @@ public class VuMeter extends Control {
 
         private static final CssMetaData<VuMeter, Paint> SECTION_FILL_2 =
             new CssMetaData<VuMeter, Paint>("-section-fill-2",
-                                                PaintConverter.getInstance(),
+                                                (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                 DEFAULT_SECTION_FILL_2) {
 
                 @Override public boolean isSettable(VuMeter gauge) {
@@ -426,7 +426,7 @@ public class VuMeter extends Control {
 
         private static final CssMetaData<VuMeter, Paint> SECTION_FILL_3 =
             new CssMetaData<VuMeter, Paint>("-section-fill-3",
-                                                PaintConverter.getInstance(),
+                                                (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                 DEFAULT_SECTION_FILL_3) {
 
                 @Override public boolean isSettable(VuMeter gauge) {
@@ -444,7 +444,7 @@ public class VuMeter extends Control {
 
         private static final CssMetaData<VuMeter, Paint> SECTION_FILL_4 =
             new CssMetaData<VuMeter, Paint>("-section-fill-4",
-                                                PaintConverter.getInstance(),
+                                                (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                 DEFAULT_SECTION_FILL_4) {
 
                 @Override public boolean isSettable(VuMeter gauge) {

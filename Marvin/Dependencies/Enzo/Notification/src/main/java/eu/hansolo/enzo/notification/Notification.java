@@ -36,6 +36,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -96,7 +97,7 @@ public class Notification {
 
 
         // ******************** Constructor ***************************************
-        private Notifier() {
+        Notifier() {
             init();
             initGraphics();
         }
@@ -115,13 +116,17 @@ public class Notification {
             scene.getStylesheets().add(getClass().getResource("notifier.css").toExternalForm());            
 
             stage = new Stage();
-            stage.setMaxWidth(1);
-            stage.setMaxHeight(1);
-            stage.setWidth(1);
-            stage.setHeight(1);
+            stage.setMinWidth(0);
+            stage.setMinHeight(0);
+            stage.setMaxWidth(0);
+            stage.setMaxHeight(0);
+            stage.setWidth(0);
+            stage.setHeight(0);
+            stage.initModality(Modality.NONE);
 
             stage.setResizable(false);
-            stage.initStyle(StageStyle.TRANSPARENT);
+            //stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initStyle(StageStyle.UTILITY);
             stage.setScene(scene);
             stage.setAlwaysOnTop(true);
         }

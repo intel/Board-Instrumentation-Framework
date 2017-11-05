@@ -180,7 +180,7 @@ public class Symbol extends Region {
         if (Platform.isFxApplicationThread()) {
             tooltip = TOOLTIP;
             Tooltip.install(this, tooltip);
-    }
+        }
     }
 
     public final void setTooltipText(final String TOOLTIP_TEXT) { tooltip.setText(TOOLTIP_TEXT); }

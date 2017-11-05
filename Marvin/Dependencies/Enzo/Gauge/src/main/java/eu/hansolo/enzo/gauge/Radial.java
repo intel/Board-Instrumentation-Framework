@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.gauge;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.gauge.skin.RadialSkin;
 import javafx.animation.AnimationTimer;
@@ -791,7 +790,7 @@ public class Radial extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<Radial, Paint> TICK_MARK_FILL =
-                new CssMetaData<Radial, Paint>("-tick-mark-fill", PaintConverter.getInstance(), Color.BLACK) {
+                new CssMetaData<Radial, Paint>("-tick-mark-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
 
                     @Override public boolean isSettable(Radial gauge) {
                         return null == gauge.tickMarkFill || !gauge.tickMarkFill.isBound();
@@ -803,7 +802,7 @@ public class Radial extends Control {
                 };
 
         private static final CssMetaData<Radial, Paint> TICK_LABEL_FILL =
-                new CssMetaData<Radial, Paint>("-tick-label-fill", PaintConverter.getInstance(), Color.BLACK) {
+                new CssMetaData<Radial, Paint>("-tick-label-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
 
                     @Override public boolean isSettable(Radial gauge) {
                         return null == gauge.tickLabelFill || !gauge.tickLabelFill.isBound();

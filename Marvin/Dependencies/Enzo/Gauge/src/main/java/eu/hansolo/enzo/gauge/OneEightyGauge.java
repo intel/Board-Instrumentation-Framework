@@ -16,11 +16,11 @@
 
 package eu.hansolo.enzo.gauge;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.common.GradientLookup;
 import eu.hansolo.enzo.gauge.skin.OneEightyGaugeSkin;
 import javafx.beans.property.*;
 import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -151,10 +151,7 @@ public class OneEightyGauge extends Control {
     }
 
     public final GradientLookup getGradientLookup() { return gradientLookup; }
-    public final void setGradientLookup(final GradientLookup GRADIENT_LOOKUP) {
-        gradientLookup.setStops(GRADIENT_LOOKUP.getStops());
-        gradientLookup = GRADIENT_LOOKUP;
-    }
+    public final void setGradientLookup(final GradientLookup GRADIENT_LOOKUP) { gradientLookup = GRADIENT_LOOKUP; }
 
     public final List<Stop> getStops() { return gradientLookup.getStops(); }
     public final void setStops(final Stop... STOPS) { gradientLookup.setStops(STOPS);}
@@ -307,7 +304,7 @@ public class OneEightyGauge extends Control {
     private static class StyleableProperties {
         private static final CssMetaData<OneEightyGauge, Paint> BAR_BACKGROUND_COLOR =
             new CssMetaData<OneEightyGauge, Paint>("-bar-background-color",
-                                                   PaintConverter.getInstance(),
+                                                   (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                    DEFAULT_BAR_BACKGROUND_COLOR) {
 
                 @Override public boolean isSettable(OneEightyGauge node) {
@@ -325,7 +322,7 @@ public class OneEightyGauge extends Control {
 
         private static final CssMetaData<OneEightyGauge, Paint> BAR_COLOR =
             new CssMetaData<OneEightyGauge, Paint>("-bar-color",
-                                                   PaintConverter.getInstance(),
+                                                   (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                    DEFAULT_BAR_COLOR) {
 
                 @Override public boolean isSettable(OneEightyGauge node) {
@@ -343,7 +340,7 @@ public class OneEightyGauge extends Control {
 
         private static final CssMetaData<OneEightyGauge, Paint> TITLE_COLOR =
             new CssMetaData<OneEightyGauge, Paint>("-title-color",
-                                                   PaintConverter.getInstance(),
+                                                   (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                    DEFAULT_TITLE_COLOR) {
 
                 @Override public boolean isSettable(OneEightyGauge node) {
@@ -361,7 +358,7 @@ public class OneEightyGauge extends Control {
 
         private static final CssMetaData<OneEightyGauge, Paint> VALUE_COLOR =
             new CssMetaData<OneEightyGauge, Paint>("-value-color",
-                                                   PaintConverter.getInstance(),
+                                                   (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                    DEFAULT_VALUE_COLOR) {
 
                 @Override public boolean isSettable(OneEightyGauge node) {
@@ -379,7 +376,7 @@ public class OneEightyGauge extends Control {
 
         private static final CssMetaData<OneEightyGauge, Paint> UNIT_COLOR =
             new CssMetaData<OneEightyGauge, Paint>("-unit-color",
-                                                   PaintConverter.getInstance(),
+                                                   (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                    DEFAULT_UNIT_COLOR) {
 
                 @Override public boolean isSettable(OneEightyGauge node) {
@@ -397,7 +394,7 @@ public class OneEightyGauge extends Control {
 
         private static final CssMetaData<OneEightyGauge, Paint> MIN_TEXT_COLOR =
             new CssMetaData<OneEightyGauge, Paint>("-min-text-color",
-                                                   PaintConverter.getInstance(),
+                                                   (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                    DEFAULT_MIN_TEXT_COLOR) {
 
                 @Override public boolean isSettable(OneEightyGauge node) {
@@ -415,7 +412,7 @@ public class OneEightyGauge extends Control {
 
         private static final CssMetaData<OneEightyGauge, Paint> MAX_TEXT_COLOR =
             new CssMetaData<OneEightyGauge, Paint>("-max-text-color",
-                                                   PaintConverter.getInstance(),
+                                                   (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(),
                                                    DEFAULT_MAX_TEXT_COLOR) {
 
                 @Override public boolean isSettable(OneEightyGauge node) {

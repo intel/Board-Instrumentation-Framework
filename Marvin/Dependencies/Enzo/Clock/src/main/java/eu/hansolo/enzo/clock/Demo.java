@@ -69,6 +69,7 @@ public class Demo extends Application {
                              .design(Clock.Design.DB)
                              .text("Berlin")
                              .autoNightMode(true)
+                             .running(false)
                              .build();
         clock4 = ClockBuilder.create()
                              .prefSize(400, 400)

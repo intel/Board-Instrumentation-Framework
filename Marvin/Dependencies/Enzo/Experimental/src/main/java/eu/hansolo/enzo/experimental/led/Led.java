@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.experimental.led;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.LongProperty;
@@ -24,6 +23,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -239,7 +239,7 @@ public class Led extends Region {
     // ******************** Style related *************************************
     private static class StyleableProperties {
         private static final CssMetaData<Led, Paint> LED_COLOR =
-            new CssMetaData<Led, Paint>("-led-color", PaintConverter.getInstance(), DEFAULT_LED_COLOR) {
+            new CssMetaData<Led, Paint>("-led-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_LED_COLOR) {
 
                 @Override public boolean isSettable(Led led) {
                     return null == led.ledColor || !led.ledColor.isBound();

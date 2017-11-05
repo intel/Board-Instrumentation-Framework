@@ -53,7 +53,7 @@ public class DemoGauge extends Application {
     @Override public void init() {
         control = GaugeBuilder.create()
                               .prefSize(400, 400)
-                              .animated(true)
+                              .animated(false)
                               .startAngle(330)
                               .angleRange(300)
                               .minValue(0)
@@ -69,7 +69,7 @@ public class DemoGauge extends Application {
                               .tickLabelOrientation(Gauge.TickLabelOrientation.HORIZONTAL)
                               .threshold(70)
                               .thresholdVisible(true)
-                              .value(50)
+                              //.value(50)
                               .minMeasuredValueVisible(true)
                               .maxMeasuredValueVisible(true)
                               .title("Title")
@@ -91,7 +91,7 @@ public class DemoGauge extends Application {
         control.addMarker(marker0);
         control.setMarkerFill0(Color.RED);
 
-        lastTimerCall = System.nanoTime() + 50_000_000l;
+        lastTimerCall = System.nanoTime() + 3_000_000_000l;
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 2_000_000_000l) {

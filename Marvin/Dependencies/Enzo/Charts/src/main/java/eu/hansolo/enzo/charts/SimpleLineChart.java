@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.charts;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.charts.skin.SimpleLineChartSkin;
 import eu.hansolo.enzo.common.Section;
 import javafx.beans.property.BooleanProperty;
@@ -27,6 +26,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -418,7 +418,7 @@ public class SimpleLineChart extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<SimpleLineChart, Paint> BULLET_FILL =
-            new CssMetaData<SimpleLineChart, Paint>("-bullet-fill", PaintConverter.getInstance(), DEFAULT_BULLET_FILL) {
+            new CssMetaData<SimpleLineChart, Paint>("-bullet-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_BULLET_FILL) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.bulletFill || !chart.bulletFill.isBound();
@@ -434,7 +434,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SERIES_STROKE =
-            new CssMetaData<SimpleLineChart, Paint>("-series-stroke", PaintConverter.getInstance(), DEFAULT_SERIES_STROKE) {
+            new CssMetaData<SimpleLineChart, Paint>("-series-stroke", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SERIES_STROKE) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.seriesStroke || !chart.seriesStroke.isBound();
@@ -450,7 +450,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SECTION_FILL_0 =
-            new CssMetaData<SimpleLineChart, Paint>("-section-fill-0", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_0) {
+            new CssMetaData<SimpleLineChart, Paint>("-section-fill-0", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_0) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.sectionFill0 || !chart.sectionFill0.isBound();
@@ -466,7 +466,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SECTION_FILL_1 =
-            new CssMetaData<SimpleLineChart, Paint>("-section-fill-1", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_1) {
+            new CssMetaData<SimpleLineChart, Paint>("-section-fill-1", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_1) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.sectionFill1 || !chart.sectionFill1.isBound();
@@ -482,7 +482,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SECTION_FILL_2 =
-            new CssMetaData<SimpleLineChart, Paint>("-section-fill-2", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_2) {
+            new CssMetaData<SimpleLineChart, Paint>("-section-fill-2", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_2) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.sectionFill2 || !chart.sectionFill2.isBound();
@@ -498,7 +498,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SECTION_FILL_3 =
-            new CssMetaData<SimpleLineChart, Paint>("-section-fill-3", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_3) {
+            new CssMetaData<SimpleLineChart, Paint>("-section-fill-3", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_3) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.sectionFill3 || !chart.sectionFill3.isBound();
@@ -514,7 +514,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SECTION_FILL_4 =
-            new CssMetaData<SimpleLineChart, Paint>("-section-fill-4", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_4) {
+            new CssMetaData<SimpleLineChart, Paint>("-section-fill-4", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_4) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.sectionFill4 || !chart.sectionFill4.isBound();
@@ -530,7 +530,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SECTION_FILL_5 =
-            new CssMetaData<SimpleLineChart, Paint>("-section-fill-5", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_5) {
+            new CssMetaData<SimpleLineChart, Paint>("-section-fill-5", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_5) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.sectionFill5 || !chart.sectionFill5.isBound();
@@ -546,7 +546,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SECTION_FILL_6 =
-            new CssMetaData<SimpleLineChart, Paint>("-section-fill-6", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_6) {
+            new CssMetaData<SimpleLineChart, Paint>("-section-fill-6", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_6) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.sectionFill6 || !chart.sectionFill6.isBound();
@@ -562,7 +562,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SECTION_FILL_7 =
-            new CssMetaData<SimpleLineChart, Paint>("-section-fill-7", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_7) {
+            new CssMetaData<SimpleLineChart, Paint>("-section-fill-7", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_7) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.sectionFill7 || !chart.sectionFill7.isBound();
@@ -578,7 +578,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SECTION_FILL_8 =
-            new CssMetaData<SimpleLineChart, Paint>("-section-fill-8", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_8) {
+            new CssMetaData<SimpleLineChart, Paint>("-section-fill-8", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_8) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.sectionFill8 || !chart.sectionFill8.isBound();
@@ -594,7 +594,7 @@ public class SimpleLineChart extends Control {
             };
 
         private static final CssMetaData<SimpleLineChart, Paint> SECTION_FILL_9 =
-            new CssMetaData<SimpleLineChart, Paint>("-section-fill-9", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_9) {
+            new CssMetaData<SimpleLineChart, Paint>("-section-fill-9", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_9) {
 
                 @Override public boolean isSettable(SimpleLineChart chart) {
                     return null == chart.sectionFill9 || !chart.sectionFill9.isBound();

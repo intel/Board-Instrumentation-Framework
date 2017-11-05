@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.gauge;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.common.Marker;
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.gauge.skin.GaugeSkin;
@@ -41,6 +40,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -1587,7 +1587,7 @@ public class Gauge extends Control {
     
     private static class StyleableProperties {
         private static final CssMetaData<Gauge, Paint> TICK_MARK_FILL =
-            new CssMetaData<Gauge, Paint>("-tick-mark-fill", PaintConverter.getInstance(), Color.BLACK) {
+            new CssMetaData<Gauge, Paint>("-tick-mark-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.tickMarkFill || !gauge.tickMarkFill.isBound();
@@ -1599,7 +1599,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> TICK_LABEL_FILL =
-            new CssMetaData<Gauge, Paint>("-tick-label-fill", PaintConverter.getInstance(), Color.BLACK) {
+            new CssMetaData<Gauge, Paint>("-tick-label-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), Color.BLACK) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.tickLabelFill || !gauge.tickLabelFill.isBound();
@@ -1611,7 +1611,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> SECTION_FILL_0 =
-            new CssMetaData<Gauge, Paint>("-section-fill-0", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_0) {
+            new CssMetaData<Gauge, Paint>("-section-fill-0", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_0) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.sectionFill0 || !gauge.sectionFill0.isBound();
@@ -1627,7 +1627,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> SECTION_FILL_1 =
-            new CssMetaData<Gauge, Paint>("-section-fill-1", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_1) {
+            new CssMetaData<Gauge, Paint>("-section-fill-1", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_1) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.sectionFill1 || !gauge.sectionFill1.isBound();
@@ -1643,7 +1643,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> SECTION_FILL_2 =
-            new CssMetaData<Gauge, Paint>("-section-fill-2", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_2) {
+            new CssMetaData<Gauge, Paint>("-section-fill-2", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_2) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.sectionFill2 || !gauge.sectionFill2.isBound();
@@ -1659,7 +1659,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> SECTION_FILL_3 =
-            new CssMetaData<Gauge, Paint>("-section-fill-3", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_3) {
+            new CssMetaData<Gauge, Paint>("-section-fill-3", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_3) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.sectionFill3 || !gauge.sectionFill3.isBound();
@@ -1675,7 +1675,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> SECTION_FILL_4 =
-            new CssMetaData<Gauge, Paint>("-section-fill-4", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_4) {
+            new CssMetaData<Gauge, Paint>("-section-fill-4", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_4) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.sectionFill4 || !gauge.sectionFill4.isBound();
@@ -1691,7 +1691,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> SECTION_FILL_5 =
-            new CssMetaData<Gauge, Paint>("-section-fill-5", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_5) {
+            new CssMetaData<Gauge, Paint>("-section-fill-5", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_5) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.sectionFill5 || !gauge.sectionFill5.isBound();
@@ -1707,7 +1707,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> SECTION_FILL_6 =
-            new CssMetaData<Gauge, Paint>("-section-fill-6", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_6) {
+            new CssMetaData<Gauge, Paint>("-section-fill-6", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_6) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.sectionFill6 || !gauge.sectionFill6.isBound();
@@ -1723,7 +1723,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> SECTION_FILL_7 =
-            new CssMetaData<Gauge, Paint>("-section-fill-7", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_7) {
+            new CssMetaData<Gauge, Paint>("-section-fill-7", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_7) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.sectionFill7 || !gauge.sectionFill7.isBound();
@@ -1739,7 +1739,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> SECTION_FILL_8 =
-            new CssMetaData<Gauge, Paint>("-section-fill-8", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_8) {
+            new CssMetaData<Gauge, Paint>("-section-fill-8", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_8) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.sectionFill8 || !gauge.sectionFill8.isBound();
@@ -1755,7 +1755,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> SECTION_FILL_9 =
-            new CssMetaData<Gauge, Paint>("-section-fill-9", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_9) {
+            new CssMetaData<Gauge, Paint>("-section-fill-9", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_9) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.sectionFill9 || !gauge.sectionFill9.isBound();
@@ -1771,7 +1771,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> HISTOGRAM_FILL =
-            new CssMetaData<Gauge, Paint>("-histogram-fill", PaintConverter.getInstance(), DEFAULT_HISTOGRAM_FILL) {
+            new CssMetaData<Gauge, Paint>("-histogram-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_HISTOGRAM_FILL) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.histogramFill || !gauge.histogramFill.isBound();
@@ -1787,7 +1787,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> AREA_FILL_0 =
-            new CssMetaData<Gauge, Paint>("-area-fill-0", PaintConverter.getInstance(), DEFAULT_AREA_FILL_0) {
+            new CssMetaData<Gauge, Paint>("-area-fill-0", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_AREA_FILL_0) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.areaFill0 || !gauge.areaFill0.isBound();
@@ -1803,7 +1803,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> AREA_FILL_1 =
-            new CssMetaData<Gauge, Paint>("-area-fill-1", PaintConverter.getInstance(), DEFAULT_AREA_FILL_1) {
+            new CssMetaData<Gauge, Paint>("-area-fill-1", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_AREA_FILL_1) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.areaFill1 || !gauge.areaFill1.isBound();
@@ -1819,7 +1819,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> AREA_FILL_2 =
-            new CssMetaData<Gauge, Paint>("-area-fill-2", PaintConverter.getInstance(), DEFAULT_AREA_FILL_2) {
+            new CssMetaData<Gauge, Paint>("-area-fill-2", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_AREA_FILL_2) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.areaFill2 || !gauge.areaFill2.isBound();
@@ -1835,7 +1835,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> AREA_FILL_3 =
-            new CssMetaData<Gauge, Paint>("-area-fill-3", PaintConverter.getInstance(), DEFAULT_AREA_FILL_3) {
+            new CssMetaData<Gauge, Paint>("-area-fill-3", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_AREA_FILL_3) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.areaFill3 || !gauge.areaFill3.isBound();
@@ -1851,7 +1851,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> AREA_FILL_4 =
-            new CssMetaData<Gauge, Paint>("-area-fill-4", PaintConverter.getInstance(), DEFAULT_AREA_FILL_4) {
+            new CssMetaData<Gauge, Paint>("-area-fill-4", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_AREA_FILL_4) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.areaFill4 || !gauge.areaFill4.isBound();
@@ -1867,7 +1867,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> AREA_FILL_5 =
-            new CssMetaData<Gauge, Paint>("-area-fill-5", PaintConverter.getInstance(), DEFAULT_AREA_FILL_5) {
+            new CssMetaData<Gauge, Paint>("-area-fill-5", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_AREA_FILL_5) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.areaFill5 || !gauge.areaFill5.isBound();
@@ -1883,7 +1883,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> AREA_FILL_6 =
-            new CssMetaData<Gauge, Paint>("-area-fill-6", PaintConverter.getInstance(), DEFAULT_AREA_FILL_6) {
+            new CssMetaData<Gauge, Paint>("-area-fill-6", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_AREA_FILL_6) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.areaFill6 || !gauge.areaFill6.isBound();
@@ -1899,7 +1899,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> AREA_FILL_7 =
-            new CssMetaData<Gauge, Paint>("-area-fill-7", PaintConverter.getInstance(), DEFAULT_AREA_FILL_7) {
+            new CssMetaData<Gauge, Paint>("-area-fill-7", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_AREA_FILL_7) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.areaFill7 || !gauge.areaFill7.isBound();
@@ -1915,7 +1915,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> AREA_FILL_8 =
-            new CssMetaData<Gauge, Paint>("-area-fill-8", PaintConverter.getInstance(), DEFAULT_AREA_FILL_8) {
+            new CssMetaData<Gauge, Paint>("-area-fill-8", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_AREA_FILL_8) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.areaFill8 || !gauge.areaFill8.isBound();
@@ -1931,7 +1931,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> AREA_FILL_9 =
-            new CssMetaData<Gauge, Paint>("-area-fill-9", PaintConverter.getInstance(), DEFAULT_AREA_FILL_9) {
+            new CssMetaData<Gauge, Paint>("-area-fill-9", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_AREA_FILL_9) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.areaFill9 || !gauge.areaFill9.isBound();
@@ -1947,7 +1947,7 @@ public class Gauge extends Control {
             };
         
         private static final CssMetaData<Gauge, Paint> MARKER_FILL_0 =
-            new CssMetaData<Gauge, Paint>("-marker-fill-0", PaintConverter.getInstance(), DEFAULT_MARKER_FILL_0) {
+            new CssMetaData<Gauge, Paint>("-marker-fill-0", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_MARKER_FILL_0) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.markerFill0 || !gauge.markerFill0.isBound();
@@ -1963,7 +1963,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> MARKER_FILL_1 =
-            new CssMetaData<Gauge, Paint>("-marker-fill-1", PaintConverter.getInstance(), DEFAULT_MARKER_FILL_1) {
+            new CssMetaData<Gauge, Paint>("-marker-fill-1", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_MARKER_FILL_1) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.markerFill1 || !gauge.markerFill1.isBound();
@@ -1979,7 +1979,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> MARKER_FILL_2 =
-            new CssMetaData<Gauge, Paint>("-marker-fill-2", PaintConverter.getInstance(), DEFAULT_MARKER_FILL_2) {
+            new CssMetaData<Gauge, Paint>("-marker-fill-2", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_MARKER_FILL_2) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.markerFill2 || !gauge.markerFill2.isBound();
@@ -1995,7 +1995,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> MARKER_FILL_3 =
-            new CssMetaData<Gauge, Paint>("-marker-fill-3", PaintConverter.getInstance(), DEFAULT_MARKER_FILL_3) {
+            new CssMetaData<Gauge, Paint>("-marker-fill-3", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_MARKER_FILL_3) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.markerFill3 || !gauge.markerFill3.isBound();
@@ -2011,7 +2011,7 @@ public class Gauge extends Control {
             };
 
         private static final CssMetaData<Gauge, Paint> MARKER_FILL_4 =
-            new CssMetaData<Gauge, Paint>("-marker-fill-4", PaintConverter.getInstance(), DEFAULT_MARKER_FILL_4) {
+            new CssMetaData<Gauge, Paint>("-marker-fill-4", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_MARKER_FILL_4) {
 
                 @Override public boolean isSettable(Gauge gauge) {
                     return null == gauge.markerFill4 || !gauge.markerFill4.isBound();

@@ -16,7 +16,6 @@
 
 package eu.hansolo.enzo.gauge;
 
-import com.sun.javafx.css.converters.PaintConverter;
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.fonts.Fonts;
 import eu.hansolo.enzo.gauge.skin.SimpleGaugeSkin;
@@ -35,6 +34,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
@@ -945,7 +945,7 @@ public class SimpleGauge extends Control {
 
     private static class StyleableProperties {
         private static final CssMetaData<SimpleGauge, Paint> NEEDLE_COLOR =
-            new CssMetaData<SimpleGauge, Paint>("-needle-color", PaintConverter.getInstance(), DEFAULT_NEEDLE_COLOR) {
+            new CssMetaData<SimpleGauge, Paint>("-needle-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_NEEDLE_COLOR) {
             
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.needleColor || !gauge.needleColor.isBound();
@@ -961,7 +961,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> BORDER_COLOR =
-            new CssMetaData<SimpleGauge, Paint>("-border-color", PaintConverter.getInstance(), DEFAULT_BORDER_COLOR) {
+            new CssMetaData<SimpleGauge, Paint>("-border-color", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_BORDER_COLOR) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.borderColor || !gauge.borderColor.isBound();
@@ -977,7 +977,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> VALUE_TEXT_COLOR =
-            new CssMetaData<SimpleGauge, Paint>("-value-text", PaintConverter.getInstance(), DEFAULT_VALUE_TEXT_COLOR) {
+            new CssMetaData<SimpleGauge, Paint>("-value-text", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_VALUE_TEXT_COLOR) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.valueTextColor || !gauge.valueTextColor.isBound();
@@ -993,7 +993,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> TITLE_TEXT_COLOR =
-            new CssMetaData<SimpleGauge, Paint>("-title-text", PaintConverter.getInstance(), DEFAULT_TITLE_TEXT_COLOR) {
+            new CssMetaData<SimpleGauge, Paint>("-title-text", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_TITLE_TEXT_COLOR) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.titleTextColor || !gauge.titleTextColor.isBound();
@@ -1009,7 +1009,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_TEXT_COLOR =
-            new CssMetaData<SimpleGauge, Paint>("-section-text", PaintConverter.getInstance(), DEFAULT_SECTION_TEXT_COLOR) {
+            new CssMetaData<SimpleGauge, Paint>("-section-text", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_TEXT_COLOR) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionTextColor || !gauge.sectionTextColor.isBound();
@@ -1025,7 +1025,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_FILL_0 =
-            new CssMetaData<SimpleGauge, Paint>("-section-fill-0", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_0) {
+            new CssMetaData<SimpleGauge, Paint>("-section-fill-0", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_0) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionFill0 || !gauge.sectionFill0.isBound();
@@ -1041,7 +1041,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_FILL_1 =
-            new CssMetaData<SimpleGauge, Paint>("-section-fill-1", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_1) {
+            new CssMetaData<SimpleGauge, Paint>("-section-fill-1", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_1) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionFill1 || !gauge.sectionFill1.isBound();
@@ -1057,7 +1057,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_FILL_2 =
-            new CssMetaData<SimpleGauge, Paint>("-section-fill-2", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_2) {
+            new CssMetaData<SimpleGauge, Paint>("-section-fill-2", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_2) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionFill2 || !gauge.sectionFill2.isBound();
@@ -1073,7 +1073,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_FILL_3 =
-            new CssMetaData<SimpleGauge, Paint>("-section-fill-3", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_3) {
+            new CssMetaData<SimpleGauge, Paint>("-section-fill-3", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_3) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionFill3 || !gauge.sectionFill3.isBound();
@@ -1089,7 +1089,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_FILL_4 =
-            new CssMetaData<SimpleGauge, Paint>("-section-fill-4", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_4) {
+            new CssMetaData<SimpleGauge, Paint>("-section-fill-4", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_4) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionFill4 || !gauge.sectionFill4.isBound();
@@ -1105,7 +1105,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_FILL_5 =
-            new CssMetaData<SimpleGauge, Paint>("-section-fill-5", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_5) {
+            new CssMetaData<SimpleGauge, Paint>("-section-fill-5", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_5) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionFill5 || !gauge.sectionFill5.isBound();
@@ -1121,7 +1121,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_FILL_6 =
-            new CssMetaData<SimpleGauge, Paint>("-section-fill-6", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_6) {
+            new CssMetaData<SimpleGauge, Paint>("-section-fill-6", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_6) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionFill6 || !gauge.sectionFill6.isBound();
@@ -1137,7 +1137,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_FILL_7 =
-            new CssMetaData<SimpleGauge, Paint>("-section-fill-7", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_7) {
+            new CssMetaData<SimpleGauge, Paint>("-section-fill-7", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_7) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionFill7 || !gauge.sectionFill7.isBound();
@@ -1153,7 +1153,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_FILL_8 =
-            new CssMetaData<SimpleGauge, Paint>("-section-fill-8", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_8) {
+            new CssMetaData<SimpleGauge, Paint>("-section-fill-8", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_8) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionFill8 || !gauge.sectionFill8.isBound();
@@ -1169,7 +1169,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> SECTION_FILL_9 =
-            new CssMetaData<SimpleGauge, Paint>("-section-fill-9", PaintConverter.getInstance(), DEFAULT_SECTION_FILL_9) {
+            new CssMetaData<SimpleGauge, Paint>("-section-fill-9", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_SECTION_FILL_9) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.sectionFill9 || !gauge.sectionFill9.isBound();
@@ -1185,7 +1185,7 @@ public class SimpleGauge extends Control {
             };
 
         private static final CssMetaData<SimpleGauge, Paint> RANGE_FILL =
-            new CssMetaData<SimpleGauge, Paint>("-range-fill", PaintConverter.getInstance(), DEFAULT_RANGE_FILL) {
+            new CssMetaData<SimpleGauge, Paint>("-range-fill", (StyleConverter<?, Paint>) StyleConverter.getPaintConverter(), DEFAULT_RANGE_FILL) {
 
                 @Override public boolean isSettable(SimpleGauge gauge) {
                     return null == gauge.rangeFill || !gauge.rangeFill.isBound();
