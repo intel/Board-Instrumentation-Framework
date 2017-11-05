@@ -42,7 +42,7 @@
             <SplitToken>: </SplitToken>
         </DynamicCollector>
 
-        <DynamicCollector Frequency="500" Prefix="test1">
+        <DynamicCollector Frequency="500">
             <Plugin>
                 <PythonFile>Collectors\wlSimCollector.py</PythonFile>
                 <EntryPoint SpawnThread="True">CollectFunction</EntryPoint>
