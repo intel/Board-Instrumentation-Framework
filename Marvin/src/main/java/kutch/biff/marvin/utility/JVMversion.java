@@ -23,7 +23,6 @@ package kutch.biff.marvin.utility;
 
 public class JVMversion
 {
-
     public static final int MINIMUM_MAJOR_VERSION = 8;
     public static final int MINIMUM_BUILD_VERSION = 20;
 

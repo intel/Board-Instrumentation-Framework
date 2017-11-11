@@ -32,11 +32,11 @@ import javafx.scene.text.Font;
  * Time: 10:27
  */
 public final class Fonts {
-    private static final String BEBAS_NEUE_NAME;
+    //private static final String BEBAS_NEUE_NAME;
     private static final String DIGITAL_NAME;
     private static final String DIGITAL_READOUT_NAME;
     private static final String DIGITAL_READOUT_BOLD_NAME;
-    private static final String DIN_FUN_NAME;
+    //private static final String DIN_FUN_NAME;
     private static final String ELEKTRA_NAME;        
     private static final String ROBOTO_THIN_NAME;
     private static final String ROBOTO_LIGHT_NAME;
@@ -71,11 +71,11 @@ public final class Fonts {
 
     static {
         try {
-            bebasNeueName          = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/bebasneue.otf"), 10).getName();
-            digitalName            = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/digital.ttf"), 10).getName();
+//            bebasNeueName          = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/bebasneue.otf"), 10).getName();  // removed due to Open Source licensing issues
+            digitalName            = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/digitalreadoutb.ttf"), 10).getName(); // modified due to Open Source licensing issues
             digitalReadoutName     = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/digitalreadout.ttf"), 10).getName();
             digitalReadoutBoldName = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/digitalreadoutb.ttf"), 10).getName();
-            dinFunName             = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/din.otf"), 10).getName();
+//            dinFunName             = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/din.otf"), 10).getName(); // removed due to Open Source licensing issues
             elektraName            = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/elektra.ttf"), 10).getName();                        
             robotoThinName         = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/Roboto-Thin.ttf"), 10).getName();
             robotoLightName        = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/Roboto-Light.ttf"), 10).getName();
@@ -88,11 +88,11 @@ public final class Fonts {
             latoBoldName           = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/Lato-Bol.ttf"), 10).getName();
             latoBlackName          = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/enzo/fonts/Lato-Bla.ttf"), 10).getName();
         } catch (Exception exception) { }
-        BEBAS_NEUE_NAME           = bebasNeueName;
+  //      BEBAS_NEUE_NAME           = bebasNeueName;
         DIGITAL_NAME              = digitalName;
         DIGITAL_READOUT_NAME      = digitalReadoutName;
         DIGITAL_READOUT_BOLD_NAME = digitalReadoutBoldName;
-        DIN_FUN_NAME              = dinFunName;
+//        DIN_FUN_NAME              = dinFunName;
         ELEKTRA_NAME              = elektraName;                
         ROBOTO_THIN_NAME          = robotoThinName;
         ROBOTO_LIGHT_NAME         = robotoLightName;
@@ -108,9 +108,9 @@ public final class Fonts {
 
     
     // ******************** Methods *******************************************
-    public static Font bebasNeue(final double SIZE) {
-        return new Font(BEBAS_NEUE_NAME, SIZE);
-    }
+//    public static Font bebasNeue(final double SIZE) {
+//        return new Font(BEBAS_NEUE_NAME, SIZE);
+//    }
 
     public static Font digital(final double SIZE) {
         return new Font(DIGITAL_NAME, SIZE);
@@ -123,9 +123,9 @@ public final class Fonts {
         return new Font(DIGITAL_READOUT_BOLD_NAME, SIZE);
     }
 
-    public static Font dinFun(final double SIZE) {
-        return new Font(DIN_FUN_NAME, SIZE);
-    }
+//    public static Font dinFun(final double SIZE) {
+//        return new Font(DIN_FUN_NAME, SIZE);
+//    }
 
     public static Font elektra(final double SIZE) {
         return new Font(ELEKTRA_NAME, SIZE);
