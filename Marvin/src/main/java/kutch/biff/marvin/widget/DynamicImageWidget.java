@@ -52,6 +52,7 @@ public class DynamicImageWidget extends StaticImageWidget
     private HashMap<String, String> _ImageFilenames;
     private HashMap<String, DynamicTransition> _TransitionMap;
     private HashMap<String, ImageView> _ImageViewMap;
+    private HashMap<String,Long> _MontorMap;
     //private ArrayList<String> _ImageFileNames;
     private CircularList<String> _ListID;
     private String _CurrentKey;
@@ -61,12 +62,14 @@ public class DynamicImageWidget extends StaticImageWidget
     private static int _AutoAdvanceImageNumber = 0;
     private ImageView _ActiveView;
     private GridPane basePane;
+    private int _MonitorInterval=500;
 
     public DynamicImageWidget()
     {
         _ImageFilenames = new HashMap<>();
         _TransitionMap = new HashMap<>();
         _ImageViewMap = new HashMap<>();
+        _MontorMap = new HashMap<>();
 //        _ImageFileNames = new ArrayList<>();
         _CurrentKey = null;
         _ListID = new CircularList<>();
@@ -97,10 +100,8 @@ public class DynamicImageWidget extends StaticImageWidget
             {
                 ImageView obj = _ImageViewMap.get(key);
                 basePane.add(obj, 0, 0);
-                //pane.add(_ImageViewMap.get(key), getColumn(), getRow(), getColumnSpan(), getRowSpan());
             }
             pane.add(basePane, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-            //pane.add(_ImageView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
             SetupPeekaboo(dataMgr);
 
             if (_AutoAdvance)
@@ -123,6 +124,12 @@ public class DynamicImageWidget extends StaticImageWidget
                 mt.AddDataset(getMinionID(), getNamespace(), "Next");
                 TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
             }
+            if (!_MontorMap.isEmpty())
+            {
+                MarvinTask mt = new MarvinTask();
+                mt.AddDataset(getMinionID(), getNamespace(), "Monitor");
+                TASKMAN.AddPostponedTask(mt, _MonitorInterval);
+            }
 
             DynamicImageWidget objDynaImg = this;
 
@@ -131,6 +138,7 @@ public class DynamicImageWidget extends StaticImageWidget
                             @Override
                             public void changed(ObservableValue o, Object oldVal, Object newVal)
                             {
+                                boolean ChangeOcurred = false;
                                 if (IsPaused())
                                 {
                                     return;
@@ -149,6 +157,20 @@ public class DynamicImageWidget extends StaticImageWidget
                                 {
                                     key = _ListID.GetPrevious();
                                 }
+                                else if (strVal.equalsIgnoreCase("Monitor"))
+                                {
+                                    ChangeOcurred = MonitorForFilechange();
+                                    if (ChangeOcurred)
+                                    {
+                                    key = _CurrentKey;
+                                        
+                                    }
+                                    key = _CurrentKey;
+                                    
+                                    MarvinTask mt = new MarvinTask();
+                                    mt.AddDataset(getMinionID(), getNamespace(), "Monitor");
+                                    TASKMAN.AddPostponedTask(mt, _MonitorInterval);
+                                }
                                 else
                                 {
                                     key = strVal; // expecting an ID
@@ -157,7 +179,7 @@ public class DynamicImageWidget extends StaticImageWidget
                                 key = key.toLowerCase();
                                 if (_ImageFilenames.containsKey(key))
                                 {
-                                    if (!key.equalsIgnoreCase(_CurrentKey)) // no reason to re-load if it is already loaded
+                                    if (!key.equalsIgnoreCase(_CurrentKey) || ChangeOcurred) // no reason to re-load if it is already loaded
                                     {
                                         DynamicTransition objTransition = null;
 
@@ -226,6 +248,7 @@ public class DynamicImageWidget extends StaticImageWidget
         return basePane;
     }
 
+    @Override
     public EventHandler<MouseEvent> SetupTaskAction()
     {
         BaseWidget objWidget = this;
@@ -276,6 +299,34 @@ public class DynamicImageWidget extends StaticImageWidget
         return true;
     }
     
+    private boolean MonitorForFilechange()
+    {
+        boolean retVal = false;
+        for (String Id : _MontorMap.keySet())
+        {
+            File fp = new File(_ImageFilenames.get(Id).substring("file:".length())); // is stored as url, so skip the 1st part
+            if (fp.lastModified() != _MontorMap.get(Id))
+            {
+                _MontorMap.put(Id, fp.lastModified());
+                LOGGER.info("Monitoring " + _ImageFilenames.get(Id) +" updated");
+                ImageView objImageView = new ImageView(_ImageFilenames.get(Id));
+                objImageView.setPreserveRatio(getPreserveRatio());
+                objImageView.setSmooth(true);
+                objImageView.setPickOnBounds(!GetClickThroughTransparentRegion());
+                objImageView.setVisible(_ImageViewMap.get(Id).isVisible());
+                objImageView.setFitWidth(_ImageViewMap.get(Id).getFitWidth());
+                objImageView.setFitHeight(_ImageViewMap.get(Id).getFitHeight());
+                basePane.getChildren().remove(_ImageViewMap.get(Id));
+
+                _ImageViewMap.put(Id, objImageView);
+                basePane.add(objImageView, 0, 0);
+
+                retVal = true;
+            }
+        }
+        return retVal;
+    }
+    
     private boolean setupImages()
     {
         for (String key : _ImageFilenames.keySet())
@@ -288,10 +339,6 @@ public class DynamicImageWidget extends StaticImageWidget
             _ImageViewMap.put(key, objImageView);
         }
 
-//            _ImageView = new ImageView();
-//            _ImageView.setPreserveRatio(getPreserveRatio());
-//            _ImageView.setSmooth(true);
-//            _ImageView.setPickOnBounds(!GetClickThroughTransparentRegion());
         if (_CurrentKey == null)
         {
             LOGGER.severe("No Initial Image setup for Dynamic Image Widget.");
@@ -299,11 +346,8 @@ public class DynamicImageWidget extends StaticImageWidget
         }
         else if (_ImageFilenames.containsKey(_CurrentKey))
         {
-            //_ImageView.setImage(new Image(_ImageFilenames.get(_CurrentKey)));
-
             _ActiveView = _ImageViewMap.get(_CurrentKey);
             _ActiveView.setVisible(true);
-            //_ListID.get(_CurrentKey); // just to keep next/prev alignment
         }
         else
         {
@@ -365,7 +409,7 @@ public class DynamicImageWidget extends StaticImageWidget
         {
             Utility.ValidateAttributes(new String[]
             {
-                "Source", "ID"
+                "Source", "ID","Monitor"
             }, node);
             if (node.hasAttribute("Source"))
             {
@@ -405,6 +449,14 @@ public class DynamicImageWidget extends StaticImageWidget
                 //Image img = new Image(fn);
                 _ImageFilenames.put(Id, fn);
                 _ListID.add(Id);
+                if (node.hasAttribute("Monitor"))
+                {
+                    if (node.getBooleanAttribute("Monitor"))
+                    {
+                        _MontorMap.put(Id, file.lastModified());
+                    }
+                }
+                
             }
 
             else
