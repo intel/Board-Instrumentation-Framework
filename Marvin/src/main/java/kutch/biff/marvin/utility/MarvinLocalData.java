@@ -21,8 +21,10 @@
  */
 package kutch.biff.marvin.utility;
 
+import java.text.NumberFormat;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -99,6 +101,12 @@ public class MarvinLocalData
         TASKMAN.getDataMgr().ChangeValue("DataUpdateCount", Namespace, Long.toString(TASKMAN.getDataMgr().getUpdateCount()));
         TASKMAN.getDataMgr().ChangeValue("UnassignedDatapointCount", Namespace, Long.toString(TASKMAN.getDataMgr().getUnassignedCount()));
         TASKMAN.getDataMgr().ChangeValue("TasksExecutedCount", Namespace, Long.toString(TASKMAN.GetPerformedCount()));
+        TASKMAN.getDataMgr().ChangeValue("PendingTasksCount", Namespace, Long.toString(TASKMAN.GetPendingTaskCount()));
+        long freeMem = Runtime.getRuntime().freeMemory();
+        String KBMemStr = NumberFormat.getNumberInstance(Locale.US).format(freeMem / 1024);
+        String BytesStr = NumberFormat.getNumberInstance(Locale.US).format(freeMem);
+        TASKMAN.getDataMgr().ChangeValue("FreeMemB", Namespace, BytesStr);
+        TASKMAN.getDataMgr().ChangeValue("FreeMemKB", Namespace, KBMemStr);
     }
 
     private String GetTimeString(long seconds)

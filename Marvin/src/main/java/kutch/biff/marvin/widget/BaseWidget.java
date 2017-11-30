@@ -104,7 +104,7 @@ abstract public class BaseWidget implements Widget
     protected String _DefinitionFile;
     protected String _WidgetType;
     protected ArrayList<String> _RemoteStyleOverrideList;
-    protected int _MaxRemoteStyleOverrideToRetain = 10;
+    protected int _MaxRemoteStyleOverrideToRetain = 5;
     protected boolean StyleUpdatesFromConfigFinished = false;
     protected String _ToolTip = null;
     protected Tooltip _objToolTip = null;
@@ -952,7 +952,7 @@ abstract public class BaseWidget implements Widget
 
     protected boolean ApplyCSS()
     {
-        if (null != GetCSS_File())
+        if (null != GetCSS_File() || StyleUpdatesFromConfigFinished)
         {
             //getStylesheets().clear();
 
@@ -1092,7 +1092,7 @@ abstract public class BaseWidget implements Widget
         {
             return true; // audio widget has no 
         }
-        String StyleString = widget.getStyle();
+        String StyleString;// = widget.getStyle();
         StyleString = "";
         for (String Style : Styles)
         {

@@ -272,7 +272,7 @@ class Playback(object):
                 
             except Exception as ex:
                 Log.getLogger().error(filename+": " + str(ex))
-                GuiMgr.MessageBox_Error("Error Loading File","The format of this file requires Python 3.4 or greater.\nThere is a work-around, contact Patrick.")
+                GuiMgr.MessageBox_Error("Error Loading File","The format of this file requires Python 3.4 or greater.")
                 return False
 
             objEntry = entries[0]

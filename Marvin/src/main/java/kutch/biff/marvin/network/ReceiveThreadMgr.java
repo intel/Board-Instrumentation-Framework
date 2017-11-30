@@ -141,9 +141,9 @@ public class ReceiveThreadMgr implements Runnable
 
                             if (_WorkerThreadCount.get() < 1 || _DataQueue.size()/_WorkerThreadCount.get() > 100)
                             {
+                                LOGGER.info("Traffic burst - adding processing Thread Count, there are " + Integer.toString(_DataQueue.size()) + " packets to process.");
                                 Thread procThread = new Thread(myWorkerThread);
                                 procThread.start();
-                                LOGGER.info("Traffic burst - adding processing Thread Count");
                                 _WorkerThreadCount.incrementAndGet();
                             }
                         }

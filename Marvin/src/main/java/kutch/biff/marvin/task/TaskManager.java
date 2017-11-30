@@ -39,7 +39,6 @@ import kutch.biff.marvin.utility.Utility;
  */
 public class TaskManager
 {
-
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private static TaskManager _TaskManager = null;
     private static ArrayList<String> _OnStartupList = null;
@@ -90,19 +89,38 @@ public class TaskManager
     {
         return _TasksPerformed;
     }
+    
+    public long GetPendingTaskCount()
+    {
+        long retVal = 0;
+        synchronized (_DeferredTasks) // make a quick copy to reduce time in synchronized block
+        {
+            retVal += _DeferredTasks.size();
+        }
+        synchronized (_PostponedTaskObjectThatMustBeRunInGuiThreadList)
+        {
+             retVal = _PostponedTaskObjectThatMustBeRunInGuiThreadList.size();
+        }
+        
+        synchronized (_PostponedTasks)
+        {
+            retVal += _PostponedTasks.size();
+        }
+        return retVal;
+    }
 
     public void PerformDeferredTasks()
     {
-        boolean fDone = false;
+        //boolean fDone = false;
         int size = 0;
-        ArrayList<String> localDeferredTasksRoRun = new ArrayList<>();
+        ArrayList<String> localDeferredTasksToRun = new ArrayList<>();
         ArrayList<ITask> localPostponedTaskstoRun = new ArrayList<>();
 
         synchronized (_DeferredTasks) // make a quick copy to reduce time in synchronized block
         {
             size = _DeferredTasks.size();
 
-            localDeferredTasksRoRun.addAll(_DeferredTasks);
+            localDeferredTasksToRun.addAll(_DeferredTasks);
             _DeferredTasks.clear();
         }
 
@@ -119,17 +137,31 @@ public class TaskManager
             }
         }
 
-        String Task;
+        //String Task;
+        Platform.runLater(new Runnable()
+        {
+            @Override
+            public void run()
+            { // go run this in a GUI thread
+                // 
+                for (String strTask : localDeferredTasksToRun)
+                {
+                    PerformTask(strTask);
+                }
+            }
+        });
+        /*
+        fDone = true;
         while (!fDone)
         {
             Task = null;
-            if (localDeferredTasksRoRun.isEmpty())
+            if (localDeferredTasksToRun.isEmpty())
             {
                 fDone = true;
             }
             else
             {
-                Task = localDeferredTasksRoRun.remove(0);
+                Task = localDeferredTasksToRun.remove(0);
             }
 
             if (null != Task)
@@ -149,7 +181,7 @@ public class TaskManager
         }
 
         fDone = false;
-        ITask objTask;
+        */
         // Now go and process all of the postponed tasks that need to be done in gui thread
 
         synchronized (_PostponedTaskObjectThatMustBeRunInGuiThreadList)
@@ -158,26 +190,25 @@ public class TaskManager
             localPostponedTaskstoRun.addAll(_PostponedTaskObjectThatMustBeRunInGuiThreadList);
             _PostponedTaskObjectThatMustBeRunInGuiThreadList.clear();
         }
-        while (!fDone)
+        /*
+        for (ITask objTask : localPostponedTaskstoRun )
         {
-            objTask = null;
-            if (localPostponedTaskstoRun.isEmpty())
-            {
-                fDone = true;
-            }
-            else
-            {
-                objTask = localPostponedTaskstoRun.remove(0);
-            }
-            if (null != objTask)
-            {
-               // final ITask tmp_objTask = objTask;
-                //objTask.PerformTask();
-                //PerformTask(objTask);
-                PerformThreadedTask(objTask);
-
-            }
+            PerformThreadedTask(objTask);
         }
+        */
+        Platform.runLater(new Runnable()
+        {
+            @Override
+            public void run()
+            { // go run this in a GUI thread
+                // 
+                for (ITask objTask : localPostponedTaskstoRun )
+                {
+                    objTask.PerformTask();
+                }
+            }
+        });
+        
         PerformPostponedTasks();
     }
 
