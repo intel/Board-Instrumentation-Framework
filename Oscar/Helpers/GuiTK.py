@@ -454,6 +454,7 @@ class PlaybackControls():
         self.lstBoxPlaybackSpeed.current(4)
         self.lblStartLoop = Label(self.root,width=3,justify=CENTER)
         self.lblEndLoop = Label(self.root,width=3,justify=CENTER)
+        self.lblPlaybackTime = Label(self.root,width=10,justify=CENTER)
 
         self.slider = Scale(self.root,from_=0, to=100, orient=HORIZONTAL,length=300,command=self.sliderUpdate)
         self.slider.bind("<ButtonRelease-1>",self.sliderHandler)
@@ -467,7 +468,9 @@ class PlaybackControls():
         loopRow=4
         loopBtnRow=5
          
-        Label(self.root,text="Controls").grid(row=labelRow,column=0,sticky=(N),columnspan=3)
+        #playLenStr = str(int(Playback.get().GetPlayTime()/1000))
+        
+        #Label(self.root,text="playLenStr").grid(row=labelRow,column=0,sticky=(N),columnspan=3) 
         Label(self.root,text="Speed").grid(row=labelRow,column=4,sticky=(N))
         Label(self.root,text="Mode").grid(row=labelRow,column=5,sticky=(N))
 
@@ -482,6 +485,7 @@ class PlaybackControls():
         self.lblPacketNumber.grid(row=sliderRow,column=4,columnspan=2)
         self.btnStartLoop.grid(row=loopBtnRow,column=0,columnspan=2)
         self.btnStopLoop.grid(row=loopBtnRow,column=2,columnspan=2)
+        self.lblPlaybackTime.grid(row=labelRow,column=0,sticky=(N),columnspan=3) 
 
         disable(self.btnStopPlayback)
         disable(self.btnPausePlayback)
@@ -579,6 +583,22 @@ class PlaybackControls():
             return
         self.lstBoxRepeatMode.set(Playback.RepeatMode.toString(mode))
 
+    def updatePlaybackTime(self):
+        currTime = Playback.get().GetCurrentPlaybackTime()
+        if currTime > 0:
+            currTime = str(int(currTime/1000))
+        else:
+            currTime = "0"
+
+        endTime = Playback.get().GetPlayTime()
+        if endTime > 0:
+            endTime = str(int(endTime/1000))
+        else:
+            endTime = "0"
+
+        strVal = currTime  + "/" + endTime + " secs"
+        self.lblPlaybackTime.config(text=strVal) #kutta
+
     def updateGui(self):
         playbackMgr = Playback.get()
         guiMgr = GuiMgr.get()
@@ -587,6 +607,7 @@ class PlaybackControls():
 
         self.updatePlaybackSpeed()
         self.updateLoopValue()
+        self.updatePlaybackTime()
 
         if guiMgr.Playback_Active and False == self.Visible:
             self.root.grid()

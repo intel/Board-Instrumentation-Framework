@@ -101,11 +101,48 @@ class Playback(object):
         self.startIndex=0
         self.endIndex=len(dataList)
 
+        NamespaceMap={}
+        self.NamespaceCount = 0
+        self.ID_Count = 0
+        # go get some stats on the loaded data
+        for entry in dataList:
+            if not entry.Namespace in NamespaceMap:
+                NamespaceMap[entry.Namespace]={}
+                self.NamespaceCount += 1
+
+            if hasattr(entry,'_DataList'):
+                for subEntry in entry._DataList:
+                    if not subEntry.ID in NamespaceMap[entry.Namespace]:
+                        NamespaceMap[entry.Namespace][subEntry.ID]=subEntry.ID
+                        self.ID_Count +=1
+
+            elif not entry.ID in NamespaceMap[entry.Namespace]:
+                NamespaceMap[entry.Namespace][entry.ID]=entry.ID
+                self.ID_Count += 1
+
     def GetDataCount(self):
         return len(self.PlaybackData)
 
+    def GetCountNamespace(self):
+        return self.NamespaceCount
+
+    def GetCountID(self):
+        return self.ID_Count
+
+    def GetPlayTime(self):
+        try:
+            return self.PlaybackData[-1].ArrivalTime - self.PlaybackData[0].ArrivalTime
+        except:
+            return 0
+
     def GetCurrentNumber(self):
         return self.CurrentIndex
+
+    def GetCurrentPlaybackTime(self):
+        try:
+            return  self.PlaybackData[self.CurrentIndex].ArrivalTime - self.PlaybackData[0].ArrivalTime
+        except Exception as Ex:
+            return 0
 
     def GetLoopCount(self):
         return self.LoopCount
