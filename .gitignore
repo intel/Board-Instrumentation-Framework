@@ -6,6 +6,7 @@
 /Marvin/Dependencies/Enzo*
 /Marvin/release
 /*/*/__pycache__/
+/*/*/*.pyc
 /Minion/minion.pyproj
 /Minion/minion.sln
 /Minion/minion.v12.suo

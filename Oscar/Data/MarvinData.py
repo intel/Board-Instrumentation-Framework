@@ -20,15 +20,19 @@
 from Util import Time
 
 class MarvinData(object):
+    __FirstTime = Time.GetCurrMS()
+
     def __init__(self,Namespace,ID,Value,ElapsedTime,FormatVersion,isLive=True): 
         from Helpers import Configuration
 
         self.FormatVersion=FormatVersion
         self.Value = Value
         if True == isLive:
-            self.ArrivalTime = Time.GetCurrMS()
+            self.ArrivalTime = Time.GetCurrMS() - MarvinData.__FirstTime # just a delta from start is fine, no need for a 10 digit string for time
+
         else:
             self.ArrivalTime = ElapsedTime
+
         self.Namespace = Configuration.get().HandleBITWNamespace(Namespace) # if Bump in the Wire, change NS
 
         self.ID = ID
