@@ -150,6 +150,11 @@ public class ReceiveThreadMgr implements Runnable
                     });
                     //Process(trimmed.getBytes(), packet.getAddress());
                 }
+                else
+                {
+                    return; // kill
+                }
+                
             }
             catch (IOException ex)
             {
@@ -173,14 +178,30 @@ public class ReceiveThreadMgr implements Runnable
     public void Stop()
     {
         fKillRequested = true;
-        while (false == _fStopped)
+        int tryCount = 0;
+        while (false == _fStopped || _WorkerThreadCount.get() > 0)
         {
+            tryCount += 1;
+
             try
             {
                 Thread.sleep(5);
             }
             catch (InterruptedException ex)
             {
+            }
+            
+            if (tryCount ++ > 100)
+            {
+                LOGGER.info("Problem trying to terminate Receive Thread.  Using Brute Force.");
+                for (Thread threadObj : Thread.getAllStackTraces().keySet())
+                {
+                    if (threadObj.getState() == Thread.State.RUNNABLE)
+                    {
+                        threadObj.interrupt();
+                    }
+                }
+                return;
             }
         }
     }
