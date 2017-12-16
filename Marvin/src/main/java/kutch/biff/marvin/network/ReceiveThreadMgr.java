@@ -112,7 +112,7 @@ public class ReceiveThreadMgr implements Runnable
                         }
                     }
                     _WorkerThreadCount.decrementAndGet();
-                    LOGGER.info("Receive Queue Processing Thread successfully terminated.");
+                    //LOGGER.info("Receive Queue Processing Thread successfully terminated.");
                 }
                 catch (InterruptedException e)
                 {
@@ -198,26 +198,25 @@ public class ReceiveThreadMgr implements Runnable
             try
             {
                 Thread.sleep(50);
-                LOGGER.info("Waiting:" + Boolean.toString(_fStopped)+ ":" + Integer.toString(_WorkerThreadCount.get()));
+                //LOGGER.info("Waiting:" + Boolean.toString(_fStopped)+ ":" + Integer.toString(_WorkerThreadCount.get()));
             }
             catch (InterruptedException ex)
             {
             }
             
-            if (tryCount ++ > 100)
+            if (tryCount ++ > 100) // don't think this will every happen again, fixed problem elsewhere
             {
-                LOGGER.info("Problem trying to terminate Receive Thread.  Using Brute Force.");
+                LOGGER.severe("Problem trying to terminate Receive Thread.  Using Brute Force.");
                 for (Thread threadObj : Thread.getAllStackTraces().keySet())
                 {
                     if (threadObj.getState() == Thread.State.RUNNABLE)
                     {
-                        //threadObj.interrupt();
+                        threadObj.interrupt();
                     }
                 }
                 return;
             }
         }
-        LOGGER.info("Receive Thread successfully terminated.");
     }
 
     private void Process(byte[] Packet, InetAddress address)

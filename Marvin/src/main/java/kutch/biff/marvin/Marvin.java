@@ -775,12 +775,11 @@ public class Marvin extends Application
         {
             _receiveServer.Stop();
         }
-        LOGGER.info("Receive Server Stopped");
+
         if (null != _Heartbeat)
         {
             _Heartbeat.Stop();
         }
-        LOGGER.info("Heartbeat Stopped");
         /*
         if (null != _animationTimer)
         {
