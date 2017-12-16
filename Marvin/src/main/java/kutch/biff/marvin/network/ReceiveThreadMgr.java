@@ -65,7 +65,7 @@ public class ReceiveThreadMgr implements Runnable
 
     public ReceiveThreadMgr(DatagramSocket sock, DataManager DM)
     {
-        _fStopped = true;
+        _fStopped = false;
         fKillRequested = false;
         _socket = sock;
         _DataManager = DM;
@@ -78,7 +78,7 @@ public class ReceiveThreadMgr implements Runnable
     @Override
     public void run()
     {
-        Runnable myWorkerThread = new Runnable()
+        Runnable processQueuedDataThread = new Runnable()
         {
             @Override
             public void run()
@@ -111,6 +111,8 @@ public class ReceiveThreadMgr implements Runnable
                             }
                         }
                     }
+                    _WorkerThreadCount.decrementAndGet();
+                    LOGGER.info("Receive Queue Processing Thread successfully terminated.");
                 }
                 catch (InterruptedException e)
                 {
@@ -119,7 +121,8 @@ public class ReceiveThreadMgr implements Runnable
             }
         };
 
-        Thread procThread = new Thread(myWorkerThread);
+        Thread procThread = new Thread(processQueuedDataThread,">>>> Base Process Queue Thread <<<<<");
+
         procThread.start();
         _WorkerThreadCount.set(1);
 
@@ -142,9 +145,9 @@ public class ReceiveThreadMgr implements Runnable
                             if (_WorkerThreadCount.get() < 1 || _DataQueue.size()/_WorkerThreadCount.get() > 100)
                             {
                                 LOGGER.info("Traffic burst - adding processing Thread Count, there are " + Integer.toString(_DataQueue.size()) + " packets to process.");
-                                Thread procThread = new Thread(myWorkerThread);
+                                int threadNum = _WorkerThreadCount.incrementAndGet();
+                                Thread procThread = new Thread(processQueuedDataThread,">>>> Additionial Process Queue Thread #" + Integer.toString(threadNum)+" <<<<<");
                                 procThread.start();
-                                _WorkerThreadCount.incrementAndGet();
                             }
                         }
                     });
@@ -162,7 +165,7 @@ public class ReceiveThreadMgr implements Runnable
                 {
                     try
                     {
-                        Thread.sleep(5);  // didn't read anything, socket read timed out, so take a nap
+                        Thread.sleep(1);  // didn't read anything, socket read timed out, so take a nap
                     }
                     catch (InterruptedException ex1)
                     {
@@ -177,15 +180,25 @@ public class ReceiveThreadMgr implements Runnable
 
     public void Stop()
     {
+        _fStopped = false;
         fKillRequested = true;
+        try
+        {
+            Thread.sleep(50); // let the worker theads have a chance to end
+        }
+        catch (InterruptedException ex)
+        {
+            
+        }
         int tryCount = 0;
-        while (false == _fStopped || _WorkerThreadCount.get() > 0)
+        while (false == _fStopped || _WorkerThreadCount.get() > 1)
         {
             tryCount += 1;
 
             try
             {
-                Thread.sleep(5);
+                Thread.sleep(50);
+                LOGGER.info("Waiting:" + Boolean.toString(_fStopped)+ ":" + Integer.toString(_WorkerThreadCount.get()));
             }
             catch (InterruptedException ex)
             {
@@ -198,12 +211,13 @@ public class ReceiveThreadMgr implements Runnable
                 {
                     if (threadObj.getState() == Thread.State.RUNNABLE)
                     {
-                        threadObj.interrupt();
+                        //threadObj.interrupt();
                     }
                 }
                 return;
             }
         }
+        LOGGER.info("Receive Thread successfully terminated.");
     }
 
     private void Process(byte[] Packet, InetAddress address)

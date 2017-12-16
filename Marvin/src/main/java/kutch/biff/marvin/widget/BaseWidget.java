@@ -61,7 +61,6 @@ import org.xml.sax.SAXException;
  */
 abstract public class BaseWidget implements Widget
 {
-
     public static String DefaultWidgetDirectory = "Widget";
     private static int _WidgetCount = 0;
     private static final ArrayList<BaseWidget> _WidgetList = new ArrayList<>();
@@ -1438,5 +1437,10 @@ abstract public class BaseWidget implements Widget
         }
 
         return true;
+    }
+    
+    public void PrepareForAppShutdown()
+    {
+        
     }
 }

@@ -836,4 +836,11 @@ public abstract class MediaPlayerWidget extends BaseWidget
         LOGGER.warning("Tried to update Title of a " + _WidgetType + " to " + strTitle);
     }
 
+    @Override
+    public void PrepareForAppShutdown()
+    {
+        _mediaPlayer.stop();  // can leave a hanging thread if you don't do this
+    }
+    
+    
 }

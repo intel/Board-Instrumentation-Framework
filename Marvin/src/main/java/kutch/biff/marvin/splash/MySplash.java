@@ -57,7 +57,7 @@ public class MySplash
     private static final int SPLASH_HEIGHT = 227;
     private final boolean _Show;
     Stage _Stage;
-    AnimationTimer timer;
+    AnimationTimer _splashAnimationTimer;
     double startTimerTime;
     private String strAltSplash;
     double TimerInterval = 5000;
@@ -158,7 +158,7 @@ public class MySplash
        _Stage.show();
 
         startTimerTime = 0;
-        timer = new AnimationTimer() // can't update the Widgets outside of GUI thread, so this is a little worker to do so
+        _splashAnimationTimer = new AnimationTimer() // can't update the Widgets outside of GUI thread, so this is a little worker to do so
         {
             @Override
             public void handle(long now)
@@ -166,14 +166,13 @@ public class MySplash
                 if (0 == startTimerTime)
                 {
                     startTimerTime = System.currentTimeMillis();
+                    Thread.currentThread().setName("Splash Screen Animation Timer Thread");
                 }
                 if (_appVisible && System.currentTimeMillis() >= startTimerTime + TimerInterval)
                 {
                     stopSplash();
             //        parentStage.setIconified(false);
-                    timer.stop();
-        //LOGGER.info("----------------------------------------------");
-                    
+                    _splashAnimationTimer.stop();
 
                     if (true == Configuration.getConfig().getKioskMode())
                     {
@@ -191,7 +190,7 @@ public class MySplash
             }
         };
 
-        timer.start();
+        _splashAnimationTimer.start();
     }
 
     private void showSplash(Stage initStage)

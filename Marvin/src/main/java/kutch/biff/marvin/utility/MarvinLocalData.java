@@ -42,26 +42,30 @@ import kutch.biff.marvin.widget.BaseWidget;
  */
 public class MarvinLocalData
 {
-
-    private ConfigurationReader CONFIG = ConfigurationReader.GetConfigReader();
+    private final ConfigurationReader CONFIG = ConfigurationReader.GetConfigReader();
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
-    private String Namespace = "MarvinLocalNamespace";
-    private long startTime = System.currentTimeMillis();
-    private int _interval;
+    private final String Namespace = "MarvinLocalNamespace";
+    private final long startTime = System.currentTimeMillis();
+    private final int _interval;
     private ScheduledExecutorService executor;
+    private boolean _StopSignalled;
 
     public MarvinLocalData(int interval)
     {
         _interval = interval;
         if (_interval > 0)
         {
+            _StopSignalled = false;
             Runnable myRunnable = new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    PerformMagic();
+                    if (false == _StopSignalled)
+                    {
+                        PerformMagic();
+                    }
                 }
             };
 
@@ -73,6 +77,7 @@ public class MarvinLocalData
     
     public void Shutdown()
     {
+        _StopSignalled = true;
         executor.shutdown();
     }
 

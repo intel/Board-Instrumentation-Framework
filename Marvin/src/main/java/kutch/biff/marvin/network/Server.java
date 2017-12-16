@@ -87,7 +87,7 @@ public class Server
     public void Start()
     {
         _RecvThreadMgr = new ReceiveThreadMgr(_socket, _DataManager);
-        _Thread = new Thread(_RecvThreadMgr);
+        _Thread = new Thread(_RecvThreadMgr,"Receve Thread Manager Worker");
         _Thread.start();
     }
 }

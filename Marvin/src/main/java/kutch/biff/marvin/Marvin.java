@@ -64,7 +64,9 @@ import java.util.Locale;
 import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
 import kutch.biff.marvin.utility.MarvinLocalData;
+import java.util.Set;
 import static java.lang.Math.abs;
+import kutch.biff.marvin.widget.Widget;
 
 /**
  *
@@ -77,10 +79,10 @@ public class Marvin extends Application
     private DataManager _DataMgr;
     private ConfigurationReader _Config;
     private static TabPane _objTabPane = null;
-    private static int noOfNodes = 0;
+    private static final int noOfNodes = 0;
     private Configuration appConfig = null;
-    private Server _Server;
-    private AnimationTimer timer;
+    private Server _receiveServer;
+    private AnimationTimer _animationTimer;
     private Heartbeat _Heartbeat;
     private long lastTimerCall;
     private TabPane _TestPane;
@@ -364,7 +366,7 @@ public class Marvin extends Application
             }
 
             TASKMAN.setDataMgr(_DataMgr); // kludgy I know, I know.  I hang my head in shame
-            _Server = new Server(_DataMgr);
+            _receiveServer = new Server(_DataMgr);
         }
         return  System.currentTimeMillis() - start;
     }
@@ -406,6 +408,14 @@ public class Marvin extends Application
         LOGGER.info("Time taken to initialize all widgets: " + Long.toString(elapsed)+"ms.");
 
         return RetVal;
+    }
+    
+    private void StopWidgets()
+    {
+        for (Widget tab : _Config.getTabs())
+        {
+            tab.PrepareForAppShutdown();
+        }
     }
 
     private void DumpAllWidgetsInformation()
@@ -599,7 +609,7 @@ public class Marvin extends Application
             return;
         }
 
-        if (false == _Server.Setup(_Config.getConfiguration().getAddress(), _Config.getConfiguration().getPort()))
+        if (false == _receiveServer.Setup(_Config.getConfiguration().getAddress(), _Config.getConfiguration().getPort()))
         {
             JOptionPane.showMessageDialog(null, "Error setting up Network Configuation. \nCheck log file.", "Configuration Error", JOptionPane.ERROR_MESSAGE);
             Platform.exit();
@@ -635,18 +645,24 @@ public class Marvin extends Application
 
         strOldSuffix = "dummy";
 
-        timer = new AnimationTimer() // can't update the Widgets outside of GUI thread, so this is a little worker to do so
+        _animationTimer = new AnimationTimer() // can't update the Widgets outside of GUI thread, so this is a little worker to do so
         {
             boolean Showing = false;
 
             @Override
             public void handle(long now)
             {
+                if  (Configuration.getConfig().terminating())
+                {
+                    return;
+                }
+                
                 if (!Showing)
                 {
                     try
                     {
                         stage.show();
+                        Thread.currentThread().setName("Animation Timer Thread");
                     }
                     catch (Exception e)
                     {
@@ -657,7 +673,6 @@ public class Marvin extends Application
                         JOptionPane.showMessageDialog(null, "Error trying to launch application. \nCheck log file.", "Error", JOptionPane.ERROR_MESSAGE);
                         Platform.exit();
                     }
-
                     Showing = true;
                     return;
                 }
@@ -685,15 +700,16 @@ public class Marvin extends Application
                 }
             }
         };
+      
         int waitBeforeRun = ShowSplash ? SplashWait : NoSplashWait;
-        new java.util.Timer().schedule( // Start goodies in a few seconds
+        new java.util.Timer().schedule(// Start goodies in a few seconds
                 new java.util.TimerTask()
         {
             @Override
             public void run()
             {
-                timer.start();
-
+                _animationTimer.start();
+                this.cancel();
             }
         },
                 waitBeforeRun
@@ -707,7 +723,7 @@ public class Marvin extends Application
     private void BeginServerEtc()
     {
         LOGGER.info("Starting Server");
-        _Server.Start();
+        _receiveServer.Start();
 
         TaskManager.getTaskManager().PerformOnStartupTasks(); // perform any tasks designated to be run on startup
         _Heartbeat = new Heartbeat(_Config.getConfiguration().getHeartbeatInterval()); // every n seconds  TODO: make configurable
@@ -717,26 +733,62 @@ public class Marvin extends Application
             objLocalMarvinData = new MarvinLocalData(1);
         }
     }
+    
+    public static void DumpThreads(boolean showStack)
+    {
+        showStack = false;
+        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+        Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);        
+        
+        LOGGER.info("******* Dumping " + Integer.toString(threadArray.length) +" Threads from thread: " + Thread.currentThread().getName() + " ****************");
+        
+        String dumpString="";
+        for (Thread entry : threadArray)
+        {
+            // info is name,priority,threadgroup
+            dumpString += "\t" + entry.toString() + " -- " + entry.getState().toString() + "\n";
+            if (true == showStack)
+            {
+                for (StackTraceElement element : entry.getStackTrace())
+                {
+                    dumpString += "\t\t" + element.toString() +"\n";
+                }
+                
+            }
+                
+        }
+        LOGGER.info(dumpString);
+        
+    }
 
     @Override
     public void stop()
     {
+        Configuration.getConfig().setTerminating();
+        StopWidgets();
+        
         if (null != objLocalMarvinData)
         {
             objLocalMarvinData.Shutdown();
         }
-        if (null != timer)
+        if (null != _receiveServer)
         {
-            timer.stop();
+            _receiveServer.Stop();
         }
-        if (null != _Server)
-        {
-            _Server.Stop();
-        }
+        LOGGER.info("Receive Server Stopped");
         if (null != _Heartbeat)
         {
             _Heartbeat.Stop();
         }
+        LOGGER.info("Heartbeat Stopped");
+        /*
+        if (null != _animationTimer)
+        {
+            _animationTimer.stop();
+        }
+        LOGGER.info("Animation Timer Stopped");
+        */
+        //Marvin.DumpThreads(true);
     }
 
     public static void main(final String[] args)
@@ -748,6 +800,7 @@ public class Marvin extends Application
         }
         try
         {
+            Thread.currentThread().setName("Main Application Thread");
             Application.launch(args);
         }
         catch (OutOfMemoryError ex)

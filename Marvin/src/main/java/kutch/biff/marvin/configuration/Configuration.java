@@ -83,6 +83,7 @@ public class Configuration
     private boolean _EnableScrollBars;
     private ArrayList<OscarBullhorn> _OscarBullhornList;
     private boolean _MarvinLocalDatafeed;
+    private boolean _ShuttingDown;
     
 
     public Configuration()
@@ -115,6 +116,8 @@ public class Configuration
         _ApplicationID = "";
         _Side = Side.TOP;
         
+        _ShuttingDown = false;
+        
         _LastLiveDataReceived = 0;
         _LastRecordedDataReceived = 0;
         _MaxPacketSize = 16*1024;
@@ -123,6 +126,17 @@ public class Configuration
         _MarvinLocalDatafeed = false;
     }
 
+    
+    public boolean terminating()
+    {
+        return _ShuttingDown;
+    }
+    
+    public void setTerminating()
+    {
+        _ShuttingDown = true;
+    }
+    
     public boolean getMarvinLocalDatafeed()
     {
         return _MarvinLocalDatafeed;

@@ -154,7 +154,4 @@ public class VideoPlayerWidget extends MediaPlayerWidget
             _mediaView.setFitWidth(getWidth());
         }
     }
-
-
-    
 }

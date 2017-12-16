@@ -125,7 +125,6 @@ public class GridWidget extends BaseWidget
             {
                 RetVal = false;
             }
-
         }
         if (false == RetVal)
         {
@@ -416,4 +415,13 @@ public class GridWidget extends BaseWidget
         LOGGER.warning("Tried to update Title of a Grid to " + strTitle);
     }
 
+    @Override
+    public void PrepareForAppShutdown()
+    {
+        for (Widget _Widget : _Widgets)
+        {
+            _Widget.PrepareForAppShutdown();
+        }
+    }
+    
 }

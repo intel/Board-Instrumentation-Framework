@@ -45,7 +45,6 @@ import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.HandlePeekabo
  */
 public class TabWidget extends GridWidget
 {
-
     private Tab _tab;
     private GridPane _BaseGridPane; // throw one down in tab to put all the goodies in
     private boolean _IsVisible;

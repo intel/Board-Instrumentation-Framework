@@ -42,6 +42,7 @@ public interface Widget
     public Region getRegionObject();
     public void UpdateTitle(String newTitle);
     public boolean PerformPostCreateActions();
+    public void PrepareForAppShutdown();
 
 //    public void UpdateStyleSheet(String FileName,String ID);
 //    public void UpdateRange(double min, double max);

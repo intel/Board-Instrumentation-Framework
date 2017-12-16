@@ -1299,7 +1299,7 @@ public class TaskManager
         OscarID = OscarID.toLowerCase();
         if (null == _ClientMap || _ClientMap.isEmpty())
         {
-            LOGGER.info("Marvin tried to send something to Oscar, but there are no Oscar's available.");
+            //LOGGER.info("Marvin tried to send something to Oscar, but there are no Oscar's available.");
             return;
         }
         if (_ClientMap.containsKey(OscarID))
