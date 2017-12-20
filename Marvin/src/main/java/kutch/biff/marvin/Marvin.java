@@ -694,9 +694,12 @@ public class Marvin extends Application
                 {
                     LastMemoryUsageReportingTime = System.currentTimeMillis();
                     long freeMem = Runtime.getRuntime().freeMemory();
-                    String KBMemStr = NumberFormat.getNumberInstance(Locale.US).format(freeMem / 1024);
-                    String BytesStr = NumberFormat.getNumberInstance(Locale.US).format(freeMem);
-                    LOGGER.info("Free Memory: " + BytesStr + " Bytes " + KBMemStr + " KB.");
+                    long totalMem = Runtime.getRuntime().maxMemory();
+                    long usedMem = totalMem - freeMem;
+                    usedMem /=1024.0;
+                    String MBMemStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem / 1024 );
+                    //String BytesStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem);
+                    LOGGER.info("Used Memory: "  + MBMemStr + " MB.");
                 }
             }
         };

@@ -22,6 +22,8 @@
 package kutch.biff.marvin;
 
 import java.net.URL;
+import java.text.NumberFormat;
+import java.util.Locale;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -99,6 +101,13 @@ public class AboutBox
         Label VerLabel = new Label(Version.getVersion());
         Label Widgets = new Label("Number of Widgets - " + Integer.toString(BaseWidget.getWidgetCount()));
         Label Tasks = new Label("Number of Tasks - " + Integer.toString(BaseTask.getTaskCount()));
+        long freeMem = Runtime.getRuntime().freeMemory();
+        long totalMem = Runtime.getRuntime().maxMemory();
+        long usedMem = totalMem - freeMem;
+        usedMem /=1024.0;
+        String MBMemStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem / 1024 );
+        Label MemUsage = new Label("Mem usage (MB) - " + MBMemStr);
+        
         if (CONFIG.getConfiguration().GetApplicationID().length()>0)
         {
             Label ID = new Label("ID : " + CONFIG.getConfiguration().GetApplicationID());
@@ -115,9 +124,10 @@ public class AboutBox
         grid.add(Widgets, 1, 11);
         grid.add(Tasks, 1, 12);
         grid.add(DataCount, 1, 13);
+        grid.add(MemUsage, 1, 14);
         GridPane.setHalignment(OKBtn, HPos.CENTER);
-        grid.add(new Label(" "), 1, 14);
-        int newBottom = AboutBox.SetupExtraInfoPane(grid, 14, 1);
+        grid.add(new Label(" "), 1, 15);
+        int newBottom = AboutBox.SetupExtraInfoPane(grid, 20, 1);
 
         Slider objSlider = new Slider(.25, 3, CONFIG.getConfiguration().getScaleFactor());
         objSlider.valueProperty().bindBidirectional(CONFIG.getConfiguration().getScaleProperty());
