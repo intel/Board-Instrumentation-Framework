@@ -41,6 +41,7 @@ public class SVG_WidgetBuilder
         
         _widget = (SVG_Widget) TextBuilder.ReadTextWidgetInfo(_widget,masterNode,widgetDefFilename);
         
+        
         for (FrameworkNode node :masterNode.getChildNodes())
         {
             if (BaseWidget.HandleCommonDefinitionFileConfig(_widget,node))

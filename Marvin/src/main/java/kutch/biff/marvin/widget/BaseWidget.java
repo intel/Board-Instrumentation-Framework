@@ -84,6 +84,8 @@ abstract public class BaseWidget implements Widget
     private VPos _VerticalPosition;
     protected Pos _Position;
     private ArrayList<Pair<String, String>> _Peekaboos;
+    private boolean _ClickThroughTransparentRegion=false;
+    
 
 //    private String _PeekabooID;
 //    private String _PeekabooNamespace;
@@ -158,6 +160,8 @@ abstract public class BaseWidget implements Widget
         _RemoteStyleOverrideList = new ArrayList<>();
         _ToolTipStyle = null;
         _SelectedStyle = null;
+        _ClickThroughTransparentRegion=false;
+
 
         if (CONFIG.isDebugMode())
         {
@@ -218,6 +222,10 @@ abstract public class BaseWidget implements Widget
         {
             HandleToolTipInit();
             Tooltip.install(this.getStylableObject(), _objToolTip);
+        }
+        if (this.GetClickThroughTransparentRegion() && null != getStylableObject())
+        {
+            getStylableObject().setPickOnBounds(false);
         }
 
         return true;
@@ -946,6 +954,11 @@ abstract public class BaseWidget implements Widget
             widget.setUnitsOverride(str);
             return true;
         }
+        else if (node.getNodeName().equalsIgnoreCase("ClickThroughTransparent"))
+        {
+            widget.SetClickThroughTransparentRegion(node.getBooleanValue());
+            return true;
+        }
         return false;
     }
 
@@ -1439,6 +1452,17 @@ abstract public class BaseWidget implements Widget
         return true;
     }
     
+    public boolean GetClickThroughTransparentRegion()
+    {
+        return _ClickThroughTransparentRegion;
+    }
+
+    public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent)
+    {
+        this._ClickThroughTransparentRegion = _CanClickOnTransparent;
+    }
+    
+    @Override
     public void PrepareForAppShutdown()
     {
         

@@ -617,7 +617,6 @@ public class WidgetBuilder
             {
                 retWidget = SteelGaugeRadialSteelBuilder.Build(baseNode, Filename);
             }
-
             else if (strWidget.equalsIgnoreCase("Steel180Gauge"))
             {
                 retWidget = SteelGauge180Builder.Build(baseNode, Filename);
@@ -1252,6 +1251,10 @@ public class WidgetBuilder
             else if (name.equalsIgnoreCase("AliasList")) // TODO, should specifically search for this 1st, as might want to place this anywhere in grid
             {
                 AliasMgr.HandleAliasNode(node);
+            }
+            else if (node.getNodeName().equalsIgnoreCase("ClickThroughTransparent"))
+            {
+                retWidget.SetClickThroughTransparentRegion(node.getBooleanValue());
             }
 
             else

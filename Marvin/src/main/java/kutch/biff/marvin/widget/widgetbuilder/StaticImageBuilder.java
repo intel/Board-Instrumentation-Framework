@@ -98,11 +98,6 @@ public class StaticImageBuilder
                     return null;
                 }
             }
-            else if (node.getNodeName().equalsIgnoreCase("ClickThroughTransparent"))
-            {
-                _widget.SetClickThroughTransparentRegion(node.getBooleanValue());
-            }
-
         }
         return _widget;
     }

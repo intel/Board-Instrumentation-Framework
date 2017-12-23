@@ -40,7 +40,7 @@ public class StaticImageWidget extends BaseWidget
     private String _SrcFile;
     private boolean _PreserveRatio;
     private boolean _ScaleToFit;
-    private boolean _ClickThroughTransparentRegion=false;
+    //private boolean _ClickThroughTransparentRegion=false;
 //    private Pane _Pane;
     
     public StaticImageWidget()
@@ -104,7 +104,7 @@ public class StaticImageWidget extends BaseWidget
     {
         this._PreserveRatio = _PreserveRatio;
     }
-
+/*
     public boolean GetClickThroughTransparentRegion()
     {
         return _ClickThroughTransparentRegion;
@@ -114,7 +114,7 @@ public class StaticImageWidget extends BaseWidget
     {
         this._ClickThroughTransparentRegion = _CanClickOnTransparent;
     }
-
+*/
     private boolean setupImage()
     {
         if (null == _SrcFile)
@@ -131,7 +131,7 @@ public class StaticImageWidget extends BaseWidget
             _ImageView = new ImageView(_Image);
             _ImageView.setPreserveRatio(getPreserveRatio());
             _ImageView.setSmooth(true);
-            boolean f = GetClickThroughTransparentRegion();
+            
             _ImageView.setPickOnBounds(!GetClickThroughTransparentRegion()); // this allows mouse clicks (for Tasks) to be detected on transparent parts of image
             if (0 == getWidth() && 0 == getHeight())
             {

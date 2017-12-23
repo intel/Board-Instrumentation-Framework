@@ -113,21 +113,22 @@ public class AboutBox
             Label ID = new Label("ID : " + CONFIG.getConfiguration().GetApplicationID());
             grid.add(ID, 1, 6);
         }
+        int newBottom = 0;
         grid.setAlignment(Pos.CENTER);
-        grid.add(aboutImg, 1, 0);
-        grid.add(By, 1, 1);
-        grid.add(Author, 1, 2);
-        grid.add(With, 1, 4);
-        grid.add(Where, 1, 5);
-        grid.add(new Label(" "), 1, 6);
-        grid.add(VerLabel, 1, 10);
-        grid.add(Widgets, 1, 11);
-        grid.add(Tasks, 1, 12);
-        grid.add(DataCount, 1, 13);
-        grid.add(MemUsage, 1, 14);
-        GridPane.setHalignment(OKBtn, HPos.CENTER);
-        grid.add(new Label(" "), 1, 15);
-        int newBottom = AboutBox.SetupExtraInfoPane(grid, 20, 1);
+        grid.add(aboutImg, 1, newBottom++);
+        grid.add(By, 1, newBottom++);
+        grid.add(Author, 1, newBottom++);
+        grid.add(With, 1, newBottom++);
+        grid.add(Where, 1, newBottom++);
+        grid.add(new Label(" "), 1, newBottom++);
+        grid.add(VerLabel, 1, newBottom++);
+        grid.add(Widgets, 1, newBottom++);
+        grid.add(Tasks, 1, newBottom++);
+        grid.add(DataCount, 1, newBottom++);
+        grid.add(MemUsage, 1, newBottom++);
+        GridPane.setHalignment(OKBtn, HPos.CENTER); 
+        //grid.add(new Label(" "), 1, newBottom++);
+        newBottom = AboutBox.SetupExtraInfoPane(grid, newBottom++, 1);
 
         Slider objSlider = new Slider(.25, 3, CONFIG.getConfiguration().getScaleFactor());
         objSlider.valueProperty().bindBidirectional(CONFIG.getConfiguration().getScaleProperty());
