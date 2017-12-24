@@ -839,7 +839,10 @@ public abstract class MediaPlayerWidget extends BaseWidget
     @Override
     public void PrepareForAppShutdown()
     {
-        _mediaPlayer.stop();  // can leave a hanging thread if you don't do this
+        if (null != _mediaPlayer)
+        {
+            _mediaPlayer.stop();  // can leave a hanging thread if you don't do this
+        }
     }
     
     

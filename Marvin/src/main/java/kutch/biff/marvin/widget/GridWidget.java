@@ -114,6 +114,7 @@ public class GridWidget extends BaseWidget
         }
 
         ConfigureDimentions();
+        
         SetPadding();
         
         boolean RetVal = true;
@@ -121,9 +122,10 @@ public class GridWidget extends BaseWidget
 
         for (Widget _Widget : _Widgets)
         {
-            if (false == _Widget.Create(getGridPane(), dataMgr) || !_Widget.PerformPostCreateActions())
+            if (false == _Widget.Create(getGridPane(), dataMgr))
             {
                 RetVal = false;
+                break;
             }
         }
         if (false == RetVal)
@@ -423,5 +425,21 @@ public class GridWidget extends BaseWidget
             _Widget.PrepareForAppShutdown();
         }
     }
-    
+
+    @Override
+    public boolean PerformPostCreateActions(GridWidget parentGrid)
+    {    
+        _WidgetParentGridWidget = parentGrid;
+        handlePercentageDimentions();
+        for (Widget _Widget : _Widgets)
+        {
+            if (!_Widget.PerformPostCreateActions(this))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+            
+            
 }

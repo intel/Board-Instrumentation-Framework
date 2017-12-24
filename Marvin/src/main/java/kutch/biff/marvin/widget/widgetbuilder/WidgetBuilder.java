@@ -185,40 +185,18 @@ public class WidgetBuilder
 
         if (true == widgetNode.hasAttribute("Height"))
         {
-            String str = widgetNode.getAttribute("Height");
-            try
+            if (! retWidget.parseHeight(widgetNode))
             {
-                retWidget.setHeight(Integer.parseInt(str));
-                if (retWidget.getHeight() < 1 && !retWidget.ZeroDimensionOK())
-                {
-                    LOGGER.warning(retWidget.getName() + ": Widget Height is < 1.  Either by config, or by scaling.");
-                    retWidget.setHeight(1);
-                }
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.severe(retWidget.getName() + ": Invalid Height for Widget in Application.xml :" + str);
                 return null;
             }
         }
         if (true == widgetNode.hasAttribute("Width"))
         {
             String str = widgetNode.getAttribute("Width");
-            try
+            if (false == retWidget.parseWidth(widgetNode))
             {
-                retWidget.setWidth(Integer.parseInt(str));
-                if (retWidget.getWidth() < 1 && !retWidget.ZeroDimensionOK())
-                {
-                    LOGGER.warning(retWidget.getName() + ": Widget Width is < 1.  Either by config, or by scaling.");
-                    retWidget.setWidth(1);
-                }
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.severe(retWidget.getName() + ": Invalid Width for Widget in Application.xml: " + str);
                 return null;
             }
-
         }
         // Continue reading widget definition from Application.xml
         try
@@ -852,27 +830,15 @@ public class WidgetBuilder
         }
         if (true == gridNode.hasAttribute("Height"))
         {
-            String str = gridNode.getAttribute("Height");
-            try
+            if (! retWidget.parseHeight(gridNode))
             {
-                retWidget.setHeight(Integer.parseInt(str));
-            }
-            catch (Exception ex)
-            {
-                LOGGER.severe("Invalid Height for Grid in Application.xml");
                 return null;
             }
         }
         if (true == gridNode.hasAttribute("Width"))
         {
-            String str = gridNode.getAttribute("Width");
-            try
+            if (! retWidget.parseWidth(gridNode))
             {
-                retWidget.setWidth(Integer.parseInt(str));
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.severe("Invalid Width for Grid in Application.xml");
                 return null;
             }
         }

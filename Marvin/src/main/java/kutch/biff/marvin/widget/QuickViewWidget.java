@@ -283,7 +283,7 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort
         objGrid.setColumn(0);
 
         objGrid.Create(getGridPane(), _dataMgr); // will register ID and Value Widget
-        objGrid.PerformPostCreateActions();
+        objGrid.PerformPostCreateActions(getParentGridWidget());
         objGrid.getStylableObject().setVisible(false);
         //_Grid.AddWidget(objGrid);
         _DataPoint.add(new Pair<>(ID.toUpperCase(), Arrays.asList(objGrid, objIDWidget, objValueWidget)));

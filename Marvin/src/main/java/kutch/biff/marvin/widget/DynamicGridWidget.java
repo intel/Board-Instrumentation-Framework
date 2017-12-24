@@ -39,7 +39,6 @@ import kutch.biff.marvin.widget.dynamicgrid.DynamicGrid;
 import kutch.biff.marvin.widget.dynamicgrid.DynamicTransition;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
-import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
 
 /**
  *
@@ -222,8 +221,9 @@ public class DynamicGridWidget extends GridWidget
     }
 
     @Override
-    public boolean PerformPostCreateActions()
+    public boolean PerformPostCreateActions(GridWidget objParentGrid)
     {
+        _WidgetParentGridWidget = objParentGrid;
         if (CONFIG.isDebugMode())
         {
             _ToolTip = this.toString();
@@ -237,8 +237,9 @@ public class DynamicGridWidget extends GridWidget
                 Tooltip.install(objGrid.getStylableObject(), _objToolTip);
             }
         }
+        super.PerformPostCreateActions(objParentGrid);
 
-        return true;
+        return handlePercentageDimentions();
     }
 
     @Override

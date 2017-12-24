@@ -385,6 +385,15 @@ public class Marvin extends Application
             if (false == _Config.getTabs().get(iIndex).Create(pane, _DataMgr, iIndex))
             {
                 RetVal = false;
+                break;
+            }
+        }
+        for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
+        {
+            if (false == _Config.getTabs().get(iIndex).PerformPostCreateActions(null))
+            {
+                RetVal = false;
+                break;
             }
         }
         if (true == RetVal)

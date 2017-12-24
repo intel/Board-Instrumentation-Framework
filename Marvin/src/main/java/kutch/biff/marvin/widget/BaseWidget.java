@@ -61,6 +61,7 @@ import org.xml.sax.SAXException;
  */
 abstract public class BaseWidget implements Widget
 {
+
     public static String DefaultWidgetDirectory = "Widget";
     private static int _WidgetCount = 0;
     private static final ArrayList<BaseWidget> _WidgetList = new ArrayList<>();
@@ -84,8 +85,9 @@ abstract public class BaseWidget implements Widget
     private VPos _VerticalPosition;
     protected Pos _Position;
     private ArrayList<Pair<String, String>> _Peekaboos;
-    private boolean _ClickThroughTransparentRegion=false;
-    
+    private boolean _ClickThroughTransparentRegion = false;
+    protected double _WidthPercentOfParentGrid;
+    protected double _HeightPercentOfParentGrid;
 
 //    private String _PeekabooID;
 //    private String _PeekabooNamespace;
@@ -101,6 +103,7 @@ abstract public class BaseWidget implements Widget
     private boolean _MouseHasBeenSetup;
     protected String _strAlignment;
     protected GridPane _WidgetParentPane;
+    protected GridWidget _WidgetParentGridWidget;
     protected String _DefaultPeekabooAction;
     protected String _DefinitionFile;
     protected String _WidgetType;
@@ -160,13 +163,35 @@ abstract public class BaseWidget implements Widget
         _RemoteStyleOverrideList = new ArrayList<>();
         _ToolTipStyle = null;
         _SelectedStyle = null;
-        _ClickThroughTransparentRegion=false;
-
+        _ClickThroughTransparentRegion = false;
+        _WidgetParentGridWidget = null;
+        _WidthPercentOfParentGrid = 0;
+        _HeightPercentOfParentGrid = 0;
 
         if (CONFIG.isDebugMode())
         {
             AddAdditionalStyleOverride(AliasMgr.getAliasMgr().GetAlias("DEBUG_STYLE"));
         }
+    }
+
+    public double getWidthPercentOfParentGrid()
+    {
+        return _WidthPercentOfParentGrid;
+    }
+
+    public void setWidthPercentOfParentGrid(double _WidthPercentOfParentGrid)
+    {
+        this._WidthPercentOfParentGrid = _WidthPercentOfParentGrid;
+    }
+
+    public double getHeightPercentOfParentGrid()
+    {
+        return _HeightPercentOfParentGrid;
+    }
+
+    public void setHeightPercentOfParentGrid(double _HeightPercentOfParentGrid)
+    {
+        this._HeightPercentOfParentGrid = _HeightPercentOfParentGrid;
     }
 
     public void SetDefaultPeekabooAction(String strDefault)
@@ -207,13 +232,19 @@ abstract public class BaseWidget implements Widget
         }
     }
 
+    public GridWidget getParentGridWidget()
+    {
+        return _WidgetParentGridWidget;
+    }
+
     /**
      *
      * @return
      */
     @Override
-    public boolean PerformPostCreateActions()
+    public boolean PerformPostCreateActions(GridWidget parentGrid)
     {
+        _WidgetParentGridWidget = parentGrid;
         if (CONFIG.isDebugMode())
         {
             _ToolTip = this.toString();
@@ -223,14 +254,47 @@ abstract public class BaseWidget implements Widget
             HandleToolTipInit();
             Tooltip.install(this.getStylableObject(), _objToolTip);
         }
-        if (this.GetClickThroughTransparentRegion() && null != getStylableObject())
+        if (GetClickThroughTransparentRegion() && null != getStylableObject())
         {
             getStylableObject().setPickOnBounds(false);
         }
-
-        return true;
+        
+        
+        return handlePercentageDimentions();
     }
 
+    public boolean handlePercentageDimentions()
+    {
+        if (getWidthPercentOfParentGrid() > 0)
+        {
+            double parentWidth =  _WidgetParentGridWidget.getWidth();
+            GridWidget currParent = _WidgetParentGridWidget;
+            
+            while (parentWidth == 0 )
+            {
+                System.out.println("Parent: " + currParent.getName());
+                currParent = currParent.getParentGridWidget();
+                if (null != currParent)
+                {
+                    parentWidth =  currParent.getWidth();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (parentWidth == 0)
+            {
+                LOGGER.severe("Widget [" + getName() +"] Width specified as percentage of parent grid - but parent grid width not specified.");
+                return false;
+            }
+            
+            double width = parentWidth * (getWidthPercentOfParentGrid()/100);
+            this.setWidth(width);
+        }
+        return true;
+    }
+    
     protected void SetParent(GridPane _Pane)
     {
         _WidgetParentPane = _Pane;
@@ -240,7 +304,7 @@ abstract public class BaseWidget implements Widget
     {
         return _WidgetParentPane;
     }
-    
+
     public static int getWidgetCount()
     {
         return _WidgetCount;
@@ -432,7 +496,6 @@ abstract public class BaseWidget implements Widget
 
     public void setHeight(double _Height)
     {
-
         this._Height = _Height;
     }
 
@@ -916,7 +979,7 @@ abstract public class BaseWidget implements Widget
         {
             return false;
         }
-        
+
         if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
         {
             return true;
@@ -931,7 +994,7 @@ abstract public class BaseWidget implements Widget
         {
             return true;
         }
-        
+
         if (node.getNodeName().equalsIgnoreCase("Style"))
         {
             String str = node.getTextContent();
@@ -1062,6 +1125,11 @@ abstract public class BaseWidget implements Widget
     protected void ConfigureDimentions()
     {
         Region regionNode = getRegionObject();
+        if (getParentPane().getWidth() > 0.0)
+        {
+            System.out.println(this.getName() + "-->" + Double.toString(getParentPane().getWidth()));
+        }
+
         if (null == regionNode)
         {
             LOGGER.severe(getName() + " : Should NOT BE here, NULL Widget pass to Config Dimensions");
@@ -1451,7 +1519,7 @@ abstract public class BaseWidget implements Widget
 
         return true;
     }
-    
+
     public boolean GetClickThroughTransparentRegion()
     {
         return _ClickThroughTransparentRegion;
@@ -1461,10 +1529,75 @@ abstract public class BaseWidget implements Widget
     {
         this._ClickThroughTransparentRegion = _CanClickOnTransparent;
     }
-    
+
     @Override
     public void PrepareForAppShutdown()
     {
-        
+
     }
+
+    public boolean parseWidth(FrameworkNode widgetNode)
+    {
+        String str = widgetNode.getAttribute("Width");
+        try
+        {
+            if (str.contains("%G") || str.contains("%g"))
+            {
+                str = str.replace("%g", "");
+                str = str.replace("%G", "");
+                double percentVal = Double.parseDouble(str);
+                setWidthPercentOfParentGrid(percentVal);
+            }
+            else if (str.contains("%A") || str.contains("%a") || str.contains("%"))
+            {
+                str = str.replace("%a", "");
+                str = str.replace("%A", "");
+                str = str.replace("%", "");
+                double percentVal = Double.parseDouble(str);
+                setWidth(CONFIG.getWidth() * (percentVal / 100.0));
+            }
+            else
+            {
+                setWidth(Integer.parseInt(str));
+            }
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe(getName() + ": Invalid Width specified " + str);
+            return false;
+        }
+        return true;
+    }
+    public boolean parseHeight(FrameworkNode widgetNode)
+    {
+        String str = widgetNode.getAttribute("Height");
+        try
+        {
+            if (str.contains("%G") || str.contains("%g")) // % of parent grid
+            {
+                str = str.replace("%g", "");
+                str = str.replace("%G", "");
+                double percentVal = Double.parseDouble(str);
+                setHeightPercentOfParentGrid(percentVal);
+            }
+            else if (str.contains("%A") || str.contains("%a") || str.contains("%")) // % of app
+            {
+                str = str.replace("%a", "");
+                str = str.replace("%A", "");
+                str = str.replace("%", "");
+                double percentVal = Double.parseDouble(str);
+                setHeight(CONFIG.getHeight() * (percentVal / 100.0));
+            }
+            else
+            {
+                setHeight(Integer.parseInt(str));
+            }
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe(getName() + ": Invalid Height specified " + str);
+            return false;
+        }
+        return true;
+    }    
 }

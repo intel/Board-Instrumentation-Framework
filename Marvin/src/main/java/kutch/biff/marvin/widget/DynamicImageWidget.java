@@ -280,7 +280,7 @@ public class DynamicImageWidget extends StaticImageWidget
     }
 
 @Override
-    public boolean PerformPostCreateActions()
+    public boolean PerformPostCreateActions(GridWidget objParentGrid)
     {
         if (CONFIG.isDebugMode())
         {

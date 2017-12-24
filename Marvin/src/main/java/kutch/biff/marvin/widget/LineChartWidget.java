@@ -35,7 +35,6 @@ import kutch.biff.marvin.utility.SeriesDataSet;
  */
 public class LineChartWidget extends LineChartWidget_MS
 {
-
     @Override
     @SuppressWarnings("unchecked")
     public boolean Create(GridPane pane, DataManager dataMgr)

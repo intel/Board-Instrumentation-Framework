@@ -185,11 +185,11 @@ public class FlipPanelWidget extends BaseWidget
         _FrontBaseGridPane = new GridPane();
         _BackBaseGridPane = new GridPane();
 
-        if (false == _FrontGrid.Create(_FrontBaseGridPane, dataMgr) || ! _FrontGrid.PerformPostCreateActions())
+        if (false == _FrontGrid.Create(_FrontBaseGridPane, dataMgr) || ! _FrontGrid.PerformPostCreateActions(getFrontGrid()))
         {
             return false;
         }
-        if (false == _BackGrid.Create(_BackBaseGridPane, dataMgr) || ! _BackGrid.PerformPostCreateActions())
+        if (false == _BackGrid.Create(_BackBaseGridPane, dataMgr) || ! _BackGrid.PerformPostCreateActions(_BackGrid))
         {
             return false;
         }
@@ -458,7 +458,7 @@ public class FlipPanelWidget extends BaseWidget
     }
 
     @Override
-    public boolean PerformPostCreateActions()
+    public boolean PerformPostCreateActions(GridWidget objParentGrid)
     {
         if (CONFIG.isDebugMode())
         {

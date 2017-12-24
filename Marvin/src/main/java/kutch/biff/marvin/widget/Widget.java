@@ -41,7 +41,7 @@ public interface Widget
     public void HandleCustomStyleOverride(FrameworkNode styleNode);
     public Region getRegionObject();
     public void UpdateTitle(String newTitle);
-    public boolean PerformPostCreateActions();
+    public boolean PerformPostCreateActions(GridWidget objParentGrid);
     public void PrepareForAppShutdown();
 
 //    public void UpdateStyleSheet(String FileName,String ID);
