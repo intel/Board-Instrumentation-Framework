@@ -1550,7 +1550,12 @@ abstract public class BaseWidget implements Widget
                 str = str.replace("%A", "");
                 str = str.replace("%", "");
                 double percentVal = Double.parseDouble(str);
-                setWidth(CONFIG.getWidth() * (percentVal / 100.0));
+                double screenWidth = CONFIG.getWidth();
+                if (0 == screenWidth)
+                {
+                    screenWidth = CONFIG.getCreationWidth();
+                }
+                setWidth(screenWidth * (percentVal / 100.0));
             }
             else
             {
@@ -1582,7 +1587,13 @@ abstract public class BaseWidget implements Widget
                 str = str.replace("%A", "");
                 str = str.replace("%", "");
                 double percentVal = Double.parseDouble(str);
-                setHeight(CONFIG.getHeight() * (percentVal / 100.0));
+                double screenHeight = CONFIG.getHeight();
+                if (0 == screenHeight)
+                {
+                    screenHeight = CONFIG.getCreationHeight();
+                }
+                
+                setHeight(screenHeight * (percentVal / 100.0));
             }
             else
             {
