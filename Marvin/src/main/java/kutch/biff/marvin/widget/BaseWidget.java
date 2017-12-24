@@ -1125,10 +1125,6 @@ abstract public class BaseWidget implements Widget
     protected void ConfigureDimentions()
     {
         Region regionNode = getRegionObject();
-        if (getParentPane().getWidth() > 0.0)
-        {
-            System.out.println(this.getName() + "-->" + Double.toString(getParentPane().getWidth()));
-        }
 
         if (null == regionNode)
         {
