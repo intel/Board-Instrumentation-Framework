@@ -108,12 +108,7 @@ public class AboutBox
         String MBMemStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem / 1024 );
         Label MemUsage = new Label("Mem usage (MB) - " + MBMemStr);
         
-        if (CONFIG.getConfiguration().GetApplicationID().length()>0)
-        {
-            Label ID = new Label("ID : " + CONFIG.getConfiguration().GetApplicationID());
-            grid.add(ID, 1, 6);
-        }
-        int newBottom = 0;
+        int newBottom = 1;
         grid.setAlignment(Pos.CENTER);
         grid.add(aboutImg, 1, newBottom++);
         grid.add(By, 1, newBottom++);
@@ -121,6 +116,11 @@ public class AboutBox
         grid.add(With, 1, newBottom++);
         grid.add(Where, 1, newBottom++);
         grid.add(new Label(" "), 1, newBottom++);
+        if (CONFIG.getConfiguration().GetApplicationID().length()>0)
+        {
+            Label ID = new Label("ID : " + CONFIG.getConfiguration().GetApplicationID());
+            grid.add(ID, 1, newBottom++);
+        }
         grid.add(VerLabel, 1, newBottom++);
         grid.add(Widgets, 1, newBottom++);
         grid.add(Tasks, 1, newBottom++);
