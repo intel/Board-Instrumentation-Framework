@@ -107,7 +107,6 @@ public class Marvin extends Application
     private String altSplash = null;
     private MarvinLocalData objLocalMarvinData = null;
     private MySplash _Splash;
-    
 
     // returns the base tab pane - used for dynamic tabs in debug mode
     public static TabPane GetBaseTabPane()
@@ -128,7 +127,7 @@ public class Marvin extends Application
                         java.security.cert.X509Certificate[] certs, String authType)
                 {
                 }
-                
+
                 @Override
                 public java.security.cert.X509Certificate[] getAcceptedIssuers()
                 {
@@ -348,7 +347,7 @@ public class Marvin extends Application
         long start = System.currentTimeMillis();
         _DataMgr = new DataManager();
         _Config = new ConfigurationReader();
-        
+
         if (null == _Config)
         {
             return 0;
@@ -356,8 +355,7 @@ public class Marvin extends Application
 
         SimpleDoubleProperty complete = new SimpleDoubleProperty();
         appConfig = _Config.ReadAppConfigFile(ConfigFilename, complete);
-        
-        
+
         if (null != appConfig)
         {
             if (dumpAlias)
@@ -368,7 +366,7 @@ public class Marvin extends Application
             TASKMAN.setDataMgr(_DataMgr); // kludgy I know, I know.  I hang my head in shame
             _receiveServer = new Server(_DataMgr);
         }
-        return  System.currentTimeMillis() - start;
+        return System.currentTimeMillis() - start;
     }
 
     private boolean SetupGoodies(TabPane pane)
@@ -414,16 +412,19 @@ public class Marvin extends Application
          */
         _Config.getConfiguration().setPane(pane);
         long elapsed = System.currentTimeMillis() - startTime;
-        LOGGER.info("Time taken to initialize all widgets: " + Long.toString(elapsed)+"ms.");
+        LOGGER.info("Time taken to initialize all widgets: " + Long.toString(elapsed) + "ms.");
 
         return RetVal;
     }
-    
+
     private void StopWidgets()
     {
-        for (Widget tab : _Config.getTabs())
+        if (null != _Config)
         {
-            tab.PrepareForAppShutdown();
+            for (Widget tab : _Config.getTabs())
+            {
+                tab.PrepareForAppShutdown();
+            }
         }
     }
 
@@ -454,13 +455,13 @@ public class Marvin extends Application
         if (null != _Config.getConfiguration().getCSSFile())
         {
             String osIndepFN = BaseWidget.convertToFileOSSpecific(_Config.getConfiguration().getCSSFile());
-            
+
             if (null == osIndepFN)
             {
                 return true;
             }
             String strCSS = BaseWidget.convertToFileURL(osIndepFN);
-            
+
             if (null != strCSS)
             {
                 try
@@ -527,10 +528,10 @@ public class Marvin extends Application
         }
 
         MySplash.getSplash().start(stage);
-        
+
         long elapsedTime = BeginLoadProcess();
-        LOGGER.info("Time taken to load Configuration: " + Long.toString(elapsedTime) +"ms.");
-        
+        LOGGER.info("Time taken to load Configuration: " + Long.toString(elapsedTime) + "ms.");
+
         if (!ShowSplash)
         {
             //ShowSplash = true;
@@ -661,11 +662,11 @@ public class Marvin extends Application
             @Override
             public void handle(long now)
             {
-                if  (Configuration.getConfig().terminating())
+                if (Configuration.getConfig().terminating())
                 {
                     return;
                 }
-                
+
                 if (!Showing)
                 {
                     try
@@ -705,14 +706,14 @@ public class Marvin extends Application
                     long freeMem = Runtime.getRuntime().freeMemory();
                     long totalMem = Runtime.getRuntime().maxMemory();
                     long usedMem = totalMem - freeMem;
-                    usedMem /=1024.0;
-                    String MBMemStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem / 1024 );
+                    usedMem /= 1024.0;
+                    String MBMemStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem / 1024);
                     //String BytesStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem);
-                    LOGGER.info("Used Memory: "  + MBMemStr + " MB.");
+                    LOGGER.info("Used Memory: " + MBMemStr + " MB.");
                 }
             }
         };
-      
+
         int waitBeforeRun = ShowSplash ? SplashWait : NoSplashWait;
         new java.util.Timer().schedule(// Start goodies in a few seconds
                 new java.util.TimerTask()
@@ -745,16 +746,16 @@ public class Marvin extends Application
             objLocalMarvinData = new MarvinLocalData(1);
         }
     }
-    
+
     public static void DumpThreads(boolean showStack)
     {
         showStack = false;
         Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-        Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);        
-        
-        LOGGER.info("******* Dumping " + Integer.toString(threadArray.length) +" Threads from thread: " + Thread.currentThread().getName() + " ****************");
-        
-        String dumpString="";
+        Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+
+        LOGGER.info("******* Dumping " + Integer.toString(threadArray.length) + " Threads from thread: " + Thread.currentThread().getName() + " ****************");
+
+        String dumpString = "";
         for (Thread entry : threadArray)
         {
             // info is name,priority,threadgroup
@@ -763,14 +764,14 @@ public class Marvin extends Application
             {
                 for (StackTraceElement element : entry.getStackTrace())
                 {
-                    dumpString += "\t\t" + element.toString() +"\n";
+                    dumpString += "\t\t" + element.toString() + "\n";
                 }
-                
+
             }
-                
+
         }
         LOGGER.info(dumpString);
-        
+
     }
 
     @Override
@@ -778,7 +779,7 @@ public class Marvin extends Application
     {
         Configuration.getConfig().setTerminating();
         StopWidgets();
-        
+
         if (null != objLocalMarvinData)
         {
             objLocalMarvinData.Shutdown();
@@ -798,7 +799,7 @@ public class Marvin extends Application
             _animationTimer.stop();
         }
         LOGGER.info("Animation Timer Stopped");
-        */
+         */
         //Marvin.DumpThreads(true);
     }
 

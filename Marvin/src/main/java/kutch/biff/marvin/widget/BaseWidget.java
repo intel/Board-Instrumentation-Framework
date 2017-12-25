@@ -265,6 +265,7 @@ abstract public class BaseWidget implements Widget
 
     public boolean handlePercentageDimentions()
     {
+        boolean changed = false;
         if (getWidthPercentOfParentGrid() > 0)
         {
             double parentWidth =  _WidgetParentGridWidget.getWidth();
@@ -272,7 +273,6 @@ abstract public class BaseWidget implements Widget
             
             while (parentWidth == 0 )
             {
-                System.out.println("Parent: " + currParent.getName());
                 currParent = currParent.getParentGridWidget();
                 if (null != currParent)
                 {
@@ -290,8 +290,41 @@ abstract public class BaseWidget implements Widget
             }
             
             double width = parentWidth * (getWidthPercentOfParentGrid()/100);
-            this.setWidth(width);
+            setWidth(width);
+            changed = true;
         }
+        if (getHeightPercentOfParentGrid() > 0)
+        {
+            double parentHeight =  _WidgetParentGridWidget.getHeight();
+            GridWidget currParent = _WidgetParentGridWidget;
+            
+            while (parentHeight == 0 )
+            {
+                currParent = currParent.getParentGridWidget();
+                if (null != currParent)
+                {
+                    parentHeight =  currParent.getHeight();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (parentHeight == 0)
+            {
+                LOGGER.severe("Widget [" + getName() +"] Height specified as percentage of parent grid - but parent grid width not specified.");
+                return false;
+            }
+            
+            double Height = parentHeight * (getHeightPercentOfParentGrid()/100);
+            setHeight(Height);
+            changed = true;
+        }
+        if (changed)
+        {
+            ConfigureDimentions();
+        }
+        
         return true;
     }
     
