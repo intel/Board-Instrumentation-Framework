@@ -693,6 +693,7 @@ public class ConfigurationReader
         }
 
         AliasMgr.getAliasMgr().addMarvinInfo();
+        _Configuration.setPrimaryScreenDetermined(true);
         return NetworkSettingsRead;
     }
 

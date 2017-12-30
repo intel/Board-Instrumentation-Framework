@@ -23,10 +23,10 @@ package kutch.biff.marvin.splash;
 
 import java.io.File;
 import java.net.URL;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -62,6 +62,7 @@ public class MySplash
     private String strAltSplash;
     double TimerInterval = 5000;
     public boolean _appVisible;
+    Rectangle2D AppVisualBounds = null;
 
     static public MySplash getSplash()
     {
@@ -73,7 +74,6 @@ public class MySplash
         _Splash = this;
         _Show = show;
         _appVisible = false;
-        
         
         strAltSplash = alternateSplashImage;
         init();
@@ -149,6 +149,7 @@ public class MySplash
         //parentStage.setIconified(true);
 
         _Stage = new Stage();
+        
         _Stage.setTitle("Marvin");
         _Stage.initStyle(StageStyle.UNDECORATED);
         _Stage.toFront();
@@ -163,6 +164,16 @@ public class MySplash
             @Override
             public void handle(long now)
             {
+                if (null == AppVisualBounds && null != Configuration.getConfig())
+                {
+                    if (Configuration.getConfig().isPrimaryScreenDetermined())
+                    {
+                        AppVisualBounds = Configuration.getConfig().getPrimaryScreen().getVisualBounds();
+                        _Stage.setX(AppVisualBounds.getMinX() + Configuration.getConfig().getWidth()/2 - _Stage.getWidth()/2);
+                        _Stage.setY(AppVisualBounds.getMinY() + Configuration.getConfig().getHeight()/2- _Stage.getHeight()/2);
+                    }
+                    
+                }
                 if (0 == startTimerTime)
                 {
                     startTimerTime = System.currentTimeMillis();

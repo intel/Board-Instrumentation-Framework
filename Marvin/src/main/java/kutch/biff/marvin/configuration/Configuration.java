@@ -86,6 +86,7 @@ public class Configuration
     private boolean _MarvinLocalDatafeed;
     private boolean _ShuttingDown;
     private Screen  _PrimaryScreen;
+    private boolean _PrimaryScreenDetermined;
     
 
     public Configuration()
@@ -118,6 +119,7 @@ public class Configuration
         _ApplicationID = "";
         _Side = Side.TOP;
         _PrimaryScreen = Screen.getPrimary();
+        _PrimaryScreenDetermined = false;
        
         _ShuttingDown = false;
         
@@ -129,6 +131,16 @@ public class Configuration
         _MarvinLocalDatafeed = false;
     }
 
+    public boolean isPrimaryScreenDetermined()
+    {
+        return _PrimaryScreenDetermined;
+    }
+
+    public void setPrimaryScreenDetermined(boolean _PrimaryScreenDetermined)
+    {
+        this._PrimaryScreenDetermined = _PrimaryScreenDetermined;
+    }
+
     public Screen getPrimaryScreen()
     {
         return _PrimaryScreen;
@@ -137,6 +149,7 @@ public class Configuration
     public void setPrimaryScreen(Screen _PrimaryScreen)
     {
         this._PrimaryScreen = _PrimaryScreen;
+        setPrimaryScreenDetermined(true);
     }
 
     
