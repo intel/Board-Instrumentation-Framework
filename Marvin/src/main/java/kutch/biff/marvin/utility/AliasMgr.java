@@ -31,6 +31,9 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
+import kutch.biff.marvin.configuration.Configuration;
 import static kutch.biff.marvin.configuration.ConfigurationReader.OpenXMLFile;
 import kutch.biff.marvin.logger.MarvinLogger;
 import org.w3c.dom.Attr;
@@ -163,6 +166,30 @@ public class AliasMgr
         if (null == Value)
         {
             String strError = "Alias [" + Alias + "] has NULL value!";
+            LOGGER.severe(strError);
+            map.put(Alias.toUpperCase(),strError);
+        }
+        else
+        {
+            map.put(Alias.toUpperCase(), Value);
+        }
+    }
+    
+    public void AddRootAlias(String Alias, String Value)
+    {
+        if (null == Alias)
+        {
+            LOGGER.severe("Attempted to set a Root ALIAS ID to NULL");
+            return;
+        }
+        Map map = _AliasList.get(_AliasList.size()-1);
+        if (map.containsKey(Alias.toUpperCase()))
+        {
+            return;
+        }
+        if (null == Value)
+        {
+            String strError = "Root Alias [" + Alias + "] has NULL value!";
             LOGGER.severe(strError);
             map.put(Alias.toUpperCase(),strError);
         }
@@ -354,6 +381,15 @@ public class AliasMgr
             return true;
         }
         return false;
+    }
+    
+    public void addMarvinInfo()
+    {
+        Configuration CONFIG = Configuration.getConfig();        
+        
+        Rectangle2D visualBounds = CONFIG.getPrimaryScreen().getVisualBounds();
+        AddAlias("SCREEN_WIDTH", Integer.toString((int) visualBounds.getWidth()));
+        AddAlias("SCREEN_HEIGHT", Integer.toString((int) visualBounds.getHeight()));
     }
 
     private void AddEnvironmentVars()

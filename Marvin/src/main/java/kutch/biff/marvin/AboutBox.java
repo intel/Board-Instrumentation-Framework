@@ -57,7 +57,6 @@ import kutch.biff.marvin.widget.BaseWidget;
  */
 public class AboutBox
 {
-
     public static void ShowAboutBox()
     {
         Stage dialog = new Stage();
@@ -159,6 +158,11 @@ public class AboutBox
                 stage.close();
             }
         });
+        
+        int xPos = (int) (CONFIG.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX() + CONFIG.getConfiguration().getWidth()/2 - 125);
+        int yPos = (int) (CONFIG.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY() + CONFIG.getConfiguration().getHeight()/2 - 200);
+        stage.setX(xPos);
+        stage.setY(yPos);        
         return grid;
     }
 
@@ -173,7 +177,7 @@ public class AboutBox
         Label lblVersionJVM;
         Label lblTabCount;
 
-        Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
+        Rectangle2D visualBounds = CONFIG.getConfiguration().getPrimaryScreen().getVisualBounds();
         int appWidth = (int) visualBounds.getWidth();
         int appHeight = (int) visualBounds.getHeight();
 

@@ -39,7 +39,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javax.net.ssl.HttpsURLConnection;
@@ -419,7 +418,7 @@ public class Marvin extends Application
 
     private void StopWidgets()
     {
-        if (null != _Config)
+        if (null != _Config && null != _Config.getTabs())
         {
             for (Widget tab : _Config.getTabs())
             {
@@ -549,8 +548,9 @@ public class Marvin extends Application
         _objTabPane.setSide(_Config.getConfiguration().getSide());
         GridPane sceneGrid = new GridPane();
 
+        
         Scene scene = null;
-        Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
+        Rectangle2D visualBounds = _Config.getConfiguration().getPrimaryScreen().getVisualBounds();
         int appWidth = (int) visualBounds.getWidth();
         int appHeight = (int) visualBounds.getHeight();
 
@@ -729,6 +729,9 @@ public class Marvin extends Application
         );
 
         DumpAllWidgetsInformation();
+
+        stage.setX(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX());
+        stage.setY(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY());
 
         stage.setMaximized(true);
     }

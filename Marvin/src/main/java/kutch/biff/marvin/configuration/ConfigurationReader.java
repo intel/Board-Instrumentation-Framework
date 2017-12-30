@@ -188,7 +188,8 @@ public class ConfigurationReader
         }
         if (_Configuration.isAutoScale() && _Configuration.getCreationHeight() > 0 && _Configuration.getCreationWidth() > 0)
         {
-            Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
+            Rectangle2D visualBounds = _Configuration.getPrimaryScreen().getVisualBounds();
+            
             double appWidth = visualBounds.getWidth();
             double appHeight = visualBounds.getHeight();
             // if app size specified
@@ -417,6 +418,30 @@ public class ConfigurationReader
                 _Configuration.setIgnoreWebCerts(node.getBooleanValue());
 
                 LOGGER.config("Ignoring Web Certifications");
+            }
+            else if (node.getNodeName().equalsIgnoreCase("MonitorNumber"))
+            {
+                try
+                {
+                    int monitorNum = Integer.parseInt(node.getTextContent());
+                    int count = Screen.getScreens().size();
+                    if (monitorNum <= Screen.getScreens().size())
+                    {
+                        Screen primary = Screen.getScreens().get(monitorNum -1);
+                        _Configuration.setPrimaryScreen(primary);
+                        LOGGER.config("Setting Primary Screen to monitor #" +  node.getTextContent());
+                    }
+                    else
+                    {
+                        LOGGER.severe("<MonitorNumber> set to " + node.getTextContent() +" however there are only " + Integer.toHexString(count) + " monitors.");
+                        return false;
+                    }
+                }
+                catch (Exception Ex)
+                {
+                    LOGGER.severe("Invalid MonitorNumber specified");
+                    return false;
+                }
             }
             else if (node.getNodeName().equalsIgnoreCase("CreationSize"))
             {
@@ -667,6 +692,7 @@ public class ConfigurationReader
             LOGGER.severe("No <Network> section found in Application.xml");
         }
 
+        AliasMgr.getAliasMgr().addMarvinInfo();
         return NetworkSettingsRead;
     }
 

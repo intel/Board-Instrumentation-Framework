@@ -33,6 +33,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import kutch.biff.marvin.AboutBox;
 import kutch.biff.marvin.logger.MarvinLogger;
@@ -84,6 +85,7 @@ public class Configuration
     private ArrayList<OscarBullhorn> _OscarBullhornList;
     private boolean _MarvinLocalDatafeed;
     private boolean _ShuttingDown;
+    private Screen  _PrimaryScreen;
     
 
     public Configuration()
@@ -115,7 +117,8 @@ public class Configuration
         _IgnoreWebCerts = false;
         _ApplicationID = "";
         _Side = Side.TOP;
-        
+        _PrimaryScreen = Screen.getPrimary();
+       
         _ShuttingDown = false;
         
         _LastLiveDataReceived = 0;
@@ -124,6 +127,16 @@ public class Configuration
         _EnableScrollBars = false;
         _OscarBullhornList = new ArrayList<>();
         _MarvinLocalDatafeed = false;
+    }
+
+    public Screen getPrimaryScreen()
+    {
+        return _PrimaryScreen;
+    }
+
+    public void setPrimaryScreen(Screen _PrimaryScreen)
+    {
+        this._PrimaryScreen = _PrimaryScreen;
     }
 
     
