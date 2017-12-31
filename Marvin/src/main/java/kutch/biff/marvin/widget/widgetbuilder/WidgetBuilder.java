@@ -1133,6 +1133,10 @@ public class WidgetBuilder
             else if (node.getNodeName().equalsIgnoreCase("ClickThroughTransparent"))
             {
                 retWidget.SetClickThroughTransparentRegion(node.getBooleanValue());
+                if (node.hasAttribute("Propagate") && node.getBooleanAttribute("Propagate"))
+                {
+                    retWidget.setExplicitPropagate(true);
+                }
             }
 
             else if (!retWidget.HandleWidgetSpecificSettings(node))
@@ -1204,6 +1208,10 @@ public class WidgetBuilder
             else if (node.getNodeName().equalsIgnoreCase("ClickThroughTransparent"))
             {
                 retWidget.SetClickThroughTransparentRegion(node.getBooleanValue());
+                if (node.hasAttribute("Propagate") && node.getBooleanAttribute("Propagate"))
+                {
+                    retWidget.setExplicitPropagate(true);
+                }                
             }
             
             else if (name.equalsIgnoreCase("Peekaboo")) // for external grid files

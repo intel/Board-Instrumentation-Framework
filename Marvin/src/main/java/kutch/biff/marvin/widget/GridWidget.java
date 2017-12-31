@@ -39,22 +39,47 @@ import kutch.biff.marvin.utility.Utility;
  */
 public class GridWidget extends BaseWidget
 {
+
     protected ArrayList<Widget> _Widgets;
     private GridPane _GridPane = null;
     private int _hGap, _vGap;
     private int _insetTop, _insetBottom, _insetLeft, _insetRight;
+    private boolean _PropagateClickThrough;
+    private boolean _PropagateExplicitlyConfigured;
     //private Pos _Position; // this could be a problem
 
+    protected boolean isPropagateClickThrough()
+    {
+        return _PropagateClickThrough;
+    }
+
+    protected void setPropagateClickThrough(boolean _PropagateClickThrough)
+    {
+        this._PropagateClickThrough = _PropagateClickThrough;
+    }
+    
+    public void setExplicitPropagate(boolean _PropagateClickThrough)
+    {
+        setPropagateClickThrough(_PropagateClickThrough);
+        _PropagateExplicitlyConfigured = true;
+    }
+
+    public boolean getExplicitPropagate()
+    {
+        return _PropagateExplicitlyConfigured;
+    }
     public GridWidget()
     {
         _Widgets = new ArrayList<>();
         _GridPane = new GridPane();
+        _PropagateClickThrough = false;
+        _PropagateExplicitlyConfigured = false;
 
         _hGap = -1;
         _vGap = -1;
 
         _Position = Pos.TOP_CENTER; // default for both Tab and Grids
-         _insetTop = _insetBottom = _insetLeft = _insetRight =-1;
+        _insetTop = _insetBottom = _insetLeft = _insetRight = -1;
         setDefaultIsSquare(false);
     }
 
@@ -114,9 +139,9 @@ public class GridWidget extends BaseWidget
         }
 
         ConfigureDimentions();
-        
+
         SetPadding();
-        
+
         boolean RetVal = true;
         //ApplyCSS();
 
@@ -152,12 +177,12 @@ public class GridWidget extends BaseWidget
         SetupTaskAction();
         return ApplyCSS();
     }
-   
+
     public void SetPadding()
     {
         getGridPane().setPadding(new Insets(getInsetTop(), getInsetRight(), getInsetBottom(), getInsetLeft()));
     }
-    
+
     @Override
     public javafx.scene.Node getStylableObject()
     {
@@ -199,7 +224,7 @@ public class GridWidget extends BaseWidget
     {
         if (-1 == _insetTop)
         {
-            if (null != getParentPane() && ! CONFIG.getLegacyInsetMode())
+            if (null != getParentPane() && !CONFIG.getLegacyInsetMode())
             {
                 _insetTop = 0;//(int) getParentPane().getInsets().getTop();
             }
@@ -224,7 +249,7 @@ public class GridWidget extends BaseWidget
     {
         if (-1 == _insetBottom)
         {
-            if (null != getParentPane() && ! CONFIG.getLegacyInsetMode())
+            if (null != getParentPane() && !CONFIG.getLegacyInsetMode())
             {
                 _insetBottom = 0;//(int) getParentPane().getInsets().getBottom();
             }
@@ -249,7 +274,7 @@ public class GridWidget extends BaseWidget
     {
         if (-1 == _insetLeft)
         {
-            if (null != getParentPane() && ! CONFIG.getLegacyInsetMode())
+            if (null != getParentPane() && !CONFIG.getLegacyInsetMode())
             {
                 _insetLeft = 0;//(int) getParentPane().getInsets().getLeft();
             }
@@ -275,7 +300,7 @@ public class GridWidget extends BaseWidget
     {
         if (-1 == _insetRight)
         {
-            if (null != getParentPane() && ! CONFIG.getLegacyInsetMode())
+            if (null != getParentPane() && !CONFIG.getLegacyInsetMode())
             {
                 _insetRight = 0;//(int) getParentPane().getInsets().getRight();
             }
@@ -428,9 +453,31 @@ public class GridWidget extends BaseWidget
 
     @Override
     public boolean PerformPostCreateActions(GridWidget parentGrid)
-    {    
+    {
         _WidgetParentGridWidget = parentGrid;
         handlePercentageDimentions();
+        if (isPropagateClickThrough())
+        {
+            boolean flag = GetClickThroughTransparentRegion();
+            
+            for (Widget _Widget : _Widgets)
+            {
+                if (_Widget instanceof GridWidget)
+                {
+                    GridWidget objGrid = (GridWidget)_Widget;
+                    if (objGrid.getExplicitPropagate())
+                    {
+                        continue; // if specified for a sub-grid, do not override
+                    }
+                    else
+                    {
+                        objGrid.setPropagateClickThrough(true);
+                    }
+                }
+                _Widget.SetClickThroughTransparentRegion(flag);
+
+            }
+        }
         for (Widget _Widget : _Widgets)
         {
             if (!_Widget.PerformPostCreateActions(this))
@@ -442,9 +489,8 @@ public class GridWidget extends BaseWidget
         {
             getStylableObject().setPickOnBounds(false);
         }
-        
+
         return true;
     }
-            
-            
+
 }

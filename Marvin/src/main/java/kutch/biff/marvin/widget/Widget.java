@@ -43,6 +43,7 @@ public interface Widget
     public void UpdateTitle(String newTitle);
     public boolean PerformPostCreateActions(GridWidget objParentGrid);
     public void PrepareForAppShutdown();
+    public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent);
 
 //    public void UpdateStyleSheet(String FileName,String ID);
 //    public void UpdateRange(double min, double max);
