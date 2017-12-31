@@ -438,6 +438,11 @@ public class GridWidget extends BaseWidget
                 return false;
             }
         }
+        if (GetClickThroughTransparentRegion() && null != getStylableObject())
+        {
+            getStylableObject().setPickOnBounds(false);
+        }
+        
         return true;
     }
             

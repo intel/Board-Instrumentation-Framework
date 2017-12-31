@@ -120,12 +120,12 @@ public class WidgetBuilder
         fileName = BaseWidget.convertToFileOSSpecific(fileName);
         String fileNameWPath;
         File fCheck = new File(fileName);
-        
+
         if (null == fCheck)
         {
             return null;
         }
-        
+
         if (fCheck.exists())
         {
             fileNameWPath = fileName;  //fully qualified path provided (likely custom widget)
@@ -185,7 +185,7 @@ public class WidgetBuilder
 
         if (true == widgetNode.hasAttribute("Height"))
         {
-            if (! retWidget.parseHeight(widgetNode))
+            if (!retWidget.parseHeight(widgetNode))
             {
                 return null;
             }
@@ -288,7 +288,11 @@ public class WidgetBuilder
                     return null;
                 }
             }
-            
+            else if (node.getNodeName().equalsIgnoreCase("ClickThroughTransparent"))
+            {
+                retWidget.SetClickThroughTransparentRegion(node.getBooleanValue());
+            }
+
             else if (node.getNodeName().equalsIgnoreCase("MinionSrc"))
             {
                 if (node.hasAttributes())
@@ -353,7 +357,7 @@ public class WidgetBuilder
                 }, widgetNode);
                 if (widgetNode.hasAttribute("ID") && widgetNode.hasAttribute("Namespace"))
                 {
-                    widget.addPeekaboo(widgetNode.getAttribute("Namespace"),widgetNode.getAttribute("ID"));
+                    widget.addPeekaboo(widgetNode.getAttribute("Namespace"), widgetNode.getAttribute("ID"));
                 }
                 else
                 {
@@ -383,7 +387,7 @@ public class WidgetBuilder
                     {
                         String validOpts[] =
                         {
-                            "Pause", "Resume", "Remove", "Insert","Disable","Enable","Select","Deselected"
+                            "Pause", "Resume", "Remove", "Insert", "Disable", "Enable", "Select", "Deselected"
                         };
                         boolean found = false;
 
@@ -688,14 +692,14 @@ public class WidgetBuilder
             {
                 retWidget = SVG_WidgetBuilder.Build(baseNode, Filename);
             }
-            
+
             else if (strWidget.equalsIgnoreCase("PDF_Reader"))
             {
                 LOGGER.severe("PDF Reader not currently supported");
                 retWidget = null;
                 //retWidget = PDF_ReaderWidgetBuilder.Build(baseNode, Filename);
             }
-            
+
             else if (strWidget.equalsIgnoreCase("AudioPlayer"))
             {
                 retWidget = AudioPlayerWidgetBuilder.Build(baseNode, Filename);
@@ -731,7 +735,7 @@ public class WidgetBuilder
             }
             if (null != retWidget)
             {
-                retWidget.setWidgetInformation(file.getParent(),Filename,strWidget);
+                retWidget.setWidgetInformation(file.getParent(), Filename, strWidget);
             }
         }
         else
@@ -750,7 +754,7 @@ public class WidgetBuilder
         if (true == isFlipPanelGrid)
         {
             WhatIsIt = "FlipPanel";
-        }        
+        }
         if (gridNode.hasAttribute("hgap"))
         {
             try
@@ -789,9 +793,10 @@ public class WidgetBuilder
         if (gridNode.hasAttribute("Task"))
         {
             objGridWidget.setTaskID(gridNode.getAttribute("Task"));
-        }        
+        }
         return true;
     }
+
     public static GridWidget BuildGrid(FrameworkNode gridNode, boolean isFlipPanelGrid)
     {
         GridWidget retWidget = new GridWidget();
@@ -830,14 +835,14 @@ public class WidgetBuilder
         }
         if (true == gridNode.hasAttribute("Height"))
         {
-            if (! retWidget.parseHeight(gridNode))
+            if (!retWidget.parseHeight(gridNode))
             {
                 return null;
             }
         }
         if (true == gridNode.hasAttribute("Width"))
         {
-            if (! retWidget.parseWidth(gridNode))
+            if (!retWidget.parseWidth(gridNode))
             {
                 return null;
             }
@@ -874,7 +879,7 @@ public class WidgetBuilder
         AliasMgr.getAliasMgr().UpdateCurrentColumn(Integer.parseInt(strColumn));
         AliasMgr.getAliasMgr().UpdateCurrentRow(Integer.parseInt(strRow));
         AliasMgr.getAliasMgr().PushAliasList(true);
-        
+
         if (true == gridNode.hasAttribute("File"))
         {
             AliasMgr.getAliasMgr().PushAliasList(true);
@@ -1125,6 +1130,10 @@ public class WidgetBuilder
                     return null;
                 }
             }
+            else if (node.getNodeName().equalsIgnoreCase("ClickThroughTransparent"))
+            {
+                retWidget.SetClickThroughTransparentRegion(node.getBooleanValue());
+            }
 
             else if (!retWidget.HandleWidgetSpecificSettings(node))
             {
@@ -1147,7 +1156,7 @@ public class WidgetBuilder
         {
             LOGGER.config("Processing file [" + filename + "]");
         }
-        
+
         for (FrameworkNode node : gridNode.getChildNodes())
         {
             String name = node.getNodeName();
@@ -1175,7 +1184,7 @@ public class WidgetBuilder
                     return null;
                 }
             }
-            else if ( node.getNodeName().equalsIgnoreCase("For"))
+            else if (node.getNodeName().equalsIgnoreCase("For"))
             {
                 List<Widget> repeatList = WidgetBuilder.BuildRepeatList(node);
                 if (null == repeatList)
@@ -1192,6 +1201,11 @@ public class WidgetBuilder
             {
                 HandleStyleOverride(retWidget, node);
             }
+            else if (node.getNodeName().equalsIgnoreCase("ClickThroughTransparent"))
+            {
+                retWidget.SetClickThroughTransparentRegion(node.getBooleanValue());
+            }
+            
             else if (name.equalsIgnoreCase("Peekaboo")) // for external grid files
             {
                 if (!HandlePeekaboo(retWidget, node))
@@ -1206,7 +1220,7 @@ public class WidgetBuilder
                     return null;
                 }
             }
-            
+
             else if (name.equalsIgnoreCase("Size"))
             {
                 if (false == HandleSizeSection(node, retWidget))
@@ -1286,7 +1300,9 @@ public class WidgetBuilder
 
         AliasMgr.getAliasMgr().PushAliasList(false);
         AliasMgr.getAliasMgr().AddAliasFromAttibuteList(repeatNode, new String[] // can define an alias list in <repeat>
-        {    "Count", "startvlaue", "currentCountAlias", "currentvalueAlias"      });
+                                                {
+                                                    "Count", "startvlaue", "currentCountAlias", "currentvalueAlias"
+        });
 
         if (!repeatNode.hasAttribute("Count"))
         {
@@ -1330,7 +1346,7 @@ public class WidgetBuilder
             // Always have these aliases
             AliasMgr.getAliasMgr().AddAlias("CurrentValueAlias", Integer.toString(iLoop + start));
             AliasMgr.getAliasMgr().AddAlias("CurrentCountAlias", Integer.toString(iLoop));
-            
+
             for (FrameworkNode node : repeatNode.getChildNodes())
             {
                 if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
