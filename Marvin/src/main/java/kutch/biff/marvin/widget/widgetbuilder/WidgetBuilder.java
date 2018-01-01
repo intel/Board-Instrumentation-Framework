@@ -991,12 +991,7 @@ public class WidgetBuilder
         }
         if (true == dynaTabNode.hasAttribute("Height"))
         {
-            String str = dynaTabNode.getAttribute("Height");
-            try
-            {
-                retWidget.setHeight(Integer.parseInt(str));
-            }
-            catch (NumberFormatException ex)
+            if (!retWidget.parseHeight(dynaTabNode))
             {
                 LOGGER.severe("Invalid Height for Grid in Application.xml");
                 return null;
@@ -1004,12 +999,7 @@ public class WidgetBuilder
         }
         if (true == dynaTabNode.hasAttribute("Width"))
         {
-            String str = dynaTabNode.getAttribute("Width");
-            try
-            {
-                retWidget.setWidth(Integer.parseInt(str));
-            }
-            catch (NumberFormatException ex)
+            if (!retWidget.parseWidth(dynaTabNode))
             {
                 LOGGER.severe("Invalid Width for Grid in Application.xml");
                 return null;

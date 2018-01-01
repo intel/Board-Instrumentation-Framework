@@ -385,7 +385,7 @@ public class DynamicGridWidget extends GridWidget
             {
                 return null;
             }
-            retWidget = ReadGridInfo(GridNode, retWidget, ""); // read grid from external file
+            retWidget = ReadGridInfo(GridNode, retWidget, null); // read grid from external file
             if (null == retWidget)
             {
                 return null;
