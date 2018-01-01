@@ -32,7 +32,6 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.geometry.Rectangle2D;
-import javafx.stage.Screen;
 import kutch.biff.marvin.configuration.Configuration;
 import static kutch.biff.marvin.configuration.ConfigurationReader.OpenXMLFile;
 import kutch.biff.marvin.logger.MarvinLogger;
@@ -49,7 +48,7 @@ import org.w3c.dom.NodeList;
  */
 public class AliasMgr
 {
-   private final ArrayList<Map> _AliasList;
+    private final ArrayList<Map> _AliasList;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static AliasMgr _Mgr = new AliasMgr();
     private final static String strCurrentRowAlias = "CurrentRowAlias";
@@ -246,6 +245,7 @@ public class AliasMgr
             AddAlias(strPrevColumnAlias, "0");
             AddAlias(strPrevRowAlias, "0");
         }
+        GridMacroMgr.getGridMacroMgr().PushGridMacroList();
     }
 
     /**
@@ -254,6 +254,7 @@ public class AliasMgr
     public void PopAliasList()
     {
         _AliasList.remove(0);
+        GridMacroMgr.getGridMacroMgr().PopGridMacroList();
     }
 
     /**

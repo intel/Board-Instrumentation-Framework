@@ -219,6 +219,14 @@ public class TabWidget extends GridWidget
                     return false;
                 }
             }
+            else if (node.getNodeName().equalsIgnoreCase("GridMacro") || node.getNodeName().equalsIgnoreCase("MacroGrid"))
+            {
+                if (!WidgetBuilder.ReadGridMacro(node))
+                {
+                    return false;
+                }
+            }
+
             else if (node.getNodeName().equalsIgnoreCase("For"))
             {
                 List<Widget> repeatList = WidgetBuilder.BuildRepeatList(node);

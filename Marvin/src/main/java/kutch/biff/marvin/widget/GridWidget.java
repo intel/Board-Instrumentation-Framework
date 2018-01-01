@@ -57,7 +57,7 @@ public class GridWidget extends BaseWidget
     {
         this._PropagateClickThrough = _PropagateClickThrough;
     }
-    
+
     public void setExplicitPropagate(boolean _PropagateClickThrough)
     {
         setPropagateClickThrough(_PropagateClickThrough);
@@ -68,6 +68,7 @@ public class GridWidget extends BaseWidget
     {
         return _PropagateExplicitlyConfigured;
     }
+
     public GridWidget()
     {
         _Widgets = new ArrayList<>();
@@ -361,7 +362,7 @@ public class GridWidget extends BaseWidget
             }
             catch (Exception ex)
             {
-                LOGGER.severe("Invalid PaddingOverride/Padding configuration.");
+                LOGGER.severe("Invalid PaddingOverride/Padding configuration: " + strTop + "," + strBottom + "," + strLeft + "," + strRight);
                 return false;
             }
         }
@@ -459,12 +460,12 @@ public class GridWidget extends BaseWidget
         if (isPropagateClickThrough())
         {
             boolean flag = GetClickThroughTransparentRegion();
-            
+
             for (Widget _Widget : _Widgets)
             {
                 if (_Widget instanceof GridWidget)
                 {
-                    GridWidget objGrid = (GridWidget)_Widget;
+                    GridWidget objGrid = (GridWidget) _Widget;
                     if (objGrid.getExplicitPropagate())
                     {
                         continue; // if specified for a sub-grid, do not override

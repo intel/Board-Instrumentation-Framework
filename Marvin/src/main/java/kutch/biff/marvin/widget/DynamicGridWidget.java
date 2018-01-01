@@ -32,6 +32,7 @@ import kutch.biff.marvin.task.MarvinTask;
 import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.CircularList;
 import kutch.biff.marvin.utility.FrameworkNode;
+import kutch.biff.marvin.utility.GridMacroMgr;
 import kutch.biff.marvin.utility.Utility;
 import static kutch.biff.marvin.widget.BaseWidget.CONFIG;
 import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
@@ -296,7 +297,11 @@ public class DynamicGridWidget extends GridWidget
             {
                 FileName = node.getAttribute("Source");
             }
-            else
+            else if (node.hasAttribute("Macro"))
+            {
+                
+            }
+            else 
             {
                 LOGGER.severe("Dynamic Grid Widget has no Source for Grid");
                 return false;
@@ -345,19 +350,36 @@ public class DynamicGridWidget extends GridWidget
     private GridWidget BuildGrid(FrameworkNode node)
     {
         GridWidget retWidget = new DynamicGrid(); // DynamicGrid is a superset, so can do this
-        if (true == node.hasAttribute("Source"))
+        
+        if (true == node.hasAttribute("Source") || node.hasAttribute("Macro"))
         {
+            FrameworkNode GridNode = null;
             AliasMgr.getAliasMgr().PushAliasList(true);
             AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
             {
                 "hgap", "vgap", "Align", "Source", "ID"
             });
-            if (false == AliasMgr.ReadAliasFromExternalFile(node.getAttribute("Source")))
+            if (node.hasAttribute("Source"))
             {
-                AliasMgr.getAliasMgr().PopAliasList();
-                return null;
+                if (false == AliasMgr.ReadAliasFromExternalFile(node.getAttribute("Source")))
+                {
+                    AliasMgr.getAliasMgr().PopAliasList();
+                    return null;
+                }
+                GridNode = WidgetBuilder.OpenDefinitionFile(node.getAttribute("Source"), "Grid");
+                if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("Source"))) // could also be tasks defined in external file
+                {
+                    return null;
+                }
             }
-            FrameworkNode GridNode = WidgetBuilder.OpenDefinitionFile(node.getAttribute("Source"), "Grid");
+            else
+            {
+                GridNode = GridMacroMgr.getGridMacroMgr().getGridMacro(node.getAttribute("Macro"));
+                if (null == GridNode)
+                {
+                    LOGGER.severe("Unknown Grid Macro [" + node.getAttribute("Macro") +"] specified for Dynamic Grid Source");
+                }
+            }
 
             if (null == GridNode)
             {
@@ -365,10 +387,6 @@ public class DynamicGridWidget extends GridWidget
             }
             retWidget = ReadGridInfo(GridNode, retWidget, ""); // read grid from external file
             if (null == retWidget)
-            {
-                return null;
-            }
-            if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("Source"))) // could also be tasks defined in external file
             {
                 return null;
             }

@@ -36,6 +36,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.splash.MySplash;
 import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.FrameworkNode;
+import kutch.biff.marvin.utility.GridMacroMgr;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.DynamicGridWidget;
@@ -909,14 +910,45 @@ public class WidgetBuilder
             }
             AliasMgr.getAliasMgr().PopAliasList();
         }
+        /*
         else
         { // if not an external declaration, check for known options
             Utility.ValidateAttributes(new String[]
             {
-                "row", "column", "rowSpan", "colSpan", "columnspan", "hgap", "vgap", "Align", "File", "Height", "Width"
+                "row", "column", "rowSpan", "colSpan", "columnspan", "hgap", "vgap", "Align", "File", "Height", "Width", "Macro"
             }, gridNode);
         }
+*/
+        if (gridNode.hasAttribute("Macro"))
+        {
+            if (gridNode.hasAttribute("File"))
+            {
+                LOGGER.severe("Grid cannot have both file and Macro.");
+                return null;
+            }
+            String strMacro = gridNode.getAttribute("Macro");
+            FrameworkNode nodeMacro = GridMacroMgr.getGridMacroMgr().getGridMacro(strMacro);
+            if (null == nodeMacro)
+            {
+                LOGGER.severe("Grid Macro specified [" + strMacro + "] does not defined.");
+                return null;
+            }
+            // need to get alias from the grid macro is in
+            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
+            {
+                "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
+            });
 
+            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(nodeMacro, new String[]
+            {
+                "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
+            });
+            retWidget = ReadGridInfo(nodeMacro, retWidget, null);
+            if (null == retWidget)
+            {
+                return null;
+            }
+        }
         // go read the grid contents - note that this could be a continuation from stuff already read in via file
         // so you can define most of grid in external file, but keep adding
         retWidget = ReadGridInfo(gridNode, retWidget, "");
@@ -1087,6 +1119,14 @@ public class WidgetBuilder
                     return null;
                 }
             }
+            else if (node.getNodeName().equalsIgnoreCase("GridMacro") || node.getNodeName().equalsIgnoreCase("MacroGrid"))
+            {
+                if (!ReadGridMacro(node))
+                {
+                    return null;
+                }
+            }
+
             else if (node.getNodeName().equalsIgnoreCase("For"))
             {
                 List<Widget> repeatList = WidgetBuilder.BuildRepeatList(node);
@@ -1188,6 +1228,14 @@ public class WidgetBuilder
                     return null;
                 }
             }
+            else if (name.equalsIgnoreCase("GridMacro") || name.equalsIgnoreCase("MacroGrid"))
+            {
+                if (!ReadGridMacro(node))
+                {
+                    return null;
+                }
+            }
+
             else if (node.getNodeName().equalsIgnoreCase("For"))
             {
                 List<Widget> repeatList = WidgetBuilder.BuildRepeatList(node);
@@ -1211,9 +1259,9 @@ public class WidgetBuilder
                 if (node.hasAttribute("Propagate") && node.getBooleanAttribute("Propagate"))
                 {
                     retWidget.setExplicitPropagate(true);
-                }                
+                }
             }
-            
+
             else if (name.equalsIgnoreCase("Peekaboo")) // for external grid files
             {
                 if (!HandlePeekaboo(retWidget, node))
@@ -1252,6 +1300,18 @@ public class WidgetBuilder
             }
         }
         return retWidget;
+    }
+
+    public static boolean ReadGridMacro(FrameworkNode node)
+    {
+        if (!node.hasAttribute("Name"))
+        {
+            LOGGER.severe("GridMacro must hvae a Name attribute");
+            return true;
+        }
+        String strName = node.getAttribute("Name");
+        GridMacroMgr.getGridMacroMgr().AddGridMacro(strName, node);
+        return true;
     }
 
     public static FrameworkNode OpenDefinitionFile(String inputFilename, String DesiredNode)
@@ -1375,6 +1435,11 @@ public class WidgetBuilder
                         return null;
                     }
                 }
+                else if (node.getNodeName().equalsIgnoreCase("GridMacro") || node.getNodeName().equalsIgnoreCase("MacroGrid"))
+                {
+                    ReadGridMacro(node);
+                }
+
                 else if (node.getNodeName().equalsIgnoreCase("For")) // embedded <Repeat>s - kewl!
                 {
                     objWidgetList.addAll(BuildRepeatList(node));
