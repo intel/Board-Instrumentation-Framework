@@ -55,7 +55,7 @@ public class SpacerWidget extends BaseWidget
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
-        if (getWidth()== 0 || getHeight() == 0)
+        if ((getWidth()== 0 && getWidthPercentOfParentGrid() == 0)|| (getHeight() == 0 && getHeightPercentOfParentGrid() == 0))
         {
             return true; // if it's got no height or width, just skip
         }
