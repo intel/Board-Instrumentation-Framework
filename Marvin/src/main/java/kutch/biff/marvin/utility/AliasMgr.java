@@ -48,6 +48,7 @@ import org.w3c.dom.NodeList;
  */
 public class AliasMgr
 {
+
     private final ArrayList<Map> _AliasList;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static AliasMgr _Mgr = new AliasMgr();
@@ -67,7 +68,7 @@ public class AliasMgr
     {
         _AliasList = new ArrayList<>();
         PushAliasList(true);
-        AddAlias("DEBUG_STYLE","-fx-border-color:blue;-fx-border-style: dashed");
+        AddAlias("DEBUG_STYLE", "-fx-border-color:blue;-fx-border-style: dashed");
         PushAliasList(true);
         AddEnvironmentVars();
     }
@@ -89,38 +90,38 @@ public class AliasMgr
                 if (strAlias.equalsIgnoreCase(strNextRowAlias))
                 {
                     int currVal = Integer.parseInt(GetAlias(strCurrentRowAlias));
-                    strRetVal =  Integer.toString(currVal+1);
+                    strRetVal = Integer.toString(currVal + 1);
                 }
                 else if (strAlias.equalsIgnoreCase(strPrevRowAlias))
                 {
                     int currVal = Integer.parseInt(GetAlias(strCurrentRowAlias));
-                    currVal -=1;
+                    currVal -= 1;
                     if (currVal < 0)
                     {
                         currVal = 0;
                     }
-                    strRetVal =  Integer.toString(currVal);
+                    strRetVal = Integer.toString(currVal);
                 }
                 else if (strAlias.equalsIgnoreCase(strNextColumnAlias))
                 {
                     int currVal = Integer.parseInt(GetAlias(strCurrentColumnAlias));
-                    strRetVal =  Integer.toString(currVal+1);
+                    strRetVal = Integer.toString(currVal + 1);
                 }
                 else if (strAlias.equalsIgnoreCase(strPrevColumnAlias))
                 {
                     int currVal = Integer.parseInt(GetAlias(strCurrentColumnAlias));
-                    currVal -=1;
+                    currVal -= 1;
                     if (currVal < 0)
                     {
                         currVal = 0;
                     }
-                    strRetVal =  Integer.toString(currVal);
+                    strRetVal = Integer.toString(currVal);
                 }
                 return strRetVal;
             }
         }
         String strError = "Tried to use Alias [" + strAliasRequested + "] that has not been set.";
-        LOGGER.severe(strError); 
+        LOGGER.severe(strError);
         return strError;
     }
 
@@ -148,7 +149,10 @@ public class AliasMgr
      * @param Alias
      * @param Value
      */
-    @SuppressWarnings({"unchecked", "unchecked"})
+    @SuppressWarnings(
+    {
+        "unchecked", "unchecked"
+    })
     public void AddAlias(String Alias, String Value)
     {
         if (null == Alias)
@@ -166,14 +170,14 @@ public class AliasMgr
         {
             String strError = "Alias [" + Alias + "] has NULL value!";
             LOGGER.severe(strError);
-            map.put(Alias.toUpperCase(),strError);
+            map.put(Alias.toUpperCase(), strError);
         }
         else
         {
             map.put(Alias.toUpperCase(), Value);
         }
     }
-    
+
     public void AddRootAlias(String Alias, String Value)
     {
         if (null == Alias)
@@ -181,7 +185,7 @@ public class AliasMgr
             LOGGER.severe("Attempted to set a Root ALIAS ID to NULL");
             return;
         }
-        Map map = _AliasList.get(_AliasList.size()-1);
+        Map map = _AliasList.get(_AliasList.size() - 1);
         if (map.containsKey(Alias.toUpperCase()))
         {
             return;
@@ -190,14 +194,14 @@ public class AliasMgr
         {
             String strError = "Root Alias [" + Alias + "] has NULL value!";
             LOGGER.severe(strError);
-            map.put(Alias.toUpperCase(),strError);
+            map.put(Alias.toUpperCase(), strError);
         }
         else
         {
             map.put(Alias.toUpperCase(), Value);
         }
     }
-    
+
     public void UpdateCurrentColumn(int newValue)
     {
         UpdateAlias(strNextColumnAlias, Integer.toString(newValue + 1));
@@ -235,7 +239,7 @@ public class AliasMgr
     public final void PushAliasList(boolean addRowColAliases)
     {
         _AliasList.add(0, new HashMap<>()); // put in position 0 
-        
+
         if (addRowColAliases)
         {
             AddAlias(strCurrentRowAlias, "0");
@@ -269,7 +273,7 @@ public class AliasMgr
         {
             return;
         }
-        
+
         for (Object objKey : map.keySet())
         {
             String key = (String) objKey;
@@ -334,8 +338,8 @@ public class AliasMgr
             }
             else // unknown
             {
-                 LOGGER.severe("Unknown <AliasList> entry: " + nodeAlias.getNodeName());
-                 return false;
+                LOGGER.severe("Unknown <AliasList> entry: " + nodeAlias.getNodeName());
+                return false;
             }
         }
         return true;
@@ -366,9 +370,9 @@ public class AliasMgr
                 LOGGER.severe("Requested to read <AliasList> from invalid xml file. Root node must be Marvin, MarvinExternalFile or Widget");
                 return false;
             }
-            
+
             FrameworkNode rootNode = new FrameworkNode(rootNodes.item(0));
-            
+
             for (FrameworkNode child : rootNode.getChildNodes())
             {
                 if (child.getNodeName().equalsIgnoreCase("AliasList"))
@@ -383,14 +387,17 @@ public class AliasMgr
         }
         return false;
     }
-    
+
     public void addMarvinInfo()
     {
-        Configuration CONFIG = Configuration.getConfig();        
-        
+        Configuration CONFIG = Configuration.getConfig();
         Rectangle2D visualBounds = CONFIG.getPrimaryScreen().getVisualBounds();
-        AddAlias("SCREEN_WIDTH", Integer.toString((int) visualBounds.getWidth()));
-        AddAlias("SCREEN_HEIGHT", Integer.toString((int) visualBounds.getHeight()));
+        double Width = visualBounds.getWidth() - CONFIG.getAppBorderWidth() * 2;
+        double Height = visualBounds.getHeight() - CONFIG.getBottomOffset() - CONFIG.getTopOffset();
+        AddAlias("CANVAS_WIDTH", Double.toString(Width));
+        AddAlias("CANVAS_HEIGHT", Double.toString(Height));
+        AddAlias("SCREEN_H2W_RATO",Double.toString(Width/Height));
+        AddAlias("SCREEN_W2H_RATO",Double.toString(Height/Width));
     }
 
     private void AddEnvironmentVars()
@@ -507,7 +514,7 @@ public class AliasMgr
         String filename = (String) tokens.nextElement(); // to get to the real filename!
         return ReadExternalAliasFile(filename);
     }
-    
+
     public void SetCurrentConfigFile(String strFname)
     {
         AddAlias("CurrentConfigFilename", strFname);

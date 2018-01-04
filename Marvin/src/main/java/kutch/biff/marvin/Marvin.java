@@ -486,6 +486,7 @@ public class Marvin extends Application
     {
 //        stage.setMaximized(true);
         stage.centerOnScreen();
+        double a = stage.getWidth();
         double BorderWidth = abs((scene.getWidth() - stage.getWidth()) / 2);
         _Config.getConfiguration().setAppBorderWidth(BorderWidth);
 

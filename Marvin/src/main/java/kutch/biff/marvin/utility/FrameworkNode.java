@@ -657,13 +657,25 @@ public class FrameworkNode
             {
                 NewVal = val1 + val2;
             }
-            else if (Operator.equalsIgnoreCase("Subtract") || Operator.equalsIgnoreCase("-"))
+            else if (Operator.equalsIgnoreCase("Subtract") || Operator.equalsIgnoreCase("-") ||  Operator.equalsIgnoreCase("sib"))
             {
                 NewVal = val1 - val2;
             }
-            else if (Operator.equalsIgnoreCase("Multiply") || Operator.equalsIgnoreCase("*"))
+            else if (Operator.equalsIgnoreCase("Multiply") || Operator.equalsIgnoreCase("*")|| Operator.equalsIgnoreCase("mul"))
             {
                 NewVal = val1 * val2;
+            }
+            else if (Operator.equalsIgnoreCase("Divide") || Operator.equalsIgnoreCase("div"))
+            {
+                try
+                {
+                    NewVal = val1 / val2;
+                }
+                catch (Exception Ex)
+                {
+                    LOGGER.warning("dried to divide bad MarvinMath: " + strData);
+                    return "";
+                }
             }
             else
             {
