@@ -252,6 +252,7 @@ public class WidgetBuilder
             {
                 continue;
             }
+
             if (node.getNodeName().equalsIgnoreCase("Title"))
             {
                 retWidget.setTitle(node.getTextContent());
@@ -1202,6 +1203,13 @@ public class WidgetBuilder
             if (name.equalsIgnoreCase("PaddingOverride") || name.equalsIgnoreCase("Padding"))
             {
                 if (false == retWidget.HandleWidgetSpecificSettings(node))
+                {
+                    return null;
+                }
+            }
+            else if (node.getNodeName().equalsIgnoreCase("Tasklist"))
+            {
+                if (!ConfigurationReader.ReadTaskList(node))
                 {
                     return null;
                 }
