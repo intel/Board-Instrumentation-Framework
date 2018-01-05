@@ -32,6 +32,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
@@ -1623,10 +1624,11 @@ abstract public class BaseWidget implements Widget
                 double screenHeight = CONFIG.getHeight();
                 if (0 == screenHeight)
                 {
-                    screenHeight = CONFIG.getCreationHeight();
+                    Rectangle2D visualBounds = CONFIG.getPrimaryScreen().getVisualBounds();
+                    screenHeight = (int) visualBounds.getHeight();
                 }
-                
-                setHeight(screenHeight * (percentVal / 100.0));
+                /**** Big ugly HACK!!, don't know how to calculate how much screen space the menu and tab bars use. With default fonts and such it's 76 **/
+                setHeight((screenHeight-76) * (percentVal / 100.0));
             }
             else
             {

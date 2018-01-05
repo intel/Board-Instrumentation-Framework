@@ -38,6 +38,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
+import javafx.stage.Stage;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -162,9 +163,10 @@ public class ConfigurationReader
             _Configuration = new Configuration();
             if (false == ReadAppSettings(doc))
             {
-                _Configuration = null;
+                return null;
             }
-            else if (false == ReadTaskAndConditionals(doc))
+
+            if (false == ReadTaskAndConditionals(doc))
             {
                 _Configuration = null;
             }
@@ -189,7 +191,7 @@ public class ConfigurationReader
         if (_Configuration.isAutoScale() && _Configuration.getCreationHeight() > 0 && _Configuration.getCreationWidth() > 0)
         {
             Rectangle2D visualBounds = _Configuration.getPrimaryScreen().getVisualBounds();
-            
+
             double appWidth = visualBounds.getWidth();
             double appHeight = visualBounds.getHeight();
             // if app size specified
@@ -243,8 +245,8 @@ public class ConfigurationReader
     {
         Utility.ValidateAttributes(new String[]
         {
-            "mode", "Width", "Height", "Scale", "ID", "EnableScrollBars","MarvinLocalData"
-                                                      
+            "mode", "Width", "Height", "Scale", "ID", "EnableScrollBars", "MarvinLocalData"
+
         }, appNode);
         if (appNode.hasAttribute("ID"))
         {
@@ -259,8 +261,8 @@ public class ConfigurationReader
         }
         if (appNode.hasAttribute("MarvinLocalData"))
         {
-            if (appNode.getAttribute("MarvinLocalData").equalsIgnoreCase("enable") ||
-                appNode.getAttribute("MarvinLocalData").equalsIgnoreCase("enabled"))
+            if (appNode.getAttribute("MarvinLocalData").equalsIgnoreCase("enable")
+                || appNode.getAttribute("MarvinLocalData").equalsIgnoreCase("enabled"))
             {
                 _Configuration.setMarvinLocalDatafeed(true);
             }
@@ -385,10 +387,8 @@ public class ConfigurationReader
         AliasMgr.ReadAliasFromRootDocument(doc);
         ReadAppAttributes(baseNode);
 
-//        ArrayList<FrameworkNode> AppChildren = baseNode.getChildNodes();
-//        ArrayList<FrameworkNode> TabChildren = null;
         ArrayList<String> TabList = new ArrayList<String>();
-
+        
         for (FrameworkNode node : baseNode.getChildNodes())
         {
             if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
@@ -427,13 +427,13 @@ public class ConfigurationReader
                     int count = Screen.getScreens().size();
                     if (monitorNum <= Screen.getScreens().size())
                     {
-                        Screen primary = Screen.getScreens().get(monitorNum -1);
+                        Screen primary = Screen.getScreens().get(monitorNum - 1);
                         _Configuration.setPrimaryScreen(primary);
-                        LOGGER.config("Setting Primary Screen to monitor #" +  node.getTextContent());
+                        LOGGER.config("Setting Primary Screen to monitor #" + node.getTextContent());
                     }
                     else
                     {
-                        LOGGER.severe("<MonitorNumber> set to " + node.getTextContent() +" however there are only " + Integer.toHexString(count) + " monitors.");
+                        LOGGER.severe("<MonitorNumber> set to " + node.getTextContent() + " however there are only " + Integer.toHexString(count) + " monitors.");
                         return false;
                     }
                 }
@@ -544,7 +544,7 @@ public class ConfigurationReader
             {
                 Utility.ValidateAttributes(new String[]
                 {
-                    "top", "bottom", "left", "right","legacymode"
+                    "top", "bottom", "left", "right", "legacymode"
                 }, node);
                 String strTop = "-1";
                 String strBottom = "-1";
@@ -586,7 +586,7 @@ public class ConfigurationReader
                         LOGGER.config("Using LEGACY mode of padding.");
                     }
                 }
-                
+
             }
             else if (node.getNodeName().equalsIgnoreCase("MainMenu"))
             {
@@ -682,6 +682,9 @@ public class ConfigurationReader
             LOGGER.severe("No Tabs defined in <Application> section of configuration file.");
             return false;
         }
+        AliasMgr.getAliasMgr().addMarvinInfo();
+        _Configuration.setPrimaryScreenDetermined(true);
+        
         if (VerifyTabList(TabList))
         {
             _tabs = ReadTabs(doc, TabList);
@@ -691,9 +694,6 @@ public class ConfigurationReader
         {
             LOGGER.severe("No <Network> section found in Application.xml");
         }
-
-        AliasMgr.getAliasMgr().addMarvinInfo();
-        _Configuration.setPrimaryScreenDetermined(true);
         return NetworkSettingsRead;
     }
 

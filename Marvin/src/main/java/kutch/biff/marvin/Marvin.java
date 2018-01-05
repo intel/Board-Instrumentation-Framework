@@ -341,7 +341,7 @@ public class Marvin extends Application
         _Splash = new MySplash(ShowSplash, altSplash);
     }
 
-    private long BeginLoadProcess()
+    private long BeginLoadProcess(Stage stage)
     {
         long start = System.currentTimeMillis();
         _DataMgr = new DataManager();
@@ -484,6 +484,8 @@ public class Marvin extends Application
 
     private void checkSize(Stage stage, Scene scene, GridPane objGridPane)
     {
+        
+        //if (1 == 1) return;
 //        stage.setMaximized(true);
         stage.centerOnScreen();
         double a = stage.getWidth();
@@ -529,7 +531,7 @@ public class Marvin extends Application
 
         MySplash.getSplash().start(stage);
 
-        long elapsedTime = BeginLoadProcess();
+        long elapsedTime = BeginLoadProcess(stage);
         LOGGER.info("Time taken to load Configuration: " + Long.toString(elapsedTime) + "ms.");
 
         if (!ShowSplash)
@@ -632,7 +634,7 @@ public class Marvin extends Application
         stage.setScene(scene);
         stage.setHeight(appHeight);
         stage.setWidth(appWidth);
-
+        
         if (_Config.getConfiguration().getKioskMode())
         {
             stage.initStyle(StageStyle.UNDECORATED);

@@ -45,6 +45,7 @@ import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.HandlePeekabo
  */
 public class TabWidget extends GridWidget
 {
+
     private Tab _tab;
     private GridPane _BaseGridPane; // throw one down in tab to put all the goodies in
     private boolean _IsVisible;
@@ -74,8 +75,8 @@ public class TabWidget extends GridWidget
             _ScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
             _ScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         }
-         _DefinitionFile = "Tab {"+tabID+"}";
-         _WidgetType = "Tab";        
+        _DefinitionFile = "Tab {" + tabID + "}";
+        _WidgetType = "Tab";
     }
 
     /**
@@ -105,12 +106,12 @@ public class TabWidget extends GridWidget
             getGridPane().setAlignment(getPosition());
 
             //stackReference.getChildren().add(this.getGridPane());
-                basePane.getChildren().add(_stackReference);
-                basePane.getChildren().add(_BaseGridPane);
+            basePane.getChildren().add(_stackReference);
+            basePane.getChildren().add(_BaseGridPane);
 
-                _stackReference.prefWidthProperty().bind(CONFIG.getCurrentWidthProperty());
-                _stackReference.prefHeightProperty().bind(CONFIG.getCurrentHeightProperty());
-                
+            _stackReference.prefWidthProperty().bind(CONFIG.getCurrentWidthProperty());
+            _stackReference.prefHeightProperty().bind(CONFIG.getCurrentHeightProperty());
+
             if (_UseScrollBars)
             {
                 _ScrollPane.setContent(basePane);
@@ -125,7 +126,7 @@ public class TabWidget extends GridWidget
                 _tab.setContent(basePane);
 
             }
-            
+
             new TranslationCalculator(_stackReference, _BaseGridPane, CONFIG.getScaleProperty(), getPosition()); // handles all the resizing/scaling
 
             tabPane.getTabs().add(_tab);
@@ -197,12 +198,20 @@ public class TabWidget extends GridWidget
                     return false;
                 }
             }
-            
+
             else if (node.getNodeName().equalsIgnoreCase("StyleOverride"))
             {
                 if (false == WidgetBuilder.HandleStyleOverride(this, node))
                 {
                     return false;
+                }
+            }
+            else if (node.getNodeName().equalsIgnoreCase("ClickThroughTransparent"))
+            {
+                SetClickThroughTransparentRegion(node.getBooleanValue());
+                if (node.hasAttribute("Propagate") && node.getBooleanAttribute("Propagate"))
+                {
+                    setExplicitPropagate(true);
                 }
             }
 
@@ -239,7 +248,7 @@ public class TabWidget extends GridWidget
 
             else if (node.getNodeName().equalsIgnoreCase("TaskList"))
             {
-                 ConfigurationReader.ReadTaskList(node);
+                ConfigurationReader.ReadTaskList(node);
             }
             else if (node.getNodeName().equalsIgnoreCase("Prompt"))
             {

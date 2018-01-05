@@ -394,10 +394,15 @@ public class AliasMgr
         Rectangle2D visualBounds = CONFIG.getPrimaryScreen().getVisualBounds();
         double Width = visualBounds.getWidth() - CONFIG.getAppBorderWidth() * 2;
         double Height = visualBounds.getHeight() - CONFIG.getBottomOffset() - CONFIG.getTopOffset();
-        AddAlias("CANVAS_WIDTH", Double.toString(Width));
-        AddAlias("CANVAS_HEIGHT", Double.toString(Height));
-        AddAlias("SCREEN_H2W_RATO",Double.toString(Width/Height));
-        AddAlias("SCREEN_W2H_RATO",Double.toString(Height/Width));
+        double H2W_Ratio = Width/Height;
+        double W2H_Ratio = Height/Width;
+        
+        H2W_Ratio = visualBounds.getWidth()/visualBounds.getHeight();
+        W2H_Ratio = visualBounds.getHeight()/visualBounds.getWidth();
+        AddRootAlias("CANVAS_WIDTH", Double.toString(Width));
+        AddRootAlias("CANVAS_HEIGHT", Double.toString(Height));
+        AddRootAlias("SCREEN_H2W_RATIO",Double.toString(H2W_Ratio));
+        AddRootAlias("SCREEN_W2H_RATIO",Double.toString(W2H_Ratio));
     }
 
     private void AddEnvironmentVars()
