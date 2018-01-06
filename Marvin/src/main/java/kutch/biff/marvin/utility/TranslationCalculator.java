@@ -73,7 +73,7 @@ public class TranslationCalculator
         double tY = CalcTranslationY();
         // Don't think I need this anymor
         _Translate.setX(tX);
-        //_Translate.setY(tY);
+        _Translate.setY(tY);
     }
 
     private void SetupListeners()
