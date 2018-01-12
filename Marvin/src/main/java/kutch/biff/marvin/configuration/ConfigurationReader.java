@@ -294,7 +294,7 @@ public class ConfigurationReader
             String strWidth = appNode.getAttribute("Width");
             try
             {
-                _Configuration.setWidth(Integer.parseInt(strWidth));
+                _Configuration.setWidth((int)Double.parseDouble(strWidth));
             }
             catch (Exception ex)
             {
@@ -306,7 +306,7 @@ public class ConfigurationReader
             String strHeight = appNode.getAttribute("Height");
             try
             {
-                _Configuration.setHeight(Integer.parseInt(strHeight));
+                _Configuration.setHeight((int)Double.parseDouble(strHeight));
             }
             catch (Exception ex)
             {

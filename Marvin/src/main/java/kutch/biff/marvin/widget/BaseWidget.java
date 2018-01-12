@@ -1593,7 +1593,7 @@ abstract public class BaseWidget implements Widget
             }
             else
             {
-                setWidth(Integer.parseInt(str));
+                setWidth(Double.parseDouble(str));
             }
         }
         catch (NumberFormatException ex)
@@ -1632,7 +1632,7 @@ abstract public class BaseWidget implements Widget
             }
             else
             {
-                setHeight(Integer.parseInt(str));
+                setHeight(Double.parseDouble(str));
             }
         }
         catch (NumberFormatException ex)
