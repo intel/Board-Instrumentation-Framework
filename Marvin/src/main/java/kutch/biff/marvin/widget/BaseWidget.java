@@ -1061,7 +1061,7 @@ abstract public class BaseWidget implements Widget
 
     protected boolean ApplyCSS()
     {
-        if (null != GetCSS_File() || StyleUpdatesFromConfigFinished)
+        if (null != GetCSS_File())
         {
             //getStylesheets().clear();
 
