@@ -783,8 +783,11 @@ public class Marvin extends Application
     @Override
     public void stop()
     {
-        Configuration.getConfig().setTerminating();
-        StopWidgets();
+        if (null != Configuration.getConfig())
+        {
+            Configuration.getConfig().setTerminating();
+            StopWidgets();
+        }
 
         if (null != objLocalMarvinData)
         {
