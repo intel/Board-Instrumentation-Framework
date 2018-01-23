@@ -462,7 +462,7 @@ public class LcdSkin extends SkinBase<Lcd> implements Skin<Lcd> {
         switch(getSkinnable().getValueFont()) {
             case LCD:
                 valueFont = Fonts.digital(0.6 * height);
-                digitalFontSizeFactor = 1.4;
+                //digitalFontSizeFactor = 1.4;
                 break;
             case DIGITAL:
                 valueFont = Fonts.digitalReadout(0.5833333333 * height);
