@@ -39,13 +39,15 @@ import kutch.biff.marvin.utility.Utility;
  */
 public class GridWidget extends BaseWidget
 {
-
     protected ArrayList<Widget> _Widgets;
     private GridPane _GridPane = null;
     private int _hGap, _vGap;
     private int _insetTop, _insetBottom, _insetLeft, _insetRight;
     private boolean _PropagateClickThrough;
     private boolean _PropagateExplicitlyConfigured;
+    protected double _hGapPercentOfParentGrid;
+    protected double _vGapPercentOfParentGrid;
+    
     //private Pos _Position; // this could be a problem
 
     protected boolean isPropagateClickThrough()
@@ -82,6 +84,10 @@ public class GridWidget extends BaseWidget
         _Position = Pos.TOP_CENTER; // default for both Tab and Grids
         _insetTop = _insetBottom = _insetLeft = _insetRight = -1;
         setDefaultIsSquare(false);
+        
+        _hGapPercentOfParentGrid = 0;
+        _vGapPercentOfParentGrid = 0;
+        
     }
 
     public Image getImage(Color fillColor)
@@ -493,5 +499,160 @@ public class GridWidget extends BaseWidget
 
         return true;
     }
-
+    
+    protected void sethGapPercentOfParentGrid(double percentVal)
+    {
+        _hGapPercentOfParentGrid = percentVal;
+    }
+    protected void setvGapPercentOfParentGrid(double percentVal)
+    {
+        _vGapPercentOfParentGrid = percentVal;
+    }
+    
+    protected double gethGapPercentOfParentGrid()
+    {
+        return _hGapPercentOfParentGrid ;
+    }
+    protected double getvGapPercentOfParentGrid()
+    {
+        return _vGapPercentOfParentGrid ;
+    }
+    
+    public boolean parsehGapValue(FrameworkNode widgetNode)
+    {
+        String str = widgetNode.getAttribute("hgap");
+        try
+        {
+            if (str.contains("%G") || str.contains("%g"))
+            {
+                str = str.replace("%g", "");
+                str = str.replace("%G", "");
+                double percentVal = Double.parseDouble(str);
+                sethGapPercentOfParentGrid(percentVal);
+            }
+            else if (str.contains("%A") || str.contains("%a") || str.contains("%"))
+            {
+                str = str.replace("%a", "");
+                str = str.replace("%A", "");
+                str = str.replace("%", "");
+                double percentVal = Double.parseDouble(str);
+                double screenWidth = CONFIG.getWidth();
+                if (0 == screenWidth)
+                {
+                    screenWidth = CONFIG.getCreationWidth();
+                }
+                sethGap((int)(screenWidth * (percentVal / 100.0)));
+            }
+            else
+            {
+                sethGap((int)Double.parseDouble(str));
+            }
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe(getName() + ": Invalid hGap specified " + str);
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean parsevGapValue(FrameworkNode widgetNode)
+    {
+        String str = widgetNode.getAttribute("vgap");
+        try
+        {
+            if (str.contains("%G") || str.contains("%g"))
+            {
+                str = str.replace("%g", "");
+                str = str.replace("%G", "");
+                double percentVal = Double.parseDouble(str);
+                setvGapPercentOfParentGrid(percentVal);
+            }
+            else if (str.contains("%A") || str.contains("%a") || str.contains("%"))
+            {
+                str = str.replace("%a", "");
+                str = str.replace("%A", "");
+                str = str.replace("%", "");
+                double percentVal = Double.parseDouble(str);
+                double screenWidth = CONFIG.getWidth();
+                if (0 == screenWidth)
+                {
+                    screenWidth = CONFIG.getCreationWidth();
+                }
+                setvGap((int)(screenWidth * (percentVal / 100.0)));
+            }
+            else
+            {
+                setvGap((int)Double.parseDouble(str));
+            }
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe(getName() + ": Invalid hGap specified " + str);
+            return false;
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean handlePercentageDimentions()    
+    {
+        if (gethGapPercentOfParentGrid() > 0)
+        {
+            double parentWidth =  _WidgetParentGridWidget.getWidth();
+            GridWidget currParent = _WidgetParentGridWidget;
+            
+            while (parentWidth == 0 )
+            {
+                currParent = currParent.getParentGridWidget();
+                if (null != currParent)
+                {
+                    parentWidth =  currParent.getWidth();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (parentWidth == 0)
+            {
+                LOGGER.severe("Widget [" + getName() +"] hGap specified as percentage of parent grid - but parent grid width not specified.");
+                return false;
+            }
+            
+            double width = parentWidth * (getWidthPercentOfParentGrid()/100);
+            
+            getGridPane().setHgap((int)width);
+        }
+        
+        if (getvGapPercentOfParentGrid() > 0)
+        {
+            double parentHeight =  _WidgetParentGridWidget.getHeight();
+            GridWidget currParent = _WidgetParentGridWidget;
+            
+            while (parentHeight == 0 )
+            {
+                currParent = currParent.getParentGridWidget();
+                if (null != currParent)
+                {
+                    parentHeight =  currParent.getHeight();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (parentHeight == 0)
+            {
+                LOGGER.severe("Widget [" + getName() +"] vGap specified as percentage of parent grid - but parent grid width not specified.");
+                return false;
+            }
+            
+            double height = parentHeight * (getWidthPercentOfParentGrid()/100);
+            
+            getGridPane().setVgap((int)height);
+        }
+        return super.handlePercentageDimentions();
+    }
+    
 }

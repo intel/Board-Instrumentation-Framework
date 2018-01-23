@@ -759,30 +759,29 @@ public class WidgetBuilder
         }
         if (gridNode.hasAttribute("hgap"))
         {
-            try
+            if (objGridWidget.parsehGapValue(gridNode))
             {
-                objGridWidget.sethGap(Integer.parseInt(gridNode.getAttribute("hgap")));
-                LOGGER.config("Setting hGap for " + WhatIsIt + " :" + gridNode.getAttribute("hgap"));
+                LOGGER.config("Setting hGap for DynamicGrid :" + gridNode.getAttribute("hgap"));
             }
-            catch (NumberFormatException ex)
+            else
             {
-                LOGGER.severe("hgap for " + WhatIsIt + "  invalid: " + gridNode.getAttribute("hgap") + ".  Ignoring");
+                LOGGER.warning("hgap for DynamicGrid  invalid: " + gridNode.getAttribute("hgap") + ".  Ignoring");
                 return false;
             }
         }
         if (gridNode.hasAttribute("vgap"))
         {
-            try
+            if (objGridWidget.parsevGapValue(gridNode))
             {
-                objGridWidget.setvGap(Integer.parseInt(gridNode.getAttribute("vgap")));
-                LOGGER.config("Setting vGap for " + WhatIsIt + " :" + gridNode.getAttribute("vgap"));
+                LOGGER.config("Setting vGap for DynamicGrid :" + gridNode.getAttribute("vgap"));
             }
-            catch (NumberFormatException ex)
+            else
             {
-                LOGGER.severe("vgap for " + WhatIsIt + " invalid: " + gridNode.getAttribute("vgap") + ".  Ignoring");
+                LOGGER.warning("vgap for DynamicGrid invalid: " + gridNode.getAttribute("vgap") + ".  Ignoring");
                 return false;
             }
         }
+
         if (true == gridNode.hasAttribute("Align"))
         {
             String str = gridNode.getAttribute("Align");
@@ -919,7 +918,7 @@ public class WidgetBuilder
                 "row", "column", "rowSpan", "colSpan", "columnspan", "hgap", "vgap", "Align", "File", "Height", "Width", "Macro"
             }, gridNode);
         }
-*/
+         */
         if (gridNode.hasAttribute("Macro"))
         {
             if (gridNode.hasAttribute("File"))
@@ -936,13 +935,13 @@ public class WidgetBuilder
             }
             // need to get alias from the grid macro is in
             AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
-            {
-                "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
+                                                    {
+                                                        "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
             });
 
             AliasMgr.getAliasMgr().AddAliasFromAttibuteList(nodeMacro, new String[]
-            {
-                "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
+                                                    {
+                                                        "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
             });
             retWidget = ReadGridInfo(nodeMacro, retWidget, null);
             if (null == retWidget)

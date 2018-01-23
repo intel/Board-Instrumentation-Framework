@@ -47,6 +47,7 @@ import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
  */
 public class DynamicGridWidget extends GridWidget
 {
+
     private final HashMap<String, DynamicGrid> _GridMap;
     private final HashMap<String, String> _TaskMap;
     private CircularList<String> _ListID;
@@ -84,7 +85,7 @@ public class DynamicGridWidget extends GridWidget
                     objWidget.getStylableObject().setVisible(false);
                 }
             }
-            
+
             if (_GridMap.isEmpty())
             {
                 LOGGER.warning("Dynamic Grid has no Grids.  Ignoring.");
@@ -127,40 +128,41 @@ public class DynamicGridWidget extends GridWidget
             }
 
             dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
-            {
-                @Override
-                public void changed(ObservableValue o, Object oldVal, Object newVal)
-                {
-                    if (IsPaused())
-                    {
-                        return;
-                    }
+                        {
+                            @Override
+                            public void changed(ObservableValue o, Object oldVal, Object newVal)
+                            {
+                                if (IsPaused())
+                                {
+                                    return;
+                                }
 
-                    String strVal = newVal.toString().replaceAll("(\\r|\\n)", "");
-                    String key;
+                                String strVal = newVal.toString().replaceAll("(\\r|\\n)", "");
+                                String key;
 
-                    if (strVal.equalsIgnoreCase("Next")) // go to next image in the list
-                    {
-                        key = _ListID.GetNext();
+                                if (strVal.equalsIgnoreCase("Next")) // go to next image in the list
+                                {
+                                    key = _ListID.GetNext();
 
-                    }
-                    else if (strVal.equalsIgnoreCase("Previous")) // go to previous image in the list
-                    {
-                        key = _ListID.GetPrevious();
-                    }
-                    else
-                    {
-                        key = strVal; // expecting an ID
-                        _ListID.get(key); // just to keep next/prev alignment
-                    }
-                    ActivateGrid(key);
-                }
-            });
+                                }
+                                else if (strVal.equalsIgnoreCase("Previous")) // go to previous image in the list
+                                {
+                                    key = _ListID.GetPrevious();
+                                }
+                                else
+                                {
+                                    key = strVal; // expecting an ID
+                                    _ListID.get(key); // just to keep next/prev alignment
+                                }
+                                ActivateGrid(key);
+                            }
+                        });
 
             return true;
         }
         return false;
     }
+
     private void ActivateGrid(String key)
     {
         String prevKey = _CurrentKey;
@@ -183,11 +185,11 @@ public class DynamicGridWidget extends GridWidget
             {
                 setAlignment(objGridNext.getAlignment());
                 getGridPane().setAlignment(getPosition());
-                if (null == objGridCurrent )
+                if (null == objGridCurrent)
                 {
                     objGridNext.getStylableObject().setVisible(true);
                 }
-                else 
+                else
                 {
                     if (null != _latestTransition && _latestTransition.stillPlaying())
                     {
@@ -205,7 +207,7 @@ public class DynamicGridWidget extends GridWidget
         }
         else
         {
-            LOGGER.warning("Received unknown ID: [" + key +"] for DynamicGrid #" + getName() +": [" + getNamespace() + ":" + getMinionID() + "]");
+            LOGGER.warning("Received unknown ID: [" + key + "] for DynamicGrid #" + getName() + ": [" + getNamespace() + ":" + getMinionID() + "]");
             return;
         }
         if (_AutoAdvance)
@@ -234,7 +236,7 @@ public class DynamicGridWidget extends GridWidget
             HandleToolTipInit();
             for (String key : _GridMap.keySet())
             {
-                DynamicGrid objGrid = _GridMap.get(key); 
+                DynamicGrid objGrid = _GridMap.get(key);
                 Tooltip.install(objGrid.getStylableObject(), _objToolTip);
             }
         }
@@ -299,9 +301,9 @@ public class DynamicGridWidget extends GridWidget
             }
             else if (node.hasAttribute("Macro"))
             {
-                
+
             }
-            else 
+            else
             {
                 LOGGER.severe("Dynamic Grid Widget has no Source for Grid");
                 return false;
@@ -329,16 +331,16 @@ public class DynamicGridWidget extends GridWidget
             }
 
             DynamicGrid objGrid = (DynamicGrid) BuildGrid(node);
-            
+
             if (null == objGrid)
             {
                 return false;
             }
-            if ( null == objGrid.ReadTransitionInformation(node))
+            if (null == objGrid.ReadTransitionInformation(node))
             {
                 return false;
             }
-            
+
             objGrid.ConfigureAlignment();
             _Widgets.add(objGrid);
             _GridMap.put(Id, objGrid);
@@ -350,14 +352,14 @@ public class DynamicGridWidget extends GridWidget
     private GridWidget BuildGrid(FrameworkNode node)
     {
         GridWidget retWidget = new DynamicGrid(); // DynamicGrid is a superset, so can do this
-        
+
         if (true == node.hasAttribute("Source") || node.hasAttribute("Macro"))
         {
             FrameworkNode GridNode = null;
             AliasMgr.getAliasMgr().PushAliasList(true);
             AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
-            {
-                "hgap", "vgap", "Align", "Source", "ID"
+                                                    {
+                                                        "hgap", "vgap", "Align", "Source", "ID"
             });
             if (node.hasAttribute("Source"))
             {
@@ -377,7 +379,7 @@ public class DynamicGridWidget extends GridWidget
                 GridNode = GridMacroMgr.getGridMacroMgr().getGridMacro(node.getAttribute("Macro"));
                 if (null == GridNode)
                 {
-                    LOGGER.severe("Unknown Grid Macro [" + node.getAttribute("Macro") +"] specified for Dynamic Grid Source");
+                    LOGGER.severe("Unknown Grid Macro [" + node.getAttribute("Macro") + "] specified for Dynamic Grid Source");
                 }
             }
 
@@ -392,26 +394,26 @@ public class DynamicGridWidget extends GridWidget
             }
             if (node.hasAttribute("hgap"))
             {
-                try
+                if (retWidget.parsehGapValue(node))
                 {
-                    retWidget.sethGap(Integer.parseInt(node.getAttribute("hgap")));
                     LOGGER.config("Setting hGap for DynamicGrid :" + node.getAttribute("hgap"));
                 }
-                catch (NumberFormatException ex)
+                else
                 {
                     LOGGER.warning("hgap for DynamicGrid  invalid: " + node.getAttribute("hgap") + ".  Ignoring");
+                    return null;
                 }
             }
             if (node.hasAttribute("vgap"))
             {
-                try
+                if (retWidget.parsevGapValue(node))
                 {
-                    retWidget.setvGap(Integer.parseInt(node.getAttribute("vgap")));
                     LOGGER.config("Setting vGap for DynamicGrid :" + node.getAttribute("vgap"));
                 }
-                catch (NumberFormatException ex)
+                else
                 {
                     LOGGER.warning("vgap for DynamicGrid invalid: " + node.getAttribute("vgap") + ".  Ignoring");
+                    return null;
                 }
             }
             if (true == node.hasAttribute("Align"))

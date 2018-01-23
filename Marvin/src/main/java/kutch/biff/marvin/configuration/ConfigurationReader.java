@@ -38,7 +38,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
-import javafx.stage.Stage;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -968,8 +967,9 @@ public class ConfigurationReader
                     {
                         try
                         {
-                            tab.sethGap(Integer.parseInt(node.getAttribute("hgap")));
-                            LOGGER.config("Setting hGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("hgap"));
+                            if (!tab.parsehGapValue(node))
+                                LOGGER.config("Setting hGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("hgap"));
+                            //tab.sethGap(Integer.parseInt(node.getAttribute("hgap")));
                         }
                         catch (Exception ex)
                         {
@@ -980,8 +980,10 @@ public class ConfigurationReader
                     {
                         try
                         {
-                            tab.setvGap(Integer.parseInt(node.getAttribute("vgap")));
-                            LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("vgap"));
+                            if (!tab.parsevGapValue(node))
+                                LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("vgap"));
+//                            tab.setvGap(Integer.parseInt(node.getAttribute("vgap")));
+                            //LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("vgap"));
                         }
                         catch (Exception ex)
                         {
