@@ -1281,7 +1281,7 @@ public class ConfigurationReader
 
         Utility.ValidateAttributes(new String[]
         {
-            "ID", "Type"
+            "ID", "Type","Height","Width"
         }, promptNode);
 
         if (false == promptNode.hasAttribute("ID"))

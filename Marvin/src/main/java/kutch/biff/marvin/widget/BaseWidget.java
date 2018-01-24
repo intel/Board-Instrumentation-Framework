@@ -259,8 +259,7 @@ abstract public class BaseWidget implements Widget
         {
             getStylableObject().setPickOnBounds(false);
         }
-        
-        
+
         return handlePercentageDimentions();
     }
 
@@ -269,15 +268,15 @@ abstract public class BaseWidget implements Widget
         boolean changed = false;
         if (getWidthPercentOfParentGrid() > 0)
         {
-            double parentWidth =  _WidgetParentGridWidget.getWidth();
+            double parentWidth = _WidgetParentGridWidget.getWidth();
             GridWidget currParent = _WidgetParentGridWidget;
-            
-            while (parentWidth == 0 )
+
+            while (parentWidth == 0)
             {
                 currParent = currParent.getParentGridWidget();
                 if (null != currParent)
                 {
-                    parentWidth =  currParent.getWidth();
+                    parentWidth = currParent.getWidth();
                 }
                 else
                 {
@@ -286,25 +285,25 @@ abstract public class BaseWidget implements Widget
             }
             if (parentWidth == 0)
             {
-                LOGGER.severe("Widget [" + getName() +"] Width specified as percentage of parent grid - but parent grid width not specified.");
+                LOGGER.severe("Widget [" + getName() + "] Width specified as percentage of parent grid - but parent grid width not specified.");
                 return false;
             }
-            
-            double width = parentWidth * (getWidthPercentOfParentGrid()/100);
+
+            double width = parentWidth * (getWidthPercentOfParentGrid() / 100);
             setWidth(width);
             changed = true;
         }
         if (getHeightPercentOfParentGrid() > 0)
         {
-            double parentHeight =  _WidgetParentGridWidget.getHeight();
+            double parentHeight = _WidgetParentGridWidget.getHeight();
             GridWidget currParent = _WidgetParentGridWidget;
-            
-            while (parentHeight == 0 )
+
+            while (parentHeight == 0)
             {
                 currParent = currParent.getParentGridWidget();
                 if (null != currParent)
                 {
-                    parentHeight =  currParent.getHeight();
+                    parentHeight = currParent.getHeight();
                 }
                 else
                 {
@@ -313,11 +312,11 @@ abstract public class BaseWidget implements Widget
             }
             if (parentHeight == 0)
             {
-                LOGGER.severe("Widget [" + getName() +"] Height specified as percentage of parent grid - but parent grid width not specified.");
+                LOGGER.severe("Widget [" + getName() + "] Height specified as percentage of parent grid - but parent grid width not specified.");
                 return false;
             }
-            
-            double Height = parentHeight * (getHeightPercentOfParentGrid()/100);
+
+            double Height = parentHeight * (getHeightPercentOfParentGrid() / 100);
             setHeight(Height);
             changed = true;
         }
@@ -325,10 +324,10 @@ abstract public class BaseWidget implements Widget
         {
             ConfigureDimentions();
         }
-        
+
         return true;
     }
-    
+
     protected void SetParent(GridPane _Pane)
     {
         _WidgetParentPane = _Pane;
@@ -1566,6 +1565,65 @@ abstract public class BaseWidget implements Widget
 
     }
 
+    public static int parsePercentWidth(FrameworkNode widgetNode)
+    {
+        String str = widgetNode.getAttribute("Width");
+        try
+        {
+            if (str.contains("%A") || str.contains("%a") || str.contains("%"))
+            {
+                str = str.replace("%a", "");
+                str = str.replace("%A", "");
+                str = str.replace("%", "");
+                double percentVal = Double.parseDouble(str);
+                double screenWidth = CONFIG.getWidth();
+                if (0 == screenWidth)
+                {
+                    screenWidth = CONFIG.getCreationWidth();
+                }
+                return ((int) (screenWidth * (percentVal / 100.0)));
+            }
+            else
+            {
+                return ((int) Double.parseDouble(str));
+            }
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe("Invalid Width specified " + str);
+        }
+        return 0;
+    }
+
+    public static int parsePercentWidth(FrameworkNode widgetNode, String strAttribute)
+    {
+        String str = widgetNode.getAttribute(strAttribute);
+        try
+        {
+            if (str.contains("%A") || str.contains("%a") || str.contains("%"))
+            {
+                str = str.replace("%a", "");
+                str = str.replace("%A", "");
+                str = str.replace("%", "");
+                double percentVal = Double.parseDouble(str);
+                double screenWidth = CONFIG.getWidth();
+                if (0 == screenWidth)
+                {
+                    screenWidth = CONFIG.getCreationWidth();
+                }
+                return ((int) (screenWidth * (percentVal / 100.0)));
+            }
+            else
+            {
+                return ((int) Double.parseDouble(str));
+            }
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe("Invalid Width specified " + str);
+        }
+        return 0;
+    }
     public boolean parseWidth(FrameworkNode widgetNode)
     {
         String str = widgetNode.getAttribute("Width");
@@ -1603,6 +1661,7 @@ abstract public class BaseWidget implements Widget
         }
         return true;
     }
+
     public boolean parseHeight(FrameworkNode widgetNode)
     {
         String str = widgetNode.getAttribute("Height");
@@ -1627,8 +1686,12 @@ abstract public class BaseWidget implements Widget
                     Rectangle2D visualBounds = CONFIG.getPrimaryScreen().getVisualBounds();
                     screenHeight = (int) visualBounds.getHeight();
                 }
-                /**** Big ugly HACK!!, don't know how to calculate how much screen space the menu and tab bars use. With default fonts and such it's 76 **/
-                setHeight((screenHeight-76) * (percentVal / 100.0));
+                /**
+                 * ** Big ugly HACK!!, don't know how to calculate how much
+                 * screen space the menu and tab bars use. With default fonts
+                 * and such it's 76 *
+                 */
+                setHeight((screenHeight - 76) * (percentVal / 100.0));
             }
             else
             {
@@ -1641,5 +1704,5 @@ abstract public class BaseWidget implements Widget
             return false;
         }
         return true;
-    }    
+    }
 }

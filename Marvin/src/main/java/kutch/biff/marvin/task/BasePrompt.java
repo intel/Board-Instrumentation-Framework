@@ -28,8 +28,10 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
+import kutch.biff.marvin.widget.BaseWidget;
 
 /**
  *
@@ -42,6 +44,9 @@ abstract public class BasePrompt
     private String _Prompt;
     private String _PromptedValue;
     private String _ID;
+    private double _Width,_Height;
+    private String _StyleOverride;
+    private String _CssFile;
     protected final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());    
     
     public BasePrompt(String ID)
@@ -51,8 +56,51 @@ abstract public class BasePrompt
         _Prompt = null;    
         _PromptedValue = null;
         _ID = ID;
+        _Width = 0; 
+        _Height=0;
+        _CssFile = null;
+        _StyleOverride = null;
     }
 
+    public String getStyleOverride()
+    {
+        return _StyleOverride;
+    }
+
+    public void setStyleOverride(String _StyleOverride)
+    {
+        this._StyleOverride = _StyleOverride;
+    }
+
+    public double getWidth()
+    {
+        return _Width;
+    }
+
+    public void setWidth(double _Width)
+    {
+        this._Width = _Width;
+    }
+
+    public double getHeight()
+    {
+        return _Height;
+    }
+
+    public void setHeight(double _Height)
+    {
+        this._Height = _Height;
+    }
+
+    public String getCssFile()
+    {
+        return _CssFile;
+    }
+
+    public void setCssFile(String _CssFile)
+    {
+        this._CssFile = _CssFile;
+    }
     @Override
     public String toString()
     {
@@ -104,6 +152,8 @@ abstract public class BasePrompt
         {
             return false;
         }
+        
+       
         CreateDialog().showAndWait();  
         
         return null != GetPromptedValue();
@@ -115,11 +165,49 @@ abstract public class BasePrompt
         dialog.initStyle(StageStyle.UTILITY);
         dialog.initModality(Modality.APPLICATION_MODAL);
         Pane dlgPane = SetupDialog(dialog);
+        Scene objScene = new Scene(dlgPane);
+        
+        String cssFile = Configuration.getConfig().getCSSFile();
+        if (null != getCssFile() )
+        {
+            cssFile = getCssFile();
+        }
+       
+        if (null != cssFile)
+        {
+            String osIndepFN = BaseWidget.convertToFileOSSpecific(cssFile);
+
+            if (null == osIndepFN)
+            {
+                
+            }
+            String strCSS = BaseWidget.convertToFileURL(osIndepFN);
+
+            if (null != strCSS)
+            {
+                try
+                {
+                    if (false == objScene.getStylesheets().add(strCSS))
+                    {
+                        //LOGGER.severe("Problems with application stylesheet: " + Configuration.getConfig().getConfiguration().getCSSFile());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //LOGGER.severe("Problems with application stylesheet: " + Configuration.getConfig().getConfiguration().getCSSFile());
+                }
+            }
+        }
+        if (null != getStyleOverride())
+        {
+            dlgPane.setStyle(getStyleOverride());
+        }
+        
         if (null == dlgPane)
         {
             return null;
         }
-        Scene objScene = new Scene(dlgPane);
+        
         dialog.setScene(objScene);
 
         return dialog;

@@ -105,6 +105,16 @@ public class Prompt_ListBox extends BasePrompt
         }
         //len++;
         double Height = 24 * len; // hack! (but recommended from javafx community
+        
+        if (getWidth()>0)
+        {
+            MaxWidth = getWidth();
+        }
+        if (getHeight()>0)
+        {
+            Height = getHeight();
+        }
+        
         listBox.setPrefHeight(Height+10); // +10 pushes box down enough to not hae scroll
         listBox.setPrefWidth(MaxWidth+30);  // add some padding at end
         

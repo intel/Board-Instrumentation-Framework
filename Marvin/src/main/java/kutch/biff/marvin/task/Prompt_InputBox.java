@@ -24,6 +24,7 @@ package kutch.biff.marvin.task;
 import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -61,9 +62,19 @@ public class Prompt_InputBox extends BasePrompt
         {
             objPrompt.setText(_PrevVal);
         }
+        root.setAlignment(Pos.CENTER_LEFT);
 
         GridPane.setColumnSpan(lblMessage, 2);
         GridPane.setHalignment(btn, HPos.CENTER);
+        
+        if (getWidth()>0)
+        {
+            objPrompt.setPrefWidth(getWidth());
+        }
+        if (getHeight()>0)
+        {
+            root.setPrefHeight(getHeight());
+        }        
 
         root.add(lblMessage, 0, 0);
         root.add(objPrompt, 0, 2);
