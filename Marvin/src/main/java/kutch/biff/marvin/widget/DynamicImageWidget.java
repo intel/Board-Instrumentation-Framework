@@ -282,6 +282,7 @@ public class DynamicImageWidget extends StaticImageWidget
 @Override
     public boolean PerformPostCreateActions(GridWidget objParentGrid)
     {
+        _WidgetParentGridWidget = objParentGrid;
         if (CONFIG.isDebugMode())
         {
             _ToolTip = this.toString();
@@ -295,8 +296,8 @@ public class DynamicImageWidget extends StaticImageWidget
                 Tooltip.install(objView, _objToolTip);
             }
         }
-
-        return true;
+        return handlePercentageDimentions();
+        //return true;
     }
     
     private boolean MonitorForFilechange()
@@ -482,12 +483,10 @@ public class DynamicImageWidget extends StaticImageWidget
     {
         for (String key : _ImageFilenames.keySet())
         {
-
             if (getHeight() > 0)
             {
                 _ImageViewMap.get(key).setFitHeight(getHeight());
             }
-
             if (getWidth() > 0)
             {
                 _ImageViewMap.get(key).setFitWidth(getWidth());
