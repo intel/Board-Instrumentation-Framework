@@ -432,14 +432,14 @@ public class ConfigurationReader
                     }
                     else
                     {
-                        LOGGER.severe("<MonitorNumber> set to " + node.getTextContent() + " however there are only " + Integer.toHexString(count) + " monitors.");
-                        return false;
+                        LOGGER.warning("<MonitorNumber> set to " + node.getTextContent() + " however there are only " + Integer.toHexString(count) + " monitors. Ignoring");
+                        //return false;
                     }
                 }
                 catch (Exception Ex)
                 {
-                    LOGGER.severe("Invalid MonitorNumber specified");
-                    return false;
+                    LOGGER.severe("Invalid MonitorNumber specified.  Ignoring.");
+                    //return false;
                 }
             }
             else if (node.getNodeName().equalsIgnoreCase("CreationSize"))
