@@ -31,6 +31,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import kutch.biff.marvin.configuration.Configuration;
 
 /**
  *
@@ -80,6 +81,14 @@ public class Prompt_InputBox extends BasePrompt
         root.add(objPrompt, 0, 2);
         root.add(btn, 0, 3);
         root.add(lblSpacer,0,4);
+        
+        // place on correct screen and center
+        int xPos = (int) (Configuration.getConfig().getPrimaryScreen().getVisualBounds().getMinX());
+        int yPos = (int) (Configuration.getConfig().getPrimaryScreen().getVisualBounds().getMinY());
+        dialog.setX(xPos);
+        dialog.setY(yPos);        
+        
+        dialog.centerOnScreen();
 
         btn.setOnAction((ActionEvent event) ->
         {

@@ -41,7 +41,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import kutch.biff.marvin.configuration.ConfigurationReader;
@@ -159,10 +158,12 @@ public class AboutBox
             }
         });
         
-        int xPos = (int) (CONFIG.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX() + CONFIG.getConfiguration().getWidth()/2 - 125);
-        int yPos = (int) (CONFIG.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY() + CONFIG.getConfiguration().getHeight()/2 - 200);
+        // place on correct screen.
+        int xPos = (int) (CONFIG.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX());
+        int yPos = (int) (CONFIG.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY());
         stage.setX(xPos);
         stage.setY(yPos);        
+        stage.centerOnScreen();  // and center it.
         return grid;
     }
 

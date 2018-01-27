@@ -35,6 +35,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
 
@@ -121,14 +122,22 @@ public class Prompt_ListBox extends BasePrompt
         root.add(listBox, 0,2);
         GridPane.setHalignment(btn, HPos.CENTER);
         root.add(btn,0,3);
+        
+        // place on correct screen and center
+        int xPos = (int) (Configuration.getConfig().getPrimaryScreen().getVisualBounds().getMinX());
+        int yPos = (int) (Configuration.getConfig().getPrimaryScreen().getVisualBounds().getMinY());
+        dialog.setX(xPos);
+        dialog.setY(yPos);        
+        
+        dialog.centerOnScreen();
  
-            btn.setOnAction((ActionEvent event) -> 
-            {
-                int Selection = listBox.getSelectionModel().getSelectedIndex();
-                SetPromptedValue(_ParamList.get(Selection));
-                _PrevSelection = Selection;
-                dialog.close();
-            });
+        btn.setOnAction((ActionEvent event) -> 
+        {
+            int Selection = listBox.getSelectionModel().getSelectedIndex();
+            SetPromptedValue(_ParamList.get(Selection));
+            _PrevSelection = Selection;
+            dialog.close();
+        });
 
         return root;
     }     
