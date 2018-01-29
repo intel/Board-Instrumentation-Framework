@@ -1068,7 +1068,7 @@ public class WidgetBuilder
         { // if not an external declaration, check for known options
             Utility.ValidateAttributes(new String[]
             {
-                "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align"
+                "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align","Height","Width"
             }, dynaTabNode);
 
         }
