@@ -38,7 +38,6 @@ import kutch.biff.marvin.logger.MarvinLogger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -390,6 +389,17 @@ public class AliasMgr
 
     public void addMarvinInfo()
     {
+        try
+        {
+            String current = new java.io.File( "." ).getCanonicalPath();
+            AddRootAlias("WORKING_DIR",current);
+            
+        }
+        catch (IOException ex)
+        {
+            
+        }
+        
         Configuration CONFIG = Configuration.getConfig();
         Rectangle2D visualBounds = CONFIG.getPrimaryScreen().getVisualBounds();
         double Width = visualBounds.getWidth() - CONFIG.getAppBorderWidth() * 2;
@@ -403,6 +413,7 @@ public class AliasMgr
         AddRootAlias("CANVAS_HEIGHT", Double.toString(Height));
         AddRootAlias("SCREEN_H2W_RATIO",Double.toString(H2W_Ratio));
         AddRootAlias("SCREEN_W2H_RATIO",Double.toString(W2H_Ratio));
+        
     }
 
     private void AddEnvironmentVars()
