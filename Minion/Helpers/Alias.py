@@ -87,6 +87,9 @@ class AliasMgr:
         for key in os.environ.keys():
             AliasMgr.AddAlias(key,os.environ[key])
 
+        curr_dir_path = os.path.dirname(os.path.realpath(__file__))
+        AliasMgr.AddAlias("WORKING_DIR",curr_dir_path)
+
         # on linux, computername is not an environment vairable, so let's add it :-)
         if False == AliasMgr.IsAliased("ComputerName"):
             try:
