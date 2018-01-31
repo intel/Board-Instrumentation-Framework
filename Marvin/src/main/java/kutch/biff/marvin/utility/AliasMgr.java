@@ -22,6 +22,7 @@
 package kutch.biff.marvin.utility;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -393,7 +394,15 @@ public class AliasMgr
         {
             String current = new java.io.File( "." ).getCanonicalPath();
             AddRootAlias("WORKING_DIR",current);
-            
+            if (File.separatorChar == '/')
+              {
+              }
+              else
+              {
+                  String path = "file:///" + current.replace(File.separatorChar, '/');
+                   AddRootAlias("WORKING_DIR_URI",path);
+            System.out.println(path);
+              }            
         }
         catch (IOException ex)
         {
