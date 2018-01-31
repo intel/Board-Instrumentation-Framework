@@ -2,6 +2,7 @@ Release 18.01
 Added GridMacro capability to Marvin.
 Added % to hgap and vgap
 added ability to set height and width and styles for input boxes
+added $(WORKING_DIR) and $(WORKING_DIR_URI) to Marvin
 
 Release 17.12
 Added <ClickThroughTransparent> for all widgets.
