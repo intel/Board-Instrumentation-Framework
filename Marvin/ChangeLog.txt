@@ -4,6 +4,7 @@ Added % to hgap and vgap
 added ability to set height and width and styles for input boxes
 added $(WORKING_DIR) and $(WORKING_DIR_URI) to Marvin
 added $(RandomVal) alias to Marvin
+added ExcludeForAutoActions to DynamicGrid GridFile options
 
 Release 17.12
 Added <ClickThroughTransparent> for all widgets.

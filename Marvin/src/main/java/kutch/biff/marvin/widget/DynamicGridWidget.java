@@ -50,7 +50,8 @@ public class DynamicGridWidget extends GridWidget
 
     private final HashMap<String, DynamicGrid> _GridMap;
     private final HashMap<String, String> _TaskMap;
-    private CircularList<String> _ListID;
+    private final CircularList<String> _ListID;
+    private final HashMap<String, String> _DoNotIncludeInAutoMap;
     private String _CurrentKey;
     private boolean _AutoAdvance;
     private boolean _AutoLoopWithAdvance;
@@ -63,6 +64,7 @@ public class DynamicGridWidget extends GridWidget
     {
         _GridMap = new HashMap<>();
         _TaskMap = new HashMap<>();
+        _DoNotIncludeInAutoMap = new HashMap<>();
         _ListID = new CircularList<>();
         _CurrentKey = null;
         _AutoAdvance = false;
@@ -142,12 +144,34 @@ public class DynamicGridWidget extends GridWidget
 
                                 if (strVal.equalsIgnoreCase("Next")) // go to next image in the list
                                 {
+                                    int count = _ListID.size();
+                                    
                                     key = _ListID.GetNext();
-
+                                    while (_DoNotIncludeInAutoMap.containsKey(key) && count>=0)
+                                    {
+                                        count--;
+                                        key = _ListID.GetNext();
+                                    }
+                                    if (count < 0)
+                                    {
+                                        LOGGER.warning("Asked to perform Next, however all items in DyanmicGrid are marked as to exclude from automatic actions.");
+                                        return;
+                                    }
                                 }
                                 else if (strVal.equalsIgnoreCase("Previous")) // go to previous image in the list
                                 {
+                                    int count = _ListID.size();
                                     key = _ListID.GetPrevious();
+                                    while (_DoNotIncludeInAutoMap.containsKey(key) && count>=0)
+                                    {
+                                        count--;
+                                        key = _ListID.GetPrevious();
+                                    }
+                                    if (count < 0)
+                                    {
+                                        LOGGER.warning("Asked to perform previous, however all items in DyanmicGrid are marked as to exclude from automatic actions.");
+                                        return;
+                                    }
                                 }
                                 else
                                 {
@@ -328,6 +352,14 @@ public class DynamicGridWidget extends GridWidget
             {
                 String Task = node.getAttribute("TaskOnActivate");
                 _TaskMap.put(Id, Task); // task to run on activate
+            }
+            if (node.hasAttribute("ExcludeForAutoActions"))
+            {
+                boolean fExclude = node.getBooleanAttribute("ExcludeForAutoActions"); 
+                if (true == fExclude)
+                {
+                    _DoNotIncludeInAutoMap.put(Id, Id);
+                }
             }
 
             DynamicGrid objGrid = (DynamicGrid) BuildGrid(node);
