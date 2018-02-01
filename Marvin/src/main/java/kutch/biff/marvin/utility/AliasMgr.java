@@ -58,6 +58,7 @@ public class AliasMgr
     private final static String strNextColumnAlias = "NextColumnAlias";
     private final static String strPrevColumnAlias = "PrevColumnAlias";
     private final static String strPrevRowAlias = "PrevRowAlias";
+    private int randomVal;
 
     public static AliasMgr getAliasMgr()
     {
@@ -68,9 +69,12 @@ public class AliasMgr
     {
         _AliasList = new ArrayList<>();
         PushAliasList(true);
+        randomVal = 1;
+        AddAlias("RandomVal", Integer.toString(randomVal));
         AddAlias("DEBUG_STYLE", "-fx-border-color:blue;-fx-border-style: dashed");
         PushAliasList(true);
         AddEnvironmentVars();
+        
     }
 
     /**
@@ -349,7 +353,14 @@ public class AliasMgr
     {
         Document doc = OpenXMLFile(FileName);
         AliasMgr.getAliasMgr().SetCurrentConfigFile(FileName);
+        AliasMgr.getAliasMgr().AddRandomValueAlias();
         return ReadAliasFromRootDocument(doc);
+    }
+    
+    public void AddRandomValueAlias()
+    {
+        randomVal++;
+        AddAlias("RandomVal", Integer.toString(randomVal));
     }
 
     public static boolean ReadAliasFromRootDocument(Document doc)
@@ -401,7 +412,6 @@ public class AliasMgr
               {
                   String path = "file:///" + current.replace(File.separatorChar, '/');
                    AddRootAlias("WORKING_DIR_URI",path);
-            System.out.println(path);
               }            
         }
         catch (IOException ex)
@@ -422,7 +432,6 @@ public class AliasMgr
         AddRootAlias("CANVAS_HEIGHT", Double.toString(Height));
         AddRootAlias("SCREEN_H2W_RATIO",Double.toString(H2W_Ratio));
         AddRootAlias("SCREEN_W2H_RATIO",Double.toString(W2H_Ratio));
-        
     }
 
     private void AddEnvironmentVars()
