@@ -385,17 +385,16 @@ public class Marvin extends Application
                 break;
             }
         }
-        for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
-        {
-            if (false == _Config.getTabs().get(iIndex).PerformPostCreateActions(null))
-            {
-                RetVal = false;
-                break;
-            }
-        }
         if (true == RetVal)
         {
-            //RetVal = SetAppStyle(pane);
+            for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
+            {
+                if (false == _Config.getTabs().get(iIndex).PerformPostCreateActions(null))
+                {
+                    RetVal = false;
+                    break;
+                }
+            }
         }
 
         // check if all have been setup with parent pane (a bit of a hack for this added peekabooo feature_
@@ -484,7 +483,7 @@ public class Marvin extends Application
 
     private void checkSize(Stage stage, Scene scene, GridPane objGridPane)
     {
-        
+
         //if (1 == 1) return;
 //        stage.setMaximized(true);
         stage.centerOnScreen();
@@ -551,7 +550,6 @@ public class Marvin extends Application
         _objTabPane.setSide(_Config.getConfiguration().getSide());
         GridPane sceneGrid = new GridPane();
 
-        
         Scene scene = null;
         Rectangle2D visualBounds = _Config.getConfiguration().getPrimaryScreen().getVisualBounds();
         int appWidth = (int) visualBounds.getWidth();
@@ -634,7 +632,7 @@ public class Marvin extends Application
         stage.setScene(scene);
         stage.setHeight(appHeight);
         stage.setWidth(appWidth);
-        
+
         if (_Config.getConfiguration().getKioskMode())
         {
             stage.initStyle(StageStyle.UNDECORATED);
