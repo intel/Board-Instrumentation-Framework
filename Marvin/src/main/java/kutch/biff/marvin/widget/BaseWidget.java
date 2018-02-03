@@ -1333,6 +1333,7 @@ abstract public class BaseWidget implements Widget
         }
     }
 
+    
     public EventHandler<MouseEvent> SetupTaskAction()
     {
         if (false == _MouseHasBeenSetup) // quick hack, as I call this from MOST widgets, but now want it from all.  Will eventually remove from individual widgets.
@@ -1361,6 +1362,16 @@ abstract public class BaseWidget implements Widget
             }
         }
         return null;
+    }
+
+    public boolean isMouseHasBeenSetup()
+    {
+        return _MouseHasBeenSetup;
+    }
+
+    public void setMouseHasBeenSetup(boolean _MouseHasBeenSetup)
+    {
+        this._MouseHasBeenSetup = _MouseHasBeenSetup;
     }
 
     @Override

@@ -22,14 +22,16 @@
 package kutch.biff.marvin.widget;
 
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
+import static kutch.biff.marvin.widget.BaseWidget.CONFIG;
 
 /**
  *
@@ -38,7 +40,6 @@ import kutch.biff.marvin.utility.FrameworkNode;
 public class VideoPlayerWidget extends MediaPlayerWidget
 {
     private final MediaView _mediaView;
-    private final StackPane _Pane;
     private boolean _RetainAspectRatio;
     private static boolean _HasBeenVerified = false;
     private static boolean _IsValid = true;
@@ -79,7 +80,6 @@ public class VideoPlayerWidget extends MediaPlayerWidget
     {
         super("VideoPlayerWidget");
         _mediaView = new MediaView();
-        _Pane = new StackPane();
         _RetainAspectRatio = true;
     }
 
@@ -109,7 +109,38 @@ public class VideoPlayerWidget extends MediaPlayerWidget
         }
         pane.add(_mediaView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
         
+        SetupTaskAction();
         return true;
+    }
+    @Override
+    public EventHandler<MouseEvent> SetupTaskAction()
+    {
+        if (false == isMouseHasBeenSetup()) // quick hack, as I call this from MOST widgets, but now want it from all.  Will eventually remove from individual widgets.
+        {
+            BaseWidget objWidget = this;
+            if (_TaskMap.size() > 0 || CONFIG.isDebugMode()) // only do if a task to setup, or if debug mode
+            {
+                EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>()
+                {
+                    @Override
+                    public void handle(MouseEvent event)
+                    {
+                        if (event.isShiftDown() && CONFIG.isDebugMode())
+                        {
+                            LOGGER.info(objWidget.toString(true));
+                        }
+                        else if (true == CONFIG.getAllowTasks() && _TaskMap.containsKey(_CurrentMediaID.toLowerCase()))
+                        {
+                            TASKMAN.PerformTask(_TaskMap.get(_CurrentMediaID.toLowerCase()));
+                        }
+                    }
+                };
+                getStylableObject().setOnMouseClicked(eh);
+                setMouseHasBeenSetup(true);
+                return eh;
+            }
+        }
+        return null;
     }
     
     @Override

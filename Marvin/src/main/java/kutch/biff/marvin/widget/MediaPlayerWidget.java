@@ -48,8 +48,9 @@ public abstract class MediaPlayerWidget extends BaseWidget
 {
     private HashMap<String, String> _MediaURI;
     private HashMap<String, String> _MediaFilesAndTags;
+    protected HashMap<String, String> _TaskMap;
     private CircularList<String> _ListOfIDs;
-    private String _CurrentMediaID;
+    protected String _CurrentMediaID;
     private MediaPlayer _mediaPlayer;
     private boolean _RepeatList;
     private boolean _RepeatSingleMedia;
@@ -71,6 +72,7 @@ public abstract class MediaPlayerWidget extends BaseWidget
         _RepeatSingleMedia = false;
         _mediaPlayer = null;
         _MediaFilesAndTags = new HashMap<>();
+        _TaskMap = new HashMap<>();
         _AutoStart = false;
         _VolumeLevel = 50;
         _EventMarkerMap = new HashMap<>();
@@ -218,7 +220,7 @@ public abstract class MediaPlayerWidget extends BaseWidget
                     if (false == _MediaURI.containsKey(ID))
                     {
                         _MediaURI.put(ID, uriFile); // has of uri's
-                        _ListOfIDs.add(0, ID);
+                        _ListOfIDs.add(ID);
                         return true;
                     }
                     LOGGER.severe("Duplicate media ID specified for " + _WidgetType + " Widget:" + ID);
@@ -380,7 +382,7 @@ public abstract class MediaPlayerWidget extends BaseWidget
     {
         if (!_RepeatList && !_RepeatSingleMedia)
         {
-            OnStop(); // reset the media to start and be able to play it again
+      //      OnStop(); // reset the media to start and be able to play it again
             return;
         }
         String strNextID = "";
@@ -534,6 +536,15 @@ public abstract class MediaPlayerWidget extends BaseWidget
 
                 List<Pair<String, String>> markers = new ArrayList<>(); // list of markers of tasks
                 _EventMarkerMap.put(key, markers);
+                
+                if (node.hasAttribute("Task"))
+                {
+                    String taskID = node.getAttribute("task");
+                    if (null != taskID)
+                    {
+                        _TaskMap.put(key,taskID);
+                    }
+                }
 
                 return GetMarkers(node, inputType, markers);
             }
