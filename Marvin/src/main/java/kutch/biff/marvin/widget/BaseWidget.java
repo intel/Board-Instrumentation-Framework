@@ -236,6 +236,18 @@ abstract public class BaseWidget implements Widget
     {
         return _WidgetParentGridWidget;
     }
+    
+    protected void FireDefaultPeekaboo()
+    {
+        if (null != _DefaultPeekabooAction)
+        {
+            /* Some default action for peekaboo, don't want it to be general for
+               all widgets with same peekabook id/namespace, so simply call a worker function
+               with that peekaboo string at a later time (let eveyrthing load)
+             */
+            SendDefaultPeekabooAction(100);
+        }        
+    }
 
     /**
      *
@@ -259,6 +271,7 @@ abstract public class BaseWidget implements Widget
             getStylableObject().setPickOnBounds(false);
         }
 
+        FireDefaultPeekaboo();
         return handlePercentageDimentions();
     }
 
@@ -896,14 +909,6 @@ abstract public class BaseWidget implements Widget
                                 HandlePeekabooMessage(strPeek);
                             }
                         });
-        }
-        if (null != _DefaultPeekabooAction)
-        {
-            /* Some default action for peekaboo, don't want it to be general for
-               all widgets with same peekabook id/namespace, so simply call a worker function
-               with that peekaboo string at a later time (let eveyrthing load)
-             */
-            SendDefaultPeekabooAction(5000);
         }
     }
 

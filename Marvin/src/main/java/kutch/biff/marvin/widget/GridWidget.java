@@ -496,7 +496,8 @@ public class GridWidget extends BaseWidget
         {
             getStylableObject().setPickOnBounds(false);
         }
-
+        
+        FireDefaultPeekaboo();
         return true;
     }
     

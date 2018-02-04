@@ -470,6 +470,7 @@ public class FlipPanelWidget extends BaseWidget
             Tooltip.install(_vFront, _objToolTip);
             Tooltip.install(_vBack, _objToolTip);
         }
+        FireDefaultPeekaboo();
 
         return true;
     }    

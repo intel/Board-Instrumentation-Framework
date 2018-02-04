@@ -296,6 +296,8 @@ public class DynamicImageWidget extends StaticImageWidget
                 Tooltip.install(objView, _objToolTip);
             }
         }
+        FireDefaultPeekaboo();
+        
         return handlePercentageDimentions();
         //return true;
     }
