@@ -411,7 +411,7 @@ public class AliasMgr
               else
               {
                   String path = "file:///" + current.replace(File.separatorChar, '/');
-                   AddRootAlias("WORKING_DIR_URI",path);
+                  AddRootAlias("WORKING_DIR_URI",path);
               }            
         }
         catch (IOException ex)

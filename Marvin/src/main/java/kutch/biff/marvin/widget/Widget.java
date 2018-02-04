@@ -44,10 +44,6 @@ public interface Widget
     public boolean PerformPostCreateActions(GridWidget objParentGrid);
     public void PrepareForAppShutdown();
     public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent);
-
-//    public void UpdateStyleSheet(String FileName,String ID);
-//    public void UpdateRange(double min, double max);
-//    public void WidgetSpecificPeekaboo(String ID,Value);
 }
 
 
