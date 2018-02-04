@@ -1214,7 +1214,7 @@ public class ConfigurationReader
 
         Utility.ValidateAttributes(new String[]
         {
-            "ID", "File", "PerformOnStartup", "PerformOnConnect"
+            "ID", "File", "PerformOnStartup", "PerformOnConnect","stepped"
         }, taskNode);
         if (false == taskNode.hasAttribute("ID"))
         {
