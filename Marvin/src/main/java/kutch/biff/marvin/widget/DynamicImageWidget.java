@@ -420,7 +420,7 @@ public class DynamicImageWidget extends StaticImageWidget
         {
             Utility.ValidateAttributes(new String[]
             {
-                "Source", "ID","Monitor"
+                "Source", "ID","Monitor","Task"
             }, node);
             if (node.hasAttribute("Source"))
             {
