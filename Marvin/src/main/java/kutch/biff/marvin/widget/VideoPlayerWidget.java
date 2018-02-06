@@ -133,6 +133,10 @@ public class VideoPlayerWidget extends MediaPlayerWidget
                         {
                             TASKMAN.PerformTask(_TaskMap.get(_CurrentMediaID.toLowerCase()));
                         }
+                        else if (null != getTaskID() && true == CONFIG.getAllowTasks())
+                        {
+                            TASKMAN.PerformTask(getTaskID());
+                        }
                     }
                 };
                 getStylableObject().setOnMouseClicked(eh);
