@@ -63,11 +63,14 @@ public class DynamicImageWidget extends StaticImageWidget
     private ImageView _ActiveView;
     private GridPane basePane;
     private int _MonitorInterval=500;
+    private final HashMap<String, String> _TaskMap;
+
 
     public DynamicImageWidget()
     {
         _ImageFilenames = new HashMap<>();
         _TransitionMap = new HashMap<>();
+        _TaskMap = new HashMap<>();
         _ImageViewMap = new HashMap<>();
         _MontorMap = new HashMap<>();
 //        _ImageFileNames = new ArrayList<>();
@@ -263,6 +266,11 @@ public class DynamicImageWidget extends StaticImageWidget
                     {
                         LOGGER.info(objWidget.toString(true));
                     }
+                    else if (_TaskMap.containsKey(_CurrentKey) && true == CONFIG.getAllowTasks())
+                    {
+                        TASKMAN.PerformTask(_TaskMap.get(_CurrentKey));
+                    }
+                    
                     else if (null != getTaskID() && true == CONFIG.getAllowTasks())
                     {
                         TASKMAN.PerformTask(getTaskID());
@@ -438,6 +446,10 @@ public class DynamicImageWidget extends StaticImageWidget
             {
                 LOGGER.severe("Dynamic Image Widget has no ID for Image");
                 return false;
+            }
+            if (node.hasAttribute("Task"))
+            {
+                _TaskMap.put(Id, node.getAttribute("Task"));
             }
             String fname = convertToFileOSSpecific(FileName);
             if (null == fname)
