@@ -48,7 +48,6 @@ import org.w3c.dom.NodeList;
  */
 public class AliasMgr
 {
-
     private final ArrayList<Map> _AliasList;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static AliasMgr _Mgr = new AliasMgr();
@@ -74,7 +73,6 @@ public class AliasMgr
         AddAlias("DEBUG_STYLE", "-fx-border-color:blue;-fx-border-style: dashed");
         PushAliasList(true);
         AddEnvironmentVars();
-        
     }
 
     /**
@@ -159,6 +157,10 @@ public class AliasMgr
     })
     public void AddAlias(String Alias, String Value)
     {
+        if (Alias.equalsIgnoreCase("canvas_width"))
+        {
+            LOGGER.severe("Attempted to set an ALIAS ID to NULL");
+        }
         if (null == Alias)
         {
             LOGGER.severe("Attempted to set an ALIAS ID to NULL");
@@ -421,8 +423,19 @@ public class AliasMgr
         
         Configuration CONFIG = Configuration.getConfig();
         Rectangle2D visualBounds = CONFIG.getPrimaryScreen().getVisualBounds();
-        double Width = visualBounds.getWidth() - CONFIG.getAppBorderWidth() * 2;
-        double Height = visualBounds.getHeight() - CONFIG.getBottomOffset() - CONFIG.getTopOffset();
+        double Width = CONFIG.getWidth();
+        double Height = CONFIG.getHeight();
+        // use configured dimensions, otherwise use screen;
+        if (Width == 0.0)
+        {
+            Width = visualBounds.getWidth();
+        }
+        if (Height == 0.0)
+        {
+            Height = visualBounds.getHeight();
+        }
+        Width = Width - CONFIG.getAppBorderWidth() * 2;
+        Height = Height - CONFIG.getBottomOffset() - CONFIG.getTopOffset();
         double H2W_Ratio = Width/Height;
         double W2H_Ratio = Height/Width;
         

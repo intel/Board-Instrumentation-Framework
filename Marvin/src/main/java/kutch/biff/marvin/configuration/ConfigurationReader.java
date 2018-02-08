@@ -293,7 +293,7 @@ public class ConfigurationReader
             String strWidth = appNode.getAttribute("Width");
             try
             {
-                _Configuration.setWidth((int)Double.parseDouble(strWidth));
+                _Configuration.setWidth((int) Double.parseDouble(strWidth));
             }
             catch (Exception ex)
             {
@@ -305,7 +305,7 @@ public class ConfigurationReader
             String strHeight = appNode.getAttribute("Height");
             try
             {
-                _Configuration.setHeight((int)Double.parseDouble(strHeight));
+                _Configuration.setHeight((int) Double.parseDouble(strHeight));
             }
             catch (Exception ex)
             {
@@ -369,6 +369,27 @@ public class ConfigurationReader
         return retVal;
     }
 
+    private void FetchDimenstions(FrameworkNode node)
+    {
+        try
+        {
+            if (node.hasAttribute("Width"))
+            {
+                int appWidth = Integer.parseInt(node.getAttribute("Width"));
+                _Configuration.setWidth(appWidth);
+            }
+            if (node.hasAttribute("Height"))
+            {
+                int appHeight = Integer.parseInt(node.getAttribute("Height"));
+                _Configuration.setHeight(appHeight);
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+
+    }
+
     private boolean ReadAppSettings(Document doc)
     {
         NodeList appStuff = doc.getElementsByTagName("Application");
@@ -383,11 +404,13 @@ public class ConfigurationReader
         }
         boolean NetworkSettingsRead = false;
         FrameworkNode baseNode = new FrameworkNode(appStuff.item(0));
+        FetchDimenstions(baseNode);
+        AliasMgr.getAliasMgr().addMarvinInfo();
         AliasMgr.ReadAliasFromRootDocument(doc);
         ReadAppAttributes(baseNode);
 
         ArrayList<String> TabList = new ArrayList<String>();
-        
+
         for (FrameworkNode node : baseNode.getChildNodes())
         {
             if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
@@ -681,9 +704,8 @@ public class ConfigurationReader
             LOGGER.severe("No Tabs defined in <Application> section of configuration file.");
             return false;
         }
-        AliasMgr.getAliasMgr().addMarvinInfo();
         _Configuration.setPrimaryScreenDetermined(true);
-        
+
         if (VerifyTabList(TabList))
         {
             _tabs = ReadTabs(doc, TabList);
@@ -968,7 +990,9 @@ public class ConfigurationReader
                         try
                         {
                             if (!tab.parsehGapValue(node))
+                            {
                                 LOGGER.config("Setting hGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("hgap"));
+                            }
                             //tab.sethGap(Integer.parseInt(node.getAttribute("hgap")));
                         }
                         catch (Exception ex)
@@ -981,7 +1005,9 @@ public class ConfigurationReader
                         try
                         {
                             if (!tab.parsevGapValue(node))
+                            {
                                 LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("vgap"));
+                            }
 //                            tab.setvGap(Integer.parseInt(node.getAttribute("vgap")));
                             //LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("vgap"));
                         }
@@ -1214,7 +1240,7 @@ public class ConfigurationReader
 
         Utility.ValidateAttributes(new String[]
         {
-            "ID", "File", "PerformOnStartup", "PerformOnConnect","stepped"
+            "ID", "File", "PerformOnStartup", "PerformOnConnect", "stepped"
         }, taskNode);
         if (false == taskNode.hasAttribute("ID"))
         {
@@ -1281,7 +1307,7 @@ public class ConfigurationReader
 
         Utility.ValidateAttributes(new String[]
         {
-            "ID", "Type","Height","Width"
+            "ID", "Type", "Height", "Width"
         }, promptNode);
 
         if (false == promptNode.hasAttribute("ID"))
