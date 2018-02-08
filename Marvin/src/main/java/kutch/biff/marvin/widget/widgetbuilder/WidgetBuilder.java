@@ -957,7 +957,7 @@ public class WidgetBuilder
         return retWidget;
     }
 
-    public static DynamicGridWidget BuildDynamicGrid(FrameworkNode dynaTabNode)
+    public static DynamicGridWidget BuildDynamicGrid(FrameworkNode dynaGridNode)
     {
         DynamicGridWidget retWidget = new DynamicGridWidget();
         String rowSpan = "1";
@@ -966,48 +966,53 @@ public class WidgetBuilder
         String strColumn = "0";
         String WhatIsIt = "DynamicGrid";
 
-        if (false == dynaTabNode.hasAttribute("row"))
+        if (false == dynaGridNode.hasAttribute("row"))
         {
             LOGGER.severe("DynamicGrid with no row");
             return null;
         }
-
-        if (false == dynaTabNode.hasAttribute("column"))
+        
+        if (dynaGridNode.hasAttribute("Task"))
+        {
+            retWidget.setTaskID(dynaGridNode.getAttribute("Task"));
+        }
+        
+        if (false == dynaGridNode.hasAttribute("column"))
         {
             LOGGER.severe("Grid with no column");
             return null;
         }
-        if (dynaTabNode.hasAttribute("rowSpan"))
+        if (dynaGridNode.hasAttribute("rowSpan"))
         {
-            rowSpan = dynaTabNode.getAttribute("rowSpan");
+            rowSpan = dynaGridNode.getAttribute("rowSpan");
         }
-        if (dynaTabNode.hasAttribute("colSpan"))
+        if (dynaGridNode.hasAttribute("colSpan"))
         {
-            colSpan = dynaTabNode.getAttribute("colSpan");
+            colSpan = dynaGridNode.getAttribute("colSpan");
         }
-        if (dynaTabNode.hasAttribute("columnspan"))
+        if (dynaGridNode.hasAttribute("columnspan"))
         {
-            colSpan = dynaTabNode.getAttribute("columnspan");
+            colSpan = dynaGridNode.getAttribute("columnspan");
         }
-        if (true == dynaTabNode.hasAttribute("Height"))
+        if (true == dynaGridNode.hasAttribute("Height"))
         {
-            if (!retWidget.parseHeight(dynaTabNode))
+            if (!retWidget.parseHeight(dynaGridNode))
             {
                 LOGGER.severe("Invalid Height for Grid in Application.xml");
                 return null;
             }
         }
-        if (true == dynaTabNode.hasAttribute("Width"))
+        if (true == dynaGridNode.hasAttribute("Width"))
         {
-            if (!retWidget.parseWidth(dynaTabNode))
+            if (!retWidget.parseWidth(dynaGridNode))
             {
                 LOGGER.severe("Invalid Width for Grid in Application.xml");
                 return null;
             }
         }
 
-        strRow = dynaTabNode.getAttribute("row");
-        strColumn = dynaTabNode.getAttribute("column");
+        strRow = dynaGridNode.getAttribute("row");
+        strColumn = dynaGridNode.getAttribute("column");
         if (strRow == null)
         {
             LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. no row defined");
@@ -1034,33 +1039,33 @@ public class WidgetBuilder
             LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. ");
             return null;
         }
-        if (dynaTabNode.hasAttribute("hgap"))
+        if (dynaGridNode.hasAttribute("hgap"))
         {
             try
             {
-                retWidget.sethGap(Integer.parseInt(dynaTabNode.getAttribute("hgap")));
-                LOGGER.config("Setting hGap for " + WhatIsIt + " :" + dynaTabNode.getAttribute("hgap"));
+                retWidget.sethGap(Integer.parseInt(dynaGridNode.getAttribute("hgap")));
+                LOGGER.config("Setting hGap for " + WhatIsIt + " :" + dynaGridNode.getAttribute("hgap"));
             }
             catch (NumberFormatException ex)
             {
-                LOGGER.warning("hgap for " + WhatIsIt + "  invalid: " + dynaTabNode.getAttribute("hgap") + ".  Ignoring");
+                LOGGER.warning("hgap for " + WhatIsIt + "  invalid: " + dynaGridNode.getAttribute("hgap") + ".  Ignoring");
             }
         }
-        if (dynaTabNode.hasAttribute("vgap"))
+        if (dynaGridNode.hasAttribute("vgap"))
         {
             try
             {
-                retWidget.setvGap(Integer.parseInt(dynaTabNode.getAttribute("vgap")));
-                LOGGER.config("Setting vGap for " + WhatIsIt + " :" + dynaTabNode.getAttribute("vgap"));
+                retWidget.setvGap(Integer.parseInt(dynaGridNode.getAttribute("vgap")));
+                LOGGER.config("Setting vGap for " + WhatIsIt + " :" + dynaGridNode.getAttribute("vgap"));
             }
             catch (NumberFormatException ex)
             {
-                LOGGER.warning("vgap for " + WhatIsIt + " invalid: " + dynaTabNode.getAttribute("vgap") + ".  Ignoring");
+                LOGGER.warning("vgap for " + WhatIsIt + " invalid: " + dynaGridNode.getAttribute("vgap") + ".  Ignoring");
             }
         }
-        if (true == dynaTabNode.hasAttribute("Align"))
+        if (true == dynaGridNode.hasAttribute("Align"))
         {
-            String str = dynaTabNode.getAttribute("Align");
+            String str = dynaGridNode.getAttribute("Align");
             retWidget.setAlignment(str);
         }
 
@@ -1069,13 +1074,13 @@ public class WidgetBuilder
             Utility.ValidateAttributes(new String[]
             {
                 "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align","Height","Width"
-            }, dynaTabNode);
+            }, dynaGridNode);
 
         }
 
         // go read the grid contents - note that this could be a continuation from stuff already read in via file
         // so you can define most of grid in external file, but keep adding
-        retWidget = ReadGridInfo(dynaTabNode, retWidget);
+        retWidget = ReadGridInfo(dynaGridNode, retWidget);
         AliasMgr.getAliasMgr().PopAliasList();
         return retWidget;
     }

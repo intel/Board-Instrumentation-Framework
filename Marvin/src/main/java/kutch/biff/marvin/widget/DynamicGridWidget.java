@@ -47,7 +47,6 @@ import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
  */
 public class DynamicGridWidget extends GridWidget
 {
-
     private final HashMap<String, DynamicGrid> _GridMap;
     private final HashMap<String, String> _TaskMap;
     private final CircularList<String> _ListID;
@@ -145,9 +144,9 @@ public class DynamicGridWidget extends GridWidget
                                 if (strVal.equalsIgnoreCase("Next")) // go to next image in the list
                                 {
                                     int count = _ListID.size();
-                                    
+
                                     key = _ListID.GetNext();
-                                    while (_DoNotIncludeInAutoMap.containsKey(key) && count>=0)
+                                    while (_DoNotIncludeInAutoMap.containsKey(key) && count >= 0)
                                     {
                                         count--;
                                         key = _ListID.GetNext();
@@ -162,7 +161,7 @@ public class DynamicGridWidget extends GridWidget
                                 {
                                     int count = _ListID.size();
                                     key = _ListID.GetPrevious();
-                                    while (_DoNotIncludeInAutoMap.containsKey(key) && count>=0)
+                                    while (_DoNotIncludeInAutoMap.containsKey(key) && count >= 0)
                                     {
                                         count--;
                                         key = _ListID.GetPrevious();
@@ -355,7 +354,7 @@ public class DynamicGridWidget extends GridWidget
             }
             if (node.hasAttribute("ExcludeForAutoActions"))
             {
-                boolean fExclude = node.getBooleanAttribute("ExcludeForAutoActions"); 
+                boolean fExclude = node.getBooleanAttribute("ExcludeForAutoActions");
                 if (true == fExclude)
                 {
                     _DoNotIncludeInAutoMap.put(Id, Id);
@@ -462,6 +461,11 @@ public class DynamicGridWidget extends GridWidget
             {
                 retWidget.setTaskID(node.getAttribute("Task"));
             }
+            else if (null != getTaskID())
+            {
+                retWidget.setTaskID(getTaskID()); // if no task setup for individual grid, use the one for this grid
+            }
+            
             AliasMgr.getAliasMgr().PopAliasList();
         }
         return retWidget;
