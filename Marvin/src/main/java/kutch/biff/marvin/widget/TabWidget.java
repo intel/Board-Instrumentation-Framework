@@ -22,6 +22,7 @@
 package kutch.biff.marvin.widget;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -263,7 +264,6 @@ public class TabWidget extends GridWidget
             {
                 LOGGER.warning("Unknown Entry: " + node.getNodeName() + " in Tab ID= " + getMinionID());
             }
-
         }
 
         return true;
@@ -294,5 +294,4 @@ public class TabWidget extends GridWidget
     {
         return _BaseGridPane;
     }
-
 }

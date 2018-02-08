@@ -408,6 +408,11 @@ public class Marvin extends Application
             }
         }        
          */
+        
+        if (TaskManager.getTaskManager().VerifyTasks())
+        {
+            LOGGER.info("Verified all referenced tasks are defined.");
+        }
         _Config.getConfiguration().setPane(pane);
         long elapsed = System.currentTimeMillis() - startTime;
         LOGGER.info("Time taken to initialize all widgets: " + Long.toString(elapsed) + "ms.");

@@ -39,6 +39,7 @@ import kutch.biff.marvin.utility.Utility;
  */
 public class GridWidget extends BaseWidget
 {
+
     protected ArrayList<Widget> _Widgets;
     private GridPane _GridPane = null;
     private int _hGap, _vGap;
@@ -47,9 +48,8 @@ public class GridWidget extends BaseWidget
     private boolean _PropagateExplicitlyConfigured;
     protected double _hGapPercentOfParentGrid;
     protected double _vGapPercentOfParentGrid;
-    
-    //private Pos _Position; // this could be a problem
 
+    //private Pos _Position; // this could be a problem
     protected boolean isPropagateClickThrough()
     {
         return _PropagateClickThrough;
@@ -84,10 +84,10 @@ public class GridWidget extends BaseWidget
         _Position = Pos.TOP_CENTER; // default for both Tab and Grids
         _insetTop = _insetBottom = _insetLeft = _insetRight = -1;
         setDefaultIsSquare(false);
-        
+
         _hGapPercentOfParentGrid = 0;
         _vGapPercentOfParentGrid = 0;
-        
+
     }
 
     public Image getImage(Color fillColor)
@@ -496,29 +496,31 @@ public class GridWidget extends BaseWidget
         {
             getStylableObject().setPickOnBounds(false);
         }
-        
+
         FireDefaultPeekaboo();
         return true;
     }
-    
+
     protected void sethGapPercentOfParentGrid(double percentVal)
     {
         _hGapPercentOfParentGrid = percentVal;
     }
+
     protected void setvGapPercentOfParentGrid(double percentVal)
     {
         _vGapPercentOfParentGrid = percentVal;
     }
-    
+
     protected double gethGapPercentOfParentGrid()
     {
-        return _hGapPercentOfParentGrid ;
+        return _hGapPercentOfParentGrid;
     }
+
     protected double getvGapPercentOfParentGrid()
     {
-        return _vGapPercentOfParentGrid ;
+        return _vGapPercentOfParentGrid;
     }
-    
+
     public boolean parsehGapValue(FrameworkNode widgetNode)
     {
         String str = widgetNode.getAttribute("hgap");
@@ -542,11 +544,11 @@ public class GridWidget extends BaseWidget
                 {
                     screenWidth = CONFIG.getCreationWidth();
                 }
-                sethGap((int)(screenWidth * (percentVal / 100.0)));
+                sethGap((int) (screenWidth * (percentVal / 100.0)));
             }
             else
             {
-                sethGap((int)Double.parseDouble(str));
+                sethGap((int) Double.parseDouble(str));
             }
         }
         catch (NumberFormatException ex)
@@ -556,7 +558,7 @@ public class GridWidget extends BaseWidget
         }
         return true;
     }
-    
+
     public boolean parsevGapValue(FrameworkNode widgetNode)
     {
         String str = widgetNode.getAttribute("vgap");
@@ -580,11 +582,11 @@ public class GridWidget extends BaseWidget
                 {
                     screenWidth = CONFIG.getCreationWidth();
                 }
-                setvGap((int)(screenWidth * (percentVal / 100.0)));
+                setvGap((int) (screenWidth * (percentVal / 100.0)));
             }
             else
             {
-                setvGap((int)Double.parseDouble(str));
+                setvGap((int) Double.parseDouble(str));
             }
         }
         catch (NumberFormatException ex)
@@ -594,21 +596,21 @@ public class GridWidget extends BaseWidget
         }
         return true;
     }
-    
+
     @Override
-    public boolean handlePercentageDimentions()    
+    public boolean handlePercentageDimentions()
     {
         if (gethGapPercentOfParentGrid() > 0)
         {
-            double parentWidth =  _WidgetParentGridWidget.getWidth();
+            double parentWidth = _WidgetParentGridWidget.getWidth();
             GridWidget currParent = _WidgetParentGridWidget;
-            
-            while (parentWidth == 0 )
+
+            while (parentWidth == 0)
             {
                 currParent = currParent.getParentGridWidget();
                 if (null != currParent)
                 {
-                    parentWidth =  currParent.getWidth();
+                    parentWidth = currParent.getWidth();
                 }
                 else
                 {
@@ -617,26 +619,26 @@ public class GridWidget extends BaseWidget
             }
             if (parentWidth == 0)
             {
-                LOGGER.severe("Widget [" + getName() +"] hGap specified as percentage of parent grid - but parent grid width not specified.");
+                LOGGER.severe("Widget [" + getName() + "] hGap specified as percentage of parent grid - but parent grid width not specified.");
                 return false;
             }
-            
-            double width = parentWidth * (getWidthPercentOfParentGrid()/100);
-            
-            getGridPane().setHgap((int)width);
+
+            double width = parentWidth * (getWidthPercentOfParentGrid() / 100);
+
+            getGridPane().setHgap((int) width);
         }
-        
+
         if (getvGapPercentOfParentGrid() > 0)
         {
-            double parentHeight =  _WidgetParentGridWidget.getHeight();
+            double parentHeight = _WidgetParentGridWidget.getHeight();
             GridWidget currParent = _WidgetParentGridWidget;
-            
-            while (parentHeight == 0 )
+
+            while (parentHeight == 0)
             {
                 currParent = currParent.getParentGridWidget();
                 if (null != currParent)
                 {
-                    parentHeight =  currParent.getHeight();
+                    parentHeight = currParent.getHeight();
                 }
                 else
                 {
@@ -645,15 +647,35 @@ public class GridWidget extends BaseWidget
             }
             if (parentHeight == 0)
             {
-                LOGGER.severe("Widget [" + getName() +"] vGap specified as percentage of parent grid - but parent grid width not specified.");
+                LOGGER.severe("Widget [" + getName() + "] vGap specified as percentage of parent grid - but parent grid width not specified.");
                 return false;
             }
-            
-            double height = parentHeight * (getWidthPercentOfParentGrid()/100);
-            
-            getGridPane().setVgap((int)height);
+
+            double height = parentHeight * (getWidthPercentOfParentGrid() / 100);
+
+            getGridPane().setVgap((int) height);
         }
         return super.handlePercentageDimentions();
     }
-    
+
+    public ArrayList<String> GetAllWidgetTasks()
+    {
+        ArrayList<String> listTasks;
+        listTasks = new ArrayList<>();
+
+        for (Widget _objWidget : _Widgets)
+        {
+            if (_objWidget instanceof GridWidget)
+            {
+                listTasks.addAll(((GridWidget) _objWidget).GetAllWidgetTasks());
+            }
+            if (((BaseWidget) _objWidget).getTaskID() != null) // not an else, because grids can have tasks too
+            {
+                listTasks.add(((BaseWidget) _objWidget).getTaskID());
+            }
+        }
+
+        return listTasks;
+    }
+
 }

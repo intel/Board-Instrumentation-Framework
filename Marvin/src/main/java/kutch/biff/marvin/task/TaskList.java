@@ -40,6 +40,11 @@ public class TaskList
         _TaskItems = null;
     }
 
+    public ArrayList<BaseTask> GetTasks()
+    {
+        return _TaskItems;
+    }
+    
     public void AddTaskItem(BaseTask objTask)
     {
         if (null == _TaskItems)

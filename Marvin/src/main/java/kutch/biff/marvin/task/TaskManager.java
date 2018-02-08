@@ -22,11 +22,13 @@
 package kutch.biff.marvin.task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.network.Client;
@@ -39,6 +41,7 @@ import kutch.biff.marvin.utility.Utility;
  */
 public class TaskManager
 {
+
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private static TaskManager _TaskManager = null;
     private static ArrayList<String> _OnStartupList = null;
@@ -65,7 +68,7 @@ public class TaskManager
         _PostponedTasksNew = new ArrayList<>();
         _PostponedTaskObjectThatMustBeRunInGuiThreadList = new ArrayList<>();
         _TasksPerformed = 0;
-        _LoopsWithManyTasks  = 0;
+        _LoopsWithManyTasks = 0;
     }
 
     // this is where a task comes in on a woker thread (like remote marvin) 
@@ -89,7 +92,7 @@ public class TaskManager
     {
         return _TasksPerformed;
     }
-    
+
     public long GetPendingTaskCount()
     {
         long retVal = 0;
@@ -99,9 +102,9 @@ public class TaskManager
         }
         synchronized (_PostponedTaskObjectThatMustBeRunInGuiThreadList)
         {
-             retVal = _PostponedTaskObjectThatMustBeRunInGuiThreadList.size();
+            retVal = _PostponedTaskObjectThatMustBeRunInGuiThreadList.size();
         }
-        
+
         synchronized (_PostponedTasks)
         {
             retVal += _PostponedTasks.size();
@@ -124,7 +127,7 @@ public class TaskManager
             _DeferredTasks.clear();
         }
 
-        if ( size > 256 && !_WarningAboutManyTasksSent)
+        if (size > 256 && !_WarningAboutManyTasksSent)
         {
             if (_LoopsWithManyTasks++ > 5)
             {
@@ -181,12 +184,12 @@ public class TaskManager
         }
 
         fDone = false;
-        */
+         */
         // Now go and process all of the postponed tasks that need to be done in gui thread
 
         synchronized (_PostponedTaskObjectThatMustBeRunInGuiThreadList)
         {
-             size = _PostponedTaskObjectThatMustBeRunInGuiThreadList.size();
+            size = _PostponedTaskObjectThatMustBeRunInGuiThreadList.size();
             localPostponedTaskstoRun.addAll(_PostponedTaskObjectThatMustBeRunInGuiThreadList);
             _PostponedTaskObjectThatMustBeRunInGuiThreadList.clear();
         }
@@ -195,23 +198,24 @@ public class TaskManager
         {
             PerformThreadedTask(objTask);
         }
-        */
+         */
         Platform.runLater(new Runnable()
         {
             @Override
             public void run()
             { // go run this in a GUI thread
                 // 
-                for (ITask objTask : localPostponedTaskstoRun )
+                for (ITask objTask : localPostponedTaskstoRun)
                 {
                     objTask.PerformTask();
                 }
             }
         });
-        
+
         PerformPostponedTasks();
     }
 
+    /*
     private void PerformThreadedTask(ITask objTask)
     {
         Platform.runLater(new Runnable()
@@ -223,7 +227,7 @@ public class TaskManager
             }
         });
     }
-
+     */
     public void AddOnStartupTask(String TaskID, BaseTask objTaskToPerform)
     {
         if (false == _TaskMap.containsKey(TaskID.toUpperCase()))
@@ -514,12 +518,12 @@ public class TaskManager
                 {
                     objTaskItem = BuildDesktopTaskItem(ID, node);
                 }
-                else if (taskType.equalsIgnoreCase("LaunchApplication") || taskType.equalsIgnoreCase("LaunchApp") || taskType.equalsIgnoreCase("LaunchProgram") || 
-                         taskType.equalsIgnoreCase("RunProgram") || taskType.equalsIgnoreCase("RunApp"))
+                else if (taskType.equalsIgnoreCase("LaunchApplication") || taskType.equalsIgnoreCase("LaunchApp") || taskType.equalsIgnoreCase("LaunchProgram")
+                         || taskType.equalsIgnoreCase("RunProgram") || taskType.equalsIgnoreCase("RunApp"))
                 {
                     objTaskItem = BuildLaunchApplicationTaskItem(ID, node);
                 }
-                
+
                 else
                 {
                     LOGGER.severe("Task with ID: " + ID + " contains a TaskItem of unknown Type of " + taskType + ".");
@@ -776,10 +780,10 @@ public class TaskManager
             }
             else
             {
-                LOGGER.severe("Task with ID: " + taskID + " contains an unknown tag: " + node.getNodeName() );
+                LOGGER.severe("Task with ID: " + taskID + " contains an unknown tag: " + node.getNodeName());
             }
         }
-        
+
         if (!objMarvinTask.isValid())
         {
             objMarvinTask = null;
@@ -1042,18 +1046,19 @@ public class TaskManager
 
         return null;
     }
-    
+
     private DesktopTask BuildDesktopTaskItem(String taskID, FrameworkNode taskNode)
     {
         /**
-	<TaskList ID="TestDesktop">
-		<TaskItem Type="Desktop">
-			<Document Action="Open">foo.html</Document>
-		</TaskItem>
-	</TaskList>        
-        **/
+         * <TaskList ID="TestDesktop">
+         * <TaskItem Type="Desktop">
+         * <Document Action="Open">foo.html</Document>
+         * </TaskItem>
+         * </TaskList>        
+        *
+         */
         DesktopTask objDesktopTask = new DesktopTask();
-        
+
         for (FrameworkNode node : taskNode.getChildNodes())
         {
             if (node.getNodeName().equalsIgnoreCase("Document"))
@@ -1062,7 +1067,7 @@ public class TaskManager
                 {
                     "Action"
                 }, node);
-                
+
                 if (!objDesktopTask.SetDocument(node.getTextContent()))
                 {
                     LOGGER.severe("Desktop task has invalid document: " + node.getTextContent());
@@ -1081,7 +1086,7 @@ public class TaskManager
                 }
             }
         }
-         
+
         if (!objDesktopTask.isValid())
         {
             objDesktopTask = null;
@@ -1089,17 +1094,18 @@ public class TaskManager
         }
         return objDesktopTask;
     }
-    
+
     private LaunchProgramTask BuildLaunchApplicationTaskItem(String taskID, FrameworkNode taskNode)
     {
         /**
-	<TaskList ID="TestLaunch">
-		<TaskItem Type="LaunchProgram">
-			<Application>foo.exe</Document>
-			<Param>1</Param>
-			<Param>2</Param>
-		</TaskItem>
-	</TaskList>	        **/
+         * <TaskList ID="TestLaunch">
+         * <TaskItem Type="LaunchProgram">
+         * <Application>foo.exe</Document>
+         * <Param>1</Param>
+         * <Param>2</Param>
+         * </TaskItem>
+         * </TaskList>	        *
+         */
         LaunchProgramTask objRunProgramTask = new LaunchProgramTask();
         objRunProgramTask.setParams(GetParameters(taskNode));
 
@@ -1114,7 +1120,7 @@ public class TaskManager
                 }
             }
         }
-         
+
         if (!objRunProgramTask.isValid())
         {
             objRunProgramTask = null;
@@ -1187,7 +1193,7 @@ public class TaskManager
         }
         _TasksPerformed++;
         TaskList objTaskList = _TaskMap.get(TaskID.toUpperCase());
-        
+
         if (null != objTaskList)
         {
             return objTaskList.PerformTasks();
@@ -1203,7 +1209,7 @@ public class TaskManager
      * @param Address Where it
      * @param Port is from
      */
-    public void OscarAnnouncementReceived(String OscarID, String Address, int Port,String OscarVersion)
+    public void OscarAnnouncementReceived(String OscarID, String Address, int Port, String OscarVersion)
     {
         if (null == _ClientMap)
         {
@@ -1295,7 +1301,7 @@ public class TaskManager
             LOGGER.severe("SendToOscar fn received NULL OscarID.");
             return;
         }
-        
+
         OscarID = OscarID.toLowerCase();
         if (null == _ClientMap || _ClientMap.isEmpty())
         {
@@ -1332,6 +1338,54 @@ public class TaskManager
         AddNewTask(ID, objTask, false, false);
 
         return ID;
+    }
+
+    public boolean VerifyTasks()
+    {
+        boolean returnVal = true;
+        HashMap<String, String> _knownBad = new HashMap<>();
+        for (String strKey : _TaskMap.keySet())
+        {
+            TaskList objTaskList = _TaskMap.get(strKey);
+            for (BaseTask objTask : objTaskList.GetTasks())
+            {
+                String taskID = objTask.getTaskID_ForVerification();
+                if (null == taskID)
+                {
+
+                }
+                else if (_TaskMap.containsKey(taskID.toUpperCase()))
+                {
+                    // all good
+                }
+                else if (false == _knownBad.containsKey(taskID.toUpperCase()))
+                {
+                    _knownBad.put(taskID.toUpperCase(), taskID);
+                    LOGGER.warning("Task with ID " + taskID + " specified, but not defined anywhere.");
+                    returnVal = false;
+                }
+            }
+        }
+
+        for (int iIndex = 0; iIndex < ConfigurationReader.GetConfigReader().getTabs().size(); iIndex++)
+        {
+            ArrayList<String> taskIDs = ConfigurationReader.GetConfigReader().getTabs().get(iIndex).GetAllWidgetTasks();
+            for (String taskID : taskIDs)
+            {
+                if (_TaskMap.containsKey(taskID.toUpperCase()))
+                {
+                    // all good
+                }
+                else if (false == _knownBad.containsKey(taskID.toUpperCase()))
+                {
+                    _knownBad.put(taskID.toUpperCase(), taskID);
+                    LOGGER.warning("Task with ID " + taskID + " specified, but not defined anywhere.");
+                    returnVal = false;
+                }
+            }
+        }
+
+        return returnVal;
     }
 
 }

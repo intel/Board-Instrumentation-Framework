@@ -52,7 +52,12 @@ abstract public class BaseTask implements ITask
         _TaskCount++;
         _ID=taskID;
     }
-            
+    
+    public String getTaskID_ForVerification()
+    {
+        return _ID;
+    }
+    
     public String getTaskID()
     {
         if (null == _ID)
