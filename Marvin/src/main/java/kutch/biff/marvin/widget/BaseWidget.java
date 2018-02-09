@@ -479,8 +479,10 @@ abstract public class BaseWidget implements Widget
         retStr.append(Integer.toString((int) (getHeight() * CONFIG.getScaleFactor())));
         retStr.append("]");
         retStr.append(" ");
+/*
 
         Region objRegion = getRegionObject();
+        
         if (null != objRegion)
         {
             retStr.append(strCR);
@@ -491,6 +493,7 @@ abstract public class BaseWidget implements Widget
             retStr.append(Integer.toString((int) objRegion.getHeight()));
             retStr.append("]");
         }
+        */
         return retStr.toString();
     }
 

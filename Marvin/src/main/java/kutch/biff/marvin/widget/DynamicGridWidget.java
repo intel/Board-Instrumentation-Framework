@@ -40,6 +40,9 @@ import kutch.biff.marvin.widget.dynamicgrid.DynamicGrid;
 import kutch.biff.marvin.widget.dynamicgrid.DynamicTransition;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
+import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
+import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
+import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
 
 /**
  *
@@ -48,7 +51,7 @@ import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
 public class DynamicGridWidget extends GridWidget
 {
     private final HashMap<String, DynamicGrid> _GridMap;
-    private final HashMap<String, String> _TaskMap;
+    private final HashMap<String, String> _TaskOnGridActivatekMap;
     private final CircularList<String> _ListID;
     private final HashMap<String, String> _DoNotIncludeInAutoMap;
     private String _CurrentKey;
@@ -62,7 +65,7 @@ public class DynamicGridWidget extends GridWidget
     public DynamicGridWidget()
     {
         _GridMap = new HashMap<>();
-        _TaskMap = new HashMap<>();
+        _TaskOnGridActivatekMap = new HashMap<>();
         _DoNotIncludeInAutoMap = new HashMap<>();
         _ListID = new CircularList<>();
         _CurrentKey = null;
@@ -76,6 +79,9 @@ public class DynamicGridWidget extends GridWidget
     @Override
     public boolean Create(GridPane parentPane, DataManager dataMgr)
     {
+        setTaskID(null);
+        setMouseHasBeenSetup( true); // don't want a task setup for this actual dyanmic grid, but if one is 
+                                     // specified, all the contined grids will have that task
         if (super.Create(parentPane, dataMgr))
         {
             _TransitionPane = getGridPane(); // _ParentPane is used in 
@@ -223,9 +229,9 @@ public class DynamicGridWidget extends GridWidget
                 _CurrentKey = key;
             }
 
-            if (_TaskMap.containsKey(key))  // Grid now active - is there a task associated with it?
+            if (_TaskOnGridActivatekMap.containsKey(key))  // Grid now active - is there a task associated with it?
             {
-                TASKMAN.PerformTask(_TaskMap.get(key)); // yup, go run it!
+                TASKMAN.PerformTask(_TaskOnGridActivatekMap.get(key)); // yup, go run it!
             }
         }
         else
@@ -350,7 +356,7 @@ public class DynamicGridWidget extends GridWidget
             if (node.hasAttribute("TaskOnActivate"))
             {
                 String Task = node.getAttribute("TaskOnActivate");
-                _TaskMap.put(Id, Task); // task to run on activate
+                _TaskOnGridActivatekMap.put(Id, Task); // task to run on activate
             }
             if (node.hasAttribute("ExcludeForAutoActions"))
             {
@@ -465,7 +471,6 @@ public class DynamicGridWidget extends GridWidget
             {
                 retWidget.setTaskID(getTaskID()); // if no task setup for individual grid, use the one for this grid
             }
-            
             AliasMgr.getAliasMgr().PopAliasList();
         }
         return retWidget;
