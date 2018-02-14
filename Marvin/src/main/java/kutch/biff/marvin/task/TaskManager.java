@@ -551,7 +551,7 @@ public class TaskManager
     }
 
     /**
-     * helper routine to see if a Taks with the given ID already exists
+     * helper routine to see if a Task with the given ID already exists
      *
      * @param TaskID
      * @return true if the TaskList with the TaskID already exists, else false

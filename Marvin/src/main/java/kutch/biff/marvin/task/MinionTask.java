@@ -100,6 +100,6 @@ public class MinionTask extends BaseTask
         sendBuffer += "</Marvin>";
         
         TASKMAN.SendToAllOscars(sendBuffer.getBytes());
-        LOGGER.info("Sending Minion Taks [" + getNamespace() + ":"+getID()+"]");
+        LOGGER.info("Sending Minion Task [" + getNamespace() + ":"+getID()+"]");
     }
 }
