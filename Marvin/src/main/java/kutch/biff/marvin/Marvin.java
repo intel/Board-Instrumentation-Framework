@@ -408,7 +408,6 @@ public class Marvin extends Application
             }
         }        
          */
-        
         if (TaskManager.getTaskManager().VerifyTasks())
         {
             LOGGER.info("Verified all referenced tasks are defined.");
@@ -826,6 +825,8 @@ public class Marvin extends Application
         {
             Thread.currentThread().setName("Main Application Thread");
             Application.launch(args);
+            System.exit(0);
+
         }
         catch (OutOfMemoryError ex)
         {
@@ -838,6 +839,7 @@ public class Marvin extends Application
             ex.printStackTrace(pw);
             LOGGER.severe(sw.toString());
             LOGGER.severe(ex.toString());
+            System.exit(1);
         }
 
     }
