@@ -8,4 +8,4 @@ https://www.youtube.com/watch?v=NYI8BDv17Lw
 
 
 
-Take a look at the 200+ page PDF file for details: https://github.com/intel/Board-Instrumentation-Framework/blob/master/BIFF%20Instrumentation%20Framework%20User%20Guide.pdf.
+Take a look at the 200+ page BIFF Instrumenation Framework User Guide.pdf file for details: https://github.com/intel/Board-Instrumentation-Framework/blob/master/BIFF%20Instrumentation%20Framework%20User%20Guide.pdf.
