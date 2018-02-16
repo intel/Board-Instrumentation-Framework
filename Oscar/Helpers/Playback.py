@@ -373,7 +373,7 @@ class Playback(object):
         entries = self.PlaybackData
 
         with open(filename,'w+t') as fp:
-            fp.write("Namespace,Name,TimeInterval(secs),# of Datapoints, Total Time(secs), Avg Time (ms),# of samples,Values...\n")
+            fp.write("Namespace,Name,TimeInterval(secs),# of Datapoints, Total Time(secs), Avg Time (ms),# of samples,Average Value,Values...\n")
 
 
             for Node in entries: # create a dictionary of each namespace+entity, then a list of values for each
@@ -435,14 +435,24 @@ class Playback(object):
 
                 if len(newList):
                     fp.write("," + str(len(newList))) # Write the count
-                    if newList[0].ID == "uStackState":
-                        pass
                 
                     if newList != None and self.__IsNumeric(newList[0].Value):
+                        tVal = 0
+                        for Node in newList:
+                            tVal += float(Node.Value)
+
+                        if tVal !=0:
+                            avgVal = tVal/len(newList)
+                        else:
+                            avgVal = 0
+
+                        fp.write(","+ "{0:.2f}".format(avgVal)) # write the average
+
                         for Node in newList:
                             fp.write("," + "{0:.2f}".format(float(Node.Value))) #write the data
                 
                     else:
+                        fp.write(",NA") #no Average for text
                         for Node in newList:
                             fp.write("," + Node.Value) #write the data - it is a string
 

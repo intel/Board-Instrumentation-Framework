@@ -1,3 +1,6 @@
+Release 18.02
+Added an Average value column to CSV output
+
 Release 17.02
 Bug Fix - Specifying log file was not working
 Added -m | -minimize option to run Gui initially minimized
