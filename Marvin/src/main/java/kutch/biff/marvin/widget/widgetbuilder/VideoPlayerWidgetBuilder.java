@@ -55,5 +55,5 @@ public class VideoPlayerWidgetBuilder
         }
         return objWidget;     
     }
-    
+   
 }

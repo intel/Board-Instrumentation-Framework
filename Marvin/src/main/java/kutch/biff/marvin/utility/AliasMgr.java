@@ -48,6 +48,7 @@ import org.w3c.dom.NodeList;
  */
 public class AliasMgr
 {
+
     private final ArrayList<Map> _AliasList;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static AliasMgr _Mgr = new AliasMgr();
@@ -152,9 +153,9 @@ public class AliasMgr
      * @param Value
      */
     @SuppressWarnings(
-    {
-        "unchecked", "unchecked"
-    })
+            {
+                "unchecked", "unchecked"
+            })
     public void AddAlias(String Alias, String Value)
     {
         if (Alias.equalsIgnoreCase("canvas_width"))
@@ -305,12 +306,37 @@ public class AliasMgr
         {
             if (nodeAlias.getNodeName().equalsIgnoreCase("Alias"))
             {
+                String strReplace = null;
                 NamedNodeMap map = nodeAlias.GetNode().getAttributes();
+                for (int iLoop = 0; iLoop < map.getLength(); iLoop++)
+                {
+                    FrameworkNode node = new FrameworkNode(map.item(iLoop));
+                    if (node.getNodeName().equals("REPLACE"))
+                    {
+                        strReplace = node.getTextContent();
+                    }
+                }
+
                 for (int iLoop = 0; iLoop < map.getLength(); iLoop++)
                 {
                     FrameworkNode node = new FrameworkNode(map.item(iLoop));
 
                     String strAlias = node.getNodeName();
+                    if (strAlias.equals("REPLACE"))
+                    {
+                        continue; // ignore 
+                    }
+                    if (strAlias.contains("REPLACE"))
+                    {
+                        if (null != strReplace)
+                        {
+                            strAlias = strAlias.replace("REPLACE", strReplace);
+                        }
+                        else
+                        {
+                            LOGGER.warning("Attempted to replace 'REPLACE' in alias " + strAlias + " however REPLACE not defined.  Ignoring");
+                        }
+                    }
 
                     String strValue = node.getTextContent();
                     AliasMgr._Mgr.AddAlias(strAlias, strValue);
@@ -320,13 +346,39 @@ public class AliasMgr
             else if (nodeAlias.getNodeName().equalsIgnoreCase("DefaultAlias"))
             {
                 NamedNodeMap map = nodeAlias.GetNode().getAttributes();
+                String strReplace = null;
+                for (int iLoop = 0; iLoop < map.getLength(); iLoop++)
+                {
+                    FrameworkNode node = new FrameworkNode(map.item(iLoop));
+                    if (node.getNodeName().equals("REPLACE"))
+                    {
+                        strReplace = node.getTextContent();
+                    }
+                }
+                
                 for (int iLoop = 0; iLoop < map.getLength(); iLoop++)
                 {
                     FrameworkNode node = new FrameworkNode(map.item(iLoop));
 
                     String strAlias = node.getNodeName();
                     String strValue = node.getTextContent();
-
+                    
+                    if (strAlias.equals("REPLACE"))
+                    {
+                        continue; // ignore 
+                    }
+                    if (strAlias.contains("REPLACE"))
+                    {
+                        if (null != strReplace)
+                        {
+                            strAlias = strAlias.replace("REPLACE", strReplace);
+                        }
+                        else
+                        {
+                            LOGGER.warning("Attempted to replace 'REPLACE' in alias " + strAlias + " however REPLACE not defined.  Ignoring");
+                        }
+                    }
+                    
                     if (false == getAliasMgr().IsAliased(strAlias))
                     {
                         AliasMgr._Mgr.AddAlias(strAlias, strValue);
@@ -358,7 +410,7 @@ public class AliasMgr
         AliasMgr.getAliasMgr().AddRandomValueAlias();
         return ReadAliasFromRootDocument(doc);
     }
-    
+
     public void AddRandomValueAlias()
     {
         randomVal++;
@@ -405,22 +457,22 @@ public class AliasMgr
     {
         try
         {
-            String current = new java.io.File( "." ).getCanonicalPath();
-            AddRootAlias("WORKING_DIR",current);
+            String current = new java.io.File(".").getCanonicalPath();
+            AddRootAlias("WORKING_DIR", current);
             if (File.separatorChar == '/')
-              {
-              }
-              else
-              {
-                  String path = "file:///" + current.replace(File.separatorChar, '/');
-                  AddRootAlias("WORKING_DIR_URI",path);
-              }            
+            {
+            }
+            else
+            {
+                String path = "file:///" + current.replace(File.separatorChar, '/');
+                AddRootAlias("WORKING_DIR_URI", path);
+            }
         }
         catch (IOException ex)
         {
-            
+
         }
-        
+
         Configuration CONFIG = Configuration.getConfig();
         Rectangle2D visualBounds = CONFIG.getPrimaryScreen().getVisualBounds();
         double Width = CONFIG.getWidth();
@@ -436,15 +488,15 @@ public class AliasMgr
         }
         Width = Width - CONFIG.getAppBorderWidth() * 2;
         Height = Height - CONFIG.getBottomOffset() - CONFIG.getTopOffset();
-        double H2W_Ratio = Width/Height;
-        double W2H_Ratio = Height/Width;
-        
-        H2W_Ratio = visualBounds.getWidth()/visualBounds.getHeight();
-        W2H_Ratio = visualBounds.getHeight()/visualBounds.getWidth();
+        double H2W_Ratio = Width / Height;
+        double W2H_Ratio = Height / Width;
+
+        H2W_Ratio = visualBounds.getWidth() / visualBounds.getHeight();
+        W2H_Ratio = visualBounds.getHeight() / visualBounds.getWidth();
         AddRootAlias("CANVAS_WIDTH", Double.toString(Width));
         AddRootAlias("CANVAS_HEIGHT", Double.toString(Height));
-        AddRootAlias("SCREEN_H2W_RATIO",Double.toString(H2W_Ratio));
-        AddRootAlias("SCREEN_W2H_RATIO",Double.toString(W2H_Ratio));
+        AddRootAlias("SCREEN_H2W_RATIO", Double.toString(H2W_Ratio));
+        AddRootAlias("SCREEN_W2H_RATIO", Double.toString(W2H_Ratio));
     }
 
     private void AddEnvironmentVars()

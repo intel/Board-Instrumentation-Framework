@@ -22,6 +22,8 @@
 package kutch.biff.marvin.utility;
 
 import java.io.File;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -673,7 +675,31 @@ public class FrameworkNode
                 }
                 catch (Exception Ex)
                 {
-                    LOGGER.warning("dried to divide bad MarvinMath: " + strData);
+                    LOGGER.warning("tried to divide bad MarvinMath: " + strData);
+                    return "";
+                }
+            }
+            else if (Operator.equalsIgnoreCase("maximum") || Operator.equalsIgnoreCase("max"))
+            {
+                try
+                {
+                    NewVal = max(val1,val2);
+                }
+                catch (Exception Ex)
+                {
+                    LOGGER.warning("tried to perform maximum MarvinMath: " + strData);
+                    return "";
+                }
+            }
+            else if (Operator.equalsIgnoreCase("minimum") || Operator.equalsIgnoreCase("min"))
+            {
+                try
+                {
+                    NewVal = min(val1,val2);
+                }
+                catch (Exception Ex)
+                {
+                    LOGGER.warning("tried to perform minimum MarvinMath: " + strData);
                     return "";
                 }
             }
