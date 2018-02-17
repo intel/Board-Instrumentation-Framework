@@ -160,15 +160,21 @@ def CollectAllDevices(frameworkInterface,slimDataSetParam):
         else:
             slimDataSet = False
 
+        SleepTime = float(frameworkInterface.Interval)/1000.0   
+
+        InitialRun = True
         while not frameworkInterface.KillThreadSignalled():
             dataMap = __GatherAllNetworkDeviceInfo(slimDataSet)
             for entry in dataMap:
-                if not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
+                if InitialRun and not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
                     frameworkInterface.AddCollector(entry)    # Nope, so go add it
                         
                 frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
 
-            time.sleep(float(frameworkInterface.Interval)/1000.0)
+            time.sleep(SleepTime)
+
+            if InitialRun:
+                InitialRun = False
 
     except Exception as ex:
         Logger.error("Unrecoverable error in LinuxNetwork Collector plugin: " + str(ex))
@@ -190,17 +196,23 @@ def CollectDevice(frameworkInterface,DeviceName,slimDataSetParam):
             slimDataSet = True
         else:
             slimDataSet = False
+
+        SleepTime = float(frameworkInterface.Interval)/1000.0
+        InitialRun = True
         
         while not frameworkInterface.KillThreadSignalled():
             dataMap={}
             __GatherNetworkDeviceInfo(DeviceName,dataMap,slimDataSet)
             for entry in dataMap:
-                if not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
+                if InitialRun and not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
                     frameworkInterface.AddCollector(entry)    # Nope, so go add it
                         
                 frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
 
-            time.sleep(float(frameworkInterface.Interval)/1000.0)
+            time.sleep(SleepTime)
+
+            if InitialRun:
+                InitialRun = False
 
     except Exception as ex:
         Logger.error("Unrecoverable error in LinuxNetwork Collector plugin: " + str(ex))

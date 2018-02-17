@@ -17,4 +17,4 @@
 #   External file containing the version string for the application    
 #
 ##############################################################################
-__version__ = "18.01.31 Build 1"
+__version__ = "18.02.17 Build 1"
