@@ -524,7 +524,7 @@ class Configuration():
         return objDynamicCollector.AddCollectorModifier(ID,Precision,Normalize,SyncFile,Scale,DoNotSend,SendOnlyOnChange)
 
     # go read a collector
-    def __ReadDynamicCollector(self,node,objNamespace,IsInGroup):
+    def __ReadDynamicCollector(self,node,objNamespace,objGroup=None):
         objDynaCollector = None
         Prefix = ""
         Suffix = ""
@@ -532,13 +532,14 @@ class Configuration():
         SendOnlyOnDelta = False
         DoNotSend = False
         Scale = 1
+        IsInGroup = objGroup != None
 
         attributes = node.attributes
 
         if not IsInGroup:
             Frequency = None
         else:
-            Frequency = 0
+            Frequency = objGroup._PollingInterval
 
         if "ID" in attributes.keys():
             Log.getLogger().error("DynamicCollector does not take an ID")
@@ -686,7 +687,6 @@ class Configuration():
             self.HandleInvalidXML("Error Parsing " + _Which + " for DynamicCollector: " + str(ex))
             objDynaCollector = None
 
-
         objDynaCollector = self.ReadUserPluginSettings(node,objDynaCollector)
 
         return objDynaCollector
@@ -772,7 +772,6 @@ class Configuration():
         else:
             Frequency = objNamespace._DefaultInterval
 
-        #objGroup._PollingInterval = int(Frequency)
         try:
             objGroup._PollingInterval = int(Frequency)
         except Exception:
@@ -831,13 +830,14 @@ class Configuration():
                
 
             elif node.nodeName.lower() == "dynamiccollector":
-               objDyna = self.__ReadDynamicCollector(node,objNamespace,True)
-               if None == objDyna:
+               objDynamicCollector_InGroup = self.__ReadDynamicCollector(node,objNamespace,objGroup)
+
+               if None == objDynamicCollector_InGroup:
                    return False
 
-               objDyna.SetGroup(objGroup)
+               objDynamicCollector_InGroup.SetGroup(objGroup)
 
-               if not objGroup.AddCollector(objDyna):
+               if not objGroup.AddCollector(objDynamicCollector_InGroup):
                    return False
 
             else:
@@ -968,7 +968,7 @@ class Configuration():
 
 
             elif node.nodeName.lower() == "dynamiccollector":
-               objDyna = self.__ReadDynamicCollector(node,objNamespace,False)
+               objDyna = self.__ReadDynamicCollector(node,objNamespace)
                if None == objDyna:
                    return False
 

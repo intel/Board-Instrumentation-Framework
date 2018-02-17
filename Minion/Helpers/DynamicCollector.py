@@ -25,6 +25,7 @@
 from Helpers import Log
 from Util import Time
 from Util import Sleep
+from Util import Utility
 from Helpers import ThreadManager
 from Helpers import Worker
 from Collectors import FileCollector
@@ -55,6 +56,7 @@ class DynamicCollector(Collector.Collector):
 
     def SetPluginInfo(self, pluginFile, pluginFunction, pluginSpawnThread):
         pluginInterface = self.CreatePluginInterfaceObject()
+
         self.__pluginInfo = UserPluginFramework.UserPluginFramework(pluginFile,pluginFunction,self._Parameters, pluginInterface, pluginSpawnThread)
         valid = self.__pluginInfo.ValidateUserPlugin()
         self.Collect = self.__CollectProcForPlugin # remap collect prox
@@ -302,7 +304,7 @@ class DynamicCollector(Collector.Collector):
                 self.LockFileName = objDyna.GetLockFile()
                 self.Interval = objDyna._PollingInterval
                 self.Logger = Log.getLogger()
-                
+               
         interface = UserPluginInterface(self)
         return interface
 

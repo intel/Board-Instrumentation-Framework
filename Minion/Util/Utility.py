@@ -16,9 +16,25 @@
 #    File Abstract: 
 #       Various helper utilities
 ##############################################################################
+import traceback
+import os
+from Helpers import Alias
+
 def IsNumeric(value):
     try:
         val = float(value)
         return True
     except ValueError:
         return False
+
+def getCallStack(DoNotShowSystemStuff=True):
+    curr_dir_path = Alias.AliasMgr.GetAlias("WORKING_DIR") +"\\"
+    strReturn=" -- Stack Dump Start ---\n"
+    for line in traceback.format_stack()[:-2]:
+        if True == DoNotShowSystemStuff and not curr_dir_path in line: # trim off OS components, only care about my code
+            continue
+        line = line.replace(curr_dir_path,"")
+        strReturn += line.strip() +"\n"
+
+    strReturn+=" -- Stack Dump End ---"
+    return strReturn

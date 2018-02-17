@@ -98,6 +98,9 @@ def main():
     else:
         Log.setLevel(logging.ERROR)
 
+    curr_dir_path = os.path.dirname(os.path.realpath(__file__))
+    Alias.AliasMgr.AddAlias("WORKING_DIR",curr_dir_path)
+
     Alias.AliasMgr.AddEnvironmentVariables()
     if None != args.aliasfile:
         if not Alias.AliasMgr.LoadExternalAliasFile(args.aliasfile):
