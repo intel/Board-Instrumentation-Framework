@@ -41,7 +41,7 @@ public interface Widget
     public void HandleCustomStyleOverride(FrameworkNode styleNode);
     public Region getRegionObject();
     public void UpdateTitle(String newTitle);
-    public boolean PerformPostCreateActions(GridWidget objParentGrid);
+    public boolean PerformPostCreateActions(GridWidget objParentGrid,boolean flag);
     public void PrepareForAppShutdown();
     public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent);
 }

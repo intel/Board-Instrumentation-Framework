@@ -103,54 +103,54 @@ public class FlipPanelWidget extends BaseWidget
         SetupPeekaboo(dataMgr);
 
         dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
-        {
-            @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
-            {
-                String strVal = newVal.toString();
-                Orientation orientation = getRequestedOrientation(strVal);
-                if (strVal.equalsIgnoreCase("Flip"))
-                {
-                    DoFlip();
-                }
-                else if (strVal.equalsIgnoreCase("Front"))
-                {
-                    DoFlip(false, getOrientation());
-                }
-                else if (strVal.equalsIgnoreCase("Back"))
-                {
-                    DoFlip(true, getOrientation());
-                }
-                else if (strVal.length() > 4 && strVal.substring(0, 5).equalsIgnoreCase("Flip:")) // Flip, but with a direction
-                {
-                    if (null != orientation)
                     {
-                        DoFlip(_Front2Back, orientation);
-                    }
+                        @Override
+                        public void changed(ObservableValue o, Object oldVal, Object newVal)
+                        {
+                            String strVal = newVal.toString();
+                            Orientation orientation = getRequestedOrientation(strVal);
+                            if (strVal.equalsIgnoreCase("Flip"))
+                            {
+                                DoFlip();
+                            }
+                            else if (strVal.equalsIgnoreCase("Front"))
+                            {
+                                DoFlip(false, getOrientation());
+                            }
+                            else if (strVal.equalsIgnoreCase("Back"))
+                            {
+                                DoFlip(true, getOrientation());
+                            }
+                            else if (strVal.length() > 4 && strVal.substring(0, 5).equalsIgnoreCase("Flip:")) // Flip, but with a direction
+                            {
+                                if (null != orientation)
+                                {
+                                    DoFlip(_Front2Back, orientation);
+                                }
 
-                }
-                else if (strVal.length() > 4 && strVal.substring(0, 5).equalsIgnoreCase("Front:")) // Flip, but with a direction
-                {
-                    if (null != orientation)
-                    {
-                        DoFlip(false, orientation);
-                    }
+                            }
+                            else if (strVal.length() > 4 && strVal.substring(0, 5).equalsIgnoreCase("Front:")) // Flip, but with a direction
+                            {
+                                if (null != orientation)
+                                {
+                                    DoFlip(false, orientation);
+                                }
 
-                }
-                else if (strVal.length() > 4 && strVal.substring(0, 5).equalsIgnoreCase("Back:")) // Flip, but with a direction
-                {
-                    if (null != orientation)
-                    {
-                        DoFlip(true, orientation);
-                    }
-                }
-                else
-                {
+                            }
+                            else if (strVal.length() > 4 && strVal.substring(0, 5).equalsIgnoreCase("Back:")) // Flip, but with a direction
+                            {
+                                if (null != orientation)
+                                {
+                                    DoFlip(true, orientation);
+                                }
+                            }
+                            else
+                            {
 
-                }
+                            }
 
-            }
-        });
+                        }
+                    });
 
         return ApplyCSS();
     }
@@ -185,11 +185,11 @@ public class FlipPanelWidget extends BaseWidget
         _FrontBaseGridPane = new GridPane();
         _BackBaseGridPane = new GridPane();
 
-        if (false == _FrontGrid.Create(_FrontBaseGridPane, dataMgr) || ! _FrontGrid.PerformPostCreateActions(getFrontGrid()))
+        if (false == _FrontGrid.Create(_FrontBaseGridPane, dataMgr) || !_FrontGrid.PerformPostCreateActions(getFrontGrid(), false))
         {
             return false;
         }
-        if (false == _BackGrid.Create(_BackBaseGridPane, dataMgr) || ! _BackGrid.PerformPostCreateActions(_BackGrid))
+        if (false == _BackGrid.Create(_BackBaseGridPane, dataMgr) || !_BackGrid.PerformPostCreateActions(_BackGrid, false))
         {
             return false;
         }
@@ -418,8 +418,8 @@ public class FlipPanelWidget extends BaseWidget
     protected boolean ApplyCSS()
     {
         //super.ApplyCSS(); // can do CSS for entire widget here, and below is for individual sides
-        _BackGrid.setWidgetInformation(getDefinintionFileDirectory(),null,"FlipPanel");
-        _FrontGrid.setWidgetInformation(getDefinintionFileDirectory(),null,"FlipPanel");
+        _BackGrid.setWidgetInformation(getDefinintionFileDirectory(), null, "FlipPanel");
+        _FrontGrid.setWidgetInformation(getDefinintionFileDirectory(), null, "FlipPanel");
         if (null == _FrontGrid.GetCSS_File())
         {
             _FrontGrid.setBaseCSSFilename(getBaseCSSFilename());
@@ -451,6 +451,7 @@ public class FlipPanelWidget extends BaseWidget
         ApplyStyleOverrides(_vBack, _BackGrid.getStyleOverride());
         return true;
     }
+
     @Override
     public void UpdateTitle(String strTitle)
     {
@@ -458,8 +459,23 @@ public class FlipPanelWidget extends BaseWidget
     }
 
     @Override
-    public boolean PerformPostCreateActions(GridWidget objParentGrid)
+    public boolean PerformPostCreateActions(GridWidget objParentGrid, boolean updateToolTipOnly)
     {
+        if (true == updateToolTipOnly)
+        {
+            if (CONFIG.isDebugMode())
+            {
+                _ToolTip = this.toString();
+            }
+            if (_ToolTip != null && null != getStylableObject())
+            {
+                HandleToolTipInit();
+                Tooltip.install(_vFront, _objToolTip);
+                Tooltip.install(_vBack, _objToolTip);
+            }
+            return true;
+        }
+
         if (CONFIG.isDebugMode())
         {
             _ToolTip = this.toString();
@@ -473,5 +489,5 @@ public class FlipPanelWidget extends BaseWidget
         FireDefaultPeekaboo();
 
         return true;
-    }    
+    }
 }

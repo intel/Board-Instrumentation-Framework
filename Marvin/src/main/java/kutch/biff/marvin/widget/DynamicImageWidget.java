@@ -52,7 +52,7 @@ public class DynamicImageWidget extends StaticImageWidget
     private HashMap<String, String> _ImageFilenames;
     private HashMap<String, DynamicTransition> _TransitionMap;
     private HashMap<String, ImageView> _ImageViewMap;
-    private HashMap<String,Long> _MontorMap;
+    private HashMap<String, Long> _MontorMap;
     //private ArrayList<String> _ImageFileNames;
     private CircularList<String> _ListID;
     private String _CurrentKey;
@@ -62,9 +62,8 @@ public class DynamicImageWidget extends StaticImageWidget
     private static int _AutoAdvanceImageNumber = 0;
     private ImageView _ActiveView;
     private GridPane basePane;
-    private int _MonitorInterval=500;
+    private int _MonitorInterval = 500;
     private final HashMap<String, String> _TaskMap;
-
 
     public DynamicImageWidget()
     {
@@ -165,11 +164,11 @@ public class DynamicImageWidget extends StaticImageWidget
                                     ChangeOcurred = MonitorForFilechange();
                                     if (ChangeOcurred)
                                     {
-                                    key = _CurrentKey;
-                                        
+                                        key = _CurrentKey;
+
                                     }
                                     key = _CurrentKey;
-                                    
+
                                     MarvinTask mt = new MarvinTask();
                                     mt.AddDataset(getMinionID(), getNamespace(), "Monitor");
                                     TASKMAN.AddPostponedTask(mt, _MonitorInterval);
@@ -270,7 +269,7 @@ public class DynamicImageWidget extends StaticImageWidget
                     {
                         TASKMAN.PerformTask(_TaskMap.get(_CurrentKey));
                     }
-                    
+
                     else if (null != getTaskID() && true == CONFIG.getAllowTasks())
                     {
                         TASKMAN.PerformTask(getTaskID());
@@ -287,9 +286,27 @@ public class DynamicImageWidget extends StaticImageWidget
         return null;
     }
 
-@Override
-    public boolean PerformPostCreateActions(GridWidget objParentGrid)
+    @Override
+    public boolean PerformPostCreateActions(GridWidget objParentGrid, boolean updateToolTipOnly)
     {
+        if (true == updateToolTipOnly)
+        {
+            if (CONFIG.isDebugMode())
+            {
+                _ToolTip = this.toString();
+            }
+            if (_ToolTip != null && null != getStylableObject())
+            {
+                HandleToolTipInit();
+                for (String key : _ImageFilenames.keySet())
+                {
+                    ImageView objView = _ImageViewMap.get(key);
+                    Tooltip.install(objView, _objToolTip);
+                }
+            }
+            return true;
+        }
+
         _WidgetParentGridWidget = objParentGrid;
         if (CONFIG.isDebugMode())
         {
@@ -305,11 +322,11 @@ public class DynamicImageWidget extends StaticImageWidget
             }
         }
         FireDefaultPeekaboo();
-        
+
         return handlePercentageDimentions();
         //return true;
     }
-    
+
     private boolean MonitorForFilechange()
     {
         boolean retVal = false;
@@ -319,7 +336,7 @@ public class DynamicImageWidget extends StaticImageWidget
             if (fp.lastModified() != _MontorMap.get(Id))
             {
                 _MontorMap.put(Id, fp.lastModified());
-                LOGGER.info("Monitoring " + _ImageFilenames.get(Id) +" updated");
+                LOGGER.info("Monitoring " + _ImageFilenames.get(Id) + " updated");
                 ImageView objImageView = new ImageView(_ImageFilenames.get(Id));
                 objImageView.setPreserveRatio(getPreserveRatio());
                 objImageView.setSmooth(true);
@@ -337,7 +354,7 @@ public class DynamicImageWidget extends StaticImageWidget
         }
         return retVal;
     }
-    
+
     private boolean setupImages()
     {
         for (String key : _ImageFilenames.keySet())
@@ -420,7 +437,7 @@ public class DynamicImageWidget extends StaticImageWidget
         {
             Utility.ValidateAttributes(new String[]
             {
-                "Source", "ID","Monitor","Task"
+                "Source", "ID", "Monitor", "Task"
             }, node);
             if (node.hasAttribute("Source"))
             {
@@ -457,7 +474,7 @@ public class DynamicImageWidget extends StaticImageWidget
                 return false;
             }
             File file = new File(fname);
-            
+
             if (file.exists())
             {
                 String fn = "file:" + fname;
@@ -471,7 +488,7 @@ public class DynamicImageWidget extends StaticImageWidget
                         _MontorMap.put(Id, file.lastModified());
                     }
                 }
-                
+
             }
 
             else

@@ -39,7 +39,6 @@ import kutch.biff.marvin.utility.Utility;
  */
 public class GridWidget extends BaseWidget
 {
-
     protected ArrayList<Widget> _Widgets;
     private GridPane _GridPane = null;
     private int _hGap, _vGap;
@@ -462,8 +461,17 @@ public class GridWidget extends BaseWidget
     }
 
     @Override
-    public boolean PerformPostCreateActions(GridWidget parentGrid)
+    public boolean PerformPostCreateActions(GridWidget parentGrid, boolean updateToolTipOnly)
     {
+        if (true == updateToolTipOnly)
+        {
+            for (Widget _Widget : _Widgets)
+            {
+                _Widget.PerformPostCreateActions(this, updateToolTipOnly);
+            }
+            return super.PerformPostCreateActions(parentGrid,updateToolTipOnly);
+        }
+
         _WidgetParentGridWidget = parentGrid;
         handlePercentageDimentions();
         if (isPropagateClickThrough())
@@ -490,7 +498,7 @@ public class GridWidget extends BaseWidget
         }
         for (Widget _Widget : _Widgets)
         {
-            if (!_Widget.PerformPostCreateActions(this))
+            if (!_Widget.PerformPostCreateActions(this,updateToolTipOnly))
             {
                 return false;
             }

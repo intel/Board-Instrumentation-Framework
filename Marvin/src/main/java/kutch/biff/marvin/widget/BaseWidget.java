@@ -216,18 +216,15 @@ abstract public class BaseWidget implements Widget
     {
         if (null != _ToolTip)
         {
-            if (null == _objToolTip)
+            _objToolTip = new Tooltip(_ToolTip);
+            if (null != _ToolTipStyle && _ToolTipStyle.size() > 0)
             {
-                _objToolTip = new Tooltip(_ToolTip);
-                if (null != _ToolTipStyle && _ToolTipStyle.size() > 0)
+                String StyleString = "";
+                for (String Style : _ToolTipStyle)
                 {
-                    String StyleString = "";
-                    for (String Style : _ToolTipStyle)
-                    {
-                        StyleString += Style + ";";
-                    }
-                    _objToolTip.setStyle(StyleString);
+                    StyleString += Style + ";";
                 }
+                _objToolTip.setStyle(StyleString);
             }
         }
     }
@@ -254,8 +251,21 @@ abstract public class BaseWidget implements Widget
      * @return
      */
     @Override
-    public boolean PerformPostCreateActions(GridWidget parentGrid)
+    public boolean PerformPostCreateActions(GridWidget parentGrid,boolean updateToolTipOnly)
     {
+        if (true == updateToolTipOnly)
+        {
+            if (CONFIG.isDebugMode())
+            {
+                _ToolTip = this.toString();
+            }
+            if (_ToolTip != null && null != getStylableObject())
+            {
+                HandleToolTipInit();
+                Tooltip.install(this.getStylableObject(), _objToolTip);
+            }
+            return true;
+        }
         _WidgetParentGridWidget = parentGrid;
         if (CONFIG.isDebugMode())
         {
@@ -479,7 +489,6 @@ abstract public class BaseWidget implements Widget
         retStr.append(Integer.toString((int) (getHeight() * CONFIG.getScaleFactor())));
         retStr.append("]");
         retStr.append(" ");
-/*
 
         Region objRegion = getRegionObject();
         
@@ -493,7 +502,7 @@ abstract public class BaseWidget implements Widget
             retStr.append(Integer.toString((int) objRegion.getHeight()));
             retStr.append("]");
         }
-        */
+
         return retStr.toString();
     }
 

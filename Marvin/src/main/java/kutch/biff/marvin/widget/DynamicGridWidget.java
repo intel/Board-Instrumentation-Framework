@@ -253,8 +253,22 @@ public class DynamicGridWidget extends GridWidget
     }
 
     @Override
-    public boolean PerformPostCreateActions(GridWidget objParentGrid)
+    public boolean PerformPostCreateActions(GridWidget objParentGrid,boolean updateToolTipOnly)
     {
+        if (true == updateToolTipOnly)
+        {
+            if (CONFIG.isDebugMode())
+            {
+                _ToolTip = this.toString();
+            }
+            if (_ToolTip != null && null != getStylableObject())
+            {
+                HandleToolTipInit();
+                Tooltip.install(this.getStylableObject(), _objToolTip);
+            }
+            return super.PerformPostCreateActions(objParentGrid,updateToolTipOnly);
+        }
+        
         _WidgetParentGridWidget = objParentGrid;
         if (CONFIG.isDebugMode())
         {
@@ -269,7 +283,7 @@ public class DynamicGridWidget extends GridWidget
                 Tooltip.install(objGrid.getStylableObject(), _objToolTip);
             }
         }
-        super.PerformPostCreateActions(objParentGrid);
+        super.PerformPostCreateActions(objParentGrid,updateToolTipOnly);
 
         return handlePercentageDimentions();
     }

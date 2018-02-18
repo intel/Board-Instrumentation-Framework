@@ -252,7 +252,7 @@ public class QuickViewLCDWidget extends GridWidget implements IQuickViewSort
         objWidget.setHeight(getHeight());
         
         objWidget.Create(getGridPane(), _dataMgr);
-        objWidget.PerformPostCreateActions(getParentGridWidget());
+        objWidget.PerformPostCreateActions(getParentGridWidget(),false);
         
         _DataPoint.add(new Pair<>(ID.toUpperCase(), objWidget));
         SetupSort();

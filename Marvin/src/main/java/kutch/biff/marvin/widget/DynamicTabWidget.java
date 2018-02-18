@@ -135,7 +135,7 @@ public class DynamicTabWidget extends TabWidget
         objGrid.setRow(0);      // going to be moved in 'sort' anyhow
         objGrid.setColumn(0);
 
-        if (! objGrid.Create(this.getGridPane(), dataMgr) || ! objGrid.PerformPostCreateActions(this))
+        if (! objGrid.Create(this.getGridPane(), dataMgr) || ! objGrid.PerformPostCreateActions(this,false))
         {
             LOGGER.severe("Unknown failure creating Grid");
         }

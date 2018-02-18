@@ -389,7 +389,7 @@ public class Marvin extends Application
         {
             for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
             {
-                if (false == _Config.getTabs().get(iIndex).PerformPostCreateActions(null))
+                if (false == _Config.getTabs().get(iIndex).PerformPostCreateActions(null, false))
                 {
                     RetVal = false;
                     break;
@@ -417,6 +417,17 @@ public class Marvin extends Application
         LOGGER.info("Time taken to initialize all widgets: " + Long.toString(elapsed) + "ms.");
 
         return RetVal;
+    }
+
+    private void SetupDebugToolTips()
+    {
+        if (_Config.getConfiguration().isDebugMode())
+        {
+            for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
+            {
+                _Config.getTabs().get(iIndex).PerformPostCreateActions(null, true);
+            }
+        }
     }
 
     private void StopWidgets()
@@ -689,6 +700,7 @@ public class Marvin extends Application
                         Platform.exit();
                     }
                     Showing = true;
+                    SetupDebugToolTips();
                     return;
                 }
 
@@ -705,6 +717,7 @@ public class Marvin extends Application
                     TaskManager.getTaskManager().PerformDeferredTasks();
                     lastTimerCall = System.currentTimeMillis();
                 }
+
                 else if (ReportMemoryUsage && System.currentTimeMillis() > LastMemoryUsageReportingTime + MemoryUsageReportingInterval)
                 {
                     LastMemoryUsageReportingTime = System.currentTimeMillis();
