@@ -1304,7 +1304,7 @@ abstract public class BaseWidget implements Widget
         }
         else
         {
-            LOGGER.severe("Invalid Alignment indicated in config file: " + alignString + ". Ignoring.");
+            LOGGER.severe("Invalid Alignment indicated in config file: " + alignString);
             return false;
         }
         return true;

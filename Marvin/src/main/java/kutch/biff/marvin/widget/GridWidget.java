@@ -398,7 +398,10 @@ public class GridWidget extends BaseWidget
     @Override
     public boolean setAlignment(String alignString)
     {
-        super.setAlignment(alignString);
+        if (!super.setAlignment(alignString))
+        {
+            return false;
+        }
         if (0 == alignString.compareToIgnoreCase("Center"))
         {
             setPosition(Pos.CENTER);

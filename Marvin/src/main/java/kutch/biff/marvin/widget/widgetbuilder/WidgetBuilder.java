@@ -757,6 +757,33 @@ public class WidgetBuilder
         {
             WhatIsIt = "FlipPanel";
         }
+        if (gridNode.hasAttribute("rowSpan"))
+        {
+            objGridWidget.setRowSpan(gridNode.getIntegerAttribute("rowspan", 1));
+        }
+        if (gridNode.hasAttribute("colSpan"))
+        {
+            objGridWidget.setColumnSpan(gridNode.getIntegerAttribute("colspan", 1));
+        }
+        else if (gridNode.hasAttribute("columnSpan"))
+        {
+            objGridWidget.setColumnSpan(gridNode.getIntegerAttribute("columnspan", 1));
+        }
+        if (true == gridNode.hasAttribute("Height"))
+        {
+            if (!objGridWidget.parseHeight(gridNode))
+            {
+                return false;
+            }
+        }
+        if (true == gridNode.hasAttribute("Width"))
+        {
+            if (!objGridWidget.parseWidth(gridNode))
+            {
+                return false;
+            }
+        }
+
         if (gridNode.hasAttribute("hgap"))
         {
             if (objGridWidget.parsehGapValue(gridNode))
@@ -773,11 +800,11 @@ public class WidgetBuilder
         {
             if (objGridWidget.parsevGapValue(gridNode))
             {
-                LOGGER.config("Setting vGap for DynamicGrid :" + gridNode.getAttribute("vgap"));
+                LOGGER.config("Setting vGap for Grid :" + gridNode.getAttribute("vgap"));
             }
             else
             {
-                LOGGER.warning("vgap for DynamicGrid invalid: " + gridNode.getAttribute("vgap") + ".  Ignoring");
+                LOGGER.warning("vgap for Grid invalid: " + gridNode.getAttribute("vgap") + ".  Ignoring");
                 return false;
             }
         }
@@ -883,12 +910,13 @@ public class WidgetBuilder
 
         if (true == gridNode.hasAttribute("File"))
         {
+            String strFileName = gridNode.getAttribute("File");
             AliasMgr.getAliasMgr().PushAliasList(true);
             AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
                                                     {
                                                         "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "File", "Height", "Width"
             });
-            if (false == AliasMgr.ReadAliasFromExternalFile(gridNode.getAttribute("File")))
+            if (false == AliasMgr.ReadAliasFromExternalFile(strFileName))
             {
                 AliasMgr.getAliasMgr().PopAliasList();
                 return null;
@@ -896,15 +924,15 @@ public class WidgetBuilder
             FrameworkNode GridNode = WidgetBuilder.OpenDefinitionFile(gridNode.getAttribute("File"), "Grid");
             if (null == GridNode)
             {
-                LOGGER.severe("Invalid file: " + gridNode.getAttribute("File") + " no <Grid> found.");
+                LOGGER.severe("Invalid file: " +strFileName + " no <Grid> found.");
                 return null;
             }
-            retWidget = ReadGridInfo(GridNode, retWidget, gridNode.getAttribute("File")); // read grid from external file
+            retWidget = ReadGridInfo(GridNode, retWidget, strFileName); // read grid from external file
             if (null == retWidget)
             {
                 return null;
             }
-            if (!ConfigurationReader.ReadTasksFromExternalFile(gridNode.getAttribute("File"))) // could also be tasks defined in external file
+            if (!ConfigurationReader.ReadTasksFromExternalFile(strFileName)) // could also be tasks defined in external file
             {
                 return null;
             }
@@ -1185,7 +1213,10 @@ public class WidgetBuilder
 
     public static GridWidget ReadGridInfo(FrameworkNode gridNode, GridWidget retWidget, String filename)
     {
-        ReadGridAttributes(retWidget, gridNode, false);
+        if (!ReadGridAttributes(retWidget, gridNode, false))
+        {
+            return null;
+        }
 
         if (gridNode.getChildNodes().isEmpty())
         {
