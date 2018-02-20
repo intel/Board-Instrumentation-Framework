@@ -49,6 +49,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.DefaultPeekabooTask;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.AliasMgr;
+import kutch.biff.marvin.utility.CircularList;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
@@ -118,6 +119,9 @@ abstract public class BaseWidget implements Widget
     protected ArrayList<String> _SelectedStyle;
     protected String _SelectedStyleCSS = null;
     protected String _SelectedStyleID = null;
+    
+    private static CircularList<String> DebugStyles = null;
+
 
     public BaseWidget()
     {
@@ -171,6 +175,14 @@ abstract public class BaseWidget implements Widget
         if (CONFIG.isDebugMode())
         {
             AddAdditionalStyleOverride(AliasMgr.getAliasMgr().GetAlias("DEBUG_STYLE"));
+            if (null == DebugStyles)
+            {
+                DebugStyles= new CircularList<>();
+                DebugStyles.add("-fx-background-color:yellow;-fx-border-color:black;-fx-border-style: solid"); 
+                DebugStyles.add("-fx-background-color:lightblue;-fx-border-color:dimgrey;-fx-border-style: dotted"); 
+                DebugStyles.add("-fx-background-color:darkviolet;-fx-border-color:yellow;-fx-border-style: dashed"); 
+                DebugStyles.add("-fx-background-color:lime;-fx-border-color:deeppink;-fx-border-style: solid"); 
+            }
         }
     }
 
@@ -1363,9 +1375,18 @@ abstract public class BaseWidget implements Widget
                     @Override
                     public void handle(MouseEvent event)
                     {
-                        if (event.isShiftDown() && CONFIG.isDebugMode())
+                        if (CONFIG.isDebugMode() && event.isShiftDown())
                         {
-                            LOGGER.info(objWidget.toString(true));
+                                LOGGER.info(objWidget.toString(true));
+                        }
+                        else if (CONFIG.isDebugMode() && event.isControlDown())
+                        {
+                            if (null != getStylableObject())
+                            {
+                                
+                                AddAdditionalStyleOverride(DebugStyles.GetNext());
+                                ApplyCSS();
+                            }
                         }
                         else if (null != getTaskID() && true == CONFIG.getAllowTasks())
                         {
