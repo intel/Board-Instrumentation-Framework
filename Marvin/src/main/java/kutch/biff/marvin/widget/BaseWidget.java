@@ -215,7 +215,7 @@ abstract public class BaseWidget implements Widget
         }
         else
         {
-            LOGGER.warning(" Attemptedt to se an already set default peekaboo action to: " + strDefault + ". Ignoring.");
+            LOGGER.warning(" Attempted to se an already set default peekaboo action to: " + strDefault + ". Ignoring.");
         }
     }
 
