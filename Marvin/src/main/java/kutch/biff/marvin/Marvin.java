@@ -462,7 +462,7 @@ public class Marvin extends Application
             }
             if (dumpWidgetInfo)
             {
-                LOGGER.config(kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.GetFileTree());
+                LOGGER.config("External Grid/Tab usage file from " + ConfigFilename + "\n" + kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.GetFileTree());
             }
         }
     }
