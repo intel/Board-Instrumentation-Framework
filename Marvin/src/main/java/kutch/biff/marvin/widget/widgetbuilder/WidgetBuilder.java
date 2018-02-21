@@ -57,6 +57,8 @@ public class WidgetBuilder
     private final static Configuration CONFIG = Configuration.getConfig();
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static MySplash SPLASH = MySplash.getSplash();
+    private static int FileDepth = 1;
+    private static String FileTree = "";
 
     public static Widget Build(FrameworkNode node)
     {
@@ -911,6 +913,7 @@ public class WidgetBuilder
         if (true == gridNode.hasAttribute("File"))
         {
             String strFileName = gridNode.getAttribute("File");
+            StartReadingExternalFile(gridNode);
             AliasMgr.getAliasMgr().PushAliasList(true);
             AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
                                                     {
@@ -924,7 +927,7 @@ public class WidgetBuilder
             FrameworkNode GridNode = WidgetBuilder.OpenDefinitionFile(gridNode.getAttribute("File"), "Grid");
             if (null == GridNode)
             {
-                LOGGER.severe("Invalid file: " +strFileName + " no <Grid> found.");
+                LOGGER.severe("Invalid file: " + strFileName + " no <Grid> found.");
                 return null;
             }
             retWidget = ReadGridInfo(GridNode, retWidget, strFileName); // read grid from external file
@@ -937,6 +940,7 @@ public class WidgetBuilder
                 return null;
             }
             AliasMgr.getAliasMgr().PopAliasList();
+            DoneReadingExternalFile();
         }
         /*
         else
@@ -999,12 +1003,12 @@ public class WidgetBuilder
             LOGGER.severe("DynamicGrid with no row");
             return null;
         }
-        
+
         if (dynaGridNode.hasAttribute("Task"))
         {
             retWidget.setTaskID(dynaGridNode.getAttribute("Task"));
         }
-        
+
         if (false == dynaGridNode.hasAttribute("column"))
         {
             LOGGER.severe("Grid with no column");
@@ -1101,7 +1105,7 @@ public class WidgetBuilder
         { // if not an external declaration, check for known options
             Utility.ValidateAttributes(new String[]
             {
-                "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align","Height","Width"
+                "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
             }, dynaGridNode);
 
         }
@@ -1487,5 +1491,28 @@ public class WidgetBuilder
 
         AliasMgr.getAliasMgr().PopAliasList();
         return objWidgetList;
+    }
+
+    public static void StartReadingExternalFile(FrameworkNode node)
+    {
+        String strPrint = Integer.toString(FileDepth) + ": ";
+        for (int iLoop = 0; iLoop < FileDepth; iLoop++)
+        {
+            strPrint += "....";
+        }
+
+        strPrint += node.getAttributeList() + "\n";
+        FileTree += strPrint;
+        FileDepth++;
+    }
+
+    public static void DoneReadingExternalFile()
+    {
+        FileDepth--;
+    }
+
+    public static String GetFileTree()
+    {
+        return FileTree;
     }
 }

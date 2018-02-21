@@ -419,11 +419,13 @@ public class DynamicGridWidget extends GridWidget
                     AliasMgr.getAliasMgr().PopAliasList();
                     return null;
                 }
+                WidgetBuilder.StartReadingExternalFile(node);
                 GridNode = WidgetBuilder.OpenDefinitionFile(node.getAttribute("Source"), "Grid");
                 if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("Source"))) // could also be tasks defined in external file
                 {
                     return null;
                 }
+                WidgetBuilder.DoneReadingExternalFile();
             }
             else
             {

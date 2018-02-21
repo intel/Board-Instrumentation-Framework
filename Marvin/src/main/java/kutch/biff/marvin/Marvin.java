@@ -441,7 +441,7 @@ public class Marvin extends Application
         }
     }
 
-    private void DumpAllWidgetsInformation()
+    private void DumpAllWidgetsInformation() 
     {
         if (_Config.getConfiguration().isDebugMode())
         {
@@ -459,6 +459,10 @@ public class Marvin extends Application
                 {
                     // objWidget.getRegionObject().requestLayout();
                 }
+            }
+            if (dumpWidgetInfo)
+            {
+                LOGGER.info(kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.GetFileTree());
             }
         }
     }

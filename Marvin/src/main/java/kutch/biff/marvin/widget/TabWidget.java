@@ -22,7 +22,6 @@
 package kutch.biff.marvin.widget;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;

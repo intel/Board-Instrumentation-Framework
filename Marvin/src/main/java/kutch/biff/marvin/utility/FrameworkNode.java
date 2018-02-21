@@ -55,6 +55,29 @@ public class FrameworkNode
         _attributes = baseNode.getAttributes();
     }
 
+    public String getAttributeList()
+    {
+        if (!hasAttributes())
+        {
+            return "";
+        }
+        String strAttributes = "";
+        
+        for (int index = 0; index < _node.getAttributes().getLength(); index++)
+        {
+            Node attribute = _node.getAttributes().item(index);
+            if (attribute.getNodeName().equalsIgnoreCase("File") || attribute.getNodeName().equalsIgnoreCase("Source"))
+            {
+                strAttributes = attribute.getNodeName() + "=\"" + getAttribute(attribute.getNodeName()) +"\" " + strAttributes;
+            }
+            else
+            {
+                strAttributes += attribute.getNodeName() + "=\"" + getAttribute(attribute.getNodeName()) +"\" ";
+            }
+        
+        }
+        return strAttributes;
+    }
     public boolean hasAttributes()
     {
         return _node.hasAttributes();

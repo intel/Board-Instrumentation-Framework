@@ -52,6 +52,7 @@ import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.DynamicTabWidget;
 import kutch.biff.marvin.widget.TabWidget;
+import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.OpenDefinitionFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -924,12 +925,14 @@ public class ConfigurationReader
 
                                 if (node.hasAttribute("File")) // can externally define widgets within
                                 {
+                                    WidgetBuilder.StartReadingExternalFile(node);
                                     tabNode = OpenTabDefinitionFile(node.getAttribute("File"));
                                     if (null == tabNode)
                                     {
                                         LOGGER.severe("Invalid tab definition file: " + node.getAttribute("File"));
                                         return null;
                                     }
+
                                     AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
                                                                             {
                                                                                 "ID", "File", "Align", "hgap", "vgap"
@@ -959,6 +962,10 @@ public class ConfigurationReader
                                 if (false == tab.LoadConfiguration(tabNode))
                                 {
                                     return null;
+                                }
+                                if (node.hasAttribute("File"))
+                                {
+                                    WidgetBuilder.DoneReadingExternalFile();
                                 }
 
                                 break;
