@@ -91,7 +91,6 @@ public class Configuration
 
     public Configuration()
     {
-        //LOGGER.setLevel(Level);
         _insetTop = 0;
         _insetBottom = 0;
         _insetLeft= 0;

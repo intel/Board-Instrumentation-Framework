@@ -276,30 +276,30 @@ public class Marvin extends Application
             }
         }
 
-        LOGGER.setLevel(Level.ALL);
+        MarvinLogger.setDebugLevel(Level.ALL);
         LOGGER.config("--- BIFF GUI [Marvin]  " + Version.getVersion());
-        LOGGER.setLevel(Level.SEVERE);
+        MarvinLogger.setDebugLevel(Level.SEVERE);
 
         if (0 == verboseLevel)
         {
-            LOGGER.setLevel(Level.SEVERE);
+            MarvinLogger.setDebugLevel(Level.SEVERE);
         }
 
         if (1 == verboseLevel)
         {
-            LOGGER.setLevel(Level.WARNING);
+            MarvinLogger.setDebugLevel(Level.WARNING);
         }
         else if (2 == verboseLevel)
         {
-            LOGGER.setLevel(Level.INFO);
+            MarvinLogger.setDebugLevel(Level.INFO);
         }
         else if (3 == verboseLevel)
         {
-            LOGGER.setLevel(Level.CONFIG);
+            MarvinLogger.setDebugLevel(Level.CONFIG);
         }
         else if (4 == verboseLevel)
         {
-            LOGGER.setLevel(Level.ALL);
+            MarvinLogger.setDebugLevel(Level.ALL);
         }
     }
 
@@ -326,7 +326,7 @@ public class Marvin extends Application
         try
         {
             MarvinLogger.setup(LogFileName);
-            LOGGER.setLevel(Level.SEVERE);
+            MarvinLogger.setDebugLevel(Level.SEVERE);
         }
         catch (IOException e)
         {
@@ -452,7 +452,7 @@ public class Marvin extends Application
                     StringBuilder sb = new StringBuilder();
                     sb.append("Widget Information: ");
                     sb.append(objWidget.toString(false));
-                    LOGGER.info(sb.toString());
+                    LOGGER.config(sb.toString());
                 }
                 objWidget.SetupTaskAction();
                 if (null != objWidget.getRegionObject())
@@ -462,7 +462,7 @@ public class Marvin extends Application
             }
             if (dumpWidgetInfo)
             {
-                LOGGER.info(kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.GetFileTree());
+                LOGGER.config(kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.GetFileTree());
             }
         }
     }

@@ -22,15 +22,19 @@
 package kutch.biff.marvin.logger;
 
 import java.io.IOException;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class MarvinLogger
 {
     static private FileHandler _marvinLogFile;
     static private Formatter _marvinLogFormatObj;
+    //private static ConsoleHandler _
 
     static public void setup(String fileName) throws IOException
     {
@@ -38,7 +42,7 @@ public class MarvinLogger
         {
             Logger logger =  Logger.getLogger(MarvinLogger.class.getName());
 
-            logger.setLevel(Level.SEVERE);
+//            logger.setLevel(Level.ALL);
                           
              int limit = 1024000 * 10; // 10 Mb maximum, then cut off
             _marvinLogFile = new FileHandler(fileName,limit,1);
@@ -47,10 +51,24 @@ public class MarvinLogger
             _marvinLogFile.setFormatter(_marvinLogFormatObj);
             
             logger.addHandler(_marvinLogFile);
+            
+            ConsoleHandler consoleHandler = new ConsoleHandler();
+            consoleHandler.setFormatter(new SimpleFormatter());
+            logger.addHandler(consoleHandler);
+            setDebugLevel(Level.WARNING);
         }
         catch (Exception ex)
         {
             System.out.println(ex.toString());
+        }
+    }
+    static public void setDebugLevel(Level newLevel)
+    {
+        Logger logger =  Logger.getLogger(MarvinLogger.class.getName());
+        logger.setLevel(newLevel);
+        for (Handler hdl :logger.getHandlers())
+        {
+            hdl.setLevel(newLevel);
         }
     }
 }

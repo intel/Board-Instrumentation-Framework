@@ -279,12 +279,10 @@ public class ConfigurationReader
             }
             if (0 == appNode.getAttribute("mode").compareToIgnoreCase("Debug"))
             {
-                //LOGGER.setLevel(Level.ALL);
                 _Configuration.setDebugMode(true);
             }
             else
             {
-                //LOGGER.setLevel(Level.WARNING);
                 _Configuration.setDebugMode(false);
             }
         }
