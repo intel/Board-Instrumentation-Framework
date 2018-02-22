@@ -41,7 +41,7 @@
             <SplitToken>= </SplitToken>
             <SplitToken>: </SplitToken>
         </DynamicCollector>
-
+<!--
         <DynamicCollector Frequency="500">
             <Plugin>
                 <PythonFile>Collectors\wlSimCollector.py</PythonFile>
@@ -52,17 +52,20 @@
             </Plugin>
         </DynamicCollector>
 
+-->
 
-
-        <!--        
+ 
         <DynamicCollector SendOnlyOnChange="true" Prefix="bob">
 			<Plugin>
 				<PythonFile>Collectors\PluginTester.py</PythonFile>
 				<EntryPoint SpawnThread="True">CollectFunction</EntryPoint>
-				<Param>2200</Param>
+				<Param>2</Param>
 			</Plugin>
+            <Modifier ID="PluginTestData.1-2044">
+                <Bound Max="100"/>
+            </Modifier>
 		</DynamicCollector>
-
+        <!--       
 
         <DynamicCollector SendOnlyOnChange="true">
             <Plugin>

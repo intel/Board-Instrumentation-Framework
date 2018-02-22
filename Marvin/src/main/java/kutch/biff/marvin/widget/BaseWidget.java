@@ -24,6 +24,7 @@ package kutch.biff.marvin.widget;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -63,6 +64,7 @@ import org.xml.sax.SAXException;
  */
 abstract public class BaseWidget implements Widget
 {
+
     public static String DefaultWidgetDirectory = "Widget";
     private static int _WidgetCount = 0;
     private static final ArrayList<BaseWidget> _WidgetList = new ArrayList<>();
@@ -119,9 +121,8 @@ abstract public class BaseWidget implements Widget
     protected ArrayList<String> _SelectedStyle;
     protected String _SelectedStyleCSS = null;
     protected String _SelectedStyleID = null;
-    
-    private static CircularList<String> DebugStyles = null;
 
+    private static CircularList<String> DebugStyles = null;
 
     public BaseWidget()
     {
@@ -177,11 +178,11 @@ abstract public class BaseWidget implements Widget
             AddAdditionalStyleOverride(AliasMgr.getAliasMgr().GetAlias("DEBUG_STYLE"));
             if (null == DebugStyles)
             {
-                DebugStyles= new CircularList<>();
-                DebugStyles.add("-fx-background-color:yellow;-fx-border-color:black;-fx-border-style: solid"); 
-                DebugStyles.add("-fx-background-color:lightblue;-fx-border-color:dimgrey;-fx-border-style: dotted"); 
-                DebugStyles.add("-fx-background-color:darkviolet;-fx-border-color:yellow;-fx-border-style: dashed"); 
-                DebugStyles.add("-fx-background-color:lime;-fx-border-color:deeppink;-fx-border-style: solid"); 
+                DebugStyles = new CircularList<>();
+                DebugStyles.add("-fx-background-color:yellow;-fx-border-color:black;-fx-border-style: solid");
+                DebugStyles.add("-fx-background-color:lightblue;-fx-border-color:dimgrey;-fx-border-style: dotted");
+                DebugStyles.add("-fx-background-color:darkviolet;-fx-border-color:yellow;-fx-border-style: dashed");
+                DebugStyles.add("-fx-background-color:lime;-fx-border-color:deeppink;-fx-border-style: solid");
             }
         }
     }
@@ -245,7 +246,7 @@ abstract public class BaseWidget implements Widget
     {
         return _WidgetParentGridWidget;
     }
-    
+
     protected void FireDefaultPeekaboo()
     {
         if (null != _DefaultPeekabooAction)
@@ -255,7 +256,7 @@ abstract public class BaseWidget implements Widget
                with that peekaboo string at a later time (let eveyrthing load)
              */
             SendDefaultPeekabooAction(100);
-        }        
+        }
     }
 
     /**
@@ -263,7 +264,7 @@ abstract public class BaseWidget implements Widget
      * @return
      */
     @Override
-    public boolean PerformPostCreateActions(GridWidget parentGrid,boolean updateToolTipOnly)
+    public boolean PerformPostCreateActions(GridWidget parentGrid, boolean updateToolTipOnly)
     {
         if (true == updateToolTipOnly)
         {
@@ -503,7 +504,7 @@ abstract public class BaseWidget implements Widget
         retStr.append(" ");
 
         Region objRegion = getRegionObject();
-        
+
         if (null != objRegion)
         {
             retStr.append(strCR);
@@ -516,6 +517,54 @@ abstract public class BaseWidget implements Widget
         }
 
         return retStr.toString();
+    }
+    
+    protected double getAncestrialWidth()
+    {
+        double width = getWidth() * CONFIG.getScaleFactor();
+        GridWidget currParent = _WidgetParentGridWidget;
+        
+        if (width < 1 && currParent != null)
+        {
+            while (width == 0 && null != currParent)
+            {
+                currParent = currParent.getParentGridWidget();
+                if (null != currParent)
+                {
+                    width = currParent.getWidth() * CONFIG.getScaleFactor();
+                }
+            }
+        }
+        return width;
+    }
+
+    public boolean isOutsideConfiguredSize()
+    {
+        Region objRegion = getRegionObject();
+
+        if (null == objRegion)
+        {
+            return false;
+        }
+        
+        double configHeight = getAncestrialWidth();
+
+        double wDelta = objRegion.getWidth() - (configHeight);
+        double hDelta = objRegion.getHeight() - getHeight() * CONFIG.getScaleFactor();
+
+        if (objRegion.getWidth() > configHeight)
+        {
+            System.out.println("# " + Integer.toString(this.getWidgetNumber()) + " " + Double.toString(wDelta));
+        }
+        if (getWidth() > 0 && wDelta > 2)
+        {
+            return true;
+        }
+        else if (getHeight() > 0 && hDelta > 2)
+        {
+            return true;
+        }
+        return false;
     }
 
     public int getDecimalPlaces()
@@ -1362,7 +1411,6 @@ abstract public class BaseWidget implements Widget
         }
     }
 
-    
     public EventHandler<MouseEvent> SetupTaskAction()
     {
         if (false == _MouseHasBeenSetup) // quick hack, as I call this from MOST widgets, but now want it from all.  Will eventually remove from individual widgets.
@@ -1377,13 +1425,13 @@ abstract public class BaseWidget implements Widget
                     {
                         if (CONFIG.isDebugMode() && event.isShiftDown())
                         {
-                                LOGGER.info(objWidget.toString(true));
+                            LOGGER.info(objWidget.toString(true));
                         }
                         else if (CONFIG.isDebugMode() && event.isControlDown())
                         {
                             if (null != getStylableObject())
                             {
-                                
+
                                 AddAdditionalStyleOverride(DebugStyles.GetNext());
                                 ApplyCSS();
                             }
@@ -1672,6 +1720,7 @@ abstract public class BaseWidget implements Widget
         }
         return 0;
     }
+
     public boolean parseWidth(FrameworkNode widgetNode)
     {
         String str = widgetNode.getAttribute("Width");

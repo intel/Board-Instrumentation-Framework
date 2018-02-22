@@ -395,6 +395,7 @@ public class Marvin extends Application
                     break;
                 }
             }
+
         }
 
         // check if all have been setup with parent pane (a bit of a hack for this added peekabooo feature_
@@ -412,6 +413,7 @@ public class Marvin extends Application
         {
             LOGGER.info("Verified all referenced tasks are defined.");
         }
+
         _Config.getConfiguration().setPane(pane);
         long elapsed = System.currentTimeMillis() - startTime;
         LOGGER.info("Time taken to initialize all widgets: " + Long.toString(elapsed) + "ms.");
@@ -428,6 +430,13 @@ public class Marvin extends Application
                 _Config.getTabs().get(iIndex).PerformPostCreateActions(null, true);
             }
         }
+        /*
+        WIP to check if a widget is bigger than it's parent grid - not working yet
+        for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
+        {
+            _Config.getTabs().get(iIndex).CheckSizingBounds();
+        }
+        */
     }
 
     private void StopWidgets()
@@ -441,7 +450,7 @@ public class Marvin extends Application
         }
     }
 
-    private void DumpAllWidgetsInformation() 
+    private void DumpAllWidgetsInformation()
     {
         if (_Config.getConfiguration().isDebugMode())
         {

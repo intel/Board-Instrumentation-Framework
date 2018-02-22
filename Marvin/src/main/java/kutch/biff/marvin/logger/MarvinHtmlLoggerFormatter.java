@@ -64,12 +64,17 @@ class MarvinHtmlLoggerFormatter extends Formatter
         strBuffer.append(getDateStr(record));
         strBuffer.append("</td>");
         strBuffer.append("<td>");
-        strBuffer.append(formatMessage(record));
+        String Message = record.getMessage();
+        if (record.getMessage().contains("\n"))
+        {
+            Message = record.getMessage().replaceAll("\n","<br>");
+        }
+        strBuffer.append(Message);
         return strBuffer.toString();
     }
 
     // helper to format nice timesamp
-    private String getDateStr(LogRecord rec)
+    public static String getDateStr(LogRecord rec)
     {
         long milliseconds = rec.getMillis();
         SimpleDateFormat date_format = new SimpleDateFormat("MMM dd,yyyy HH:mm");
