@@ -21,8 +21,10 @@
  */
 package kutch.biff.marvin.widget;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.SnapshotParameters;
@@ -461,23 +463,32 @@ public class GridWidget extends BaseWidget
         }
     }
 
-    public void CheckSizingBounds()
+    public void CheckSizingBounds(int depth)
     {
+        Bounds local = this.getGridPane().getBoundsInLocal();
+        Dimension configD = this.getConfiguredDimensions();
+        Dimension viewD = this.getRealDimensions();
+        
+        if (configD.getWidth() > 0)
+        {
+            if (configD.getWidth() < local.getWidth() && local.getWidth() - configD.getWidth() > depth*2) // *2 is to account for borders in debug mode
+            {
+                LOGGER.warning("Grid Widget[" + Integer.toString(getWidgetNumber()) +"] configured width is " + Integer.toString((int)configD.getWidth()) + ", but real width is " + Integer.toString((int)local.getWidth()));
+            }
+        }
+        if (configD.getHeight() > 0)
+        {
+            if (configD.getHeight() < local.getHeight() && local.getHeight() -configD.getHeight() > depth*2 )
+            {
+                LOGGER.warning("Grid Widget[" + Integer.toString(getWidgetNumber()) +"]configured Height is " + Integer.toString((int)configD.getHeight()) + ", but real height is " + Integer.toString((int)local.getHeight()));
+            }
+        }
+
         for (Widget _Widget : _Widgets)
         {
-            /*
-            if (((BaseWidget) (_Widget)).isOutsideConfiguredSize())
+            if (GridWidget.class.isInstance(_Widget))
             {
-                LOGGER.warning("Widget " + ((BaseWidget) (_Widget)) + " is larger than configured.");
-            }
-*/
-            if (GridWidget.class.isInstance(_Widget) )
-            {
-                if (((BaseWidget) (_Widget)).isOutsideConfiguredSize())
-                {
-                    LOGGER.warning("Widget " + ((BaseWidget) (_Widget)) + " is larger than configured.");
-                }
-                ((GridWidget) (_Widget)).CheckSizingBounds();
+                ((GridWidget) (_Widget)).CheckSizingBounds(++depth);
             }
         }
     }
@@ -486,12 +497,18 @@ public class GridWidget extends BaseWidget
     {
         if (true == updateToolTipOnly)
         {
+            if (!TabWidget.class.isInstance(this))
+            {
+                super.PerformPostCreateActions(parentGrid, updateToolTipOnly);
+
+            }
             for (Widget _Widget : _Widgets)
             {
                 _Widget.PerformPostCreateActions(this, updateToolTipOnly);
 
             }
-            return super.PerformPostCreateActions(parentGrid, updateToolTipOnly);
+            return true;
+            //return super.PerformPostCreateActions(parentGrid, updateToolTipOnly);
         }
 
         _WidgetParentGridWidget = parentGrid;

@@ -430,13 +430,13 @@ public class Marvin extends Application
                 _Config.getTabs().get(iIndex).PerformPostCreateActions(null, true);
             }
         }
-        /*
-        WIP to check if a widget is bigger than it's parent grid - not working yet
+
+        //WIP to check if a widget is bigger than it's parent grid - not working yet
         for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
         {
-            _Config.getTabs().get(iIndex).CheckSizingBounds();
+            _Config.getTabs().get(iIndex).CheckSizingBounds(1);
         }
-        */
+
     }
 
     private void StopWidgets()
@@ -700,8 +700,10 @@ public class Marvin extends Application
                 {
                     try
                     {
+                        Showing = true;
                         stage.show();
                         Thread.currentThread().setName("Animation Timer Thread");
+                        SetupDebugToolTips();
                     }
                     catch (Exception e)
                     {
@@ -713,7 +715,6 @@ public class Marvin extends Application
                         Platform.exit();
                     }
                     Showing = true;
-                    SetupDebugToolTips();
                     return;
                 }
 

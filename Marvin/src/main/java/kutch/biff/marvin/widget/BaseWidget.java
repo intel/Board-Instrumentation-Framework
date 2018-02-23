@@ -21,10 +21,10 @@
  */
 package kutch.biff.marvin.widget;
 
+import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -503,16 +503,17 @@ abstract public class BaseWidget implements Widget
         retStr.append("]");
         retStr.append(" ");
 
-        Region objRegion = getRegionObject();
+        //Region objRegion = getRegionObject();
+        Dimension visDim = getRealDimensions();
 
-        if (null != objRegion)
+//        if (null != objRegion)
         {
             retStr.append(strCR);
             retStr.append("Actual Size : ");
             retStr.append("[");
-            retStr.append(Integer.toString((int) objRegion.getWidth()));
+            retStr.append(Integer.toString((int) visDim.getWidth()));
             retStr.append("x");
-            retStr.append(Integer.toString((int) objRegion.getHeight()));
+            retStr.append(Integer.toString((int) visDim.getHeight()));
             retStr.append("]");
         }
 
@@ -537,22 +538,51 @@ abstract public class BaseWidget implements Widget
         }
         return width;
     }
+    
+    public Dimension getConfiguredDimensions()
+    {
+        Dimension objDimension = new Dimension();
+        objDimension.setSize(getWidth() * CONFIG.getScaleFactor(),getHeight() * CONFIG.getScaleFactor());
+        return objDimension;
+    }
+    
+    public Dimension getRealDimensions()
+    {
+        Double Height=0.0,Width=0.0;
+        
+        Dimension objDimension = new Dimension();
+        if (null != getRegionObject())
+        {
+            Width = getRegionObject().getWidth();
+            Height = getRegionObject().getHeight();
+        }
+        else if (null != getStylableObject())
+        {
+            Width = getStylableObject().getBoundsInParent().getWidth();
+            Height = getStylableObject().getBoundsInParent().getHeight();
+            //getStylableObject().b
+            double pWidth =  getStylableObject().getParent().getBoundsInLocal().getWidth();
+            double pHeight =  getStylableObject().getParent().getBoundsInLocal().getHeight();
+            pWidth *=1;
+        }
+        objDimension.setSize(Width,Height);
+        return objDimension;
+    }
 
     public boolean isOutsideConfiguredSize()
     {
-        Region objRegion = getRegionObject();
-
-        if (null == objRegion)
-        {
-            return false;
-        }
+        double Height,Width;
+        
+        Dimension visDim = getRealDimensions();
+        Height = visDim.height;
+        Width = visDim.width;
         
         double configHeight = getAncestrialWidth();
 
-        double wDelta = objRegion.getWidth() - (configHeight);
-        double hDelta = objRegion.getHeight() - getHeight() * CONFIG.getScaleFactor();
+        double wDelta = Width - (configHeight);
+        double hDelta = Height - getHeight() * CONFIG.getScaleFactor();
 
-        if (objRegion.getWidth() > configHeight)
+        if (Width > configHeight)
         {
             System.out.println("# " + Integer.toString(this.getWidgetNumber()) + " " + Double.toString(wDelta));
         }
@@ -614,7 +644,7 @@ abstract public class BaseWidget implements Widget
 
     public void setHeight(double _Height)
     {
-        this._Height = _Height;
+        this._Height = Math.round(_Height);
     }
 
     public double getWidth()
@@ -624,7 +654,7 @@ abstract public class BaseWidget implements Widget
 
     public void setWidth(double _Width)
     {
-        this._Width = _Width;
+        this._Width = Math.round(_Width);
     }
 
     public int getRow()
