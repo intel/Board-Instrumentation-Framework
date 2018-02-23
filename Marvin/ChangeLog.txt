@@ -1,3 +1,6 @@
+Release 18.02
+Log warning when a grid grows beyond specified bounds (if you in fact specify)
+
 Release 18.01
 Added GridMacro capability to Marvin.
 Added % to hgap and vgap
