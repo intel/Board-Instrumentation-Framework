@@ -64,7 +64,7 @@ public class SpacerWidget extends BaseWidget
         ConfigureAlignment();
 
         pane.add(_panel,  getColumn(), getRow(),getColumnSpan(),getRowSpan());
-        
+        SetupTaskAction();   
         return ApplyCSS();
     }
 @Override

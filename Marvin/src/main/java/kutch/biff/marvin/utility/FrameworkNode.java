@@ -733,7 +733,8 @@ public class FrameworkNode
             }
 
             retString = strData.substring(0, OutterIndex);
-            retString += Integer.toString((int) NewVal);
+            //retString += Integer.toString((int) NewVal);
+            retString += Double.toString(NewVal);
             retString += strData.substring(CloseParenIndex + 1);
         }
         else
