@@ -106,6 +106,7 @@ public class Marvin extends Application
     private String altSplash = null;
     private MarvinLocalData objLocalMarvinData = null;
     private MySplash _Splash;
+    private boolean _CheckForSizeProblems = true;
 
     // returns the base tab pane - used for dynamic tabs in debug mode
     public static TabPane GetBaseTabPane()
@@ -283,23 +284,27 @@ public class Marvin extends Application
         if (0 == verboseLevel)
         {
             MarvinLogger.setDebugLevel(Level.SEVERE);
+            _CheckForSizeProblems = false;
         }
 
-        if (1 == verboseLevel)
+        switch (verboseLevel)
         {
-            MarvinLogger.setDebugLevel(Level.WARNING);
-        }
-        else if (2 == verboseLevel)
-        {
-            MarvinLogger.setDebugLevel(Level.INFO);
-        }
-        else if (3 == verboseLevel)
-        {
-            MarvinLogger.setDebugLevel(Level.CONFIG);
-        }
-        else if (4 == verboseLevel)
-        {
-            MarvinLogger.setDebugLevel(Level.ALL);
+            case 1:
+                MarvinLogger.setDebugLevel(Level.WARNING);
+                _CheckForSizeProblems = false;
+                break;
+            case 2:
+                MarvinLogger.setDebugLevel(Level.INFO);
+                _CheckForSizeProblems = false;
+                break;
+            case 3:
+                MarvinLogger.setDebugLevel(Level.CONFIG);
+                break;
+            case 4:
+                MarvinLogger.setDebugLevel(Level.ALL);
+                break;
+            default:
+                break;
         }
     }
 
@@ -431,10 +436,13 @@ public class Marvin extends Application
             }
         }
 
-        //WIP to check if a widget is bigger than it's parent grid - not working yet
-        for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
+        //check if a widget is bigger than it's parent grid - not working yet
+        if (_CheckForSizeProblems)
         {
-            _Config.getTabs().get(iIndex).CheckSizingBounds(1);
+            for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
+            {
+                _Config.getTabs().get(iIndex).CheckSizingBounds(1);
+            }
         }
 
     }
@@ -463,7 +471,7 @@ public class Marvin extends Application
                     sb.append(objWidget.toString(false));
                     LOGGER.config(sb.toString());
                 }
-                objWidget.SetupTaskAction();
+                objWidget.SetupTaskAction(); // setup shift and ctrl click actions for debug
                 if (null != objWidget.getRegionObject())
                 {
                     // objWidget.getRegionObject().requestLayout();
