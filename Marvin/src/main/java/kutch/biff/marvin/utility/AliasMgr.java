@@ -464,9 +464,11 @@ public class AliasMgr
             }
             else
             {
-                String path = "file:///" + current.replace(File.separatorChar, '/');
-                AddRootAlias("WORKING_DIR_URI", path);
+                //String path = "file:///" + current.replace(File.separatorChar, '/');
+                //AddRootAlias("WORKING_DIR_URI", path);
             }
+            String path = new File(".").toURI().toString();
+            AddRootAlias("WORKING_DIR_URI", path);            
         }
         catch (IOException ex)
         {
