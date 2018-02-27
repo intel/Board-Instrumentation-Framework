@@ -355,14 +355,14 @@ public class AliasMgr
                         strReplace = node.getTextContent();
                     }
                 }
-                
+
                 for (int iLoop = 0; iLoop < map.getLength(); iLoop++)
                 {
                     FrameworkNode node = new FrameworkNode(map.item(iLoop));
 
                     String strAlias = node.getNodeName();
                     String strValue = node.getTextContent();
-                    
+
                     if (strAlias.equals("REPLACE"))
                     {
                         continue; // ignore 
@@ -378,7 +378,7 @@ public class AliasMgr
                             LOGGER.warning("Attempted to replace 'REPLACE' in alias " + strAlias + " however REPLACE not defined.  Ignoring");
                         }
                     }
-                    
+
                     if (false == getAliasMgr().IsAliased(strAlias))
                     {
                         AliasMgr._Mgr.AddAlias(strAlias, strValue);
@@ -459,14 +459,19 @@ public class AliasMgr
         {
             String current = new java.io.File(".").getCanonicalPath();
             AddRootAlias("WORKING_DIR", current);
+
             if (File.separatorChar == '/')
             {
             }
             else
             {
-                String path = "file:///" + current.replace(File.separatorChar, '/');
-                AddRootAlias("WORKING_DIR_URI", path);
+
+                //String path = "file:///" + current.replace(File.separatorChar, '/');
+                //String path = new File(".").toURI().toString();
+                //AddRootAlias("WORKING_DIR_URI", path);
             }
+            String path = new File(".").toURI().toString();
+            AddRootAlias("WORKING_DIR_URI", path);
         }
         catch (IOException ex)
         {

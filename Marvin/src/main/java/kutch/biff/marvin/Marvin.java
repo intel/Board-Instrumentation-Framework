@@ -107,6 +107,7 @@ public class Marvin extends Application
     private MarvinLocalData objLocalMarvinData = null;
     private MySplash _Splash;
     private boolean _CheckForSizeProblems = true;
+    private boolean _SizeCheckWindowShowing = false;
 
     // returns the base tab pane - used for dynamic tabs in debug mode
     public static TabPane GetBaseTabPane()
@@ -346,11 +347,14 @@ public class Marvin extends Application
         _Splash = new MySplash(ShowSplash, altSplash);
     }
 
-    private long BeginLoadProcess(Stage stage)
+    private long BeginLoadProcess()
     {
         long start = System.currentTimeMillis();
         _DataMgr = new DataManager();
-        _Config = new ConfigurationReader();
+        if (null == _Config)
+        {
+            _Config = new ConfigurationReader();
+        }
 
         if (null == _Config)
         {
@@ -444,7 +448,6 @@ public class Marvin extends Application
                 _Config.getTabs().get(iIndex).CheckSizingBounds(1);
             }
         }
-
     }
 
     private void StopWidgets()
@@ -554,6 +557,85 @@ public class Marvin extends Application
         basePlane.add(_TestPane, 2, 2);
     }
 
+    private void DoSizeTest(Stage stage)
+    {
+        _Config = new ConfigurationReader();
+        if (null == _Config)
+        {
+            return;
+        }
+
+        Configuration config = _Config.ReadStartupInfo(ConfigFilename);
+        if (null == config)
+        {
+            return;
+        }
+        _objTabPane = new TabPane();
+        _objTabPane.setSide(config.getSide());
+
+        GridPane sceneGrid = new GridPane();
+
+        GridPane.setHalignment(_Config.getConfiguration().getMenuBar(), HPos.LEFT);
+        GridPane.setValignment(_Config.getConfiguration().getMenuBar(), VPos.TOP);
+
+        sceneGrid.add(_Config.getConfiguration().getMenuBar(), 0, 0);
+        sceneGrid.add(_objTabPane, 0, 1);
+
+        Scene scene = null;
+        Rectangle2D visualBounds = _Config.getConfiguration().getPrimaryScreen().getVisualBounds();
+        int appWidth = (int) visualBounds.getWidth();
+        int appHeight = (int) visualBounds.getHeight();
+
+        if (config.getWidth() > 0)
+        {
+            appWidth = config.getWidth();
+        }
+        else
+        {
+            config.setWidth(appWidth);
+        }
+        if (config.getHeight() > 0)
+        {
+            appHeight = config.getHeight();
+        }
+        else
+        {
+            config.setHeight(appHeight);
+        }
+
+        scene = new Scene(sceneGrid);
+        SetAppStyle(scene.getStylesheets());
+        stage.setScene(scene);
+        stage.setX(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX());
+        stage.setY(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY());
+
+        stage.setMaximized(true);
+
+        stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>()
+                      {
+                          @Override
+                          public void handle(WindowEvent window)
+                          {
+                              FinishLoad(stage);
+                          }
+                      });
+
+        while (false && !_SizeCheckWindowShowing)
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException ex)
+            {
+                Logger.getLogger(Marvin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        FinishLoad(stage);
+
+    }
+
     @Override
     public void start(Stage stage) throws Exception
     {
@@ -564,9 +646,15 @@ public class Marvin extends Application
             return;
         }
 
+        DoSizeTest(stage);
+    }
+
+    public void FinishLoad(Stage stage)
+    {
+
         MySplash.getSplash().start(stage);
 
-        long elapsedTime = BeginLoadProcess(stage);
+        long elapsedTime = BeginLoadProcess();
         LOGGER.info("Time taken to load Configuration: " + Long.toString(elapsedTime) + "ms.");
 
         if (!ShowSplash)
@@ -582,8 +670,11 @@ public class Marvin extends Application
         }
         _Config.getConfiguration().setAppStage(stage);
 
-        _objTabPane = new TabPane();
-        _objTabPane.setSide(_Config.getConfiguration().getSide());
+        if (null == _objTabPane)
+        {
+            _objTabPane = new TabPane();
+            _objTabPane.setSide(_Config.getConfiguration().getSide());
+        }
         GridPane sceneGrid = new GridPane();
 
         Scene scene = null;

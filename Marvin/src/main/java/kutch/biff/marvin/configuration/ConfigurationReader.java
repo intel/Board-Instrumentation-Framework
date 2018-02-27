@@ -153,15 +153,30 @@ public class ConfigurationReader
     {
         return _OpenXMLFile(filename, false);
     }
+    
+    public Configuration ReadStartupInfo(String filename)
+    {
+        Document doc = OpenXMLFile(filename);
+        _Configuration = new Configuration();
+        if (false == ReadAppSettings(doc,true))
+        {
+            return null;
+        }
+
+        return _Configuration;
+    }
 
     public Configuration ReadAppConfigFile(String filename, DoubleProperty completeness)
     {
         Document doc = OpenXMLFile(filename);
-        AliasMgr.getAliasMgr().SetCurrentConfigFile(filename);
         if (null != doc)
         {
-            _Configuration = new Configuration();
-            if (false == ReadAppSettings(doc))
+            AliasMgr.getAliasMgr().SetCurrentConfigFile(filename);
+            if (null == _Configuration)
+            {
+                _Configuration = new Configuration();
+            }
+            if (false == ReadAppSettings(doc,false))
             {
                 return null;
             }
@@ -389,7 +404,7 @@ public class ConfigurationReader
 
     }
 
-    private boolean ReadAppSettings(Document doc)
+    private boolean ReadAppSettings(Document doc, boolean basicInfoOnly)
     {
         NodeList appStuff = doc.getElementsByTagName("Application");
         if (appStuff.getLength() < 1)
@@ -450,12 +465,14 @@ public class ConfigurationReader
                     {
                         Screen primary = Screen.getScreens().get(monitorNum - 1);
                         _Configuration.setPrimaryScreen(primary);
-                        LOGGER.config("Setting Primary Screen to monitor #" + node.getTextContent());
+                        if (false == basicInfoOnly)
+                        {
+                            LOGGER.config("Setting Primary Screen to monitor #" + node.getTextContent());
+                        }
                     }
-                    else
+                    else if (false == basicInfoOnly)
                     {
                         LOGGER.warning("<MonitorNumber> set to " + node.getTextContent() + " however there are only " + Integer.toHexString(count) + " monitors. Ignoring");
-                        //return false;
                     }
                 }
                 catch (Exception Ex)
@@ -475,7 +492,7 @@ public class ConfigurationReader
                     _Configuration.setCreationWidth(node.getIntegerAttribute("Width", 0));
                     _Configuration.setCreationHeight(node.getIntegerAttribute("Height", 0));
                 }
-                else
+                else if (false == basicInfoOnly)
                 {
                     LOGGER.severe("Invalid CreationSize specified");
                 }
@@ -483,6 +500,11 @@ public class ConfigurationReader
 
             else if (node.getNodeName().equalsIgnoreCase("Tasks"))
             {
+                if (basicInfoOnly)
+                {
+                    continue;
+                }
+
                 Utility.ValidateAttributes(new String[]
                 {
                     "Enabled"
@@ -504,6 +526,10 @@ public class ConfigurationReader
             }
             else if (node.getNodeName().equalsIgnoreCase("Network"))
             {
+                if (basicInfoOnly)
+                {
+                    continue;
+                }
                 Utility.ValidateAttributes(new String[]
                 {
                     "IP", "Port"
@@ -563,6 +589,11 @@ public class ConfigurationReader
             }
             else if (node.getNodeName().equalsIgnoreCase("Padding"))
             {
+                if (basicInfoOnly)
+                {
+                    continue;
+                }
+
                 Utility.ValidateAttributes(new String[]
                 {
                     "top", "bottom", "left", "right", "legacymode"
@@ -618,6 +649,11 @@ public class ConfigurationReader
             }
             else if (node.getNodeName().equalsIgnoreCase("UnregisteredData"))
             {
+                if (basicInfoOnly)
+                {
+                    continue;
+                }
+
                 if (false == ReadUnregisteredDataInfo(node))
                 {
                     return false;
@@ -625,6 +661,10 @@ public class ConfigurationReader
             }
             else if (node.getNodeName().equalsIgnoreCase("Tabs"))
             {
+                if (basicInfoOnly)
+                {
+                    continue;
+                }
                 Utility.ValidateAttributes(new String[]
                 {
                     "side"
@@ -681,6 +721,10 @@ public class ConfigurationReader
             }
             else if (node.getNodeName().equalsIgnoreCase("RefreshInterval"))
             {
+                if (basicInfoOnly)
+                {
+                    continue;
+                }
                 String strInterval = node.getTextContent();
                 try
                 {
@@ -698,6 +742,11 @@ public class ConfigurationReader
             }
         }
 
+        if (basicInfoOnly)
+        {
+            return true;
+        }
+        
         if (TabList.size() < 1)
         {
             LOGGER.severe("No Tabs defined in <Application> section of configuration file.");
@@ -1330,6 +1379,10 @@ public class ConfigurationReader
 
     private boolean ReadAppMenu(FrameworkNode menuNode)
     {
+        if (null != _Configuration.getMenuBar())
+        {
+            return true;
+        }
         if (menuNode.hasAttribute("Show"))
         {
             String strVal = menuNode.getAttribute("Show");

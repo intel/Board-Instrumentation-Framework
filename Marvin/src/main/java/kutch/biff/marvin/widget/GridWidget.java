@@ -497,7 +497,7 @@ public class GridWidget extends BaseWidget
     {
         if (true == updateToolTipOnly)
         {
-            if (!TabWidget.class.isInstance(this))
+            //if (!TabWidget.class.isInstance(this))
             {
                 super.PerformPostCreateActions(parentGrid, updateToolTipOnly);
 
