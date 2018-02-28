@@ -65,7 +65,21 @@ import javafx.stage.WindowEvent;
 import kutch.biff.marvin.utility.MarvinLocalData;
 import java.util.Set;
 import static java.lang.Math.abs;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
+import javafx.geometry.Side;
+import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import kutch.biff.marvin.widget.Widget;
+import static java.lang.Math.abs;
+import javafx.geometry.Point2D;
+import javafx.scene.control.ScrollPane;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
 
 /**
  *
@@ -522,7 +536,6 @@ public class Marvin extends Application
 
     private void checkSize(Stage stage, Scene scene, GridPane objGridPane)
     {
-
         //if (1 == 1) return;
 //        stage.setMaximized(true);
         stage.centerOnScreen();
@@ -530,13 +543,13 @@ public class Marvin extends Application
         double BorderWidth = abs((scene.getWidth() - stage.getWidth()) / 2);
         _Config.getConfiguration().setAppBorderWidth(BorderWidth);
 
-        _Config.getConfiguration().setBottomOffset(_TestPane.getHeight());
+        //_Config.getConfiguration().setBottomOffset(_TestPane.getHeight());
         double height = _TestPane.getHeight(); // tab + borders
         if (null != _Config.getConfiguration().getMenuBar() && true == _Config.getConfiguration().getShowMenuBar())
         {
             height = _TestPane.getHeight() + _Config.getConfiguration().getMenuBar().getHeight(); //menu + borders + tab
         }
-        _Config.getConfiguration().setTopOffset(height);
+//        _Config.getConfiguration().setTopOffset(height);
         objGridPane.getChildren().remove(_TestPane);
     }
 
@@ -546,6 +559,7 @@ public class Marvin extends Application
      *
      * @param basePlane
      */
+    
     private void SetupSizeCheckPane(GridPane basePlane)
     {
         _TestPane = new TabPane();
@@ -556,9 +570,11 @@ public class Marvin extends Application
 
         basePlane.add(_TestPane, 2, 2);
     }
-
-    private void DoSizeTest(Stage stage)
+    
+/*
+    private void LoadApplication(Stage stage)
     {
+        stage.setIconified(true);
         _Config = new ConfigurationReader();
         if (null == _Config)
         {
@@ -606,6 +622,8 @@ public class Marvin extends Application
         scene = new Scene(sceneGrid);
         SetAppStyle(scene.getStylesheets());
         stage.setScene(scene);
+        stage.setIconified(true);
+
         stage.setX(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX());
         stage.setY(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY());
 
@@ -635,9 +653,113 @@ public class Marvin extends Application
         FinishLoad(stage);
 
     }
+    */
+    /// pop up quick simple tab,menu and style it, then grab the size of the window
+    /// so we know the canvas dimenstions
+    private void testAppSize(Stage stage)
+    {
+        final GridPane stagePane = new GridPane();
+        final GridPane canvasPane = new GridPane();
+        canvasPane.setAlignment(Pos.TOP_LEFT);
 
-    @Override
-    public void start(Stage stage) throws Exception
+        _Config = new ConfigurationReader();
+        final Configuration basicConfig = _Config.ReadStartupInfo(ConfigFilename);
+
+        stage.setX(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX());
+        stage.setY(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY());
+        
+        TabPane tabPane = new TabPane();
+        Tab objTab = new Tab();
+        final Side tabSide = basicConfig.getSide();
+        if (tabSide == Side.TOP || tabSide == Side.BOTTOM)
+        {
+            tabPane.setSide(Side.TOP);
+        }
+        else
+        {
+            tabPane.setSide(Side.LEFT);
+        }
+        objTab.setText("");
+        
+        tabPane.getTabs().add(objTab);
+        stagePane.add(tabPane, 0, 1);
+
+        MenuBar objMenuBar = new MenuBar();
+        if (basicConfig.getShowMenuBar())
+        {
+            Menu objMenu = new Menu("About");
+            MenuItem objItem = new MenuItem("Dummy");
+            objMenu.getItems().add(objItem);
+            objMenuBar.getMenus().add(objMenu);
+            stagePane.add(objMenuBar, 0, 0);
+        }
+
+        if (basicConfig.getEnableScrollBars())
+        {
+            ScrollPane testScrollPane = new ScrollPane();
+            testScrollPane.setPannable(true);
+            testScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+            testScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+            testScrollPane.setContent(canvasPane);
+            objTab.setContent(testScrollPane);
+
+        }
+        else
+        {
+            objTab.setContent(canvasPane);
+        }
+        stage.setTitle(basicConfig.getAppTitle());
+
+        Scene scene = new Scene(stagePane);
+        stage.setScene(scene);
+        SetAppStyle(scene.getStylesheets());
+        stage.setMaximized(true);
+        stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>()
+                      {
+                          @Override
+                          public void handle(WindowEvent window)
+                          {
+                              scene.heightProperty().addListener(new ChangeListener<Number>()
+                              {
+                                  @Override
+                                  public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight)
+                                  {
+                                      scene.heightProperty().removeListener(this);
+                                      Point2D canvasInScene = canvasPane.localToScene(0.0,0.0);
+                                      int cvHeight;
+                                      int cvWidth;
+                                      if (tabSide == Side.TOP || tabSide == Side.BOTTOM)
+                                      {
+                                        cvHeight =  (int)(scene.getHeight() - canvasInScene.getY());
+                                        cvWidth = (int) scene.getWidth();
+                                      }
+                                      else
+                                      {
+                                        cvHeight =  (int)(scene.getHeight() - canvasInScene.getY());
+                                        cvWidth = (int) (scene.getWidth() - canvasInScene.getX());
+                                      }
+                                      basicConfig.setCanvasWidth(cvWidth);
+                                      basicConfig.setCanvasHeight(cvHeight);
+                                      
+                                      stage.setIconified(true);
+                                      Platform.runLater(new Runnable()
+                                      {
+                                          @Override
+                                          public void run()
+                                          {
+                                              FinishLoad(stage);
+                                          }
+                                      });
+
+                                  }
+                              });
+                          }
+                      });
+
+        stage.show();
+    }
+/*
+    public void performRealLoad(Stage stage)
     {
         if (true == ShowHelp)
         {
@@ -646,7 +768,15 @@ public class Marvin extends Application
             return;
         }
 
-        DoSizeTest(stage);
+        LoadApplication(stage);
+
+    }
+    */
+
+    @Override
+    public void start(Stage stage) throws Exception
+    {
+        testAppSize(stage);
     }
 
     public void FinishLoad(Stage stage)
@@ -756,6 +886,7 @@ public class Marvin extends Application
         checkSize(stage, scene, sceneGrid); // go resize based upon scaling
 
         stage.setTitle(_Config.getConfiguration().getAppTitle());
+        stage.setIconified(false);
         stage.setScene(scene);
         stage.setHeight(appHeight);
         stage.setWidth(appWidth);
@@ -905,7 +1036,6 @@ public class Marvin extends Application
 
         }
         LOGGER.info(dumpString);
-
     }
 
     @Override

@@ -558,6 +558,10 @@ public class TaskManager
      */
     public boolean TaskExists(String TaskID)
     {
+        if (null == TaskID)
+        {
+            return false;
+        }
         if (null != _TaskMap)
         {
             return _TaskMap.containsKey(TaskID.toUpperCase());

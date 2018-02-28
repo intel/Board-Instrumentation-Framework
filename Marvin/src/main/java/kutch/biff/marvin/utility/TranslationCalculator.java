@@ -45,7 +45,7 @@ public class TranslationCalculator
     protected final static Configuration CONFIG = Configuration.getConfig();
 
     private final DoubleProperty _Scale;
-    private final Pane _ReferencePane;
+//    private final Pane _ReferencePane;
     private final Pane _WorkingPane;
     private final Rectangle clip = new Rectangle();
     private final Pos _Position;
@@ -55,7 +55,7 @@ public class TranslationCalculator
     {
         _Scale = objScaleProperty;
 
-        _ReferencePane = objBasePane;
+  //      _ReferencePane = objBasePane;
         _WorkingPane = objWorkingPane;
         _Position = position;
         _Translate = new Translate();
@@ -94,6 +94,7 @@ public class TranslationCalculator
                 Calculate();
             }
         });
+        /*
         _ReferencePane.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() // when things are resized
         {
             @Override
@@ -105,6 +106,7 @@ public class TranslationCalculator
                 Calculate();
             }
         });
+        */
         _Scale.addListener(new ChangeListener<Number>() // when the scale changes
         {
             @Override
@@ -122,7 +124,8 @@ public class TranslationCalculator
 
         scale = _Scale.getValue();
 
-        refWidth = _ReferencePane.getWidth();
+        //refWidth = _ReferencePane.getWidth();
+        refWidth = CONFIG.getCanvasWidth();
         paneWidth = _WorkingPane.getWidth();
 
         if (_Position == Pos.CENTER_RIGHT || _Position == Pos.TOP_RIGHT || _Position == Pos.BOTTOM_RIGHT)
@@ -156,7 +159,8 @@ public class TranslationCalculator
 
         scale = _Scale.getValue();
 
-        refHeight = _ReferencePane.getHeight();
+        //refHeight = _ReferencePane.getHeight();
+        refHeight = CONFIG.getCanvasHeight();
         paneHeight = _WorkingPane.getHeight();
         if (paneHeight == 0 || refHeight == 0)
         {
@@ -165,7 +169,6 @@ public class TranslationCalculator
         if (_Position == Pos.BOTTOM_CENTER || _Position == Pos.BOTTOM_RIGHT || _Position == Pos.BOTTOM_LEFT)
         {
             ty = (refHeight - (paneHeight * scale)) / scale; // Bottom aligned
-            ty -= (CONFIG.getTopOffset() +CONFIG.getMenuBar().getHeight())/scale; // need to offset for menu (if there), tab height, and border
         }
         else if (_Position == Pos.TOP_CENTER || _Position == Pos.TOP_LEFT || _Position == Pos.TOP_RIGHT)
         {
@@ -174,20 +177,17 @@ public class TranslationCalculator
         else if (_Position == Pos.CENTER || _Position == Pos.CENTER_LEFT || _Position == Pos.CENTER_RIGHT)
         {
             ty = ((refHeight - (paneHeight * scale)) / scale) / 2; // centered
-            ty -= CONFIG.getTopOffset(); // need to offset for menu (if there), tab height, and border
-            //String logStr = "RefHeight: " + Double.toString(refHeight) + " PaneHeight: " + Double.toString(paneHeight) + " Diff: " + Double.toString(refHeight-paneHeight);
-            //logStr += " TranslateY=" + Double.toString(ty);
-            //LOGGER.info(logStr);
         }
         else
         {
             ty = 0;
         }
+        /*
         if (ty < CONFIG.getTopOffset() * -1)
         {
             ty = CONFIG.getTopOffset() * -1;
         }
-        
+        */
         return ty;
     }
 }

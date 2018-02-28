@@ -460,18 +460,8 @@ public class AliasMgr
             String current = new java.io.File(".").getCanonicalPath();
             AddRootAlias("WORKING_DIR", current);
 
-            if (File.separatorChar == '/')
-            {
-            }
-            else
-            {
-
-                //String path = "file:///" + current.replace(File.separatorChar, '/');
-                //String path = new File(".").toURI().toString();
-                //AddRootAlias("WORKING_DIR_URI", path);
-            }
             String path = new File(".").toURI().toString();
-            AddRootAlias("WORKING_DIR_URI", path);
+            AddRootAlias("WORKING_DIR_URI", path);            
         }
         catch (IOException ex)
         {
@@ -491,15 +481,15 @@ public class AliasMgr
         {
             Height = visualBounds.getHeight();
         }
-        Width = Width - CONFIG.getAppBorderWidth() * 2;
-        Height = Height - CONFIG.getBottomOffset() - CONFIG.getTopOffset();
+        //Width = Width - CONFIG.getAppBorderWidth() * 2;
+        //Height = Height - CONFIG.getBottomOffset() - CONFIG.getTopOffset();
         double H2W_Ratio = Width / Height;
         double W2H_Ratio = Height / Width;
 
         H2W_Ratio = visualBounds.getWidth() / visualBounds.getHeight();
         W2H_Ratio = visualBounds.getHeight() / visualBounds.getWidth();
-        AddRootAlias("CANVAS_WIDTH", Double.toString(Width));
-        AddRootAlias("CANVAS_HEIGHT", Double.toString(Height));
+        AddRootAlias("CANVAS_WIDTH", Integer.toString(Configuration.getConfig().getCanvasWidth()));
+        AddRootAlias("CANVAS_HEIGHT", Integer.toString(Configuration.getConfig().getCanvasHeight()));
         AddRootAlias("SCREEN_H2W_RATIO", Double.toString(H2W_Ratio));
         AddRootAlias("SCREEN_W2H_RATIO", Double.toString(W2H_Ratio));
     }

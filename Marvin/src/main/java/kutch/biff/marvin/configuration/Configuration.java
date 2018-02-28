@@ -87,6 +87,7 @@ public class Configuration
     private boolean _ShuttingDown;
     private Screen  _PrimaryScreen;
     private boolean _PrimaryScreenDetermined;
+    private int _CanvasWidth,_CanvasHeight;
     
 
     public Configuration()
@@ -100,7 +101,8 @@ public class Configuration
         _Width=0;
         _Height=0;
         _CreationWidth=0;
-        _CreationHeight=0;
+        _CreationHeight=0;  
+        _CanvasWidth = _CanvasHeight = 0;
         _AllowTasks = true;
         _ShowMenuBar = false;
         TitleSuffix = "";
@@ -128,6 +130,26 @@ public class Configuration
         _EnableScrollBars = false;
         _OscarBullhornList = new ArrayList<>();
         _MarvinLocalDatafeed = false;
+    }
+
+    public int getCanvasWidth()
+    {
+        return _CanvasWidth;
+    }
+
+    public void setCanvasWidth(int _CanvasWidth)
+    {
+        this._CanvasWidth = _CanvasWidth;
+    }
+
+    public int getCanvasHeight()
+    {
+        return _CanvasHeight;
+    }
+
+    public void setCanvasHeight(int _CanvasHeight)
+    {
+        this._CanvasHeight = _CanvasHeight;
     }
 
     public boolean isPrimaryScreenDetermined()
@@ -532,10 +554,10 @@ public class Configuration
     {
         this._CreationHeight = _CreationHeight;
     }
-
+/*
     public double getBottomOffset()
     {
-        return _bottomOffset;
+        return 0.0;//return _bottomOffset;
     }
 
     public void setBottomOffset(double _bottomOffset)
@@ -545,14 +567,14 @@ public class Configuration
 
     public double getTopOffset()
     {
-        return _topOffset;
+        return 0.0; //return _topOffset;
     }
 
     public void setTopOffset(double _topOffset)
     {
         this._topOffset = _topOffset;
     }
-
+*/
     public double getAppBorderWidth()
     {
         return _AppBorderWidth;

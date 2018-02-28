@@ -153,12 +153,15 @@ public class ConfigurationReader
     {
         return _OpenXMLFile(filename, false);
     }
-    
+
     public Configuration ReadStartupInfo(String filename)
     {
         Document doc = OpenXMLFile(filename);
-        _Configuration = new Configuration();
-        if (false == ReadAppSettings(doc,true))
+        if (null == _Configuration)
+        {
+            _Configuration = new Configuration();
+        }
+        if (false == ReadAppSettings(doc, true))
         {
             return null;
         }
@@ -176,7 +179,7 @@ public class ConfigurationReader
             {
                 _Configuration = new Configuration();
             }
-            if (false == ReadAppSettings(doc,false))
+            if (false == ReadAppSettings(doc, false))
             {
                 return null;
             }
@@ -642,7 +645,7 @@ public class ConfigurationReader
             }
             else if (node.getNodeName().equalsIgnoreCase("MainMenu"))
             {
-                if (false == ReadAppMenu(node))
+                if (false == ReadAppMenu(node, basicInfoOnly))
                 {
                     return false;
                 }
@@ -661,10 +664,6 @@ public class ConfigurationReader
             }
             else if (node.getNodeName().equalsIgnoreCase("Tabs"))
             {
-                if (basicInfoOnly)
-                {
-                    continue;
-                }
                 Utility.ValidateAttributes(new String[]
                 {
                     "side"
@@ -694,6 +693,10 @@ public class ConfigurationReader
                     {
                         LOGGER.warning("Invalid <Tabs Side=> attribute: " + sideStr + ". Ignoring");
                     }
+                }
+                if (basicInfoOnly)
+                {
+                    continue;
                 }
 
                 for (FrameworkNode tabNode : node.getChildNodes(true))
@@ -746,7 +749,7 @@ public class ConfigurationReader
         {
             return true;
         }
-        
+
         if (TabList.size() < 1)
         {
             LOGGER.severe("No Tabs defined in <Application> section of configuration file.");
@@ -1377,7 +1380,7 @@ public class ConfigurationReader
         return retVal;
     }
 
-    private boolean ReadAppMenu(FrameworkNode menuNode)
+    private boolean ReadAppMenu(FrameworkNode menuNode, boolean basicInfoOnly)
     {
         if (null != _Configuration.getMenuBar())
         {
@@ -1389,13 +1392,23 @@ public class ConfigurationReader
             if (strVal.equalsIgnoreCase("True"))
             {
                 _Configuration.setShowMenuBar(true);
-                LOGGER.config("Show Menu Bar = TRUE");
+                if (!basicInfoOnly)
+                {
+                    LOGGER.config("Show Menu Bar = TRUE");
+                }
             }
             else
             {
                 _Configuration.setShowMenuBar(false);
-                LOGGER.config("Show Menu Bar = FALSE");
+                if (!basicInfoOnly)
+                {
+                    LOGGER.config("Show Menu Bar = FALSE");
+                }
             }
+        }
+        if (basicInfoOnly)
+        {
+            return true;
         }
         MenuBar objMenuBar = new MenuBar();
         for (FrameworkNode node : menuNode.getChildNodes())
@@ -1440,13 +1453,6 @@ public class ConfigurationReader
                 {
                     "Text", "Task"
                 }, node);
-                if (false == TASKMAN.TaskExists(node.getAttribute("Task")))
-                {
-                    // it's OK, the tasks could be defined in an external file
-                    //LOGGER.wa("Menu item with title of " + Title + " has an unknown TASK id");
-                    //return null;
-                }
-
                 if (node.hasAttribute("Text") && node.hasAttribute("Task"))
                 {
                     MenuItem objItem = new MenuItem(node.getAttribute("Text"));

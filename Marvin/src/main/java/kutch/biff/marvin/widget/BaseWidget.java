@@ -1680,6 +1680,7 @@ abstract public class BaseWidget implements Widget
         return _ClickThroughTransparentRegion;
     }
 
+    @Override
     public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent)
     {
         this._ClickThroughTransparentRegion = _CanClickOnTransparent;
@@ -1702,7 +1703,7 @@ abstract public class BaseWidget implements Widget
                 str = str.replace("%A", "");
                 str = str.replace("%", "");
                 double percentVal = Double.parseDouble(str);
-                double screenWidth = CONFIG.getWidth();
+                double screenWidth = CONFIG.getCanvasWidth();
                 if (0 == screenWidth)
                 {
                     screenWidth = CONFIG.getCreationWidth();
@@ -1732,7 +1733,7 @@ abstract public class BaseWidget implements Widget
                 str = str.replace("%A", "");
                 str = str.replace("%", "");
                 double percentVal = Double.parseDouble(str);
-                double screenWidth = CONFIG.getWidth();
+                double screenWidth = CONFIG.getCanvasHeight();
                 if (0 == screenWidth)
                 {
                     screenWidth = CONFIG.getCreationWidth();
@@ -1769,12 +1770,12 @@ abstract public class BaseWidget implements Widget
                 str = str.replace("%A", "");
                 str = str.replace("%", "");
                 double percentVal = Double.parseDouble(str);
-                double screenWidth = CONFIG.getWidth();
-                if (0 == screenWidth)
+                double canvasWidth = CONFIG.getCanvasWidth();
+                if (0 == canvasWidth)
                 {
-                    screenWidth = CONFIG.getCreationWidth();
+                    canvasWidth = CONFIG.getCreationWidth();
                 }
-                setWidth(screenWidth * (percentVal / 100.0));
+                setWidth(canvasWidth * (percentVal / 100.0));
             }
             else
             {
@@ -1807,18 +1808,13 @@ abstract public class BaseWidget implements Widget
                 str = str.replace("%A", "");
                 str = str.replace("%", "");
                 double percentVal = Double.parseDouble(str);
-                double screenHeight = CONFIG.getHeight();
-                if (0 == screenHeight)
+                double canvasHeight = CONFIG.getCanvasHeight();
+                if (0 == canvasHeight)
                 {
                     Rectangle2D visualBounds = CONFIG.getPrimaryScreen().getVisualBounds();
-                    screenHeight = (int) visualBounds.getHeight();
+                    canvasHeight = (int) visualBounds.getHeight();
                 }
-                /**
-                 * ** Big ugly HACK!!, don't know how to calculate how much
-                 * screen space the menu and tab bars use. With default fonts
-                 * and such it's 76 *
-                 */
-                setHeight((screenHeight - 76) * (percentVal / 100.0));
+                setHeight(canvasHeight * (percentVal / 100.0));
             }
             else
             {
