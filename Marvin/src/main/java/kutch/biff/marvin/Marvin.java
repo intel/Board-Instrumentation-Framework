@@ -64,21 +64,16 @@ import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
 import kutch.biff.marvin.utility.MarvinLocalData;
 import java.util.Set;
-import static java.lang.Math.abs;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
-import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import kutch.biff.marvin.widget.Widget;
-import static java.lang.Math.abs;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ScrollPane;
-import static java.lang.Math.abs;
 import static java.lang.Math.abs;
 
 /**

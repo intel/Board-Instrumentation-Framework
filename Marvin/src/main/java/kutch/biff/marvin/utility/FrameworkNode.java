@@ -752,7 +752,14 @@ public class FrameworkNode
             }
             else
             {
-                retString += Double.toString(NewVal);
+                if (NewVal == Math.floor(NewVal) && !Double.isInfinite(NewVal))
+                { // if zeor's behind decimal, turn into an int.
+                    retString += Integer.toString((int)NewVal);
+                }
+                else
+                {
+                    retString += Double.toString(NewVal);
+                }
             }
             retString += strData.substring(CloseParenIndex + 1);
         }
