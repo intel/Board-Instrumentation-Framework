@@ -75,6 +75,7 @@ import kutch.biff.marvin.widget.Widget;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ScrollPane;
 import static java.lang.Math.abs;
+import static java.lang.Math.abs;
 
 /**
  *

@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 /**
  * This is a wrapper class for the XML Node object. It allows case non-sensitve

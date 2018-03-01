@@ -40,6 +40,7 @@ import kutch.biff.marvin.widget.dynamicgrid.DynamicGrid;
 import kutch.biff.marvin.widget.dynamicgrid.DynamicTransition;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
+import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
 
 /**
  *

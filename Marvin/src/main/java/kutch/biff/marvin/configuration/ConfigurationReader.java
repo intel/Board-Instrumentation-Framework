@@ -166,6 +166,7 @@ public class ConfigurationReader
             return null;
         }
 
+        AliasMgr.getAliasMgr().ClearAll(); // nuke anything already read, will start fresh
         return _Configuration;
     }
 
@@ -422,6 +423,7 @@ public class ConfigurationReader
         boolean NetworkSettingsRead = false;
         FrameworkNode baseNode = new FrameworkNode(appStuff.item(0));
         FetchDimenstions(baseNode);
+        
         AliasMgr.getAliasMgr().addMarvinInfo();
         AliasMgr.ReadAliasFromRootDocument(doc);
         ReadAppAttributes(baseNode);

@@ -68,6 +68,12 @@ public class AliasMgr
     private AliasMgr()
     {
         _AliasList = new ArrayList<>();
+        ClearAll();
+    }
+
+    public void ClearAll()
+    {
+        _AliasList.clear();
         PushAliasList(true);
         randomVal = 1;
         AddAlias("RandomVal", Integer.toString(randomVal));
@@ -75,7 +81,6 @@ public class AliasMgr
         PushAliasList(true);
         AddEnvironmentVars();
     }
-
     /**
      * Fetches the string associated with the alias if exists, else null
      *
@@ -158,10 +163,6 @@ public class AliasMgr
             })
     public void AddAlias(String Alias, String Value)
     {
-        if (Alias.equalsIgnoreCase("canvas_width"))
-        {
-            LOGGER.severe("Attempted to set an ALIAS ID to NULL");
-        }
         if (null == Alias)
         {
             LOGGER.severe("Attempted to set an ALIAS ID to NULL");
