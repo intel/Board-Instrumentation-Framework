@@ -1,5 +1,6 @@
 Release 18.02
 Log warning when a grid grows beyond specified bounds (if you in fact specify)
+Added optional precision to marvinmath
 
 Release 18.01
 Added GridMacro capability to Marvin.

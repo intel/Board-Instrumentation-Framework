@@ -24,6 +24,7 @@ package kutch.biff.marvin.utility;
 import java.io.File;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,22 +63,23 @@ public class FrameworkNode
             return "";
         }
         String strAttributes = "";
-        
+
         for (int index = 0; index < _node.getAttributes().getLength(); index++)
         {
             Node attribute = _node.getAttributes().item(index);
             if (attribute.getNodeName().equalsIgnoreCase("File") || attribute.getNodeName().equalsIgnoreCase("Source"))
             {
-                strAttributes = attribute.getNodeName() + "=\"" + getAttribute(attribute.getNodeName()) +"\" " + strAttributes;
+                strAttributes = attribute.getNodeName() + "=\"" + getAttribute(attribute.getNodeName()) + "\" " + strAttributes;
             }
             else
             {
-                strAttributes += attribute.getNodeName() + "=\"" + getAttribute(attribute.getNodeName()) +"\" ";
+                strAttributes += attribute.getNodeName() + "=\"" + getAttribute(attribute.getNodeName()) + "\" ";
             }
-        
+
         }
         return strAttributes;
     }
+
     public boolean hasAttributes()
     {
         return _node.hasAttributes();
@@ -658,7 +660,7 @@ public class FrameworkNode
         else if (CloseParenIndex > 0)
         {
             String OperationSet[] = strData.substring(OutterIndex + "MarvinMath(".length(), CloseParenIndex).split(",");
-            if (3 != OperationSet.length)
+            if (3 != OperationSet.length && 4 != OperationSet.length)
             {
                 LOGGER.warning("Something looks like a MarvinMath but is not correctly formed: " + strData);
                 return strData;
@@ -682,11 +684,11 @@ public class FrameworkNode
             {
                 NewVal = val1 + val2;
             }
-            else if (Operator.equalsIgnoreCase("Subtract") || Operator.equalsIgnoreCase("-") ||  Operator.equalsIgnoreCase("sib"))
+            else if (Operator.equalsIgnoreCase("Subtract") || Operator.equalsIgnoreCase("-") || Operator.equalsIgnoreCase("sib"))
             {
                 NewVal = val1 - val2;
             }
-            else if (Operator.equalsIgnoreCase("Multiply") || Operator.equalsIgnoreCase("*")|| Operator.equalsIgnoreCase("mul"))
+            else if (Operator.equalsIgnoreCase("Multiply") || Operator.equalsIgnoreCase("*") || Operator.equalsIgnoreCase("mul"))
             {
                 NewVal = val1 * val2;
             }
@@ -706,7 +708,7 @@ public class FrameworkNode
             {
                 try
                 {
-                    NewVal = max(val1,val2);
+                    NewVal = max(val1, val2);
                 }
                 catch (Exception Ex)
                 {
@@ -718,7 +720,7 @@ public class FrameworkNode
             {
                 try
                 {
-                    NewVal = min(val1,val2);
+                    NewVal = min(val1, val2);
                 }
                 catch (Exception Ex)
                 {
@@ -733,8 +735,25 @@ public class FrameworkNode
             }
 
             retString = strData.substring(0, OutterIndex);
-            //retString += Integer.toString((int) NewVal);
-            retString += Double.toString(NewVal);
+            
+            if (4 == OperationSet.length)
+            { // they specified a precision
+                try
+                {
+                    Integer.parseInt(OperationSet[3]); // test if valid
+                    String fmtStr = "%." + OperationSet[3] + "f";
+                    retString += String.format(fmtStr,NewVal);
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.warning("Something looks like a MarvinMath but is not correctly formed: " + strData + " - precision appears to be invalid.");
+                    return strData;
+                }
+            }
+            else
+            {
+                retString += Double.toString(NewVal);
+            }
             retString += strData.substring(CloseParenIndex + 1);
         }
         else
@@ -839,7 +858,7 @@ public class FrameworkNode
     public static FrameworkNode Resolve(FrameworkNode origNode, String strCountAlias, String strValueAlias)
     {
         FrameworkNode parentNode = new FrameworkNode(origNode.GetNode().cloneNode(true)); // dup node to manipulate
-        
+
         String aliasList[] =
         {
             "CurrentValueAlias", "CurrentCountAlias", strCountAlias, strValueAlias
@@ -859,11 +878,11 @@ public class FrameworkNode
         // Add current count alias as an attribute = should then be available to grids and things withing a loop
         if (!parentNode.hasAttribute("CurrentValueAlias"))
         {
-            ((Element) parentNode.GetNode()).setAttribute("CurrentValueAlias", AliasMgr.getAliasMgr().GetAlias("CurrentValueAlias"));                    
+            ((Element) parentNode.GetNode()).setAttribute("CurrentValueAlias", AliasMgr.getAliasMgr().GetAlias("CurrentValueAlias"));
         }
         if (!parentNode.hasAttribute("CurrentCountAlias"))
         {
-            ((Element) parentNode.GetNode()).setAttribute("CurrentCountAlias", AliasMgr.getAliasMgr().GetAlias("CurrentCountAlias"));                    
+            ((Element) parentNode.GetNode()).setAttribute("CurrentCountAlias", AliasMgr.getAliasMgr().GetAlias("CurrentCountAlias"));
         }
 
         if (parentNode.hasChildren())
@@ -874,18 +893,18 @@ public class FrameworkNode
                 FrameworkNode newChild = Resolve(childNode, strCountAlias, strValueAlias);
                 nodeChildrenList.add(newChild.GetNode());
             }
-        
-            String newContent = ProcessLoopVars(parentNode.getTextContent(),aliasList);
-        
+
+            String newContent = ProcessLoopVars(parentNode.getTextContent(), aliasList);
+
             parentNode.removeAllChildren();
             parentNode._node.setTextContent(newContent);
-            
+
             for (Node childNode : nodeChildrenList)
             {
                 parentNode.GetNode().appendChild(childNode);
             }
         }
-        
+
         return parentNode;
     }
 
@@ -921,7 +940,7 @@ public class FrameworkNode
 
     public static void dumpTree(FrameworkNode doc)
     {
-        dumpTree(doc.GetNode(),"");
+        dumpTree(doc.GetNode(), "");
     }
 
     public static void dumpTree(Node doc)
