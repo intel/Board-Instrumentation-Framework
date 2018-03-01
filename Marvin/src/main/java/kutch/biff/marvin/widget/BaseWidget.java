@@ -519,12 +519,12 @@ abstract public class BaseWidget implements Widget
 
         return retStr.toString();
     }
-    
+
     protected double getAncestrialWidth()
     {
         double width = getWidth() * CONFIG.getScaleFactor();
         GridWidget currParent = _WidgetParentGridWidget;
-        
+
         if (width < 1 && currParent != null)
         {
             while (width == 0 && null != currParent)
@@ -538,18 +538,18 @@ abstract public class BaseWidget implements Widget
         }
         return width;
     }
-    
+
     public Dimension getConfiguredDimensions()
     {
         Dimension objDimension = new Dimension();
-        objDimension.setSize(getWidth() * CONFIG.getScaleFactor(),getHeight() * CONFIG.getScaleFactor());
+        objDimension.setSize(getWidth() * CONFIG.getScaleFactor(), getHeight() * CONFIG.getScaleFactor());
         return objDimension;
     }
-    
+
     public Dimension getRealDimensions()
     {
-        Double Height=0.0,Width=0.0;
-        
+        Double Height = 0.0, Width = 0.0;
+
         Dimension objDimension = new Dimension();
         if (null != getRegionObject())
         {
@@ -561,22 +561,22 @@ abstract public class BaseWidget implements Widget
             Width = getStylableObject().getBoundsInParent().getWidth();
             Height = getStylableObject().getBoundsInParent().getHeight();
             //getStylableObject().b
-            double pWidth =  getStylableObject().getParent().getBoundsInLocal().getWidth();
-            double pHeight =  getStylableObject().getParent().getBoundsInLocal().getHeight();
-            pWidth *=1;
+            double pWidth = getStylableObject().getParent().getBoundsInLocal().getWidth();
+            double pHeight = getStylableObject().getParent().getBoundsInLocal().getHeight();
+            pWidth *= 1;
         }
-        objDimension.setSize(Width,Height);
+        objDimension.setSize(Width, Height);
         return objDimension;
     }
 
     public boolean isOutsideConfiguredSize()
     {
-        double Height,Width;
-        
+        double Height, Width;
+
         Dimension visDim = getRealDimensions();
         Height = visDim.height;
         Width = visDim.width;
-        
+
         double configHeight = getAncestrialWidth();
 
         double wDelta = Width - (configHeight);
@@ -930,11 +930,19 @@ abstract public class BaseWidget implements Widget
         }
         else if (strPeek.equalsIgnoreCase("Pause"))
         {
-            _Paused = true;
+            if (false == _Paused)
+            {
+                _Paused = true;
+                OnPaused();
+            }
         }
         else if (strPeek.equalsIgnoreCase("Resume"))
         {
-            _Paused = false;
+            if (true == _Paused)
+            {
+                _Paused = false;
+                OnResumed();
+            }
         }
         else if (strPeek.equalsIgnoreCase("Select"))
         {
@@ -1828,4 +1836,15 @@ abstract public class BaseWidget implements Widget
         }
         return true;
     }
+
+    @Override
+    public void OnPaused()
+    {
+    }
+
+    @Override
+    public void OnResumed()
+    {
+    }
+
 }

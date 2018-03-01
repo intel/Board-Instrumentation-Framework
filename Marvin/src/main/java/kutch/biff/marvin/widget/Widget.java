@@ -44,6 +44,8 @@ public interface Widget
     public boolean PerformPostCreateActions(GridWidget objParentGrid,boolean flag);
     public void PrepareForAppShutdown();
     public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent);
+    public void OnPaused();
+    public void OnResumed();
 }
 
 

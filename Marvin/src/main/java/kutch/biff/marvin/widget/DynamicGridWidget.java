@@ -50,6 +50,7 @@ import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
  */
 public class DynamicGridWidget extends GridWidget
 {
+
     private final HashMap<String, DynamicGrid> _GridMap;
     private final HashMap<String, String> _TaskOnGridActivatekMap;
     private final CircularList<String> _ListID;
@@ -80,8 +81,8 @@ public class DynamicGridWidget extends GridWidget
     public boolean Create(GridPane parentPane, DataManager dataMgr)
     {
         setTaskID(null);
-        setMouseHasBeenSetup( true); // don't want a task setup for this actual dyanmic grid, but if one is 
-                                     // specified, all the contined grids will have that task
+        setMouseHasBeenSetup(true); // don't want a task setup for this actual dyanmic grid, but if one is 
+        // specified, all the contined grids will have that task
         if (super.Create(parentPane, dataMgr))
         {
             _TransitionPane = getGridPane(); // _ParentPane is used in 
@@ -253,7 +254,7 @@ public class DynamicGridWidget extends GridWidget
     }
 
     @Override
-    public boolean PerformPostCreateActions(GridWidget objParentGrid,boolean updateToolTipOnly)
+    public boolean PerformPostCreateActions(GridWidget objParentGrid, boolean updateToolTipOnly)
     {
         if (true == updateToolTipOnly)
         {
@@ -266,9 +267,9 @@ public class DynamicGridWidget extends GridWidget
                 HandleToolTipInit();
                 Tooltip.install(this.getStylableObject(), _objToolTip);
             }
-            return super.PerformPostCreateActions(objParentGrid,updateToolTipOnly);
+            return super.PerformPostCreateActions(objParentGrid, updateToolTipOnly);
         }
-        
+
         _WidgetParentGridWidget = objParentGrid;
         if (CONFIG.isDebugMode())
         {
@@ -283,7 +284,7 @@ public class DynamicGridWidget extends GridWidget
                 Tooltip.install(objGrid.getStylableObject(), _objToolTip);
             }
         }
-        super.PerformPostCreateActions(objParentGrid,updateToolTipOnly);
+        super.PerformPostCreateActions(objParentGrid, updateToolTipOnly);
 
         return handlePercentageDimentions();
     }
@@ -492,4 +493,28 @@ public class DynamicGridWidget extends GridWidget
         return retWidget;
     }
 
+    @Override
+    public void OnResumed()
+    {
+        if (_AutoAdvance)
+        {
+            if (null == getMinionID() || null == getNamespace())
+            {
+                String ID = Integer.toBinaryString(DynamicGridWidget._AutoAdvanceGridNumber);
+                DynamicGridWidget._AutoAdvanceGridNumber++;
+
+                if (null == getMinionID())
+                {
+                    setMinionID(ID);
+                }
+                if (null == getNamespace())
+                {
+                    setNamespace(ID);
+                }
+            }
+            MarvinTask mt = new MarvinTask();
+            mt.AddDataset(getMinionID(), getNamespace(), "Next");
+            TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
+        }
+    }
 }

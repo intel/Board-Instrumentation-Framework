@@ -578,4 +578,28 @@ public class DynamicImageWidget extends StaticImageWidget
         return fRet;
     }
 
+    @Override
+    public void OnResumed()
+    {
+        if (_AutoAdvance)
+        {
+            if (null == getMinionID() || null == getNamespace())
+            {
+                String ID = Integer.toBinaryString(DynamicImageWidget._AutoAdvanceImageNumber);
+                DynamicImageWidget._AutoAdvanceImageNumber++;
+
+                if (null == getMinionID())
+                {
+                    setMinionID(ID);
+                }
+                if (null == getNamespace())
+                {
+                    setNamespace(ID);
+                }
+            }
+            MarvinTask mt = new MarvinTask();
+            mt.AddDataset(getMinionID(), getNamespace(), "Next");
+            TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
+        }
+    }
 }
