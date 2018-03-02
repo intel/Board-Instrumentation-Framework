@@ -76,6 +76,8 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.ScrollPane;
 import static java.lang.Math.abs;
 import static java.lang.Math.abs;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
 
 /**
  *
@@ -371,8 +373,7 @@ public class Marvin extends Application
             return 0;
         }
 
-        SimpleDoubleProperty complete = new SimpleDoubleProperty();
-        appConfig = _Config.ReadAppConfigFile(ConfigFilename, complete);
+        appConfig = _Config.ReadAppConfigFile(ConfigFilename);
 
         if (null != appConfig)
         {
@@ -555,7 +556,6 @@ public class Marvin extends Application
      *
      * @param basePlane
      */
-    
     private void SetupSizeCheckPane(GridPane basePlane)
     {
         _TestPane = new TabPane();
@@ -566,8 +566,8 @@ public class Marvin extends Application
 
         basePlane.add(_TestPane, 2, 2);
     }
-    
-/*
+
+    /*
     private void LoadApplication(Stage stage)
     {
         stage.setIconified(true);
@@ -649,7 +649,7 @@ public class Marvin extends Application
         FinishLoad(stage);
 
     }
-    */
+     */
     /// pop up quick simple tab,menu and style it, then grab the size of the window
     /// so we know the canvas dimenstions
     private void testAppSize(Stage stage)
@@ -661,9 +661,9 @@ public class Marvin extends Application
         _Config = new ConfigurationReader();
         final Configuration basicConfig = _Config.ReadStartupInfo(ConfigFilename);
 
-        stage.setX(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX());
-        stage.setY(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY());
-        
+        stage.setX(basicConfig.getPrimaryScreen().getVisualBounds().getMinX());
+        stage.setY(basicConfig.getPrimaryScreen().getVisualBounds().getMinY());
+
         TabPane tabPane = new TabPane();
         Tab objTab = new Tab();
         final Side tabSide = basicConfig.getSide();
@@ -676,7 +676,7 @@ public class Marvin extends Application
             tabPane.setSide(Side.LEFT);
         }
         objTab.setText("");
-        
+
         tabPane.getTabs().add(objTab);
         stagePane.add(tabPane, 0, 1);
 
@@ -698,7 +698,6 @@ public class Marvin extends Application
             testScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
             testScrollPane.setContent(canvasPane);
             objTab.setContent(testScrollPane);
-
         }
         else
         {
@@ -709,7 +708,6 @@ public class Marvin extends Application
         Scene scene = new Scene(stagePane);
         stage.setScene(scene);
         SetAppStyle(scene.getStylesheets());
-        stage.setMaximized(true);
         stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>()
                       {
                           @Override
@@ -721,22 +719,22 @@ public class Marvin extends Application
                                   public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight)
                                   {
                                       scene.heightProperty().removeListener(this);
-                                      Point2D canvasInScene = canvasPane.localToScene(0.0,0.0);
+                                      Point2D canvasInScene = canvasPane.localToScene(0.0, 0.0);
                                       int cvHeight;
                                       int cvWidth;
                                       if (tabSide == Side.TOP || tabSide == Side.BOTTOM)
                                       {
-                                        cvHeight =  (int)(scene.getHeight() - canvasInScene.getY());
-                                        cvWidth = (int) scene.getWidth();
+                                          cvHeight = (int) (scene.getHeight() - canvasInScene.getY());
+                                          cvWidth = (int) scene.getWidth();
                                       }
                                       else
                                       {
-                                        cvHeight =  (int)(scene.getHeight() - canvasInScene.getY());
-                                        cvWidth = (int) (scene.getWidth() - canvasInScene.getX());
+                                          cvHeight = (int) (scene.getHeight() - canvasInScene.getY());
+                                          cvWidth = (int) (scene.getWidth() - canvasInScene.getX());
                                       }
                                       basicConfig.setCanvasWidth(cvWidth);
                                       basicConfig.setCanvasHeight(cvHeight);
-                                      
+
                                       stage.setIconified(true);
                                       Platform.runLater(new Runnable()
                                       {
@@ -746,48 +744,38 @@ public class Marvin extends Application
                                               FinishLoad(stage);
                                           }
                                       });
-
                                   }
                               });
                           }
                       });
 
         stage.show();
-    }
-/*
-    public void performRealLoad(Stage stage)
-    {
-        if (true == ShowHelp)
+        if (basicConfig.getWidth() > 0)
         {
-            DisplayHelp();
-            Platform.exit();
-            return;
+            stage.setWidth(basicConfig.getWidth());
+            stage.setHeight(basicConfig.getHeight());
         }
-
-        LoadApplication(stage);
-
+        else
+        {
+            stage.setMaximized(true);
+        }
     }
-    */
+
+
 
     @Override
     public void start(Stage stage) throws Exception
     {
+        MySplash.getSplash().start(stage);
         testAppSize(stage);
     }
 
     public void FinishLoad(Stage stage)
     {
-
-        MySplash.getSplash().start(stage);
+        stage.setIconified(true);
 
         long elapsedTime = BeginLoadProcess();
         LOGGER.info("Time taken to load Configuration: " + Long.toString(elapsedTime) + "ms.");
-
-        if (!ShowSplash)
-        {
-            //ShowSplash = true;
-            MySplash.getSplash().stopSplash();
-        }
 
         if (null == this.appConfig)
         {
@@ -843,26 +831,9 @@ public class Marvin extends Application
         _Config.getConfiguration().getCurrentHeightProperty().bind(scene.heightProperty());
         _Config.getConfiguration().getCurrentWidthProperty().bind(scene.widthProperty());
         _objTabPane.prefWidthProperty().bind(scene.widthProperty());
-        //_objTabPane.setPrefWidth(800);
+        
         _objTabPane.prefHeightProperty().bind(scene.heightProperty());
 
-        // Wait for gui to render before starting up network connection
-        stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>()
-                      {
-                          @Override
-                          public void handle(WindowEvent window)
-                          {
-                              Platform.runLater(new Runnable()
-                              {
-                                  @Override
-                                  public void run()
-                                  {
-                                      BeginServerEtc();
-                                      _Splash.appVisible();
-                                  }
-                              });
-                          }
-                      });
 
         SetAppStyle(scene.getStylesheets());
 
@@ -922,14 +893,16 @@ public class Marvin extends Application
                     return;
                 }
 
-                if (!Showing)
-                {
+                if (!Showing && _Splash.isSplashClosed())
+                { // will only happen once
                     try
                     {
                         Showing = true;
-                        stage.show();
+
                         Thread.currentThread().setName("Animation Timer Thread");
                         SetupDebugToolTips();
+                        BeginServerEtc();
+                        _Splash.appVisible();
                     }
                     catch (Exception e)
                     {
@@ -990,8 +963,6 @@ public class Marvin extends Application
 
         stage.setX(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX());
         stage.setY(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY());
-
-        stage.setMaximized(true);
     }
 
     private void BeginServerEtc()

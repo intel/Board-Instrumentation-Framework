@@ -60,15 +60,20 @@ public class MySplash
     AnimationTimer _splashAnimationTimer;
     double startTimerTime;
     private String strAltSplash;
-    double TimerInterval = 5000;
+    double TimerInterval = 3000;
     public boolean _appVisible;
     Rectangle2D AppVisualBounds = null;
+    private boolean _SplashClosed = true;
 
     static public MySplash getSplash()
     {
         return _Splash;
     }
 
+    public boolean isSplashClosed()
+    {
+        return _SplashClosed;
+    }
     public MySplash(boolean show, String alternateSplashImage)
     {
         _Splash = this;
@@ -145,8 +150,6 @@ public class MySplash
         {
             return;
         }
-        //return;
-        //parentStage.setIconified(true);
 
         _Stage = new Stage();
         
@@ -157,8 +160,10 @@ public class MySplash
         showSplash(_Stage);
         
        _Stage.show();
+       
 
         startTimerTime = 0;
+
         _splashAnimationTimer = new AnimationTimer() // can't update the Widgets outside of GUI thread, so this is a little worker to do so
         {
             @Override
@@ -168,27 +173,29 @@ public class MySplash
                 {
                     if (Configuration.getConfig().isPrimaryScreenDetermined())
                     {
-                        AppVisualBounds = Configuration.getConfig().getPrimaryScreen().getVisualBounds();
-                        _Stage.setX(AppVisualBounds.getMinX() + Configuration.getConfig().getWidth()/2 - _Stage.getWidth()/2);
-                        _Stage.setY(AppVisualBounds.getMinY() + Configuration.getConfig().getHeight()/2- _Stage.getHeight()/2);
+                       AppVisualBounds = Configuration.getConfig().getPrimaryScreen().getVisualBounds();
+                       _Stage.setX(AppVisualBounds.getMinX() + Configuration.getConfig().getWidth()/2 - _Stage.getWidth()/2);
+                       _Stage.setY(AppVisualBounds.getMinY() + Configuration.getConfig().getHeight()/2- _Stage.getHeight()/2);
                     }
-                    
+                    return;
                 }
+                   
                 if (0 == startTimerTime)
                 {
                     startTimerTime = System.currentTimeMillis();
                     Thread.currentThread().setName("Splash Screen Animation Timer Thread");
+                    return;
                 }
-                if (_appVisible && System.currentTimeMillis() >= startTimerTime + TimerInterval)
+                
+                if (System.currentTimeMillis() >= startTimerTime + TimerInterval)
                 {
-                    stopSplash();
-            //        parentStage.setIconified(false);
                     _splashAnimationTimer.stop();
-
+                    stopSplash();
+                    
                     if (true == Configuration.getConfig().getKioskMode())
                     {
-          //              parentStage.setResizable(false);
                     }
+                    return;
                 }
                 try
                 {
@@ -200,7 +207,9 @@ public class MySplash
                 }
             }
         };
-
+        _SplashClosed = false;
+       //startTimerTime = System.currentTimeMillis();
+        
         _splashAnimationTimer.start();
     }
 
@@ -212,8 +221,8 @@ public class MySplash
         initStage.setScene(splashScene);
 
         initStage.centerOnScreen();
+        initStage.setAlwaysOnTop(true);
         initStage.show();
-        //LOGGER.info("****************************************************************");
     }
     
     public void stopSplash()
@@ -222,69 +231,8 @@ public class MySplash
         {
             return;
         }        
+        _SplashClosed = true;
         TimerInterval = 0;
        _Stage.close();
     }
-//
-//    public int CalculateLoadItems(String filename)
-//    {
-//        Node doc = ConfigurationReader.OpenXMLFileQuietly(filename);
-//        WidgetCount = DetermineNumberOfNodes(doc);
-//        return WidgetCount;
-//    }
-//
-//    private int DetermineNumberOfNodes(Node topNode)
-//    {
-//        if (null == topNode)
-//        {
-//            return 0;
-//        }
-//        NodeList Children = topNode.getChildNodes();
-//        int iCount = 0;
-//
-//        for (int iLoop = 0; iLoop < Children.getLength(); iLoop++)
-//        {
-//            Node node = Children.item(iLoop);
-//
-//            if (node.getNodeName().equalsIgnoreCase("Widget")) // root
-//            {
-//                if (false == isFlip(node))
-//                {
-//                    iCount++;
-//                }
-//                else
-//                {
-//                    iCount += DetermineNumberOfNodes(node);
-//                }
-//            }
-//            else if (node.getNodeName().equalsIgnoreCase("Grid") || node.getNodeName().equalsIgnoreCase("Tab"))
-//            {
-//                Element elem = (Element) node;
-//                if (elem.hasAttribute("File"))
-//                {
-//                    iCount += CalculateLoadItems(elem.getAttribute("File"));
-//                }
-//                iCount += DetermineNumberOfNodes(node);
-//            }
-//            else if (node.hasChildNodes())
-//            {
-//                iCount += DetermineNumberOfNodes(node);
-//            }
-//        }
-//        return iCount;
-//    }
-
-//    private boolean isFlip(Node topNode)
-//    {
-//        NodeList Children = topNode.getChildNodes();
-//        for (int iLoop = 0; iLoop < Children.getLength(); iLoop++)
-//        {
-//            Node node = Children.item(iLoop);
-//            if (node.getNodeName().equalsIgnoreCase("Front")) // root
-//            {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 }

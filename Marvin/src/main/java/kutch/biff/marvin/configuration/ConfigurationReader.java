@@ -170,7 +170,7 @@ public class ConfigurationReader
         return _Configuration;
     }
 
-    public Configuration ReadAppConfigFile(String filename, DoubleProperty completeness)
+    public Configuration ReadAppConfigFile(String filename)
     {
         Document doc = OpenXMLFile(filename);
         if (null != doc)
