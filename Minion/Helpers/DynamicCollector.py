@@ -329,7 +329,6 @@ class DynamicCollector(Collector.Collector):
         objCollector = self._NamespaceObject.GetCollector(collectorID)
 
         if None == objCollector:
-            #objCollector = self.__createCollector(collectorID)
             Log.getLogger().error("User defined DynamicCollector tried to Set a value to a collector that does not exist, with ID: " + collectorID)
             return False
 
