@@ -1,4 +1,7 @@
 Release 18.01
+Added AlwaysCollect flag option to groups
+
+Release 18.01
 Added WORKING_DIR alias
 
 Release 17.05

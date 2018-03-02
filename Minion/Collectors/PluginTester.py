@@ -63,9 +63,10 @@ def CollectFunction(frameworkInterface,numOfItems):
         frameworkInterface.SetCollectorValue(collectorID,dataMap[collectorID]) 
 
     while not frameworkInterface.KillThreadSignalled():
-        UpdateList(dataMap)
-        for collectorID in dataMap:
-            frameworkInterface.SetCollectorValue(collectorID,dataMap[collectorID]) 
+        updatedCount = UpdateList(dataMap)
+        if updatedCount > 0:
+            for collectorID in dataMap:
+                frameworkInterface.SetCollectorValue(collectorID,dataMap[collectorID]) 
 
         time.sleep(sleepTime/1000)
 

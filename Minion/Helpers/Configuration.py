@@ -801,6 +801,11 @@ class Configuration():
             if strBool.lower() == "true" :
                 objGroup._DoNotSend = True
 
+        if "AlwaysCollect" in attributes.keys():  #  Collect, but do not send
+            strBool = Alias.Alias(attributes["AlwaysCollect"].nodeValue)
+            if strBool.lower() == "false" :
+                objGroup._ForceCollectionEvenIfNoUpdate = False
+
         for node in groupNode.childNodes:
             if node.nodeName.lower() == "#text":
                 continue # don't care

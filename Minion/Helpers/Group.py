@@ -32,6 +32,7 @@ class Group(Collector.Collector):
         Collector.Collector.__init__(self,objNamespace,"Group:" + str(Group.ID))
         Group.ID += 1
         self._CollectorList = []
+        self._ForceCollectionEvenIfNoUpdate=True
 
     def AddCollector(self,objCollector,beforeID=None):
         if True == self._NamespaceObject.AddCollector(objCollector,beforeID):
@@ -48,19 +49,22 @@ class Group(Collector.Collector):
         return False
 
     def PerformCollection(self):
-
         #Get collected time after collection, can't be sure each collection take same amount of time
         currMS = Time.GetCurrMS()
         elapsedTime = currMS - self._LastCollectionTime
         self._LastCollectionTime = currMS 
 
-        retValue = "<MinionGroup>"
+        retValue = None
+        collectedGroupData=""
         for collector in self._CollectorList:
-            returnVal = collector.PerformCollection()
-            if None != returnVal:
-                retValue += returnVal
+            id = collector.GetID()
+            if self._ForceCollectionEvenIfNoUpdate or collector.NeedsCollecting(): # by default a group ALWAYS collects, but can override that with AlwaysCollect="False" as group attribute
+                collectorData = collector.PerformCollection()
+                if None != collectorData:
+                    collectedGroupData += collectorData
 
-        retValue +="</MinionGroup>"
+        if len(collectedGroupData) > 1:
+            retValue ="<MinionGroup>" + collectedGroupData + "</MinionGroup>"
 
         if self._RefreshRequested:
             self._RefreshRequested = False
