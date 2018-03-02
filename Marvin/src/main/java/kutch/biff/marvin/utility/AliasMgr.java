@@ -71,7 +71,7 @@ public class AliasMgr
         ClearAll();
     }
 
-    public void ClearAll()
+    public final void ClearAll()
     {
         _AliasList.clear();
         PushAliasList(true);
