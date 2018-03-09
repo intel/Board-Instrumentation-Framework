@@ -22,6 +22,7 @@ import pickle
 import sys
 from Helpers import Log
 from Data import MarvinData
+from Data import MarvinGroupData
 from Util import Time
 from Util import Sleep
 from Util import Utility
@@ -365,6 +366,25 @@ class Playback(object):
         except ValueError:
             return False
 
+    def AddToMapList(self,map,node):
+        key = node.Namespace + node.ID
+        if len(key) > 1:
+            try:
+                list = map[key]
+                list.append(node)
+            except Exception: #didn't exist yet
+                list = []
+                list.append(node)
+                map[key] = list
+            return
+
+        elif isinstance(node,MarvinGroupData.MarvinDataGroup):
+            for datapoint in node._DataList:
+                self.AddToMapList(map,datapoint)
+        else:
+            Log.getLogger().error("Unknown item when trying to save to CSV: " + str(node))
+
+
     def WriteCSVFile(self,filename,interval):
         dict = {}
         timeInterval = interval * 1000 #secs to ms
@@ -376,14 +396,7 @@ class Playback(object):
 
 
             for Node in entries: # create a dictionary of each namespace+entity, then a list of values for each
-                key = Node.Namespace + Node.ID
-                try:
-                    list = dict[key]
-                    list.append(Node)
-                except Exception: #didn't exist yet
-                    list = []
-                    list.append(Node)
-                    dict[key] = list
+                self.AddToMapList(dict,Node)
 
             #Sort the dictionary so it looks better in the file
             sortedDictionary = collections.OrderedDict(sorted(dict.items()))
