@@ -30,6 +30,8 @@ from Helpers import Statistics
 from Data import ConnectionPoint
 import tkinter.messagebox
 import tkinter.filedialog
+import ntpath
+import os
 import tkinter.simpledialog
 from Helpers import Playback
 from Util import Time
@@ -351,7 +353,8 @@ class LiveControls():
             if False == response:
                return
         GuiMgr.OnStartLiveData()
-        GuiMgr.SetTitle("")
+        GuiMgr.SetPlaybackFilename("")
+        #GuiMgr.SetTitle("")
 
     def onLiveStopBtn(self):
         GuiMgr.OnStopLiveData()
@@ -597,7 +600,7 @@ class PlaybackControls():
             endTime = "0"
 
         strVal = currTime  + "/" + endTime + " secs"
-        self.lblPlaybackTime.config(text=strVal) #kutta
+        self.lblPlaybackTime.config(text=strVal) 
 
     def updateGui(self):
         playbackMgr = Playback.get()
@@ -807,7 +810,8 @@ class MenuSystem():
                GuiMgr.MessageBox_Error("Python Error","Error loading file: " + filename)
 
         self._PreviousFileMenuStatus = None
-        GuiMgr.SetTitle("- {"+filename+"}")
+        GuiMgr.SetPlaybackFilename(filename)
+        #GuiMgr.SetTitle("- {"+filename+"}")
 
 
     def HandleSave(self):
@@ -822,7 +826,8 @@ class MenuSystem():
             return
 
         GuiMgr.WriteToFile(filename)
-        GuiMgr.SetTitle("- {"+filename+"}")
+        GuiMgr.SetPlaybackFilename(filename)
+        #GuiMgr.SetTitle("- {"+filename+"}")
 
     def HandleSaveAsCSV(self):
         Interval = tkinter.simpledialog.askinteger("Interval","What time interval rate (seconds) to save data at?",parent=self.root,minvalue=1)
@@ -831,7 +836,15 @@ class MenuSystem():
 
         options = {}
         options['filetypes'] = [('Comma Separated Value File', '.csv')]
-        options['initialfile'] = 'oscar.csv'
+        strInitFile = "oscar"
+        pbFilename = GuiMgr.GetPlaybackFilename()
+        if pbFilename != None and len(pbFilename) > 1:
+            try:
+                strInitFile, ext = os.path.splitext(ntpath.basename(pbFilename))
+            except:
+                pass
+         
+        options['initialfile'] = strInitFile
         options['defaultextension'] = '.csv'
         options['parent'] = self.root
        

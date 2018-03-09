@@ -295,7 +295,6 @@ class Playback(object):
         if not Recorder.get().HasBeenSaved():
             Recorder.get().OnSaved()
 
-
     def ReadFromFile(self,filename):
         from Helpers import GuiMgr
         

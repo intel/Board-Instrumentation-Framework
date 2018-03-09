@@ -82,6 +82,13 @@ def Quit():
 def SetTitle(titleStr):
     GuiMgr.get().SetTitle(titleStr)
 
+def SetPlaybackFilename(filename):
+    GuiMgr.get().SetPlaybackFilename(filename)
+
+def GetPlaybackFilename():
+    return GuiMgr.get().GetPlaybackFilename()
+
+
 def OnSetRepeatMode(mode,startLoc=0,endLoc=None):
     GuiMgr.get().OnSetRepeatMode(mode,startLoc,endLoc)
 
@@ -122,6 +129,7 @@ class GuiMgr(object):
         self.Playback_Playing=False
         self.Playback_Stopped=False
         self.Playback_Paused=False
+        self.Playback_File=None
 
     def Init(self,whichUI,downstreamServer,upstreamServer):
         self.pGui = None
@@ -136,8 +144,19 @@ class GuiMgr(object):
         self._upstreamServer = upstreamServer
 
 
+    def SetPlaybackFilename(self,filename):
+        self.Playback_File = filename
+        if None == filename or len(filename) <1:
+            self.SetTitle("")
+        else:
+            self.SetTitle("- {"+filename+"}")
+
+    def GetPlaybackFilename(self):
+        return self.Playback_File
+
     def Start(self):
-        self.SetTitle("")
+        self.SetPlaybackFilename("")
+        #self.SetTitle("")
         self.pGui.OnStart()
 
     def Quit(self):
@@ -281,7 +300,6 @@ class GuiMgr(object):
     def WriteToFile(self,filename):
         if Playback.get().WriteToFile(filename):
             Recorder.get().OnSaved()
-            
         
     def WriteCSVFile(self,filename,interval):
         Playback.get().WriteCSVFile(filename,interval)
