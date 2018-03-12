@@ -65,7 +65,9 @@ class ServerUDP():
         self.m_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         try:
             self.m_socket.bind((self.getIP(),self.getPort()))
-            self.m_socket.setblocking(0)
+            self.m_socket.setblocking(True)
+            self.m_socket.settimeout(0.01)
+
         except Exception:
             Log.getLogger().error("Invalid Socket IP or Port " + str(self))
             return False
@@ -114,8 +116,8 @@ class ServerUDP():
                 self.m_rxPackets +=1
                 self.m_rxBytes += len(data)
 
-            except socket.error:
-                time.sleep(.01) #no data, so sleep for 10ms
+            except: # socket.error:
+                #time.sleep(.01) #no data, so sleep for 10ms
           #      iCount = 0
                 continue
 

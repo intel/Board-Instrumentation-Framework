@@ -56,7 +56,8 @@ class ServerUDP(ConnectionPoint.ConnectionPoint):
         self.m_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         try:
             self.m_socket.bind((self.getIP(),self.getPort()))
-            self.m_socket.setblocking(0)
+            self.m_socket.setblocking(True)
+            self.m_socket.settimeout(0.001)
         except Exception as ex:
             Log.getLogger().error("Invalid Socket IP or Port " + str(self) +" - " + str(ex))
             return False
@@ -86,8 +87,6 @@ class ServerUDP(ConnectionPoint.ConnectionPoint):
         self.m_DropPackets = flag
         self.m_objLock.release()
 
-
-
     def __DropPackets(self):
         self.m_objLock.acquire()
         retVal = self.m_DropPackets
@@ -108,8 +107,8 @@ class ServerUDP(ConnectionPoint.ConnectionPoint):
                     self.m_rxPackets +=1
                     self.m_rxBytes += len(data)
 
-                except socket.error:
-                    time.sleep(.01) #no data, so sleep for 10ms
+                except:# socket.error:
+                    #time.sleep(.01) #no data, so sleep for 10ms
                     continue
 
                 if not fnKillSignalled():

@@ -295,7 +295,9 @@ class Reader(object):
         self._sock = socket.socket(family, socktype, proto)
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._sock.bind(sockaddr)
-        self._sock.setblocking(0) # PK - Adding not blocking,so thread can end with app.
+        self._sock.setblocking(True)
+        self._sock.settimeout(0.01)
+
 
         if multicast:
             if hasattr(socket, "SO_REUSEPORT"):
@@ -432,7 +434,7 @@ def GatherInfoForSetup(IP, Port,timeToSnoop):
             data = myReader.decode()
 
         except socket.error:
-            time.sleep(.01) #no data, so sleep for 10ms
+            #time.sleep(.01) #no data, so sleep for 10ms
             continue
             
         if data != None:

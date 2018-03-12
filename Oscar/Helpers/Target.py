@@ -54,7 +54,7 @@ class Target(ConnectionPoint.ConnectionPoint):
 
         try:
             self.m_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM,socket.IPPROTO_UDP)
-            self.m_socket.setblocking(False)
+            self.m_socket.setblocking(True)
             self.m_socket.settimeout(0.001)
 
         except Exception as ex:
