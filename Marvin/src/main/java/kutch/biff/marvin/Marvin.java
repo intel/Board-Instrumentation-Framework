@@ -362,7 +362,6 @@ public class Marvin extends Application
     private long BeginLoadProcess()
     {
         long start = System.currentTimeMillis();
-        _DataMgr = new DataManager();
         if (null == _Config)
         {
             _Config = new ConfigurationReader();
@@ -373,6 +372,7 @@ public class Marvin extends Application
             return 0;
         }
 
+        TASKMAN.setDataMgr(_DataMgr); // kludgy I know, I know.  I hang my head in shame
         appConfig = _Config.ReadAppConfigFile(ConfigFilename);
 
         if (null != appConfig)
@@ -382,7 +382,6 @@ public class Marvin extends Application
                 AliasMgr.getAliasMgr().DumpTop();
             }
 
-            TASKMAN.setDataMgr(_DataMgr); // kludgy I know, I know.  I hang my head in shame
             _receiveServer = new Server(_DataMgr);
         }
         return System.currentTimeMillis() - start;
@@ -766,6 +765,8 @@ public class Marvin extends Application
     @Override
     public void start(Stage stage) throws Exception
     {
+        _DataMgr = new DataManager();
+
         MySplash.getSplash().start(stage);
         testAppSize(stage);
     }

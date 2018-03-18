@@ -1449,6 +1449,44 @@ abstract public class BaseWidget implements Widget
         }
     }
 
+    protected EventHandler<MouseEvent> SetupMouseEnteredTask()
+    {
+        if (null == getTaskID() || true == CONFIG.getAllowTasks())
+        {
+            return null;
+        }
+        BaseWidget objWidget = this;
+        EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>()
+        {
+            @Override
+            public void handle(MouseEvent event)
+            {
+                TASKMAN.PerformTask(getTaskID());
+            }
+        };
+        getStylableObject().setOnMouseEntered(eh);
+        return eh;
+    }
+    
+    protected EventHandler<MouseEvent> SetupMouseExitedTask()
+    {
+        if (null == getTaskID() || true == CONFIG.getAllowTasks())
+        {
+            return null;
+        }
+        BaseWidget objWidget = this;
+        EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>()
+        {
+            @Override
+            public void handle(MouseEvent event)
+            {
+                TASKMAN.PerformTask(getTaskID());
+            }
+        };
+        getStylableObject().setOnMouseExited(eh);
+        return eh;
+    }    
+
     public EventHandler<MouseEvent> SetupTaskAction()
     {
         if (false == _MouseHasBeenSetup) // quick hack, as I call this from MOST widgets, but now want it from all.  Will eventually remove from individual widgets.
@@ -1469,7 +1507,6 @@ abstract public class BaseWidget implements Widget
                         {
                             if (null != getStylableObject())
                             {
-
                                 AddAdditionalStyleOverride(DebugStyles.GetNext());
                                 ApplyCSS();
                             }
