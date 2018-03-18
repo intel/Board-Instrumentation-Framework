@@ -26,7 +26,7 @@ from Util import Utility
 from Helpers import Log
 from Helpers import VersionMgr
 from Helpers import Configuration
-
+from Helpers import ThreadManager
 
 class UI():
     TKINTR = 0
@@ -160,6 +160,7 @@ class GuiMgr(object):
         self.pGui.OnStart()
 
     def Quit(self):
+        ThreadManager.GetThreadManager().StopAllThreads()
         self.pGui.OnQuit()
 
     def _SetupGuiNone(self):

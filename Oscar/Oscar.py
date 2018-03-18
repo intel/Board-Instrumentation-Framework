@@ -37,6 +37,7 @@ else:
     from Helpers import Watchdog
     from Helpers import GuiMgr
     from Helpers import VersionMgr
+    from Helpers import Playback
 
 
 def existFile(filename):
@@ -44,6 +45,31 @@ def existFile(filename):
         print("Specified file: " + str(filename) + " does not exist.")
         return False
     return True
+
+def performBatchConvert(filematch):
+    import os
+    import fnmatch
+
+    GuiMgr.Initialize(GuiMgr.UI.NONE,None,None)
+    #dir_path = os.path.dirname(os.path.realpath(filematch))
+    convertCount = 0
+    rel_path,filename = os.path.split(filematch)
+    if len(rel_path) < 1:
+        rel_path='.'
+    for file in os.listdir(rel_path):
+        if fnmatch.fnmatch(file, filename):
+            inputFilename = os.path.join(rel_path,file)
+            if Playback.get().ReadFromFile(inputFilename):
+                Playback.get().Clear()
+                baseName,ext = os.path.splitext(inputFilename)
+                csvFilename = baseName+".csv"
+                Playback.get().WriteCSVFile(csvFilename,1)
+                print("{0} --> {1}".format(inputFilename,csvFilename))
+                convertCount += 1
+    print("Converted {0} files".format(convertCount))
+    GuiMgr.Quit()
+   
+    
 
 def HandleCommandlineArguments():
     parser = argparse.ArgumentParser(description='Oscar the wonderful')
@@ -71,6 +97,7 @@ def HandleCommandlineArguments():
 
     parser.add_argument("-t","--time",help='specifies time (in minutes) to run before automatically exiting, used with Recording and Playback',type=int)
     parser.add_argument("-ng","--nogui",help='run without GUI',action="store_true")
+    parser.add_argument("-bc","--batchconvert",help="batch convert biff files to csv",type=str)
     
     try:    
         args = parser.parse_args()
@@ -85,6 +112,10 @@ def HandleCommandlineArguments():
 
     if True == _Verbose:
         Log.setLevel(logging.DEBUG)
+
+    if None != args.batchconvert:
+        performBatchConvert(args.batchconvert)
+        return False
 
     conf = Configuration.get()
 
