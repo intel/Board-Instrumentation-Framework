@@ -762,6 +762,10 @@ public class ConfigurationReader
         if (VerifyTabList(TabList))
         {
             _tabs = ReadTabs(doc, TabList);
+            if (null == _tabs)
+            {
+                return false;
+            }
         }
 
         if (false == NetworkSettingsRead)
