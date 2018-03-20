@@ -88,6 +88,7 @@ public class Configuration
     private Screen  _PrimaryScreen;
     private boolean _PrimaryScreenDetermined;
     private int _CanvasWidth,_CanvasHeight;
+    private boolean _RunInDebugger;
     
 
     public Configuration()
@@ -130,8 +131,20 @@ public class Configuration
         _EnableScrollBars = false;
         _OscarBullhornList = new ArrayList<>();
         _MarvinLocalDatafeed = false;
+        _RunInDebugger = false;
     }
 
+    public boolean isRunInDebugger()
+    {
+        return _RunInDebugger;
+    }
+
+    public void setRunInDebugger(boolean _RunInDebugger)
+    {
+        this._RunInDebugger = _RunInDebugger;
+    }
+
+    
     public int getCanvasWidth()
     {
         return _CanvasWidth;

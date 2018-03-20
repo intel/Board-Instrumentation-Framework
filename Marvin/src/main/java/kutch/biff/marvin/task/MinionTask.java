@@ -73,6 +73,7 @@ public class MinionTask extends BaseTask
     {
         String strNamespace = getDataValue(getNamespace());
         String strID = getDataValue(getID());
+        String strParamList = "";
         if (strID == null || strNamespace== null)
         {
             return;
@@ -94,12 +95,20 @@ public class MinionTask extends BaseTask
                 }
                 
                 sendBuffer+="<Param>" + strParam + "</Param>";
+                if (strParamList.length()==0)
+                {
+                    strParamList = strParam;
+                }
+                else
+                {
+                    strParamList += "," + strParam;
+                }
             }        
         }
 
         sendBuffer += "</Marvin>";
         
         TASKMAN.SendToAllOscars(sendBuffer.getBytes());
-        LOGGER.info("Sending Minion Task [" + getNamespace() + ":"+getID()+"]");
+        LOGGER.info("Sending Minion Task [" + getNamespace() + ":"+getID()+"] Params: " + strParamList);
     }
 }

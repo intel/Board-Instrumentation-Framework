@@ -113,6 +113,7 @@ public class Marvin extends Application
     private boolean ShowHelp = false;
     private boolean ShowVersion = false;
     private boolean ShowSplash = true;
+    private boolean RunInDebugger = false;
     private boolean dumpAlias = false;
     private boolean dumpWidgetInfo = false;
     private String altSplash = null;
@@ -152,7 +153,6 @@ public class Marvin extends Application
                         java.security.cert.X509Certificate[] certs, String authType)
                 {
                 }
-
             }
         };
 
@@ -280,6 +280,11 @@ public class Marvin extends Application
             {
                 ShowSplash = false;
             }
+            else if (param.equalsIgnoreCase("-db")) // don't show splash
+            {
+                RunInDebugger = true;
+            }
+            
             else if (param.equalsIgnoreCase("-nosplash")) // don't show splash
             {
                 ShowSplash = false;

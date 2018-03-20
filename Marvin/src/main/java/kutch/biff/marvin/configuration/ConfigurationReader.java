@@ -139,7 +139,6 @@ public class ConfigurationReader
         if (true == fReport)
         {
             LOGGER.severe("Missing file: " + filename);
-            JOptionPane.showMessageDialog(null, "Missing Configuration file: " + filename, "Configuration Error", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
