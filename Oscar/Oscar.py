@@ -60,12 +60,12 @@ def performBatchConvert(filematch):
         if fnmatch.fnmatch(file, filename):
             inputFilename = os.path.join(rel_path,file)
             if Playback.get().ReadFromFile(inputFilename):
-                Playback.get().Clear()
                 baseName,ext = os.path.splitext(inputFilename)
                 csvFilename = baseName+".csv"
                 Playback.get().WriteCSVFile(csvFilename,1)
                 print("{0} --> {1}".format(inputFilename,csvFilename))
                 convertCount += 1
+                Playback.get().Clear()
     print("Converted {0} files".format(convertCount))
     GuiMgr.Quit()
    

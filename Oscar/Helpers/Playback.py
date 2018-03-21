@@ -312,6 +312,10 @@ class Playback(object):
                 GuiMgr.MessageBox_Error("Error Loading File","The format of this file requires Python 3.4 or greater.")
                 return False
 
+            if len(entries) < 1:
+                Log.getLogger().error(filename+" does not appear to have any data in it. ")
+                return False 
+
             objEntry = entries[0]
 
             if hasattr(objEntry,'FormatVersion'):
