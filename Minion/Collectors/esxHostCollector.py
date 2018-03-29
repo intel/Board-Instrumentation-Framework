@@ -14,7 +14,9 @@
 #  limitations under the License.
 ##############################################################################
 #    File Abstract: 
-#    This attempts to get info from an ESXi host.
+#    This attempts to get info from an ESXi host.  
+#    This is VERY preliminary, and may not work on other systems other than the one
+#    I tested on. Will return to it at a later time to make more robust
 #
 ##############################################################################
 from __future__ import print_function

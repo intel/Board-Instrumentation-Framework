@@ -196,9 +196,30 @@ def CreateUtilizationList(interval=.1,precision=2,returnTuple=False):
 
     return writeData
 
+def GetSystemAverageCPU(interval=.1,precision=2):
+    interval=float(interval)
+    precision=float(precision)
+
+    cpuInfo = CPULoad(interval)  # use this cool script I found online
+    strPrecision = '.' + str(int(precision)) + 'f'
+    data = cpuInfo.getcpuload()
+    coreCount = len(data) -1
+
+    total = 0.0
+    for index in range(0,coreCount):
+        key = "cpu" + str(index)
+        cpuVal = str(format(data[key],strPrecision))
+        total += cpuVal
+
+    total = total/coreCount
+
+    return str(format(total,strPrecision))
+
+
+
 ## Dynamic Collector interface, gets all raw stats
 def CollectStatsFunction(frameworkInterface):
-    dataMap = ReadProcStats()
+    dataMap = ReadProcStats(interval=.1,precision=2)
 
     for collectorID in dataMap:
         if not frameworkInterface.DoesCollectorExist(collectorID):
