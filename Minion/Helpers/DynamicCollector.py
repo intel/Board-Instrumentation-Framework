@@ -218,6 +218,10 @@ class DynamicCollector(Collector.Collector):
         objCollector.GetElapsedTimeSinceLast = objCollector.GetElapsedTimeForDynamicWidget #remap the fn called
         objCollector.SetLastCollectionTime = objCollector.SetLastCollectionTimeForDynamicWidget
         objCollector.SetProcessThreadID(self.GetProcessThreadID())
+        if fromPlugin:
+            objCollector.DynamicSuffix=str(self)
+        else:
+            objCollector.DynamicSuffix=""
 
         if True == fromPlugin: # bit of a hack, only need this if from a plugin
             if len(self.__PrefixStr) > 0:
@@ -230,7 +234,7 @@ class DynamicCollector(Collector.Collector):
             objCollector.SetScaleValue(self.ScaleValue)
 
 
-        Log.getLogger().debug("Creating Dynamic Collector[" + str(DynamicCollector.__CollectorNumber) + "]: " + ID)
+        Log.getLogger().debug("Creating Dynamic Collector[" + str(DynamicCollector.__CollectorNumber) + "]: " + ID[:-len(objCollector.DynamicSuffix)])
         objCollector._DebugNum = DynamicCollector.__CollectorNumber
         DynamicCollector.__CollectorNumber += 1
 
@@ -308,16 +312,17 @@ class DynamicCollector(Collector.Collector):
         interface = UserPluginInterface(self)
         return interface
 
-    def CollectorExistsFromPlugin(self, collectorID):
-        objCollector = self._NamespaceObject.GetCollector(collectorID)
+    def CollectorExistsFromPlugin(self, collectorID): 
+        objCollector = self._NamespaceObject.GetCollector(collectorID+str(self))
         return not objCollector == None
 
     def AddCollectorFromPlugin(self, collectorID):
         if self.CollectorExistsFromPlugin(collectorID):
             Log.getLogger().error("User defined DynamicCollector tried to Add a collector with ID that already exists: " + collectorID)
             return False
-        
-        objCollector = self.__createCollector(collectorID,True)
+
+        objCollector = self.__createCollector(collectorID+str(self),True)
+        objCollector._OverrideID = self.__PrefixStr +  collectorID + self.__SuffixStr
 
         if objCollector == None:
             Log.getLogger().error("Error creating collector using User defined DynamicCollector ID: " + collectorID)
@@ -326,7 +331,7 @@ class DynamicCollector(Collector.Collector):
         return True
 
     def SetCollectorValueFromPlugin(self,collectorID,Value,elapsedTime=None):
-        objCollector = self._NamespaceObject.GetCollector(collectorID)
+        objCollector = self._NamespaceObject.GetCollector(collectorID+str(self))
 
         if None == objCollector:
             Log.getLogger().error("User defined DynamicCollector tried to Set a value to a collector that does not exist, with ID: " + collectorID)
