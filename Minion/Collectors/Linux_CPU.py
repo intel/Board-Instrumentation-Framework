@@ -208,13 +208,13 @@ def GetSystemAverageCPU(interval=.1,precision=2):
     total = 0.0
     for index in range(0,coreCount):
         key = "cpu" + str(index)
-        cpuVal = str(format(data[key],strPrecision))
+        cpuVal = data[key]
+        
         total += cpuVal
-
+    
     total = total/coreCount
-
+    
     return str(format(total,strPrecision))
-
 
 
 ## Dynamic Collector interface, gets all raw stats
