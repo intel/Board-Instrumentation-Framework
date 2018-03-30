@@ -19,11 +19,11 @@
 import random
 import time
 
-__Instance=0
+__Instance=1
 
 def CreateList(numberToCreate):
     global __Instance
-    __Instance+=1
+    #__Instance+=1
     thisInst = __Instance
     retMap={}
     for index in range(1,numberToCreate+1):
@@ -37,7 +37,7 @@ def UpdateList(dataMap):
     updatedCount=0    
     for key in dataMap:
         val = random.randrange(int(0),int(100))
-        if val > 95: # only update 5% of the time
+        if val > 50: # only update 50% of the time
             val = random.randrange(int(1),int(5000))
             dataMap[key] = str(val)
             updatedCount += 1
