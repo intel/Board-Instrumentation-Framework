@@ -88,6 +88,14 @@ public class Conditional
         _UsesThen = usesThen;
     }
     
+    protected String getThenTask()
+    {
+        return _If_Task;
+    }
+    protected String getElseTask()
+    {
+        return _Else_Task;
+    }
     public void SetNamespaceAndID(String namespace, String id)
     {
         _Value1_ID = id;
@@ -163,6 +171,11 @@ public class Conditional
         }
         return true;
     }
+    
+    protected Type getType()
+    {
+        return _type;
+    }
 
     public static Type GetType(String strType)
     {
@@ -217,21 +230,14 @@ public class Conditional
                                                  Perform(newVal.toString());
                                              }
                                          });
-        if (_Value2_ID != null && _Value2_Namespace != null)
-        {
-            DataManager.getDataManager().AddListener(_Value2_ID, _Value2_Namespace, new ChangeListener()
-                                         {
-                                             @Override
-                                             @SuppressWarnings("unchecked")
-                                             public void changed(ObservableValue o, Object oldVal, Object newVal)
-                                             {
-                                                 Perform(newVal.toString());
-                                             }
-                                         });
-        }
+    }
+    // used for compound conditionals only
+    protected String GetValue1()
+    {
+        return DataManager.getDataManager().GetValue(_Value1_ID, _Value1_Namespace);
     }
 
-    private String GetValue2()
+    protected String GetValue2()
     {
         if (_Value2_ID != null && _Value2_Namespace != null)
         {
@@ -243,6 +249,7 @@ public class Conditional
     public static boolean EvaluateConditional(String strValue1, String strValue2, Type Conditional, boolean isCaseSensitive)
     {
         boolean result;
+        
         try
         {
             result = PerformValue(Double.parseDouble(strValue1), Double.parseDouble(strValue2), Conditional);
@@ -254,12 +261,7 @@ public class Conditional
         return result;
     }
 
-    protected void Perform2(String Val2)  really think about this
-    {
-       String Val1 = DataManager.getDataManager().GetValue(_Value1_ID, _Value1_Namespace);
-       Perform(Val1);
-    }
-    
+   
     protected void Perform(String Val1)
     {
         String Val2 = GetValue2();
@@ -279,9 +281,9 @@ public class Conditional
         }
     }
 
-    private static boolean PerformString(String Val1, String Val2, Type testType, boolean isCaseSensitive)
+    protected static boolean PerformString(String Val1, String Val2, Type testType, boolean isCaseSensitive)
     {
-        if (isCaseSensitive)
+        if (!isCaseSensitive)
         {
             Val1 = Val1.toLowerCase();
             Val2 = Val2.toLowerCase();
@@ -311,7 +313,7 @@ public class Conditional
         return false;
     }
 
-    private static boolean PerformValue(double Val1, double Val2, Type testType)
+    protected static boolean PerformValue(double Val1, double Val2, Type testType)
     {
         switch (testType)
         {

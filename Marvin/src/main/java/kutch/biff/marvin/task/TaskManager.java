@@ -74,6 +74,11 @@ public class TaskManager
     // this is where a task comes in on a woker thread (like remote marvin) 
     public void AddDeferredTask(String newTask)
     {
+        if (null == newTask)
+        {
+            LOGGER.severe("Sent null task ID to add Deferred Task");
+            return;
+        }
         synchronized (_DeferredTasks)
         {
             _DeferredTasks.add(newTask);
