@@ -53,7 +53,7 @@ public class ConditionalCase extends Conditional
 
     public ConditionalCase(Type type)
     {
-        super(type);
+        super(type,true);
         _CaseValues = new ArrayList<>();
         _Tasks = new HashMap<>();
         _DefaultTask = null;

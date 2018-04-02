@@ -21,6 +21,7 @@
  */
 package kutch.biff.marvin.utility;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
@@ -59,7 +60,8 @@ public class Conditional
     private String _If_Task;
     private String _Else_Task;
     private boolean _CaseSensitive;
-
+    protected boolean _UsesThen;
+/*
     public Conditional(Conditional.Type type)
     {
         _type = type;
@@ -70,8 +72,30 @@ public class Conditional
         _Value2 = null;
         _If_Task = null;
         _Else_Task = null;
+        _UsesThen = true;
     }
-
+*/
+    public Conditional(Conditional.Type type,boolean usesThen)
+    {
+        _type = type;
+        _Value1_ID = null;
+        _Value1_Namespace = null;
+        _Value2_ID = null;
+        _Value2_Namespace = null;
+        _Value2 = null;
+        _If_Task = null;
+        _Else_Task = null;
+        _UsesThen = usesThen;
+    }
+    
+    protected String getThenTask()
+    {
+        return _If_Task;
+    }
+    protected String getElseTask()
+    {
+        return _Else_Task;
+    }
     public void SetNamespaceAndID(String namespace, String id)
     {
         _Value1_ID = id;
@@ -147,6 +171,11 @@ public class Conditional
         }
         return true;
     }
+    
+    protected Type getType()
+    {
+        return _type;
+    }
 
     public static Type GetType(String strType)
     {
@@ -154,7 +183,7 @@ public class Conditional
         {
             return Type.Invalid;
         }
-            
+
         if (strType.equalsIgnoreCase("IF_EQ"))
         {
             return Type.EQ;
@@ -193,17 +222,22 @@ public class Conditional
     public void Enable()
     {
         DataManager.getDataManager().AddListener(_Value1_ID, _Value1_Namespace, new ChangeListener()
-                    {
-                        @Override
-                        @SuppressWarnings("unchecked")
-                        public void changed(ObservableValue o, Object oldVal, Object newVal)
-                        {
-                            Perform(newVal.toString());
-                        }
-                    });
+                                         {
+                                             @Override
+                                             @SuppressWarnings("unchecked")
+                                             public void changed(ObservableValue o, Object oldVal, Object newVal)
+                                             {
+                                                 Perform(newVal.toString());
+                                             }
+                                         });
+    }
+    // used for compound conditionals only
+    protected String GetValue1()
+    {
+        return DataManager.getDataManager().GetValue(_Value1_ID, _Value1_Namespace);
     }
 
-    private String GetValue2()
+    protected String GetValue2()
     {
         if (_Value2_ID != null && _Value2_Namespace != null)
         {
@@ -215,6 +249,7 @@ public class Conditional
     public static boolean EvaluateConditional(String strValue1, String strValue2, Type Conditional, boolean isCaseSensitive)
     {
         boolean result;
+        
         try
         {
             result = PerformValue(Double.parseDouble(strValue1), Double.parseDouble(strValue2), Conditional);
@@ -225,7 +260,8 @@ public class Conditional
         }
         return result;
     }
-    
+
+   
     protected void Perform(String Val1)
     {
         String Val2 = GetValue2();
@@ -234,8 +270,8 @@ public class Conditional
             LOGGER.warning("Tried to perform Conditional, but data not yet available");
             return;
         }
-        
-        if (Conditional.EvaluateConditional(Val1,Val2,_type,isCaseSensitive()))
+
+        if (Conditional.EvaluateConditional(Val1, Val2, _type, isCaseSensitive()))
         {
             TASKMAN.AddDeferredTask(_If_Task);
         }
@@ -245,14 +281,14 @@ public class Conditional
         }
     }
 
-    private static boolean PerformString(String Val1, String Val2, Type testType, boolean isCaseSensitive)
+    protected static boolean PerformString(String Val1, String Val2, Type testType, boolean isCaseSensitive)
     {
-        if (isCaseSensitive)
+        if (!isCaseSensitive)
         {
             Val1 = Val1.toLowerCase();
             Val2 = Val2.toLowerCase();
         }
-        
+
         Val1 = Val1.trim();
         Val2 = Val2.trim();
         switch (testType)
@@ -277,7 +313,7 @@ public class Conditional
         return false;
     }
 
-    private static boolean PerformValue(double Val1, double Val2, Type testType)
+    protected static boolean PerformValue(double Val1, double Val2, Type testType)
     {
         switch (testType)
         {
@@ -375,7 +411,7 @@ public class Conditional
     protected boolean ReadMinionSrc(FrameworkNode condNode)
     {
         String ID = null, Namespace = null;
-        
+
         for (FrameworkNode node : condNode.getChildNodes())
         {
             String strValue = null;
@@ -410,7 +446,7 @@ public class Conditional
         return true;
     }
 
-    private boolean readCondition(FrameworkNode condNode)
+    protected boolean readCondition(FrameworkNode condNode)
     {
         boolean retVal = true;
 
@@ -460,33 +496,36 @@ public class Conditional
                         }
                     }
                 }
-                
-                if (node.getNodeName().equalsIgnoreCase("Then"))
-                {
-                    _If_Task = node.getTextContent();
-                    if (_If_Task.length() < 1)
-                    {
-                        LOGGER.severe("Conditional <Then> is empty");
-                        retVal = false;
-                    }
-                }
 
-                if (node.getNodeName().equalsIgnoreCase("Else"))
+                if (_UsesThen)
                 {
-                    _Else_Task = node.getTextContent();
-                    if (_Else_Task.length() < 1)
+                    if (node.getNodeName().equalsIgnoreCase("Then"))
                     {
-                        LOGGER.severe("Conditional <Else> is empty");
-                        retVal = false;
+                        _If_Task = node.getTextContent();
+                        if (_If_Task.length() < 1)
+                        {
+                            LOGGER.severe("Conditional <Then> is empty");
+                            retVal = false;
+                        }
+                    }
+
+                    if (node.getNodeName().equalsIgnoreCase("Else"))
+                    {
+                        _Else_Task = node.getTextContent();
+                        if (_Else_Task.length() < 1)
+                        {
+                            LOGGER.severe("Conditional <Else> is empty");
+                            retVal = false;
+                        }
                     }
                 }
             }
-            if (null == _If_Task)  
+            if (null == _If_Task && _UsesThen)
             {
                 LOGGER.severe("Conditional defined with no <Then>");
                 retVal = false;
             }
-            
+
             if (null == _Value1_ID && _Value2 == null)
             {
                 LOGGER.severe("Conditional defined with no <Value>");
@@ -500,16 +539,27 @@ public class Conditional
         return retVal;
     }
 
-    public static Conditional BuildConditional(Type type, FrameworkNode condNode)
+    public static Conditional BuildConditional(Type type, FrameworkNode condNode,boolean usesThen)
     {
         Conditional objCond = null;
         if (type == Type.CASE)
         {
-            objCond =  ConditionalCase.BuildConditionalCase(condNode);
+            objCond = ConditionalCase.BuildConditionalCase(condNode);
         }
         else if (type != Type.Invalid)
         {
-            objCond = new Conditional(type);
+            ArrayList<FrameworkNode> OrChildren = condNode.getChildNodes("OR");
+            ArrayList<FrameworkNode> AndChildren = condNode.getChildNodes("And");
+
+            if (OrChildren.isEmpty() && AndChildren.isEmpty())
+            {
+                
+                objCond = new Conditional(type,usesThen);
+            }
+            else
+            {
+                objCond = new CompoundConditional(type);
+            }
             if (!objCond.readCondition(condNode))
             {
                 objCond = null;

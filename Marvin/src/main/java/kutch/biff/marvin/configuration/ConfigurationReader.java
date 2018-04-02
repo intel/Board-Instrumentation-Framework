@@ -1205,7 +1205,7 @@ public class ConfigurationReader
             return null;
         }
 
-        Conditional objConditional = Conditional.BuildConditional(type, condNode);
+        Conditional objConditional = Conditional.BuildConditional(type, condNode,true);
         if (null != objConditional)
         {
             objConditional.setCaseSensitive(CaseSensitive);
