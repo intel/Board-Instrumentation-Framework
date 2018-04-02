@@ -1,3 +1,6 @@
+Release 18.04
+Added <And> and <Or> capability to Conditionals
+
 Release 18.02
 Log warning when a grid grows beyond specified bounds (if you in fact specify)
 Added optional precision to marvinmath
