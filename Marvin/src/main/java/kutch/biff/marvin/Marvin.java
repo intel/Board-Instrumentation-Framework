@@ -663,6 +663,10 @@ public class Marvin extends Application
         canvasPane.setAlignment(Pos.TOP_LEFT);
 
         _Config = new ConfigurationReader();
+        if (null == _Config)
+        {
+            return;
+        }
         final Configuration basicConfig = _Config.ReadStartupInfo(ConfigFilename);
 
         stage.setX(basicConfig.getPrimaryScreen().getVisualBounds().getMinX());

@@ -156,6 +156,10 @@ public class ConfigurationReader
     public Configuration ReadStartupInfo(String filename)
     {
         Document doc = OpenXMLFile(filename);
+        if (null == doc)
+        {
+            return null;
+        }
         if (null == _Configuration)
         {
             _Configuration = new Configuration();

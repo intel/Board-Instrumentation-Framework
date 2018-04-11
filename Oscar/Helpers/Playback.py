@@ -301,7 +301,7 @@ class Playback(object):
         
         import os.path
         if not os.path.isfile(filename):
-            Log.getLogger().error("Asked to read from non-existante file: " + filename)
+            Log.getLogger().error("Asked to read from non-existant file: " + filename)
             return False
         with open(filename,'r+b') as fp:
             try:

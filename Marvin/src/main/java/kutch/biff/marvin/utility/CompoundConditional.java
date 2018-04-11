@@ -218,7 +218,6 @@ public class CompoundConditional extends Conditional
                 }
             }
             Evaluated(true);
-            return;
         }
    }
 }
