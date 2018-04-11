@@ -238,6 +238,7 @@ class MarvinDataHandler(object):
         GuiMgr.OnStopLiveData()
         if GuiMgr.ReadFromFile(filename):
             GuiMgr.OnEnablePlayback()
+            GuiMgr.SetPlaybackFilename(filename)
         else:
             Log.getLogger().warning("Oscar Task to load file [" + filename +"] failed")
             return False
