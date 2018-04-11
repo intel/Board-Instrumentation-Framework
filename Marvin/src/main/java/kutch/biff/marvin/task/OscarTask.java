@@ -47,11 +47,13 @@ public class OscarTask extends BaseTask
         this._OscarID = _OscarID;
     }
 
+    @Override
     public String getTaskID()
     {
         return _TaskID;
     }
 
+    @Override
     public void setTaskID(String _TaskID)
     {
         this._TaskID = _TaskID;

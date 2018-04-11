@@ -147,19 +147,22 @@ public class DataManager
         String Key = Namespace.toUpperCase() + ID.toUpperCase();
 
         _UpdateCount++;
-        boolean inWildcard = HandleWildcardChangeValue(ID, Namespace, Value);
         
-        if (false == _DataMap.containsKey(Key)  && false == inWildcard)
+        if (false == _DataMap.containsKey(Key))
         {
-            _UnassignedDataPoints++;         
-
-            LOGGER.info("Received Data update not associated with a widget: " + Namespace + " : " + ID + " [" + Value + "]");
             _DataMap.put(Key, new DataSet());
-            // nifty stuff to dynamically add a tab to show 'unregistered' data points.
-            if (kutch.biff.marvin.widget.DynamicTabWidget.isEnabled())
+            boolean inWildcard = HandleWildcardChangeValue(ID, Namespace, Value);
+            if  (false == inWildcard)
             {
-                DynamicDebugWidgetTask objTask = new DynamicDebugWidgetTask(Namespace, ID, Value);
-                TaskManager.getTaskManager().AddPostponedTask(objTask, 0);
+                _UnassignedDataPoints++;         
+
+                LOGGER.info("Received Data update not associated with a widget: " + Namespace + " : " + ID + " [" + Value + "]");
+                // nifty stuff to dynamically add a tab to show 'unregistered' data points.
+                if (kutch.biff.marvin.widget.DynamicTabWidget.isEnabled())
+                {
+                    DynamicDebugWidgetTask objTask = new DynamicDebugWidgetTask(Namespace, ID, Value);
+                    TaskManager.getTaskManager().AddPostponedTask(objTask, 0);
+                }
             }
         }
         if (_DataMap.containsKey(Key))
