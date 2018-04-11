@@ -24,6 +24,7 @@ package kutch.biff.marvin.task;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import kutch.biff.marvin.logger.MarvinLogger;
+import static kutch.biff.marvin.task.Parameter.CheckForDataSrcParameter;
 
 /**
  *
@@ -102,6 +103,7 @@ abstract public class BaseTask implements ITask
         {
             return strData;
         }
+        
         if (strData.charAt(0) == '@') // could be a prompt
         {
             BasePrompt objPrompt = PromptManager.getPromptManager().getPrompt(strData.substring(1));
@@ -118,7 +120,7 @@ abstract public class BaseTask implements ITask
             }
         }
         
-        return strData;
+        return CheckForDataSrcParameter(strData);
     }
 
     @Override

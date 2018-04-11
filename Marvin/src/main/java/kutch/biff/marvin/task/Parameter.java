@@ -64,13 +64,12 @@ public class Parameter
         return CheckForDataSrcParameter(_value);
     }
     
-    private String CheckForDataSrcParameter(String strCheck)
+    public static String CheckForDataSrcParameter(String strCheck)
     {
-        
-        return HandleDataSrc(strCheck);
+        return Parameter.HandleDataSrc(strCheck);
     }
     
-    private String GetDataSrcVal(String strAlias)
+    public static String GetDataSrcVal(String strAlias)
     {
         String parts[] = strAlias.split(",");
         String strVal = null;
@@ -92,7 +91,7 @@ public class Parameter
      * @param strData the raw string
      * @return string with expanded replacement
      */
-    private String HandleDataSrc(String strData)
+    public static String HandleDataSrc(String strData)
     {
         String retString="";
         if (false == strData.contains("%("))

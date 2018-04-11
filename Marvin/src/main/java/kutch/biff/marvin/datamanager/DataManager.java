@@ -148,10 +148,12 @@ public class DataManager
 
         _UpdateCount++;
         
+        boolean inWildcard = HandleWildcardChangeValue(ID, Namespace, Value);
+        
         if (false == _DataMap.containsKey(Key))
         {
             _DataMap.put(Key, new DataSet());
-            boolean inWildcard = HandleWildcardChangeValue(ID, Namespace, Value);
+            
             if  (false == inWildcard)
             {
                 _UnassignedDataPoints++;         
@@ -165,7 +167,7 @@ public class DataManager
                 }
             }
         }
-        if (_DataMap.containsKey(Key))
+        if (_DataMap.containsKey(Key)) // if didn't exist, is created above
         {
             _DataMap.get(Key).setLatestValue(Value);
         }
