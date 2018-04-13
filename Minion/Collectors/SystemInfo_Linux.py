@@ -111,8 +111,8 @@ def __CreateNumaMap():
     while NumaNodeExists(socketNum):
         coreList = ReadFromFile('/sys/devices/system/node/node'+str(socketNum)+'/cpulist').strip().split(',')
         for coreNum,core in enumerate(coreList):
-            core = core.strip()
-            sibs = ReadFromFile('/sys/devices/system/node/node' + str(socketNum) + '/cpu' + core + '/topology/thread_siblings_list').strip().split(',')
+            #core = core.strip()
+            sibs = ReadFromFile('/sys/devices/system/node/node' + str(socketNum) + '/cpu' + str(coreNum) + '/topology/thread_siblings_list').strip().split(',')
 
             if sibs[0] in SibCoreMap:
                 if sibs[1] != SibCoreMap[sibs[0]]:
@@ -278,6 +278,9 @@ def __GetStaticInfo():
         retMap['system.hyperthreading_enabled'] = answer
 
     return retMap
+
+def readUptime()
+
 
 def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=False):
     global Logger
