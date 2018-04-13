@@ -197,8 +197,8 @@ def __GetDMI_Data():
                 DMI_Data.append(line.decode('utf-8'))
 
         except Exception as Ex:
-            Logger.error(str(Ex))
-            DMI_Data=[]
+            #Logger.error(str(Ex))
+            DMI_Data=None
 
     return DMI_Data
 
@@ -279,8 +279,30 @@ def __GetStaticInfo():
 
     return retMap
 
-def readUptime()
+def SystemUptimeShort():
+    parts = ReadFromFile('/proc/uptime').strip().split(' ')
+    seconds = float(parts[0])
+    strTime=""
+    for scale in 86400, 3600, 60:
+        result, seconds = divmod(seconds, scale)
+        result = (int)(result)
+        seconds = (int) (seconds)
+        if strTime != '' or result > 0:
+            strTime += '{0:02d}:'.format(result)
+    strTime += '{0:02d}'.format(seconds)
+    return strTime    
 
+def SystemUptimeLong():
+    parts = ReadFromFile('/proc/uptime').strip().split(' ')
+    seconds = float(parts[0])
+    days,seconds = divmod(seconds,86400)
+    hours,seconds = divmod(int(seconds),3600)
+    minutes,seconds = divmod(int(seconds),60)
+    
+    strTime="{0} days,  {1}:{2}".format(int(days),hours,minutes)
+
+    return strTime    
+    
 
 def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=False):
     global Logger
@@ -327,6 +349,9 @@ def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=Fal
 
             except Exception as Ex:
                 pass
+
+            dataMap["system.uptime.short"] = SystemUptimeShort()
+            dataMap["system.uptime.long"] = SystemUptimeLong()
 
             for entry in dataMap:
                 if updatedCount < 5: # no need to check each on over and over, so just a few times to make sure all are in there
