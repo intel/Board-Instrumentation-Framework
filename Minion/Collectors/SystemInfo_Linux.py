@@ -109,11 +109,25 @@ def __CreateNumaMap():
     SibCoreMap={}
     CoreMap={}
     while NumaNodeExists(socketNum):
-        coreList = ReadFromFile('/sys/devices/system/node/node'+str(socketNum)+'/cpulist').strip().split(',')
-        for coreNum,core in enumerate(coreList):
-            #core = core.strip()
-            sibs = ReadFromFile('/sys/devices/system/node/node' + str(socketNum) + '/cpu' + str(coreNum) + '/topology/thread_siblings_list').strip().split(',')
+        # gets list of cores on this Socket, could be HT or not
+        # some platforms look like: 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55
+        # others look like: 0-13,28-41
 
+        coreList = ReadFromFile('/sys/devices/system/node/node'+str(socketNum)+'/cpulist').strip().split(',')
+        
+        if '-' in coreList[0]: 
+            altList=[]
+            for cList in coreList: #is the 0-13,28-41 form
+                parts=cList.split('-')
+                for index in range(int(parts[0]),int(parts[1])+1):
+                    altList.append(str(index))
+            
+            coreList=altList
+        
+        for coreNum,core in enumerate(coreList):
+            core = core.strip()
+            sibs = ReadFromFile('/sys/devices/system/node/node' + str(socketNum) + '/cpu' + core + '/topology/thread_siblings_list').strip().split(',')
+            
             if sibs[0] in SibCoreMap:
                 if sibs[1] != SibCoreMap[sibs[0]]:
                     #print("Unexpected situation!")
@@ -197,8 +211,8 @@ def __GetDMI_Data():
                 DMI_Data.append(line.decode('utf-8'))
 
         except Exception as Ex:
-            #Logger.error(str(Ex))
-            DMI_Data=None
+            Logger.error(str(Ex))
+            DMI_Data=[]
 
     return DMI_Data
 
