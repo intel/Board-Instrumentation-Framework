@@ -212,7 +212,7 @@ def __GetDMI_Data():
 
         except Exception as Ex:
             Logger.error("dmidecode not installed - unable to read all information")
-            DMI_Data=[]
+            None
 
     return DMI_Data
 
