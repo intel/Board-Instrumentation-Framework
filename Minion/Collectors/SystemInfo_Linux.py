@@ -211,7 +211,7 @@ def __GetDMI_Data():
                 DMI_Data.append(line.decode('utf-8'))
 
         except Exception as Ex:
-            Logger.error(str(Ex))
+            Logger.error("dmidecode not installed - unable to read all information")
             DMI_Data=[]
 
     return DMI_Data
