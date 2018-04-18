@@ -34,6 +34,7 @@ else:
     from Util import Sleep
     from Util import Time
     from Helpers import Log
+    from Helpers import Alias
     from Helpers import Watchdog
     from Helpers import GuiMgr
     from Helpers import VersionMgr
@@ -106,6 +107,9 @@ def HandleCommandlineArguments():
        return False
 
     _Verbose = args.verbose
+
+    Alias.AliasMgr.AddEnvironmentVariables()
+
 
     if None != args.logfile:
         Configuration.get().SetLogFilename(args.logfile)
