@@ -688,6 +688,10 @@ public class WidgetBuilder
             {
                 retWidget = FlipPanelWidgetBuilder.Build(baseNode, Filename);
             }
+            else if (strWidget.equalsIgnoreCase("FileWriter"))
+            {
+                retWidget = FileWriterWidgetBuilder.Build(baseNode, Filename);
+            }
             else if (strWidget.equalsIgnoreCase("Spacer"))
             {
                 retWidget = SpacerWidgetBuilder.Build(baseNode, Filename);
