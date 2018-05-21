@@ -65,12 +65,22 @@ public class MarvinAdminTask extends BaseTask
         {
             SetVisible();
         }
+        else if (_Task.equalsIgnoreCase("Terminate"))
+        {
+            TerminateMarvin();
+        }
         else
         {
             LOGGER.warning("Asked to perform a MarvinAdminTask of [" + _Task + "] for Task ID: " + _ID + ".  However that is not a valid task.");
         }
     }
 
+    
+    private void TerminateMarvin()
+    {
+        LOGGER.info("Terminating Marvin based upon MarvinAdminTask");
+        System.exit(0);
+    }
     /**
      * Make a tab visible or invisible
      */

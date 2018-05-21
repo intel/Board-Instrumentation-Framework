@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Rectangle2D;
@@ -74,9 +73,6 @@ import javafx.scene.control.MenuItem;
 import kutch.biff.marvin.widget.Widget;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ScrollPane;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
 import static java.lang.Math.abs;
 
 /**
