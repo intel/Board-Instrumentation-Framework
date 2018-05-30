@@ -21,7 +21,6 @@
 
 
 package kutch.biff.marvin.task;
-import javafx.application.Platform;
 import kutch.biff.marvin.configuration.Configuration;
 
 

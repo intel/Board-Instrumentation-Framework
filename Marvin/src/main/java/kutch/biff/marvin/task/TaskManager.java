@@ -485,6 +485,10 @@ public class TaskManager
                 {
                     objTaskItem = BuildOscarTaskItem(ID, node);
                 }
+                else if (taskType.equalsIgnoreCase("OscarBind"))
+                {
+                    objTaskItem = BuildOscarBindTask(ID,node);
+                }
                 else if (0 == taskType.compareToIgnoreCase("Minion"))
                 {
                     objTaskItem = BuildMinionTaskItem(ID, node);
@@ -1045,6 +1049,16 @@ public class TaskManager
         }
         return objOscarTask;
     }
+    
+    private OscarBindTask BuildOscarBindTask(String taskID, FrameworkNode taskNode)
+    {
+        OscarBindTask objTask = new OscarBindTask();
+        objTask.setParams(GetParameters(taskNode));
+        
+        return objTask;
+    }
+            
+
 
     private ChainedTask BuildChainedTaskItem(String taskID, FrameworkNode taskNode)
     {
