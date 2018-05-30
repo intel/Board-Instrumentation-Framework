@@ -20,8 +20,10 @@
 import os
 import subprocess
 import time
+import socket
 
 lscpiDataMap=None
+netdevInfoDir="/sys/class/net"
 
 def ReadFromFile(Filename):
     try:
@@ -31,15 +33,24 @@ def ReadFromFile(Filename):
     except Exception:
         return "N/A"
 
-    return file.read()
+    return file.read().strip()
+
+# in case we want to run this from a container and mount a dir
+def GetBaseDir():
+    global netdevInfoDir
+    return netdevInfoDir
+
+def SetBaseDir(dirLocation):
+    global netdevInfoDir
+    netdevInfoDir = dirLocation
 
 
 ## Generates a file with info on ALL ethernet devices
 def CreatePerfFileAll(outputFile):
     dataStr = ""
-    for root, dirs, files in os.walk("/sys/class/net"):
+    for root, dirs, files in os.walk(GetBaseDir()):
         for dir in dirs:
-            nextDir = "/sys/class/net/" + dir + "/statistics"
+            nextDir = GetBaseDir() + "/"  + dir + "/statistics"
             for statRoot, statDirs, statFiles in os.walk(nextDir):
                 for fname in statFiles:
                     sFileName = nextDir + "/" + fname
@@ -55,7 +66,7 @@ def CreatePerfFileAll(outputFile):
 ## Generates a file with info on a specific ethernet device
 def CreatePerfFileDev(ethDev,outputFile):
     dataStr = ""
-    nextDir = "/sys/class/net/" + ethDev + "/statistics"
+    nextDir = GetBaseDir() + "/"  + ethDev + "/statistics"
     for statRoot, statDirs, statFiles in os.walk(nextDir):
         for fname in statFiles:
             sFileName = nextDir + "/" + fname
@@ -79,7 +90,8 @@ def __GetLSPCIData():
     try:
         lspciList = subprocess.check_output('lspci').splitlines()
         for line in lspciList:
-            if line[8:8+checkStrLen] == checkStr:
+            line = line.decode('ascii')
+            if checkStr in line:
                 busID=line[0:7]
                 devInfoStr = line[8+checkStrLen+1:]
                 lscpiDataMap[busID]=devInfoStr
@@ -91,7 +103,7 @@ def __GetLSPCIData():
 
 def __GetDeviceVendorInfo(ethDev):
     try:
-        linkStr=os.readlink("/sys/class/net/" + ethDev + "/device")
+        linkStr=os.readlink(GetBaseDir() + "/"  + ethDev + "/device")
         parts = linkStr.split("/")
         busID= parts[-1]
         if busID.split(':')[0] == '0000': # it returns 4 byte bus#
@@ -106,7 +118,7 @@ def __GetDeviceVendorInfo(ethDev):
     return "Unknown Vendor Information"
 
 def __GatherNetworkDeviceInfo(ethDev,retMap,slimDataset):
-    nextDir = "/sys/class/net/" + ethDev + "/statistics"
+    nextDir = GetBaseDir() + "/"  + ethDev + "/statistics"
     baseName='netdev.'
     if not slimDataset:
         for statRoot, statDirs, statFiles in os.walk(nextDir):
@@ -115,15 +127,22 @@ def __GatherNetworkDeviceInfo(ethDev,retMap,slimDataset):
                 dataVal = ReadFromFile(sFileName)
                 retMap[baseName+ethDev + "." + fname] = dataVal
 
-        verFile = "/sys/class/net/" + ethDev + "/device/driver/module/version"
+        verFile = GetBaseDir() + "/"  + ethDev + "/device/driver/module/version"
         retMap[baseName+ethDev + ".version"] = ReadFromFile(verFile)
-        numaFile = "/sys/class/net/" + ethDev + "/device/numa_node"
+        numaFile = GetBaseDir() + "/"  + ethDev + "/device/numa_node"
         retMap[baseName+ethDev + ".numa_node"] = ReadFromFile(numaFile)
         retMap[baseName+ethDev + ".vendor_info"] = __GetDeviceVendorInfo(ethDev)
-        mtuFile = "/sys/class/net/" + ethDev + "/mtu"
+        mtuFile = GetBaseDir() + "/"  + ethDev + "/mtu"
         retMap[baseName+ethDev + ".mtu"] = ReadFromFile(mtuFile)
-        operStateFile = "/sys/class/net/" + ethDev + "/operstate"
+        operStateFile = GetBaseDir() + "/"  + ethDev + "/operstate"
         retMap[baseName+ethDev + ".state"] = ReadFromFile(operStateFile)
+        macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
+        retMap[baseName+ethDev + ".macaddress"] = ReadFromFile(macAddrFile)
+
+        sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sckt.connect(("8.8.8.8", 80))
+        ipAddr =  sckt.getsockname()[0]
+        retMap[baseName+ethDev + ".ipaddress"] = str(ipAddr)
 
     else: # slim dataset, just to bytes and packets
         for fname in ['rx_bytes','tx_bytes','tx_packets','rx_packets']:
@@ -135,7 +154,7 @@ def __GatherNetworkDeviceInfo(ethDev,retMap,slimDataset):
 
 def __GatherAllNetworkDeviceInfo(slimDataSet):
     tMap={}
-    for root, dirs, files in os.walk("/sys/class/net"):
+    for root, dirs, files in os.walk(GetBaseDir()):
         for dir in dirs:
            tMap= __GatherNetworkDeviceInfo(dir,tMap,slimDataSet)
 

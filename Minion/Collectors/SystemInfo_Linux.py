@@ -87,7 +87,7 @@ def NumaNodeExists(nodeNum):
 
 def GetNumaInfo(nodeNum):
     retMap={}
-    retMap['system.numa.node' + str(nodeNum) +'.cpu_list'] = ReadFromFile('/sys/devices/system/node/node'+str(nodeNum)+'/cpulist')
+    retMap['system.numa.node' + str(nodeNum) +'.cpu_list'] = strip(ReadFromFile('/sys/devices/system/node/node'+str(nodeNum)+'/cpulist'))
     return retMap
 
 def __GetNumaStats(nodeCount):
@@ -190,7 +190,7 @@ def __ProcessHyperthreadCPUInfo(CoreMap,SiblingMap,loadData):
 def GetSystemInfo_Linux(outputFile):
     data = "Platform="+GetPlatform() + os.linesep
     data += "Distro=" + GetLinuxDistro() + os.linesep
-    data +=  GetCPUInfo_Model_Linux()
+    data += "CPU.Model=" + GetCPUInfo_Model_Linux()
     data += "Memory.Total=" + GetMemoryInfo_Linux("MemTotal") + os.linesep
     data += "Memory.Free=" + GetMemoryInfo_Linux("MemFree") + os.linesep
     data += "CoreCount=" + GetCoreCount() + os.linesep

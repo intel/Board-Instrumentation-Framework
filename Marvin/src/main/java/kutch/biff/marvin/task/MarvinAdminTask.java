@@ -69,6 +69,10 @@ public class MarvinAdminTask extends BaseTask
         {
             TerminateMarvin();
         }
+        else if (_Task.equalsIgnoreCase("RefreshData"))
+        {
+            WatchdogTask.ForceRefresh();
+        }
         else
         {
             LOGGER.warning("Asked to perform a MarvinAdminTask of [" + _Task + "] for Task ID: " + _ID + ".  However that is not a valid task.");

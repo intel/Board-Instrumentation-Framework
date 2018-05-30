@@ -79,4 +79,12 @@ public class WatchdogTask extends BaseTask
         }
     }
 
+    public static void ForceRefresh()
+    {
+        if (null != WatchdogTask.objSingleton)
+        {
+            WatchdogTask.objSingleton.FirstWatchdogMessage = true;
+            WatchdogTask.objSingleton.PerformTask();
+        }
+    }
 }

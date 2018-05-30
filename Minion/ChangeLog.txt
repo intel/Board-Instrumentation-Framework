@@ -1,3 +1,6 @@
+Release 18.05
+Added MAC and IP address to LinuxNetwork collector
+
 Release 18.01
 Added AlwaysCollect flag option to groups
 
