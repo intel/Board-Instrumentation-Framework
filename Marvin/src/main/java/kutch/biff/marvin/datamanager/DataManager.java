@@ -37,7 +37,8 @@ import kutch.biff.marvin.task.TaskManager;
  */
 public class DataManager
 {
-    private static DataManager _DataManager=null;
+
+    private static DataManager _DataManager = null;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     private ConcurrentHashMap<String, DataSet> _DataMap;
@@ -51,27 +52,29 @@ public class DataManager
         _WildcardDataMap = new ConcurrentHashMap<>();
         _DataManager = this;
         _UpdateCount = 0;
-        _UnassignedDataPoints = 0;    
+        _UnassignedDataPoints = 0;
     }
 
     public static DataManager getDataManager()
     {
         return _DataManager;
     }
+
     public int NumberOfRegisteredDatapoints()
     {
         return _DataMap.size();
     }
-    
+
     public long getUpdateCount()
     {
         return _UpdateCount;
     }
+
     public long getUnassignedCount()
     {
         return _UnassignedDataPoints;
     }
-    
+
     public void AddListener(String ID, String Namespace, ChangeListener listener)
     {
         if (null == ID || null == Namespace)
@@ -144,52 +147,78 @@ public class DataManager
 
     public void ChangeValue(String ID, String Namespace, String Value)
     {
-        String Key = Namespace.toUpperCase() + ID.toUpperCase();
-
-        _UpdateCount++;
-        
-        boolean inWildcard = HandleWildcardChangeValue(ID, Namespace, Value);
-        
-        if (false == _DataMap.containsKey(Key))
+        synchronized (this)
         {
-            _DataMap.put(Key, new DataSet());
-            
-            if  (false == inWildcard)
-            {
-                _UnassignedDataPoints++;         
+            String Key = Namespace.toUpperCase() + ID.toUpperCase();
 
-                LOGGER.info("Received Data update not associated with a widget: " + Namespace + " : " + ID + " [" + Value + "]");
-                // nifty stuff to dynamically add a tab to show 'unregistered' data points.
-                if (kutch.biff.marvin.widget.DynamicTabWidget.isEnabled())
+            _UpdateCount++;
+
+            boolean inWildcard = HandleWildcardChangeValue(ID, Namespace, Value);
+
+            if (false == _DataMap.containsKey(Key))
+            {
+                _DataMap.put(Key, new DataSet());
+
+                if (false == inWildcard)
                 {
-                    DynamicDebugWidgetTask objTask = new DynamicDebugWidgetTask(Namespace, ID, Value);
-                    TaskManager.getTaskManager().AddPostponedTask(objTask, 0);
+                    _UnassignedDataPoints++;
+
+                    LOGGER.info("Received Data update not associated with a widget: " + Namespace + " : " + ID + " [" + Value + "]");
+                    // nifty stuff to dynamically add a tab to show 'unregistered' data points.
+                    if (kutch.biff.marvin.widget.DynamicTabWidget.isEnabled())
+                    {
+                        DynamicDebugWidgetTask objTask = new DynamicDebugWidgetTask(Namespace, ID, Value);
+                        TaskManager.getTaskManager().AddPostponedTask(objTask, 0);
+                    }
                 }
             }
+            if (_DataMap.containsKey(Key)) // if didn't exist, is created above
+            {
+                _DataMap.get(Key).setLatestValue(Value);
+            }
         }
-        if (_DataMap.containsKey(Key)) // if didn't exist, is created above
+    }
+
+    public String GetValue(String ID, String Namespace)
+    {
+        synchronized (this)
         {
-            _DataMap.get(Key).setLatestValue(Value);
+            if (null == ID || null == Namespace)
+            {
+                LOGGER.severe("Wildcard listener has no Namespace or RegEx pattern");
+                return null;
+            }
+
+            String Key = Namespace.toUpperCase() + ID.toUpperCase();
+
+            if (_DataMap.containsKey(Key))
+            {
+                return _DataMap.get(Key).getLatestValue();
+            }
+            return null;
         }
     }
     
-    public String GetValue(String ID, String Namespace)
+    public String GetValueForMath(String ID, String Namespace)
     {
-        if (null == ID || null == Namespace)
+        synchronized (this)
         {
-            LOGGER.severe("Wildcard listener has no Namespace or RegEx pattern");
+            if (null == ID || null == Namespace)
+            {
+                LOGGER.severe("Wildcard listener has no Namespace or RegEx pattern");
+                return null;
+            }
+
+            String Key = Namespace.toUpperCase() + ID.toUpperCase();
+
+            if (_DataMap.containsKey(Key))
+            {
+                return _DataMap.get(Key).getLatestValueForMath();
+            }
             return null;
         }
-
-        String Key = Namespace.toUpperCase() + ID.toUpperCase();
-
-        if (_DataMap.containsKey(Key))
-        {
-            return _DataMap.get(Key).getLatestValue();
-        }
-        return null;
-        
     }
+    
 
     public int PerformUpdates()
     {

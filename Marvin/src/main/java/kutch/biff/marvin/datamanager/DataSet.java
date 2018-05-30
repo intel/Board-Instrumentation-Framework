@@ -34,14 +34,24 @@ public class DataSet
     SimpleObjectProperty<DataObject> _ObjectProperty;
     ArrayList<DataObject> _DataUpdates;
     String _LatestValue;
+    String _LatestValueForMath;
 
     public DataSet()
     {
         _ObjectProperty = new SimpleObjectProperty<>();
         _DataUpdates = new ArrayList<>();  // is an arraylist because could receive back 2 back updates, before 1st update handled, 2nd one overwrites 
         _LatestValue = "";
+        _LatestValueForMath = "";
     }
 
+    public String getLatestValueForMath()
+    {
+        synchronized(this)
+        {
+            return _LatestValueForMath;
+        }
+    }
+            
     public String getLatestValue()
     {
         synchronized(this)
@@ -55,6 +65,7 @@ public class DataSet
         synchronized(this)
         {
             _DataUpdates.add(newObj);
+            _LatestValueForMath = newValue;
         }
     }
 

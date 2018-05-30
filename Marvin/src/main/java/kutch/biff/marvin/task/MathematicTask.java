@@ -17,9 +17,7 @@
  * #    File Abstract: 
  * #    Performs simple mathematic operations on a data point
  * ##############################################################################
-*/ 
-
-
+ */
 package kutch.biff.marvin.task;
 
 /**
@@ -76,41 +74,45 @@ public class MathematicTask extends PulseTask
         String currValueStr;
         double doubleVal;
 
-        currValueStr = TASKMAN.getDataMgr().GetValue(_ID, _Namespace);
-        if (null == currValueStr)
+        synchronized (TASKMAN.getDataMgr())
         {
-            LOGGER.warning("Mathematic Task failed [" + getTaskID() +"] beause the data point does not exist (yet).");
-            return;
+            currValueStr = TASKMAN.getDataMgr().GetValueForMath(_ID, _Namespace);
+
+            if (null == currValueStr)
+            {
+                LOGGER.warning("Mathematic Task failed [" + getTaskID() + "] beause the data point does not exist (yet).");
+                return;
+            }
+
+            try
+            {
+                doubleVal = Double.parseDouble(currValueStr);
+            }
+            catch (NumberFormatException ex)
+            {
+                LOGGER.warning("Attempted Mathematic Task on Non numrice Data point: [" + _Namespace + ":" + _ID + "] = " + currValueStr);
+                return;
+            }
+            double newVal = 0.0;
+            if (_Operation.equalsIgnoreCase("Add"))
+            {
+                newVal = doubleVal + _Value;
+            }
+            else if (_Operation.equalsIgnoreCase("Subtract"))
+            {
+                newVal = doubleVal - _Value;
+            }
+            else if (_Operation.equalsIgnoreCase("Multiply"))
+            {
+                newVal = doubleVal * _Value;
+            }
+            else
+            {
+                LOGGER.warning("Unknown Error processing Mathematic Task on Non numrice Data point: [" + _Namespace + ":" + _ID + "]");
+                return;
+            }
+            int intVal = (int) newVal;
+            TASKMAN.getDataMgr().ChangeValue(_ID, _Namespace, Integer.toString(intVal));
         }
-        
-        try
-        {
-            doubleVal = Double.parseDouble(currValueStr);
-        }
-        catch (NumberFormatException ex)
-        {
-            LOGGER.warning("Attempted Mathematic Task on Non numrice Data point: [" + _Namespace + ":" + _ID + "] = " + currValueStr);
-            return;
-        }
-        double newVal = 0.0;
-        if (_Operation.equalsIgnoreCase("Add"))
-        {
-            newVal = doubleVal + _Value;
-        }
-        else if (_Operation.equalsIgnoreCase("Subtract"))
-        {
-            newVal = doubleVal - _Value;
-        }
-        else if (_Operation.equalsIgnoreCase("Multiply"))
-        {
-            newVal = doubleVal * _Value;
-        }
-        else
-        {
-            LOGGER.warning("Unknown Error processing Mathematic Task on Non numrice Data point: [" + _Namespace + ":" + _ID + "]");
-            return;
-        }
-        int intVal = (int)newVal;
-        TASKMAN.getDataMgr().ChangeValue(_ID, _Namespace, Integer.toString(intVal));
     }
 }
