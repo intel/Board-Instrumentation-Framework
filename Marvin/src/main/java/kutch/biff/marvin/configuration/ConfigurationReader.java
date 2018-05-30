@@ -1102,6 +1102,10 @@ public class ConfigurationReader
             {
 
             }
+            else if (node.getNodeName().equalsIgnoreCase("Conditional"))
+            {
+
+            }
             else
             {
                 LOGGER.warning("Unexpected Tag Type in configuration file: " + node.getNodeName());
@@ -1276,7 +1280,7 @@ public class ConfigurationReader
         if (taskListNodes.size() < 1)
         {
             //LOGGER.info("No Tasks defined in config file.");
-            return true;
+            //return true;
         }
         for (FrameworkNode taskNode : taskListNodes)
         {
