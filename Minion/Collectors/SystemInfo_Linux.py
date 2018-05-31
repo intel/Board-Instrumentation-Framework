@@ -87,7 +87,7 @@ def NumaNodeExists(nodeNum):
 
 def GetNumaInfo(nodeNum):
     retMap={}
-    retMap['system.numa.node' + str(nodeNum) +'.cpu_list'] = strip(ReadFromFile('/sys/devices/system/node/node'+str(nodeNum)+'/cpulist'))
+    retMap['system.numa.node' + str(nodeNum) +'.cpu_list'] = ReadFromFile('/sys/devices/system/node/node'+str(nodeNum)+'/cpulist')
     return retMap
 
 def __GetNumaStats(nodeCount):
