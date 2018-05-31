@@ -22,12 +22,15 @@
 package kutch.biff.marvin.task;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -89,6 +92,20 @@ public class Prompt_InputBox extends BasePrompt
         dialog.setY(yPos);        
         
         dialog.centerOnScreen();
+        
+        objPrompt.setOnKeyPressed(new EventHandler<KeyEvent>() {
+        @Override
+        public void handle(KeyEvent ke) {
+            KeyCode kc = ke.getCode();
+            if (kc.equals(KeyCode.ENTER) ) 
+            {
+                SetPromptedValue(objPrompt.getText());
+                _PrevVal = objPrompt.getText();
+                dialog.close();
+                
+            }
+        }
+    });
 
         btn.setOnAction((ActionEvent event) ->
         {
