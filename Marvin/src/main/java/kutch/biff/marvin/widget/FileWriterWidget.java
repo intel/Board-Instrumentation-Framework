@@ -20,7 +20,10 @@
  */
 package kutch.biff.marvin.widget;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -59,6 +62,7 @@ public class FileWriterWidget extends BaseWidget
     {
         KeyPairIDValue, KeyPairNamespaceIDValue
     };
+    private static HashMap<String,HashMap<String,String>> _FileToDataMap= new HashMap();
     private HashMap<String, String> _DataPointMap;
     private DataManager _dataMgr;
     private String _outFile;
@@ -68,7 +72,7 @@ public class FileWriterWidget extends BaseWidget
 
     public FileWriterWidget()
     {
-        _DataPointMap = new HashMap<>(); // for quick lookup as new data comes in
+        _DataPointMap = null; //new HashMap<>(); // for quick lookup as new data comes in
         _outFile = null;
         _writeMode = WriteMode.Overwrite;
         _writeFormat = WriteFormat.KeyPairIDValue;
@@ -89,6 +93,18 @@ public class FileWriterWidget extends BaseWidget
             writer.newLine();
         }
     }
+    
+    private void UniqueValues()
+    {
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(_outFile));
+        }
+        catch (FileNotFoundException ex)
+        {
+            Logger.getLogger(FileWriterWidget.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     private void Overwrite()
     {
@@ -98,8 +114,8 @@ public class FileWriterWidget extends BaseWidget
             writer.write("");
             writeMap(writer);
             writer.close();
-
         }
+        
         catch (IOException ex)
         {
             Logger.getLogger(FileWriterWidget.class.getName()).log(Level.SEVERE, null, ex);
@@ -148,12 +164,20 @@ public class FileWriterWidget extends BaseWidget
                 {
                     String ID = parts[0];
                     String Value = parts[1];
-                    _DataPointMap.put(ID.toLowerCase(), Value);
+                    String key = _prefixStr;
+                    if (_writeFormat == WriteFormat.KeyPairNamespaceIDValue)
+                    {
+                        key  += getNamespace() +".";
+                    }
+                    key += ID;
+
+                    
+                    _DataPointMap.put(key, Value);
                     if (_writeMode == WriteMode.Append)
                     {
                         Append();
                     }
-                    else
+                    else if (_writeMode == WriteMode.Overwrite)
                     {
                         Overwrite();
                     }
@@ -176,6 +200,16 @@ public class FileWriterWidget extends BaseWidget
         if (node.getNodeName().equalsIgnoreCase("File"))
         {
             _outFile = node.getTextContent();
+            if (!_FileToDataMap.containsKey(_outFile))
+            {
+                 _DataPointMap = new HashMap();
+                 _FileToDataMap.put(_outFile,_DataPointMap);
+            }
+            else
+            {
+                 _DataPointMap = _FileToDataMap.get(_outFile);
+            }
+            
             return true;
         }
         else if (node.getNodeName().equalsIgnoreCase("Format"))

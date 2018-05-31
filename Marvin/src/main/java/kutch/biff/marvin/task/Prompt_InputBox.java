@@ -102,7 +102,6 @@ public class Prompt_InputBox extends BasePrompt
                 SetPromptedValue(objPrompt.getText());
                 _PrevVal = objPrompt.getText();
                 dialog.close();
-                
             }
         }
     });
