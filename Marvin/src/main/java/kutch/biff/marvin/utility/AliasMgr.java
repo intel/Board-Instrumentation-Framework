@@ -59,6 +59,7 @@ public class AliasMgr
     private final static String strPrevColumnAlias = "PrevColumnAlias";
     private final static String strPrevRowAlias = "PrevRowAlias";
     private int randomVal;
+    private String _ExternalAliasFile;
 
     public static AliasMgr getAliasMgr()
     {
@@ -68,6 +69,7 @@ public class AliasMgr
     private AliasMgr()
     {
         _AliasList = new ArrayList<>();
+        _ExternalAliasFile = null;
         ClearAll();
     }
 
@@ -80,6 +82,11 @@ public class AliasMgr
         AddAlias("DEBUG_STYLE", "-fx-border-color:blue;-fx-border-style: dashed");
         PushAliasList(true);
         AddEnvironmentVars();
+        if (null != _ExternalAliasFile)
+        {
+            ReadExternalAliasFile(_ExternalAliasFile);
+        }
+
     }
     /**
      * Fetches the string associated with the alias if exists, else null
@@ -606,8 +613,8 @@ public class AliasMgr
     {
         StringTokenizer tokens = new StringTokenizer(encodedFilename, "=");
         tokens.nextElement(); // eat up the -alaisfile=
-        String filename = (String) tokens.nextElement(); // to get to the real filename!
-        return ReadExternalAliasFile(filename);
+        _ExternalAliasFile = (String) tokens.nextElement(); // to get to the real filename!
+        return ReadExternalAliasFile(_ExternalAliasFile);
     }
 
     public void SetCurrentConfigFile(String strFname)
