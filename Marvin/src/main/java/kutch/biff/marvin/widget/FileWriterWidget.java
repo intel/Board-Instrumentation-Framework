@@ -83,26 +83,14 @@ public class FileWriterWidget extends BaseWidget
     {
         for (String key : _DataPointMap.keySet())
         {
-            writer.append(_prefixStr);
-            if (_writeFormat == WriteFormat.KeyPairNamespaceIDValue)
-            {
-                writer.append(getNamespace());
-            }
+            //writer.append(_prefixStr);
+            //if (_writeFormat == WriteFormat.KeyPairNamespaceIDValue)
+            //{
+//                writer.append(getNamespace());
+//            }
             writer.append(key + "=");
             writer.append(_DataPointMap.get(key));
             writer.newLine();
-        }
-    }
-    
-    private void UniqueValues()
-    {
-        try
-        {
-            BufferedReader reader = new BufferedReader(new FileReader(_outFile));
-        }
-        catch (FileNotFoundException ex)
-        {
-            Logger.getLogger(FileWriterWidget.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

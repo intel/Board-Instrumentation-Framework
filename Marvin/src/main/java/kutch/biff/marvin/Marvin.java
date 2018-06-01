@@ -652,7 +652,7 @@ public class Marvin extends Application
      */
     /// pop up quick simple tab,menu and style it, then grab the size of the window
     /// so we know the canvas dimenstions
-    private void testAppSize(Stage stage)
+    private boolean testAppSize(Stage stage)
     {
         final GridPane stagePane = new GridPane();
         final GridPane canvasPane = new GridPane();
@@ -661,9 +661,14 @@ public class Marvin extends Application
         _Config = new ConfigurationReader();
         if (null == _Config)
         {
-            return;
+            return false;
         }
         final Configuration basicConfig = _Config.ReadStartupInfo(ConfigFilename);
+        
+        if (null == basicConfig)
+        {
+            return false;
+        }
 
         stage.setX(basicConfig.getPrimaryScreen().getVisualBounds().getMinX());
         stage.setY(basicConfig.getPrimaryScreen().getVisualBounds().getMinY());
@@ -763,9 +768,8 @@ public class Marvin extends Application
         {
             stage.setMaximized(true);
         }
+        return true;
     }
-
-
 
     @Override
     public void start(Stage stage) throws Exception
@@ -773,7 +777,10 @@ public class Marvin extends Application
         _DataMgr = new DataManager();
 
         MySplash.getSplash().start(stage);
-        testAppSize(stage);
+        if (false == testAppSize(stage))
+        {
+            MySplash.getSplash().stopSplash();
+        }
     }
 
     public void FinishLoad(Stage stage)
@@ -915,7 +922,7 @@ public class Marvin extends Application
                         StringWriter strWriter = new StringWriter();
                         PrintWriter pntWriter = new PrintWriter(strWriter);
                         e.printStackTrace(pntWriter);
-                        LOGGER.severe(strWriter.toString());
+                        //LOGGER.severe(strWriter.toString());
                         JOptionPane.showMessageDialog(null, "Error trying to launch application. \nCheck log file.", "Error", JOptionPane.ERROR_MESSAGE);
                         Platform.exit();
                     }
