@@ -51,11 +51,11 @@ class ThreadClass():
     #starts the worker thread
     def Start(self):
         if True == self.__StopFlag:
-            Log.getLogger().error("Tried to restart Thread ["+self.__ID+"] before it had stopped.")
+            #Log.getLogger().warning("Tried to restart Thread ["+self.__ID+"] before it had stopped.")
             return
 
         if True == self.__Running:
-            Log.getLogger().error("Tried to restart Thread ["+self.__ID+"] that is already running.")
+            #Log.getLogger().warning("Tried to restart Thread ["+self.__ID+"] that is already running.")
             return
 
         self.__Running = True
@@ -121,7 +121,7 @@ class ThreadManager():
         
     def CreateThread(self,strName,userThreadProc,userData=None): 
         if strName in self.__threadList:
-            Log.getLogger().error("Tried to create new thread with duplicate ID: " + strName)
+            Log.getLogger().warning("Tried to create new thread with duplicate ID: " + strName)
             return False
 
         objThread = ThreadClass(strName,userThreadProc,userData)

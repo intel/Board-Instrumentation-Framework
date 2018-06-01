@@ -100,7 +100,7 @@ class TargetManager():
     # towards a Marvin
     def AddDownstreamTarget(self,objTarget,TargetID):
         if None != self.GetDownstreamTarget(TargetID):
-            Log.getLogger().error("Attempted to add duplicate Downstream  target: " + TargetID)
+            Log.getLogger().warning("Attempted to add duplicate Downstream  target: " + TargetID)
             return
 
         self._DownstreamTargets[TargetID] = objTarget

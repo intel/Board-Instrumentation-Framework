@@ -325,12 +325,12 @@ class Configuration():
             Log.getLogger().error("IncomingMinionConnection not defined")
             return False
 
+        if False == self.__ReadAutoConnectInfo(domDoc):
+            return False
+
         self.__OutgoingDownstreamConnections = self.__ReadDownstreamTargets(domDoc)
 
         if None == self.GetOutgoingDownstreamConnections(): # go read targets, if none, then Houston we have an problemo
-            return False
-
-        if False == self.__ReadAutoConnectInfo(domDoc):
             return False
 
         if False == self.__ReadShuntInfo(domDoc):
@@ -432,8 +432,8 @@ class Configuration():
                 
                 retList.append(Target)
                 
-        else:
-         Log.getLogger().error("TargetConnection not defined")
+        elif None == self.__DynamicConnectMarvinMap :
+            Log.getLogger().error("TargetConnection not defined")
  
         return retList 
 
