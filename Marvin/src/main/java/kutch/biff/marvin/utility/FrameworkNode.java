@@ -134,6 +134,25 @@ public class FrameworkNode
         return retVal;
     }
 
+    public int getIntegerContent()
+    {
+        try
+        {
+            return Integer.parseInt(getTextContent());
+        }
+        catch (NumberFormatException ex)
+        {
+            return (int)getDoubleContent();
+        }
+    }
+    
+    
+    public double getDoubleContent()
+    {
+        return Double.parseDouble(getTextContent());
+    }
+    
+
     public int getIntegerAttribute(String elemStr, int defaultValue)
     {
         if (hasAttribute(elemStr))
@@ -143,9 +162,17 @@ public class FrameworkNode
             {
                 return Integer.parseInt(str);
             }
+
             catch (NumberFormatException ex)
             {
-                LOGGER.severe("Invalid attribute : " + str);
+                try
+                {
+                    return (int) Double.parseDouble(str);
+                }
+                catch (NumberFormatException ex1)
+                {
+                    LOGGER.severe("Invalid attribute : " + str);
+                }
             }
         }
         return defaultValue;
@@ -737,14 +764,14 @@ public class FrameworkNode
             }
 
             retString = strData.substring(0, OutterIndex);
-            
+
             if (4 == OperationSet.length)
             { // they specified a precision
                 try
                 {
                     Integer.parseInt(OperationSet[3]); // test if valid
                     String fmtStr = "%." + OperationSet[3] + "f";
-                    retString += String.format(fmtStr,NewVal);
+                    retString += String.format(fmtStr, NewVal);
                 }
                 catch (Exception ex)
                 {
@@ -752,16 +779,13 @@ public class FrameworkNode
                     return strData;
                 }
             }
+            else if (NewVal == Math.floor(NewVal) && !Double.isInfinite(NewVal))
+            { // if zeor's behind decimal, turn into an int.
+                retString += Integer.toString((int) NewVal);
+            }
             else
             {
-                if (NewVal == Math.floor(NewVal) && !Double.isInfinite(NewVal))
-                { // if zeor's behind decimal, turn into an int.
-                    retString += Integer.toString((int)NewVal);
-                }
-                else
-                {
-                    retString += Double.toString(NewVal);
-                }
+                retString += Double.toString(NewVal);
             }
             retString += strData.substring(CloseParenIndex + 1);
         }
