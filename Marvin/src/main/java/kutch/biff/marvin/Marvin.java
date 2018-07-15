@@ -776,14 +776,13 @@ public class Marvin extends Application
     {
         _DataMgr = new DataManager();
 
-        MySplash.getSplash().start(stage);
         if (false == testAppSize(stage))
         {
-            MySplash.getSplash().stopSplash();
             stage.close();
             stop();
             System.exit(5);
         }
+        MySplash.getSplash().start(stage);
         
         
     }

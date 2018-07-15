@@ -174,8 +174,23 @@ public class MySplash
                     if (Configuration.getConfig().isPrimaryScreenDetermined())
                     {
                        AppVisualBounds = Configuration.getConfig().getPrimaryScreen().getVisualBounds();
-                       _Stage.setX(AppVisualBounds.getMinX() + Configuration.getConfig().getWidth()/2 - _Stage.getWidth()/2);
-                       _Stage.setY(AppVisualBounds.getMinY() + Configuration.getConfig().getHeight()/2- _Stage.getHeight()/2);
+                       /*
+                       double aboutBoxW = _Stage.getWidth()/2;
+                       double configW =Configuration.getConfig().getWidth()/2;
+                       double visM = AppVisualBounds.getMinX();
+                       double visWid = AppVisualBounds.getMaxX();
+                       */
+                       double visWidth = Math.abs(AppVisualBounds.getMaxX()) - Math.abs(AppVisualBounds.getMinX());
+                       double visHeight = Math.abs(AppVisualBounds.getMaxY()) - Math.abs(AppVisualBounds.getMinY());
+                       
+                       
+                       double X = visWidth /2  - _Stage.getWidth()/2;
+                       double Y = visHeight /2 - _Stage.getHeight()/2;
+                       
+                       _Stage.setX(X);
+                       _Stage.setY(Y);
+                       //_Stage.setX(AppVisualBounds.getMinX() + Configuration.getConfig().getWidth()/2 - _Stage.getWidth()/2);
+                       //_Stage.setY(AppVisualBounds.getMinY() + Configuration.getConfig().getHeight()/2- _Stage.getHeight()/2);
                     }
                     return;
                 }

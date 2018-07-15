@@ -465,13 +465,25 @@ public class ConfigurationReader
             }
             else if (node.getNodeName().equalsIgnoreCase("MonitorNumber"))
             {
+                if (false == basicInfoOnly)
+                    continue;
+                int count = Screen.getScreens().size();
+                if (count == 1)
+                {
+                    continue;
+                }
                 try
                 {
                     int monitorNum = Integer.parseInt(node.getTextContent());
-                    int count = Screen.getScreens().size();
-                    if (monitorNum <= Screen.getScreens().size())
+                    if (monitorNum < 1)
                     {
-                        Screen primary = Screen.getScreens().get(monitorNum - 1);
+                        LOGGER.warning("<MonitorNumber> set to " + node.getTextContent() + " smallest valid value is 1.Ignoring");
+                        continue;
+                    }
+                    
+                    if (monitorNum <= count)
+                    {
+                        Screen primary = Screen.getScreens().get(monitorNum -1);
                         _Configuration.setPrimaryScreen(primary);
                         if (false == basicInfoOnly)
                         {
