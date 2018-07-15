@@ -780,7 +780,12 @@ public class Marvin extends Application
         if (false == testAppSize(stage))
         {
             MySplash.getSplash().stopSplash();
+            stage.close();
+            stop();
+            System.exit(5);
         }
+        
+        
     }
 
     public void FinishLoad(Stage stage)
