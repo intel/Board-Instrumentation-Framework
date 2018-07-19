@@ -31,6 +31,7 @@ from Helpers import TargetManager
 from Helpers import Entry
 from Helpers import Configuration
 import collections
+import datetime
 
 class RepeatMode():
     NONE=0
@@ -390,6 +391,9 @@ class Playback(object):
 
 
     def WriteCSVFile(self,filename,interval):
+        if interval == 0:
+            return self.WriteRawCSVFile(filename)
+
         dict = {}
         timeInterval = interval * 1000 #secs to ms
 
@@ -478,9 +482,120 @@ class Playback(object):
                 fp.write("\n")            
 
         
+    def AddRawEntryToDict(self,targetDict,entry):
+        if isinstance(entry,MarvinGroupData.MarvinDataGroup):
+            for datapoint in entry._DataList:
+                self.AddRawEntryToDict(targetDict,datapoint)
+            return
+
+        if not entry.Namespace in targetDict:
+            targetDict[entry.Namespace] = {} 
+
+        entriesDict = targetDict[entry.Namespace]
+        if not entry.ID in entriesDict:
+            entriesDict[entry.ID]= []
+            entry.timeDelta=0
+            entriesDict[entry.ID].append(entry)
+
+        else:
+            t1 = entry.ArrivalTime
+            t2 = entriesDict[entry.ID][-1].ArrivalTime
+            entry.timeDelta = t1-t2
+            entriesDict[entry.ID].append(entry)
+
+    def WriteRawCSVFile(self,filename):
+            namespaceDict = {}
+
+            entries = self.PlaybackData
+            firstPktTime = Time.GetCurrMS()
+
+            for entry in entries:
+                self.AddRawEntryToDict(namespaceDict,entry)
+                if entry.ArrivalTime < firstPktTime:
+                    firstPktTime = entry.ArrivalTime
+
+            sortedNamespaceDictionary = collections.OrderedDict(sorted(namespaceDict.items()))
+
+            writeData=[]
+            writeData.append( "BIFF CSV File.  Created {0}.  Time(ms) is the # of ms data value received after the 1st value (so a relative time).".format(datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")))
+            writeData.append( "Namespace,,")
+            ROW_NS=1
+            writeData.append("ID,,")
+            ROW_ID=2
+            writeData.append(",,") #Samples,Average Header Line
+            ROW_AVG_HDR = 3
+            writeData.append(",,") #Samples,Average Line
+            ROW_AVG = 4
+            writeData.append(",,") #Values, Time Header Line
+            ROW_DATA_HDR=5
+            startRow = len(writeData) 
+            line = ""
+            maxDp = 0
+
+            #go through each NS, making 1st two rows, keep track of longest ID set, and append that many lines
+
+            for namespace in sortedNamespaceDictionary:
+                nsDict = sortedNamespaceDictionary[namespace]
+                for id in nsDict:
+                    if len(nsDict[id]) > maxDp:
+                        maxDp = len(nsDict[id])
+
+            for i in range(0,maxDp+1):
+                writeData.append(",,")
+
+            rows = len(writeData)
 
 
+            for namespace in sortedNamespaceDictionary:
+                nsDict = sortedNamespaceDictionary[namespace]
+                sortedIDDictionary = collections.OrderedDict(sorted(nsDict.items()))
+
+                for ID in sortedIDDictionary:
+                    DataSet = sortedIDDictionary[ID]
+                    writeData[ROW_NS] += namespace + ",,,"
+                    writeData[ROW_ID] += ID + ",,,"
+                    writeData[ROW_AVG_HDR] += "Average,#Samples,,"
+                    writeData[ROW_DATA_HDR] += "Values,Time(ms),,"
+                    row = startRow
                     
+                    tValue=0.0
+                    nonNumeric=False
+
+                    for entry in DataSet:
+                        rowData = writeData[row]
+                        if "," in entry.Value:
+                            writeData[row] += str(entry.Value.replace(",",";") +",")
+                        else:
+                            writeData[row] += str(entry.Value) +"," 
+                          
+                        writeData[row] += str(entry.ArrivalTime - firstPktTime) +",,"
+
+                        row += 1
+                        if not nonNumeric:
+                            try:
+                                tValue += float(entry.Value)
+                            except Exception:
+                                nonNumeric = True
+
+
+                    if nonNumeric:
+                        writeData[ROW_AVG] += "NA,"
+                    else:
+                        writeData[ROW_AVG] += "{0},".format(tValue/len(DataSet))
+
+                    writeData[ROW_AVG] += str(len(DataSet)) +",,"
+
+
+                    if len(DataSet) < maxDp:
+                        for row in range(startRow+len(DataSet),startRow + maxDp):
+                            writeData[row] += ",,,"
+
+            
+            with open(filename,'w+t') as fp:
+                for line in writeData:
+                    fp.write(line + "\n")
+                
+            
 
 
 

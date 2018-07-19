@@ -830,7 +830,7 @@ class MenuSystem():
         #GuiMgr.SetTitle("- {"+filename+"}")
 
     def HandleSaveAsCSV(self):
-        Interval = tkinter.simpledialog.askinteger("Interval","What time interval rate (seconds) to save data at?",parent=self.root,minvalue=1,initialvalue=1)
+        Interval = tkinter.simpledialog.askinteger("Interval","What time interval rate (seconds) to save data at?",parent=self.root,minvalue=0,initialvalue=1)
         if None == Interval:
             return
 
@@ -851,8 +851,10 @@ class MenuSystem():
         filename = tkinter.filedialog.asksaveasfilename(**options)
         if len(filename) < 1 :
             return
-
-        GuiMgr.WriteCSVFile(filename,Interval)
+        try:
+            GuiMgr.WriteCSVFile(filename,Interval)
+        except Exception as Ex:
+            GuiMgr.MessageBox_Error(str(Ex),"Unable to write to file: " + filename)
 
     def HandleExportToDB(self):
         GuiMgr.MessageBox_Info("Export to Database","Grimock does not currently support this.\nPlease provide feedback to Patrick on what DB\nsupport you would like.")
