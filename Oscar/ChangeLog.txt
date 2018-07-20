@@ -1,3 +1,7 @@
+Release 18.07
+Added InsertBookmark task
+Added save as CSV with all raw data (not normalized to an interval) ability
+
 Release 18.02
 Added an Average value column to CSV output
 

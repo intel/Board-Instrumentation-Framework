@@ -24,15 +24,16 @@ from Helpers import  Log
 from Util import Utility
 from Data import MarvinData
 from Data import ConnectionPoint
+from Util import Time
 from Helpers import Playback
 from Helpers import GuiMgr
 from Data.ConnectionPoint import ConnectionType
 from Helpers import TargetManager
 from Helpers import Statistics
 from Helpers import Target
+from Helpers import Recorder
 from Helpers import Configuration
 from Helpers import Alias
-
 from Util import Sleep
 
 import sys
@@ -138,8 +139,66 @@ class MarvinDataHandler(object):
         elif tTask == "StopRecording".lower():
             self.PerformStopRecordingTask(Params)
 
+        elif tTask == "InsertBookmark".lower():
+            self.PerformInsertBookmark(Params)
+
         else:
             Log.getLogger().warn("Unknown Oscar Task: " + task)
+
+    def PerformInsertBookmark(self,Params):
+        #<?xml version="1.0" encoding="utf-8"?>
+        #<Marvin Type="OscarTask">
+        #    <Version>1.0</Version>
+        #     <OscarID>DemoOscar</OscarID>
+        #     <UniqueID>1233456</UniqueID>
+        #     <Task>InsertBookmark</Task>
+        #     <Param>Namespace=foo</Param>
+        #     <Param>ID=TestMarker</Param>
+        #     <Param>Data=StartTest</Param>
+        #     <Param>Propagate=True</Param> -- if True, the data is sent back upstream towards Marvin
+        #</Marvin>
+        if len(Params) >= 3:
+            fPropagate = False
+            for param in Params:
+                parts = param.split("=")
+                if len(parts)==2:
+                    if parts[0].lower()=='namespace':
+                        namespace = Alias.Alias(parts[1])
+                    elif parts[0].lower()=='id':
+                        id = Alias.Alias(parts[1])
+                    elif parts[0].lower()=='data':
+                        data = Alias.Alias(parts[1])
+                    elif parts[0].lower()=='propagate':
+                        propagate = Alias.Alias(parts[1])
+                        if propagate.lower() == "true":
+                            fPropagate = True
+
+                    else:
+                        Log.getLogger().error("Received invalid InsertBookmark task parameter: " + str(param))
+                        return
+        else:
+            Log.getLogger().error("Received invalid InsertBookmark task.  Insufficient Parameters.")
+            return
+
+        if None == namespace:
+            Log.getLogger().error("Received invalid InsertBookmark task.  Namespace not specified.")
+            return
+
+        if None == id:
+            Log.getLogger().error("Received invalid InsertBookmark task.  ID not specified.")
+            return
+
+        if None == data:
+            Log.getLogger().error("Received invalid InsertBookmark task.  Data not specified.")
+            return
+        
+        eTime = Time.GetCurrMS()
+        objData = MarvinData.MarvinData(namespace,id,data,eTime,1.0)
+        if None != objData:
+            Recorder.get().AddData(objData)
+            GuiMgr.OnDataPacketSentDownstream(objData,"Minion")
+            if fPropagate:
+                TargetManager.GetTargetManager().BroadcastDownstream(objData.ToXML(),False,None)
 
 
     def PerformStartRecordingTask(self,Params):
