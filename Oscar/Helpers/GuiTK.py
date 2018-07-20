@@ -830,7 +830,7 @@ class MenuSystem():
         #GuiMgr.SetTitle("- {"+filename+"}")
 
     def HandleSaveAsCSV(self):
-        Interval = tkinter.simpledialog.askinteger("Interval","What time interval rate (seconds) to save data at?",parent=self.root,minvalue=0,initialvalue=1)
+        Interval = tkinter.simpledialog.askinteger("Interval","What time interval rate (seconds) to save data at? Zero will save all datapoints.",parent=self.root,minvalue=0,initialvalue=1)
         if None == Interval:
             return
 
