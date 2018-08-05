@@ -25,349 +25,356 @@
 ##############################################################################
 -->
 <Minion>
-    <AliasList>
-        <Alias BytesPerSec2MBPS=".00000008"/>
-        <Alias ButesPerSec2GBPS=".000000008"/>
-        <Alias MyFreq="750"/>
-    </AliasList>
+	<AliasList>
+		<Alias BytesPerSec2MBPS=".00000008"/>
+		<Alias ButesPerSec2GBPS=".000000008"/>
+		<Alias MyFreq="750"/>
+	</AliasList>
 
-    <Namespace>
-        <Name>DemoNamespace</Name>
-        <DefaultFrequency>$(MyFreq)</DefaultFrequency>
-        <TargetConnection IP="localhost" PORT="5100"/>
+	<Namespace>
+		<Name>DemoNamespace</Name>
+		<DefaultFrequency>$(MyFreq)</DefaultFrequency>
+		<TargetConnection IP="localhost" PORT="5100"/>
 
-        <Actor ID="SimpleActor">
-            <Executable>Demonstration\SimpleActor.bat</Executable> #Param is sent from Gui
-        </Actor>
+		<Actor ID="SimpleActor">
+			<Executable>Demonstration\SimpleActor.bat</Executable> #Param is sent from Gui
+		</Actor>
 
-        <Collector ID="CombinedSource" Frequency="500">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomList</Param>
-            <Param>10</Param>
-            <Param>80</Param>
-            <Param>4</Param>
-        </Collector>
+		<Collector ID="CombinedSource" Frequency="500">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomList</Param>
+			<Param>10</Param>
+			<Param>80</Param>
+			<Param>4</Param>
+		</Collector>
 
-        <Collector ID="CombinedSourceStacked" Frequency="500">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomList</Param>
-            <Param>20</Param>
-            <Param>90</Param>
-            <Param>2</Param>
-        </Collector>
+		<Collector ID="CombinedSourceStacked" Frequency="500">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomList</Param>
+			<Param>20</Param>
+			<Param>90</Param>
+			<Param>2</Param>
+		</Collector>
 
-        <Collector ID="tx-allqueues.tx_bytes" Frequency="500">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomList</Param>
-            <Param>1</Param>
-            <Param>3</Param>
-            <Param>20</Param>
-        </Collector>
+		<Group Frequency="2000">
+			<Collector ID="tx-allqueues.tx_bytes">
+				<Executable>Collectors\RandomVal.py</Executable>
+				<Param>GetBoundedRandomList</Param>
+				<Param>5</Param>
+				<Param>10</Param>
+				<Param>4</Param>
+			</Collector>
 
-        <Collector ID="PieSource" Frequency="500">
-            <Executable>python</Executable>
-            <Param>Demonstration/Pie.py</Param>
-        </Collector>
+			<Collector ID="rx-allqueues.rx_bytes" Scale="-1">
+				<Operator>Duplicate</Operator>
+				<Input>tx-allqueues.tx_bytes</Input>
+			</Collector>
+		</Group>
 
-        <Group Frequency="2500" ProcessThread="MyWorker">
+		<Collector ID="PieSource" Frequency="500">
+			<Executable>python</Executable>
+			<Param>Demonstration/Pie.py</Param>
+		</Collector>
+
+		<Group Frequency="2500" ProcessThread="MyWorker">
             # a Group example with its own thread!
-            <Collector ID="Austria02" >
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="Austria02" >
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="Italy02" >
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="Italy02" >
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="USA02" >
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="USA02" >
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="Brazil02" >
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="Brazil02" >
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="France02">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="France02">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="Austria03">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="Austria03">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="Italy03">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="Italy03">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="USA03">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="USA03">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="Brazil03">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="Brazil03">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="France03">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="France03">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="Austria04">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="Austria04">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="Italy04">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="Italy04">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="USA04">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="USA04">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="Brazil04">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
+			<Collector ID="Brazil04">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
 
-            <Collector ID="France04">
-                <Executable>python</Executable>
-                <Param>Demonstration/CountryTest.py</Param>
-            </Collector>
-        </Group>
-        <!-- Some others are defined externally, and use some aliases-->
-        <externalfile Rate1="250" Rate2="500">Demonstration/AdditionalFile.xml</externalfile>
+			<Collector ID="France04">
+				<Executable>python</Executable>
+				<Param>Demonstration/CountryTest.py</Param>
+			</Collector>
+		</Group>
+		<!-- Some others are defined externally, and use some aliases-->
+		<externalfile Rate1="250" Rate2="500">Demonstration/AdditionalFile.xml</externalfile>
 
-        <Collector ID="CPU_LIST" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomList</Param>
-            <Param>10</Param>
-            <Param>95</Param>
-            <Param>80</Param>
-        </Collector>
+		<Collector ID="CPU_LIST" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomList</Param>
+			<Param>10</Param>
+			<Param>95</Param>
+			<Param>80</Param>
+		</Collector>
 
-        <Collector ID="CPU_LIST2" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomList</Param>
-            <Param>10</Param>
-            <Param>95</Param>
-            <Param>32</Param>
-        </Collector>
+		<Collector ID="CPU_LIST2" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomList</Param>
+			<Param>10</Param>
+			<Param>95</Param>
+			<Param>32</Param>
+		</Collector>
 
-        <Collector ID="StackedTx_Server1" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>3</Param>
-            <Param>15</Param>
-        </Collector>
+		<Collector ID="StackedTx_Server1" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>3</Param>
+			<Param>15</Param>
+		</Collector>
 
-        <Collector ID="StackedRx_Server1" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>20</Param>
-            <Param>40</Param>
-        </Collector>
+		<Collector ID="StackedRx_Server1" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>20</Param>
+			<Param>40</Param>
+		</Collector>
 
-        <Collector ID="StackedTx_Server2" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>15</Param>
-            <Param>38</Param>
-        </Collector>
+		<Collector ID="StackedTx_Server2" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>15</Param>
+			<Param>38</Param>
+		</Collector>
 
-        <Collector ID="StackedRx_Server2" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>15</Param>
-            <Param>38</Param>
-        </Collector>
+		<Collector ID="StackedRx_Server2" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>15</Param>
+			<Param>38</Param>
+		</Collector>
 
-        <Collector ID="StackedTx_Server3" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>5</Param>
-            <Param>28</Param>
-        </Collector>
+		<Collector ID="StackedTx_Server3" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>5</Param>
+			<Param>28</Param>
+		</Collector>
 
-        <Collector ID="StackedRx_Server3" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>15</Param>
-            <Param>38</Param>
-        </Collector>
+		<Collector ID="StackedRx_Server3" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>15</Param>
+			<Param>38</Param>
+		</Collector>
 
-        <Collector ID="StackedTx_Server4" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>15</Param>
-            <Param>38</Param>
-        </Collector>
+		<Collector ID="StackedTx_Server4" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>15</Param>
+			<Param>38</Param>
+		</Collector>
 
-        <Collector ID="StackedRx_Server4" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>15</Param>
-            <Param>38</Param>
-        </Collector>
+		<Collector ID="StackedRx_Server4" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>15</Param>
+			<Param>38</Param>
+		</Collector>
 
-        <Collector ID="10GData" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetScaledBoundedRandomValue</Param>
-            <Param>45</Param>
-            <Param>100</Param>
-            <Param>.1</Param>
-        </Collector>
+		<Collector ID="10GData" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetScaledBoundedRandomValue</Param>
+			<Param>45</Param>
+			<Param>100</Param>
+			<Param>.1</Param>
+		</Collector>
 
-        <Collector ID="3to10" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetScaledBoundedRandomValue</Param>
-            <Param>30</Param>
-            <Param>100</Param>
-            <Param>.1</Param>
-        </Collector>
+		<Collector ID="3to10" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetScaledBoundedRandomValue</Param>
+			<Param>30</Param>
+			<Param>100</Param>
+			<Param>.1</Param>
+		</Collector>
 
-        <Collector ID="0to100" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetScaledBoundedRandomValue</Param>
-            <Param>10</Param>
-            <Param>1000</Param>
-            <Param>.1</Param>
-        </Collector>
-
-
-        <Collector ID="IOPS" Frequency="10000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>5000</Param>
-            <Param>25000</Param>
-        </Collector>
-
-        <Collector ID="AVG"  Frequency="120">
-            <!-- <Bound Max="20000" Min="15555" Action="set"/> -->
-            <Operator>Average</Operator>
-            <Input>FromFile</Input>
-        </Collector>
-
-        <Collector ID="Progress" Frequency="100">
-            <Executable>Demonstration/Progress.py</Executable>
-            <Param>GetProgress</Param>
-        </Collector>
-
-        <Collector ID="Max" Frequency="10" SendOnlyOnChange="True">
-            <Operator>MaxValue</Operator>
-            <Input DefaultValue="0">AVG</Input>
-
-        </Collector>
-
-        <Collector ID="Min">
-            <Operator>MinValue</Operator>
-            <Input>0to100</Input>
-            <Input>AVG</Input>
-        </Collector>
-
-        <Group Frequency="800">
-            <Collector ID="TX" >
-                <Executable>Collectors\RandomVal.py</Executable>
-                <Param>GetBoundedRandomValue</Param>
-                <Param>30</Param>
-                <Param>39</Param>
-            </Collector>
-
-            <Collector ID="RX" >
-                <Executable>Collectors\RandomVal.py</Executable>
-                <Param>GetBoundedRandomValue</Param>
-                <Param>30</Param>
-                <Param>39</Param>
-            </Collector>
-
-            <Collector ID="BX" Frequency="250">
-                <Operator>Addition</Operator>
-                <Input>TX</Input>
-                <Input>RX</Input>
-            </Collector>
-        </Group>
-
-        <Collector ID="FromFile" SendOnlyOnChange="True">
-            <Executable>Collectors/FileCollector.py</Executable>
-            <Param>ReadFromFile</Param>
-            <Param>Demonstration\InputFile.txt</Param>
-        </Collector>
-
-        <Collector ID="Uptime" Frequency="500">
-            <Executable>Collectors\MinionInfo.py</Executable>
-            <Param>MinionUptime</Param>
-        </Collector>
-
-        <Collector ID="SysTime" Frequency="500">
-            <Executable>Collectors\MinionInfo.py</Executable>
-            <Param>SystemCurrentDateTime</Param>
-            <Param>%I:%M:%S</Param>
-        </Collector>
-
-        <DynamicCollector>
-            <File>foo.txt</File>
-            <Modifier ID="val" Scale="10"></Modifier>
-        </DynamicCollector>
+		<Collector ID="0to100" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetScaledBoundedRandomValue</Param>
+			<Param>10</Param>
+			<Param>1000</Param>
+			<Param>.1</Param>
+		</Collector>
 
 
-        <Collector ID="val1" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>15</Param>
-            <Param>38</Param>
-        </Collector>
+		<Collector ID="IOPS" Frequency="10000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>5000</Param>
+			<Param>25000</Param>
+		</Collector>
 
-        <Collector ID="val2" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>15</Param>
-            <Param>38</Param>
-        </Collector>
-        <Collector ID="val3" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>15</Param>
-            <Param>38</Param>
-        </Collector>
-        <Collector ID="val4" Frequency="1000" DoNotSend="True">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>15</Param>
-            <Param>38</Param>
-        </Collector>
+		<Collector ID="AVG"  Frequency="120">
+			<!-- <Bound Max="20000" Min="15555" Action="set"/> -->
+			<Operator>Average</Operator>
+			<Input>FromFile</Input>
+		</Collector>
 
-        <Collector ID="val5" Frequency="1000">
-            <Executable>Collectors\RandomVal.py</Executable>
-            <Param>GetBoundedRandomValue</Param>
-            <Param>15</Param>
-            <Param>38</Param>
-        </Collector>
+		<Collector ID="Progress" Frequency="100">
+			<Executable>Demonstration/Progress.py</Executable>
+			<Param>GetProgress</Param>
+		</Collector>
+
+		<Collector ID="Max" Frequency="10" SendOnlyOnChange="True">
+			<Operator>MaxValue</Operator>
+			<Input DefaultValue="0">AVG</Input>
+
+		</Collector>
+
+		<Collector ID="Min">
+			<Operator>MinValue</Operator>
+			<Input>0to100</Input>
+			<Input>AVG</Input>
+		</Collector>
+
+		<Group Frequency="800">
+			<Collector ID="TX" >
+				<Executable>Collectors\RandomVal.py</Executable>
+				<Param>GetBoundedRandomValue</Param>
+				<Param>30</Param>
+				<Param>39</Param>
+			</Collector>
+
+			<Collector ID="RX" >
+				<Executable>Collectors\RandomVal.py</Executable>
+				<Param>GetBoundedRandomValue</Param>
+				<Param>30</Param>
+				<Param>39</Param>
+			</Collector>
+
+			<Collector ID="BX" Frequency="250">
+				<Operator>Addition</Operator>
+				<Input>TX</Input>
+				<Input>RX</Input>
+			</Collector>
+		</Group>
+
+		<Collector ID="FromFile" SendOnlyOnChange="True">
+			<Executable>Collectors/FileCollector.py</Executable>
+			<Param>ReadFromFile</Param>
+			<Param>Demonstration\InputFile.txt</Param>
+		</Collector>
+
+		<Collector ID="Uptime" Frequency="500">
+			<Executable>Collectors\MinionInfo.py</Executable>
+			<Param>MinionUptime</Param>
+		</Collector>
+
+		<Collector ID="SysTime" Frequency="500">
+			<Executable>Collectors\MinionInfo.py</Executable>
+			<Param>SystemCurrentDateTime</Param>
+			<Param>%I:%M:%S</Param>
+		</Collector>
+
+		<DynamicCollector>
+			<File>foo.txt</File>
+			<Modifier ID="val" Scale="10"/>
+		</DynamicCollector>
 
 
-        <Collector ID="Sum">
-            <Operator>Addition</Operator>
-            <Repeat Count="5" StartValue="0" CurrentValueAlias="val">
-                <Input DefaultValue="0">Val$(val)</Input>
-            </Repeat>
-        </Collector>
+		<Collector ID="val1" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>15</Param>
+			<Param>38</Param>
+		</Collector>
 
-        <Collector ID="LT2">
-            <Operator>Makelist</Operator>
-            <Repeat Count="5" CurrentValueAlias="val">
-                <Input DefaultValue="2">Val$(val)</Input>
-            </Repeat>
-        </Collector>
+		<Collector ID="val2" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>15</Param>
+			<Param>38</Param>
+		</Collector>
+		<Collector ID="val3" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>15</Param>
+			<Param>38</Param>
+		</Collector>
+		<Collector ID="val4" Frequency="1000" DoNotSend="True">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>15</Param>
+			<Param>38</Param>
+		</Collector>
 
-    </Namespace>
+		<Collector ID="val5" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>GetBoundedRandomValue</Param>
+			<Param>15</Param>
+			<Param>38</Param>
+		</Collector>
+
+
+		<Collector ID="Sum">
+			<Operator>Addition</Operator>
+			<Repeat Count="5" StartValue="0" CurrentValueAlias="val">
+				<Input DefaultValue="0">Val$(val)</Input>
+			</Repeat>
+		</Collector>
+
+		<Collector ID="LT2">
+			<Operator>Makelist</Operator>
+			<Repeat Count="5" CurrentValueAlias="val">
+				<Input DefaultValue="2">Val$(val)</Input>
+			</Repeat>
+		</Collector>
+
+	</Namespace>
 </Minion>

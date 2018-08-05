@@ -122,6 +122,8 @@ class Collector:
 
         self.ScaleValue = float(newVal)
 
+        return True
+
     def IsOnDemand(self):
         return self._OnDemand
 
