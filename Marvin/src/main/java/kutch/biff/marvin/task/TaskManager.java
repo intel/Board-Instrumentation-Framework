@@ -487,7 +487,7 @@ public class TaskManager
                 }
                 else if (taskType.equalsIgnoreCase("OscarBind"))
                 {
-                    objTaskItem = BuildOscarBindTask(ID,node);
+                    objTaskItem = BuildOscarBindTask(ID, node);
                 }
                 else if (0 == taskType.compareToIgnoreCase("Minion"))
                 {
@@ -1049,16 +1049,72 @@ public class TaskManager
         }
         return objOscarTask;
     }
-    
+
     private OscarBindTask BuildOscarBindTask(String taskID, FrameworkNode taskNode)
     {
-        OscarBindTask objTask = new OscarBindTask();
+        /**
+         * <TaskList ID="ConnectToOscar">
+         *   <TaskItem Type="OscarBind">
+         *     <ConnectInfo IP="myOscar.myCompany" port="1234" key="My hash key"/>
+         *   </TaskItem>
+         * </TaskList>
+         *
+         */
+        String Address;
+        int Port;
+        String Key;
+
+        if (taskNode.hasChild("ConnectionInfo"))
+        {
+            FrameworkNode connInfo = taskNode.getChild("ConnectionInfo");
+            if (connInfo.hasAttribute("IP"))
+            {
+                Address = connInfo.getAttribute("IP");
+            }
+            else if (connInfo.hasAttribute("Address"))
+            {
+                Address = connInfo.getAttribute("Address");
+            }
+            else
+            {
+                LOGGER.severe("Task with ID: " + taskID + " contains an invalid OscarBind Task - no Address/IP specified");
+                return null;
+            }
+            if (connInfo.hasAttribute("Port"))
+            {
+                Port = connInfo.getIntegerAttribute("Port", -1);
+                if (Port == -1)
+                {
+                    LOGGER.severe("Task with ID: " + taskID + " contains an invalid OscarBind Task - invalid Port specified");
+                    return null;
+                }
+            }
+            else
+            {
+                LOGGER.severe("Task with ID: " + taskID + " contains an invalid OscarBind Task - no Port specified");
+                return null;
+            }
+            if (connInfo.hasAttribute("Key"))
+            {
+                Key = connInfo.getAttribute("Key");
+            }
+            else
+            {
+                LOGGER.severe("Task with ID: " + taskID + " contains an invalid OscarBind Task - no Key specified");
+                return null;
+            }
+        }
+        else
+        {
+            LOGGER.severe("Task with ID: " + taskID + " contains an invalid definition for OscarBind Task");
+            return null;
+        }
+
+        OscarBindTask objTask = new OscarBindTask(Address, Port, Key);
         objTask.setParams(GetParameters(taskNode));
-        
+
         return objTask;
     }
-            
-
 
     private ChainedTask BuildChainedTaskItem(String taskID, FrameworkNode taskNode)
     {
@@ -1077,8 +1133,8 @@ public class TaskManager
          * <TaskItem Type="Desktop">
          * <Document Action="Open">foo.html</Document>
          * </TaskItem>
-         * </TaskList>        
-        *
+         * </TaskList>
+         *
          */
         DesktopTask objDesktopTask = new DesktopTask();
 
@@ -1127,7 +1183,7 @@ public class TaskManager
          * <Param>1</Param>
          * <Param>2</Param>
          * </TaskItem>
-         * </TaskList>	        *
+         * </TaskList>	*
          */
         LaunchProgramTask objRunProgramTask = new LaunchProgramTask();
         objRunProgramTask.setParams(GetParameters(taskNode));
