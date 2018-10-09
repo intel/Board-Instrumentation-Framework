@@ -19,7 +19,7 @@
 
 import socket
 import json
-
+from pprint import pprint as pprint
 Logger = None
 
 def __WalkList(dataList, frameworkInterface,prefix=""):
@@ -32,13 +32,12 @@ def __WalkList(dataList, frameworkInterface,prefix=""):
 
 def __WalkMap(dataMap, frameworkInterface,prefix=""):
     Logger = frameworkInterface.Logger
-
     for entryKey in dataMap:
         if isinstance(dataMap[entryKey],dict):
-            __WalkMap(dataMap[entryKey],frameworkInterface,entryKey +".")
+            __WalkMap(dataMap[entryKey],frameworkInterface,prefix + entryKey +".")
 
         elif isinstance(dataMap[entryKey],list):
-            __WalkList(dataMap[entryKey],frameworkInterface,entryKey +".")
+            __WalkList(dataMap[entryKey],frameworkInterface,prefix + entryKey +".")
 
         else:
             ID = prefix + entryKey
@@ -68,9 +67,7 @@ def JSON_Network_Collector(frameworkInterface, IP, Port):
             data, fromAddress = recvSocket.recvfrom(8192)
             data = data.strip().decode("utf-8")
             dataMap = json.loads(data)
-
             __WalkMap(dataMap,frameworkInterface)
-
 
         except socket.error:
             continue
