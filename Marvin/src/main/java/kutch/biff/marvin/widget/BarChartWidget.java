@@ -31,8 +31,6 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
-import kutch.biff.marvin.utility.SeriesDataSet;
-import kutch.biff.marvin.utility.SeriesSet;
 
 /**
  *
