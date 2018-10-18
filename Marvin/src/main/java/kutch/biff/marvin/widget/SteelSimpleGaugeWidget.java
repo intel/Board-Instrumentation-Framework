@@ -218,5 +218,11 @@ public class SteelSimpleGaugeWidget extends BaseWidget
     {
         _Gauge.setTitle(strTitle);
     }
+    @Override
+    public void UpdateValueRange()
+    {
+        _Gauge.setMinValue(MinValue);
+        _Gauge.setMaxValue(MaxValue);
+    }
   
 }

@@ -64,7 +64,6 @@ import org.xml.sax.SAXException;
  */
 abstract public class BaseWidget implements Widget
 {
-
     public static String DefaultWidgetDirectory = "Widget";
     private static int _WidgetCount = 0;
     private static final ArrayList<BaseWidget> _WidgetList = new ArrayList<>();
@@ -816,6 +815,38 @@ abstract public class BaseWidget implements Widget
         }
     }
 
+    private void HandleRemoteValueRangeUpdate(FrameworkNode node)
+    {
+        Utility.ValidateAttributes(new String[]
+        {
+            "Min", "Max" 
+        }, node);
+        
+        String strMin = "";
+        if (node.hasAttribute("Min"))
+        {
+            strMin = node.getAttribute("Min");
+        }
+        String strMax = "";
+        if (node.hasAttribute("Max"))
+        {
+            strMax = node.getAttribute("Max");
+        }
+
+        if (strMin.length() > 0 || strMax.length() > 0)
+        {
+            LOGGER.info("Updating Widget ValueRange via Peekaboo");
+            if (HandleValueRange(node))
+            {
+                UpdateValueRange();
+            }
+        }
+        else
+        {
+            LOGGER.warning("Received Invalid Peekaboo Marvin request for new ValueRange: " + node.toString());
+        }
+    }
+    
     private void HandleRemoteStyleOverride(FrameworkNode node)
     {
         if (false == StyleUpdatesFromConfigFinished)
@@ -897,6 +928,10 @@ abstract public class BaseWidget implements Widget
         else if (baseNode.getNodeName().equalsIgnoreCase("Title"))
         {
             HandleRemoteTitleUpdate(baseNode);
+        }
+        else if (baseNode.getNodeName().equalsIgnoreCase("ValueRange"))
+        {
+            HandleRemoteValueRangeUpdate(baseNode);
         }
         else
         {
@@ -1882,6 +1917,12 @@ abstract public class BaseWidget implements Widget
     @Override
     public void OnResumed()
     {
+    }
+    
+    @Override
+    public void UpdateValueRange()
+    {
+        LOGGER.warning("Tried to perform Peekaboo ValueRange update for widget [" + this.getName() +"] that does not support this feature");
     }
 
 }

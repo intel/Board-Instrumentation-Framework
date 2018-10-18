@@ -335,5 +335,20 @@ public class SteelGaugeRadialWidget extends BaseWidget
     {
         _Gauge.setTitle(getTitle());
     }
+    @Override
+    public void UpdateValueRange()
+    {
+        _Gauge.setMinValue(MinValue);
+        _Gauge.setMaxValue(MaxValue);
+        
+        if (MajorTick > 0)
+        {
+            _Gauge.setMajorTickSpace(MajorTick);
+        }
+        if (MinorTick > 0)
+        {
+            _Gauge.setMinorTickSpace(MinorTick);
+        }
+    }
   
 }

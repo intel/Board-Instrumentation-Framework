@@ -35,7 +35,6 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class SteelLCDWidget extends BaseWidget
 {
-
     private static double aspectRatio = 2.75;
     private Lcd _LCD = null;
     private String UnitText;

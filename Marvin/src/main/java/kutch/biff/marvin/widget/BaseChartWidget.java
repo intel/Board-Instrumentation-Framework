@@ -472,6 +472,13 @@ abstract public class BaseChartWidget extends BaseWidget
         _chart.setTitle(strTitle);
     }
     
+    @Override
+    public void UpdateValueRange()
+    {
+        ((NumberAxis)(_yAxis)).setUpperBound(yAxisMaxValue);
+        ((NumberAxis)(_yAxis)).setLowerBound(yAxisMinValue);
+    }
+    
     public void SetSynchronizeInformation(boolean flag, int timeout)
     {
         SynchronizeMulitSourceData = flag;

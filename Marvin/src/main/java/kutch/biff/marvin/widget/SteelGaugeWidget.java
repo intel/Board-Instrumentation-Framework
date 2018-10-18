@@ -360,5 +360,11 @@ public class SteelGaugeWidget extends BaseWidget
     {
         _Gauge.setTitle(getTitle());
     }
+    @Override
+    public void UpdateValueRange()
+    {
+        _Gauge.setMinValue(MinValue);
+        _Gauge.setMaxValue(MaxValue);
+    }
  
 }
