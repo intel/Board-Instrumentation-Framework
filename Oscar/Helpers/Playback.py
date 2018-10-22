@@ -304,7 +304,7 @@ class Playback(object):
         if not os.path.isfile(filename):
             Log.getLogger().error("Asked to read from non-existant file: " + filename)
             return False
-        with open(filename,'r+b') as fp:
+        with open(filename,'rb') as fp:
             try:
                 entries = pickle.load(fp)
                 
