@@ -54,6 +54,8 @@ public class TabWidget extends GridWidget
     private boolean _UseScrollBars;
     private Pane basePane;
     private StackPane _stackReference;
+    private String _TaskOnActivate;
+    private boolean _IgnoreFirstSelect;
 
     public TabWidget(String tabID)
     {
@@ -63,6 +65,8 @@ public class TabWidget extends GridWidget
         _tab = new Tab();
         setBaseCSSFilename("TabDefault.css");
         _IsVisible = true;
+        _TaskOnActivate = null;
+        _IgnoreFirstSelect = false;
 
         basePane = new Pane();
 
@@ -171,6 +175,11 @@ public class TabWidget extends GridWidget
             return convertToFileURL(strFile);
         }
         return null;
+    }
+
+    public void setOnActivateTask(String taskID)
+    {
+        _TaskOnActivate = taskID;
     }
 
     public boolean LoadConfiguration(FrameworkNode doc)
@@ -293,4 +302,32 @@ public class TabWidget extends GridWidget
     {
         return _BaseGridPane;
     }
+
+    @Override
+    public boolean PerformPostCreateActions(GridWidget parentGrid, boolean updateToolTipOnly)
+    {
+        if (null != _TaskOnActivate)
+        {
+
+            if (_tab.isSelected())
+            {
+                _IgnoreFirstSelect = true; // 1st tab will get the selection changed notification on startup, ignore it
+            }
+            _tab.setOnSelectionChanged(e
+                    -> 
+                    {
+                        if (_tab.isSelected())
+                        {
+                            if (!_IgnoreFirstSelect)
+                            {
+                                TASKMAN.PerformTask(_TaskOnActivate);
+                            }
+                        }
+                        _IgnoreFirstSelect = false;
+            }
+            );
+        }
+        return super.PerformPostCreateActions(parentGrid, updateToolTipOnly);
+    }
+
 }

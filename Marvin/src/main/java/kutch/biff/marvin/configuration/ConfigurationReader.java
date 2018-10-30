@@ -1006,7 +1006,7 @@ public class ConfigurationReader
 
                                     AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
                                                                             {
-                                                                                "ID", "File", "Align", "hgap", "vgap"
+                                                                                "ID", "File", "Align", "hgap", "vgap","Task"
                                     });
 
                                     if (false == AliasMgr.getAliasMgr().ReadAliasFromExternalFile(node.getAttribute("File")))
@@ -1022,7 +1022,7 @@ public class ConfigurationReader
                                 {
                                     Utility.ValidateAttributes(new String[]
                                     {
-                                        "ID", "File", "Align", "hgap", "vgap"
+                                        "ID", "File", "Align", "hgap", "vgap","Task"
                                     }, node);
                                     tabNode = node;
                                 }
@@ -1061,6 +1061,10 @@ public class ConfigurationReader
                     {
                         String str = node.getAttribute("Align");
                         tab.setAlignment(str);
+                    }
+                    if (node.hasAttribute("task"))
+                    {
+                        tab.setOnActivateTask(node.getAttribute("task"));
                     }
 
                     if (node.hasAttribute("hgap"))
