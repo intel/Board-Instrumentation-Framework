@@ -280,7 +280,7 @@ public class Marvin extends Application
             {
                 RunInDebugger = true;
             }
-            
+
             else if (param.equalsIgnoreCase("-nosplash")) // don't show splash
             {
                 ShowSplash = false;
@@ -664,7 +664,7 @@ public class Marvin extends Application
             return false;
         }
         final Configuration basicConfig = _Config.ReadStartupInfo(ConfigFilename);
-        
+
         if (null == basicConfig)
         {
             return false;
@@ -717,6 +717,12 @@ public class Marvin extends Application
         Scene scene = new Scene(stagePane);
         stage.setScene(scene);
         SetAppStyle(scene.getStylesheets());
+        
+        if (_Config.getConfiguration().getKioskMode())
+        {
+            stage.initStyle(StageStyle.UNDECORATED);
+        }
+
         stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>()
                       {
                           @Override
@@ -783,8 +789,7 @@ public class Marvin extends Application
             System.exit(5);
         }
         MySplash.getSplash().start(stage);
-        
-        
+
     }
 
     public void FinishLoad(Stage stage)
@@ -848,9 +853,8 @@ public class Marvin extends Application
         _Config.getConfiguration().getCurrentHeightProperty().bind(scene.heightProperty());
         _Config.getConfiguration().getCurrentWidthProperty().bind(scene.widthProperty());
         _objTabPane.prefWidthProperty().bind(scene.widthProperty());
-        
-        _objTabPane.prefHeightProperty().bind(scene.heightProperty());
 
+        _objTabPane.prefHeightProperty().bind(scene.heightProperty());
 
         SetAppStyle(scene.getStylesheets());
 
@@ -874,11 +878,6 @@ public class Marvin extends Application
         stage.setScene(scene);
         stage.setHeight(appHeight);
         stage.setWidth(appWidth);
-
-        if (_Config.getConfiguration().getKioskMode())
-        {
-            stage.initStyle(StageStyle.UNDECORATED);
-        }
 
         if (true == ShowHelp)
         {
