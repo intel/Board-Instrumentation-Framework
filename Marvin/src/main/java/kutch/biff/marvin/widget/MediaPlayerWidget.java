@@ -86,8 +86,13 @@ public abstract class MediaPlayerWidget extends BaseWidget
         }
         if (!VerifySupportsMedia())
         {
-            return false;
+            if (CONFIG.getEnforceMediaSupport())
+            {
+                return false;
+            }
+            return true;
         }
+        
         if (_ListOfIDs.size() == 1)
         {
             _CurrentMediaID = _ListOfIDs.get(0);

@@ -89,6 +89,17 @@ public class Configuration
     private boolean _PrimaryScreenDetermined;
     private int _CanvasWidth,_CanvasHeight;
     private boolean _RunInDebugger;
+    private boolean _EnforceMediaSupport;
+
+    public boolean getEnforceMediaSupport()
+    {
+        return _EnforceMediaSupport;
+    }
+
+    public void setEnforceMediaSupport(boolean _EnforceMediaSupport)
+    {
+        this._EnforceMediaSupport = _EnforceMediaSupport;
+    }
     
 
     public Configuration()

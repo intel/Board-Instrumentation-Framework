@@ -74,6 +74,7 @@ import kutch.biff.marvin.widget.Widget;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ScrollPane;
 import static java.lang.Math.abs;
+import static java.lang.Math.abs;
 
 /**
  *
@@ -110,6 +111,7 @@ public class Marvin extends Application
     private boolean ShowVersion = false;
     private boolean ShowSplash = true;
     private boolean RunInDebugger = false;
+    private boolean enforceMediaSupport = false;
     private boolean dumpAlias = false;
     private boolean dumpWidgetInfo = false;
     private String altSplash = null;
@@ -247,6 +249,10 @@ public class Marvin extends Application
                 verboseLevel = 4;
                 //ReportMemoryUsage = true; // super verbose mode, show memory usage
             }
+            else if (param.equalsIgnoreCase("-enforceMediaSupport"))
+            {
+                enforceMediaSupport = true;
+            }
             else if (param.equalsIgnoreCase("-dumpalias"))
             {
                 dumpAlias = true;
@@ -279,6 +285,7 @@ public class Marvin extends Application
             else if (param.equalsIgnoreCase("-db")) // don't show splash
             {
                 RunInDebugger = true;
+                ShowSplash = false;
             }
 
             else if (param.equalsIgnoreCase("-nosplash")) // don't show splash
@@ -372,10 +379,11 @@ public class Marvin extends Application
         {
             return 0;
         }
-
+        
         TASKMAN.setDataMgr(_DataMgr); // kludgy I know, I know.  I hang my head in shame
         appConfig = _Config.ReadAppConfigFile(ConfigFilename);
-
+        appConfig.setEnforceMediaSupport(enforceMediaSupport);
+        
         if (null != appConfig)
         {
             if (dumpAlias)
