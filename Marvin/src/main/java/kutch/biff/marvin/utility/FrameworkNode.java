@@ -37,6 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import kutch.biff.marvin.widget.BaseWidget;
 
 /**
  * This is a wrapper class for the XML Node object. It allows case non-sensitve
@@ -292,8 +293,8 @@ public class FrameworkNode
         }
         String userData = strInput.substring(9, strInput.indexOf(']'));
         String[] parts = userData.split(":");
-
-        File folder = new File(parts[0]);
+        String strFolder = BaseWidget.convertToFileOSSpecific(parts[0]);
+        File folder = new File(strFolder);
 
         if (!folder.exists())
         {
