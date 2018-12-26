@@ -382,10 +382,10 @@ public class Marvin extends Application
         
         TASKMAN.setDataMgr(_DataMgr); // kludgy I know, I know.  I hang my head in shame
         appConfig = _Config.ReadAppConfigFile(ConfigFilename);
-        appConfig.setEnforceMediaSupport(enforceMediaSupport);
         
         if (null != appConfig)
         {
+            appConfig.setEnforceMediaSupport(enforceMediaSupport);
             if (dumpAlias)
             {
                 AliasMgr.getAliasMgr().DumpTop();
