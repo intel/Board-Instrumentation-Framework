@@ -22,14 +22,21 @@
 package kutch.biff.marvin.datamanager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
+import javafx.scene.control.TabPane;
+import kutch.biff.marvin.configuration.Configuration;
+import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.DynamicDebugWidgetTask;
 import kutch.biff.marvin.task.TaskManager;
+import kutch.biff.marvin.utility.AliasMgr;
+import kutch.biff.marvin.utility.DynamicItemInfoContainer;
+import kutch.biff.marvin.widget.TabWidget;
 
 /**
  *
@@ -37,12 +44,12 @@ import kutch.biff.marvin.task.TaskManager;
  */
 public class DataManager
 {
-
     private static DataManager _DataManager = null;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     private ConcurrentHashMap<String, DataSet> _DataMap;
     private ConcurrentHashMap<String, List<WildcardListItem>> _WildcardDataMap;
+    private HashMap<String,String> _NamespaceMap;
     private long _UpdateCount;
     private long _UnassignedDataPoints;
 
@@ -50,6 +57,8 @@ public class DataManager
     {
         _DataMap = new ConcurrentHashMap<>();
         _WildcardDataMap = new ConcurrentHashMap<>();
+        _NamespaceMap = new HashMap<>();
+        //_NamespaceMap.put("MarvinLocalNamespace".toUpperCase(),"MarvinLocalNamespace".toUpperCase());
         _DataManager = this;
         _UpdateCount = 0;
         _UnassignedDataPoints = 0;
@@ -145,11 +154,45 @@ public class DataManager
         return RetVal;
     }
 
+    private void HandleDynamicTabCreation(DynamicItemInfoContainer item, String Namespace)
+    {
+        LOGGER.info("Creating OnDemand Tab for namespace: " + Namespace + " using Tab template ID: " + item.getID());
+        Configuration config = Configuration.getConfig();
+        TabPane parentPane = config.getPane();
+        String tabID = item.getOther();
+        if (tabID == "")
+        {
+            tabID = item.toString();
+        }
+        TabWidget tab = new TabWidget(tabID);
+        AliasMgr.getAliasMgr().PushAliasList(true);
+        AliasMgr.getAliasMgr().AddAlias("DynamicTabNamespace", Namespace);
+        tab = ConfigurationReader.ReadTab(item.getNode(), tab, tabID);
+        if (tab.Create(parentPane, this, 0))
+        {
+            tab.PerformPostCreateActions(null, false);
+        }
+        AliasMgr.getAliasMgr().PopAliasList();
+        ConfigurationReader.GetConfigReader().getTabs().add(tab);
+    }
     public void ChangeValue(String ID, String Namespace, String Value)
     {
         synchronized (this)
         {
-            String Key = Namespace.toUpperCase() + ID.toUpperCase();
+            String NamespaceCheck=Namespace.toUpperCase();
+            if (false == Configuration.getConfig().getDynamicTabList().isEmpty() &&
+                false == _NamespaceMap.containsKey(NamespaceCheck))
+            {
+                for (DynamicItemInfoContainer item : Configuration.getConfig().getDynamicTabList())
+                {
+                    if (item.Matches(Namespace))
+                    {
+                        HandleDynamicTabCreation(item,NamespaceCheck);
+                    }
+                }
+                _NamespaceMap.put(NamespaceCheck, Namespace);
+            }
+            String Key = Namespace + ID.toUpperCase();
 
             _UpdateCount++;
 
@@ -219,7 +262,6 @@ public class DataManager
         }
     }
     
-
     public int PerformUpdates()
     {
         int updatesPerformed = 0;

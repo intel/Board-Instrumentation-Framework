@@ -40,6 +40,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.network.OscarBullhorn;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.task.OscarBullhornTask;
+import kutch.biff.marvin.utility.DynamicItemInfoContainer;
  
 /** 
  *
@@ -90,7 +91,12 @@ public class Configuration
     private int _CanvasWidth,_CanvasHeight;
     private boolean _RunInDebugger;
     private boolean _EnforceMediaSupport;
+    private ArrayList<DynamicItemInfoContainer> __DynamicTabList;
 
+    public ArrayList<DynamicItemInfoContainer> getDynamicTabList()
+    {
+        return __DynamicTabList;
+    }
     public boolean getEnforceMediaSupport()
     {
         return _EnforceMediaSupport;
@@ -101,7 +107,6 @@ public class Configuration
         this._EnforceMediaSupport = _EnforceMediaSupport;
     }
     
-
     public Configuration()
     {
         _insetTop = 0;
@@ -133,7 +138,7 @@ public class Configuration
         _Side = Side.TOP;
         _PrimaryScreen = Screen.getPrimary();
         _PrimaryScreenDetermined = false;
-       
+       __DynamicTabList = new ArrayList<>();
         _ShuttingDown = false;
         
         _LastLiveDataReceived = 0;

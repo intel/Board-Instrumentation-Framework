@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.DoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
@@ -38,7 +37,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
-import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,6 +45,7 @@ import kutch.biff.marvin.task.PromptManager;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.Conditional;
+import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
@@ -411,6 +410,18 @@ public class ConfigurationReader
 
     }
 
+    private boolean InList(ArrayList<String> list, String toCheck)
+    {
+        for (String item : list)
+        {
+            if (item.equalsIgnoreCase(toCheck))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean ReadAppSettings(Document doc, boolean basicInfoOnly)
     {
         NodeList appStuff = doc.getElementsByTagName("Application");
@@ -426,12 +437,13 @@ public class ConfigurationReader
         boolean NetworkSettingsRead = false;
         FrameworkNode baseNode = new FrameworkNode(appStuff.item(0));
         FetchDimenstions(baseNode);
-        
+
         AliasMgr.getAliasMgr().addMarvinInfo();
         AliasMgr.ReadAliasFromRootDocument(doc);
         ReadAppAttributes(baseNode);
 
-        ArrayList<String> TabList = new ArrayList<String>();
+        ArrayList<String> DeclaredTabList = new ArrayList<String>();
+        ArrayList<DynamicItemInfoContainer> DynamicTabList = Configuration.getConfig().getDynamicTabList();
 
         for (FrameworkNode node : baseNode.getChildNodes())
         {
@@ -466,7 +478,9 @@ public class ConfigurationReader
             else if (node.getNodeName().equalsIgnoreCase("MonitorNumber"))
             {
                 if (false == basicInfoOnly)
+                {
                     continue;
+                }
                 int count = Screen.getScreens().size();
                 if (count == 1)
                 {
@@ -480,10 +494,10 @@ public class ConfigurationReader
                         LOGGER.warning("<MonitorNumber> set to " + node.getTextContent() + " smallest valid value is 1.Ignoring");
                         continue;
                     }
-                    
+
                     if (monitorNum <= count)
                     {
-                        Screen primary = Screen.getScreens().get(monitorNum -1);
+                        Screen primary = Screen.getScreens().get(monitorNum - 1);
                         _Configuration.setPrimaryScreen(primary);
                         if (false == basicInfoOnly)
                         {
@@ -729,7 +743,61 @@ public class ConfigurationReader
                             String ID = tabNode.getAttribute("ID");
                             if (ID != null && ID.length() > 0)
                             {
-                                TabList.add(ID);
+                                if (tabNode.hasAttribute("OnDemand") && tabNode.getBooleanAttribute("OnDemand"))
+                                {
+                                    String strTabID="";
+                                    ArrayList<String> MaskList = new ArrayList<>();
+                                    ArrayList<String> ExcludeList = new ArrayList<>();
+                                    for (FrameworkNode dynaNode : tabNode.getChildNodes(true))
+                                    {
+                                        if (dynaNode.getNodeName().equalsIgnoreCase("MatchPattern"))
+                                        {
+                                            String Mask = dynaNode.getTextContent();
+                                            if (InList(MaskList, Mask))
+                                            {
+                                                LOGGER.warning("On Demand Tab specified duplicate Namespace MatchPatterns.  Ignoring.");
+                                            }
+                                            else
+                                            {
+                                                MaskList.add(dynaNode.getTextContent());
+                                            }
+
+                                        }
+                                        else if (dynaNode.getNodeName().equalsIgnoreCase("TabID"))
+                                        {
+                                            strTabID = dynaNode.getTextContent();
+                                        }
+                                        else if (dynaNode.getNodeName().equalsIgnoreCase("ExcludePattern"))
+                                        {
+                                            String Exclude = dynaNode.getTextContent();
+                                            if (InList(ExcludeList, Exclude))
+                                            {
+                                                LOGGER.warning("On Demand Tab specified duplicate Namespace Exclude.  Ignoring.");
+                                            }
+
+                                            else
+                                            {
+                                                ExcludeList.add(dynaNode.getTextContent());
+                                            }
+
+                                            if (InList(MaskList, Exclude))
+                                            {
+                                                LOGGER.warning("On Demand Tab specified duplicate Namespace Exclude that matches Namespace Mask.");
+                                            }
+                                        }
+                                    }
+                                    if (MaskList.isEmpty())
+                                    {
+                                        LOGGER.severe("On Demand Tab with ID of " + ID + " did not specify a namespace");
+                                        return false;
+                                    }
+                                    DynamicItemInfoContainer dynaTab = new DynamicItemInfoContainer(MaskList,ExcludeList,ID,null,strTabID);
+                                    DynamicTabList.add(dynaTab);
+                                }
+                                else
+                                {
+                                    DeclaredTabList.add(ID);
+                                }
                             }
                             else
                             {
@@ -767,20 +835,24 @@ public class ConfigurationReader
             return true;
         }
 
-        if (TabList.size() < 1)
+        if (DeclaredTabList.isEmpty() && DynamicTabList.isEmpty())
         {
             LOGGER.severe("No Tabs defined in <Application> section of configuration file.");
             return false;
         }
         _Configuration.setPrimaryScreenDetermined(true);
 
-        if (VerifyTabList(TabList))
+        if (VerifyTabList(DeclaredTabList))
         {
-            _tabs = ReadTabs(doc, TabList);
+            _tabs = ReadTabs(doc, DeclaredTabList);
             if (null == _tabs)
             {
                 return false;
             }
+        }
+        if (!Configuration.getConfig().getDynamicTabList().isEmpty())
+        {
+            ReadDynamicTabs(doc);
         }
 
         if (false == NetworkSettingsRead)
@@ -790,6 +862,36 @@ public class ConfigurationReader
         return NetworkSettingsRead;
     }
 
+    private void ReadDynamicTabs(Document doc)
+    {
+        FrameworkNode appNode = new FrameworkNode(doc.getChildNodes().item(0));
+        
+        for (FrameworkNode node : appNode.getChildNodes("tab"))
+        {
+            if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
+            {
+                continue;
+            }
+            if (node.getNodeName().equalsIgnoreCase("Tab"))
+            {
+                if (node.hasAttributes())
+                {
+                    if (node.hasAttribute("ID"))
+                    {
+                        String id = node.getAttribute("ID");
+                        for (DynamicItemInfoContainer item : Configuration.getConfig().getDynamicTabList())
+                        {
+                            if (item.getID().equalsIgnoreCase(id))
+                            {
+                                item.setNode(node);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+            
     private boolean ReadUnregisteredDataInfo(FrameworkNode UnregisteredDataNode)
     {
         Utility.ValidateAttributes(new String[]
@@ -915,6 +1017,7 @@ public class ConfigurationReader
         }
         return RetVal;
     }
+    
 
     /**
      * Allows one to define the tab contents (widgets) in an onother file Node
@@ -939,6 +1042,101 @@ public class ConfigurationReader
             }
         }
         return false;
+    }
+
+    static public TabWidget ReadTab(FrameworkNode node, TabWidget tab, String id)
+    {
+        FrameworkNode tabNode = null;
+        AliasMgr.getAliasMgr().PushAliasList(true);
+        AliasMgr.getAliasMgr().AddAlias("TabID", id); // Make TabID an alias = to the ID :-)
+
+        if (node.hasAttribute("File")) // can externally define widgets within
+        {
+            WidgetBuilder.StartReadingExternalFile(node);
+            tabNode = OpenTabDefinitionFile(node.getAttribute("File"));
+            if (null == tabNode)
+            {
+                LOGGER.severe("Invalid tab definition file: " + node.getAttribute("File"));
+                return null;
+            }
+
+            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
+                                                    {
+                                                        "ID", "File", "Align", "hgap", "vgap", "Task"
+            });
+
+            if (false == AliasMgr.getAliasMgr().ReadAliasFromExternalFile(node.getAttribute("File")))
+            {
+                return null;
+            }
+            if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("File")))
+            {
+                return null;
+            }
+        }
+        else
+        {
+            Utility.ValidateAttributes(new String[]
+            {
+                "ID", "File", "Align", "hgap", "vgap", "Task"
+            }, node);
+            tabNode = node;
+        }
+        if (null == tabNode)
+        {
+            return null;
+        }
+        if (false == tab.LoadConfiguration(tabNode))
+        {
+            return null;
+        }
+        if (node.hasAttribute("File"))
+        {
+            WidgetBuilder.DoneReadingExternalFile();
+        }
+
+        if (true == node.hasAttribute("Align"))
+        {
+            String str = node.getAttribute("Align");
+            tab.setAlignment(str);
+        }
+        if (node.hasAttribute("task"))
+        {
+            tab.setOnActivateTask(node.getAttribute("task"));
+        }
+
+        if (node.hasAttribute("hgap"))
+        {
+            try
+            {
+                if (!tab.parsehGapValue(node))
+                {
+                    LOGGER.config("Setting hGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("hgap"));
+                }
+                //tab.sethGap(Integer.parseInt(node.getAttribute("hgap")));
+            }
+            catch (Exception ex)
+            {
+                LOGGER.warning("Tab ID=" + tab.getMinionID() + " has invalid hgap.  Ignoring");
+            }
+        }
+        if (node.hasAttribute("vgap"))
+        {
+            try
+            {
+                if (!tab.parsevGapValue(node))
+                {
+                    LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("vgap"));
+                }
+                //                            tab.setvGap(Integer.parseInt(node.getAttribute("vgap")));
+                //LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("vgap"));
+            }
+            catch (Exception ex)
+            {
+                LOGGER.warning("Tab ID=" + tab.getMinionID() + " has invalid vgap.  Ignoring");
+            }
+        }
+        return tab;
     }
 
     private List<TabWidget> ReadTabs(Document doc, List<String> TabID_List)
@@ -991,55 +1189,59 @@ public class ConfigurationReader
 
                                 tab = new TabWidget(id);
                                 FrameworkNode tabNode = null;
-                                AliasMgr.getAliasMgr().PushAliasList(true);
-                                AliasMgr.getAliasMgr().AddAlias("TabID", id); // Make TabID an alias = to the ID :-)
+                                //AliasMgr.getAliasMgr().PushAliasList(true);
+                                //AliasMgr.getAliasMgr().AddAlias("TabID", id); // Make TabID an alias = to the ID :-)
 
-                                if (node.hasAttribute("File")) // can externally define widgets within
+                                tab = ConfigurationReader.ReadTab(node, tab, id);
+                                if (false)
                                 {
-                                    WidgetBuilder.StartReadingExternalFile(node);
-                                    tabNode = OpenTabDefinitionFile(node.getAttribute("File"));
+                                    if (node.hasAttribute("File")) // can externally define widgets within
+                                    {
+                                        WidgetBuilder.StartReadingExternalFile(node);
+                                        tabNode = OpenTabDefinitionFile(node.getAttribute("File"));
+                                        if (null == tabNode)
+                                        {
+                                            LOGGER.severe("Invalid tab definition file: " + node.getAttribute("File"));
+                                            return null;
+                                        }
+
+                                        AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
+                                                                                {
+                                                                                    "ID", "File", "Align", "hgap", "vgap", "Task"
+                                        });
+
+                                        if (false == AliasMgr.getAliasMgr().ReadAliasFromExternalFile(node.getAttribute("File")))
+                                        {
+                                            return null;
+                                        }
+                                        if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("File")))
+                                        {
+                                            return null;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Utility.ValidateAttributes(new String[]
+                                        {
+                                            "ID", "File", "Align", "hgap", "vgap", "Task"
+                                        }, node);
+                                        tabNode = node;
+                                    }
                                     if (null == tabNode)
                                     {
-                                        LOGGER.severe("Invalid tab definition file: " + node.getAttribute("File"));
                                         return null;
                                     }
-
-                                    AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
-                                                                            {
-                                                                                "ID", "File", "Align", "hgap", "vgap","Task"
-                                    });
-
-                                    if (false == AliasMgr.getAliasMgr().ReadAliasFromExternalFile(node.getAttribute("File")))
+                                    if (false == tab.LoadConfiguration(tabNode))
                                     {
                                         return null;
                                     }
-                                    if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("File")))
+                                    if (node.hasAttribute("File"))
                                     {
-                                        return null;
+                                        WidgetBuilder.DoneReadingExternalFile();
                                     }
-                                }
-                                else
-                                {
-                                    Utility.ValidateAttributes(new String[]
-                                    {
-                                        "ID", "File", "Align", "hgap", "vgap","Task"
-                                    }, node);
-                                    tabNode = node;
-                                }
-                                if (null == tabNode)
-                                {
-                                    return null;
-                                }
-                                if (false == tab.LoadConfiguration(tabNode))
-                                {
-                                    return null;
-                                }
-                                if (node.hasAttribute("File"))
-                                {
-                                    WidgetBuilder.DoneReadingExternalFile();
-                                }
 
-                                break;
+                                    break;
+                                }
                             }
                         }
                         if (true == found)
@@ -1229,7 +1431,7 @@ public class ConfigurationReader
             return null;
         }
 
-        Conditional objConditional = Conditional.BuildConditional(type, condNode,true);
+        Conditional objConditional = Conditional.BuildConditional(type, condNode, true);
         if (null != objConditional)
         {
             objConditional.setCaseSensitive(CaseSensitive);
