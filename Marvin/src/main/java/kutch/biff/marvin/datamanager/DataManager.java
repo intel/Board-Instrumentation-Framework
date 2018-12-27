@@ -160,20 +160,23 @@ public class DataManager
         Configuration config = Configuration.getConfig();
         TabPane parentPane = config.getPane();
         String tabID = item.getOther();
-        if (tabID == "")
+        if (tabID == "") // no TabID specified in config file, so just use the object
         {
             tabID = item.toString();
         }
         TabWidget tab = new TabWidget(tabID);
         AliasMgr.getAliasMgr().PushAliasList(true);
-        AliasMgr.getAliasMgr().AddAlias("DynamicTabNamespace", Namespace);
+        AliasMgr.getAliasMgr().AddAlias("DynamicTabNamespace", Namespace); // So tab knows namespace
         tab = ConfigurationReader.ReadTab(item.getNode(), tab, tabID);
-        if (tab.Create(parentPane, this, 0))
+        if (null != tab)
         {
-            tab.PerformPostCreateActions(null, false);
+            if (tab.Create(parentPane, this, 0))
+            {
+                tab.PerformPostCreateActions(null, false);
+                ConfigurationReader.GetConfigReader().getTabs().add(tab);
+            }
         }
         AliasMgr.getAliasMgr().PopAliasList();
-        ConfigurationReader.GetConfigReader().getTabs().add(tab);
     }
     public void ChangeValue(String ID, String Namespace, String Value)
     {
