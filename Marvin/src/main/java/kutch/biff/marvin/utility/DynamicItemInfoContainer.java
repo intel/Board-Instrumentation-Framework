@@ -22,6 +22,8 @@
 package kutch.biff.marvin.utility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import javafx.util.Pair;
 
 /**
  *
@@ -30,29 +32,61 @@ import java.util.ArrayList;
 public class DynamicItemInfoContainer
 {
 
-    private final ArrayList<String> __patternList;
-    private final ArrayList<String> __excludePatternList;
-    private final String __ID;
+    private final Pair<ArrayList<String>,ArrayList<String>> __namespaceCriterea;
+    private final Pair<ArrayList<String>,ArrayList<String>> __idCriterea;
+    private String __ID;
     private FrameworkNode __node;
     private String __other;
-
-    public DynamicItemInfoContainer(ArrayList<String> pattern, ArrayList<String> excludePattern, String ID, FrameworkNode node, String other)
+    private final HashMap<String,Boolean> __PreviouslyChecked;
+    
+    public DynamicItemInfoContainer(Pair<ArrayList<String>,ArrayList<String>> namespaceCriterea,
+                                    Pair<ArrayList<String>,ArrayList<String>> idCriterea,
+                                    FrameworkNode node)
     {
-        __patternList = pattern;
-        __excludePatternList = excludePattern;
-        __ID = ID;
+        __PreviouslyChecked = new HashMap<>();
+        __namespaceCriterea = namespaceCriterea;
+        __idCriterea = idCriterea;
         __node = node;
-        __other = other;
+        __other = this.toString();
+        __ID = "";
     }
 
-    public boolean Matches(String compare)
+    public boolean Matches(String namespace, String ID)
     {
-        for (String matchPattern : __patternList)
+        // if already checked, no need to do it again
+        if (__PreviouslyChecked.containsKey(namespace+ID))
+        {
+            return false;
+        }
+        if (__idCriterea.getKey().isEmpty() && __PreviouslyChecked.containsKey(namespace))
+        {
+            return false;
+        }
+            
+        Boolean matched = Matches(namespace,__namespaceCriterea);
+        if (matched && !__idCriterea.getKey().isEmpty())
+        {
+            matched = Matches(ID,__idCriterea);
+            __PreviouslyChecked.put(namespace+ID, matched);
+        }
+        else
+        {
+            __PreviouslyChecked.put(namespace, matched);
+        }
+
+        return matched;
+    }
+    
+    private boolean Matches(String compare, Pair<ArrayList<String>,ArrayList<String>> patternPair)
+    {
+        ArrayList<String> patternList = patternPair.getKey();
+        ArrayList<String> excludePatternList = patternPair.getValue();
+        for (String matchPattern : patternList)
         {
             if (Glob.check(matchPattern, compare))
             {
                 boolean noGood = false;
-                for (String excludePattern : __excludePatternList)
+                for (String excludePattern : excludePatternList)
                 {
                     if (Glob.check(excludePattern, compare))
                     {
@@ -73,10 +107,19 @@ public class DynamicItemInfoContainer
     {
         return __ID;
     }
+    public void setID(String newID)
+    {
+        __ID = newID;
+    }
 
     public String getOther()
     {
         return __other;
+    }
+    
+    public void setOther(String otherValue)
+    {
+        __other = otherValue;
     }
 
     public FrameworkNode getNode()
@@ -88,4 +131,5 @@ public class DynamicItemInfoContainer
     {
         __node = node;
     }
+    
 }

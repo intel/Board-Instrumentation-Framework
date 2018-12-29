@@ -33,6 +33,7 @@ import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.DynamicDebugWidgetTask;
+import kutch.biff.marvin.task.LateCreateTask;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
@@ -44,12 +45,13 @@ import kutch.biff.marvin.widget.TabWidget;
  */
 public class DataManager
 {
+
     private static DataManager _DataManager = null;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     private ConcurrentHashMap<String, DataSet> _DataMap;
     private ConcurrentHashMap<String, List<WildcardListItem>> _WildcardDataMap;
-    private HashMap<String,String> _NamespaceMap;
+    private HashMap<String, String> _NamespaceMap;
     private long _UpdateCount;
     private long _UnassignedDataPoints;
 
@@ -154,46 +156,50 @@ public class DataManager
         return RetVal;
     }
 
-    private void HandleDynamicTabCreation(DynamicItemInfoContainer item, String Namespace)
+    private String GetOnDemandTabID(String configuredID)
     {
-        LOGGER.info("Creating OnDemand Tab for namespace: " + Namespace + " using Tab template ID: " + item.getID());
+        int count = 1;
+        for (TabWidget tab : ConfigurationReader.GetConfigReader().getTabs())
+        {
+            if (tab.getMinionID().equalsIgnoreCase(configuredID))
+            {
+                count += 1;
+            }
+        }
+
+        return configuredID + "." + Integer.toString(count);
+    }
+
+    private void HandleDynamicTabCreation(DynamicItemInfoContainer item, String Namespace, String ID)
+    {
+        LOGGER.info("Creating OnDemand Tab for namespace: " + Namespace + ",  using Tab template ID: " + item.getID());
         Configuration config = Configuration.getConfig();
         TabPane parentPane = config.getPane();
         String tabID = item.getOther();
-        if (tabID == "") // no TabID specified in config file, so just use the object
-        {
-            tabID = item.toString();
-        }
+        tabID = GetOnDemandTabID(tabID);
         TabWidget tab = new TabWidget(tabID);
         AliasMgr.getAliasMgr().PushAliasList(true);
-        AliasMgr.getAliasMgr().AddAlias("DynamicTabNamespace", Namespace); // So tab knows namespace
+        AliasMgr.getAliasMgr().AddAlias("TriggerdNamespace", Namespace); // So tab knows namespace
+        AliasMgr.getAliasMgr().AddAlias("TriggerdID", ID); // So tab knows namespace
         tab = ConfigurationReader.ReadTab(item.getNode(), tab, tabID);
         if (null != tab)
         {
-            if (tab.Create(parentPane, this, 0))
-            {
-                tab.PerformPostCreateActions(null, false);
-                ConfigurationReader.GetConfigReader().getTabs().add(tab);
-            }
+            LateCreateTask lateBindTask = new LateCreateTask(tab, parentPane, 0);
+            TaskManager.getTaskManager().AddPostponedTask(lateBindTask, 0);
         }
         AliasMgr.getAliasMgr().PopAliasList();
     }
+
     public void ChangeValue(String ID, String Namespace, String Value)
     {
         synchronized (this)
         {
-            String NamespaceCheck=Namespace.toUpperCase();
-            if (false == Configuration.getConfig().getDynamicTabList().isEmpty() &&
-                false == _NamespaceMap.containsKey(NamespaceCheck))
+            for (DynamicItemInfoContainer item : Configuration.getConfig().getDynamicTabList())
             {
-                for (DynamicItemInfoContainer item : Configuration.getConfig().getDynamicTabList())
+                if (item.Matches(Namespace, ID))
                 {
-                    if (item.Matches(Namespace))
-                    {
-                        HandleDynamicTabCreation(item,NamespaceCheck);
-                    }
+                    HandleDynamicTabCreation(item, Namespace, ID);
                 }
-                _NamespaceMap.put(NamespaceCheck, Namespace);
             }
             String Key = Namespace + ID.toUpperCase();
 
@@ -244,7 +250,7 @@ public class DataManager
             return null;
         }
     }
-    
+
     public String GetValueForMath(String ID, String Namespace)
     {
         synchronized (this)
@@ -264,7 +270,7 @@ public class DataManager
             return null;
         }
     }
-    
+
     public int PerformUpdates()
     {
         int updatesPerformed = 0;

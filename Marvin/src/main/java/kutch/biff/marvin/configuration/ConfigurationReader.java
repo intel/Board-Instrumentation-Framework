@@ -37,6 +37,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
+import javafx.util.Pair;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -745,54 +746,12 @@ public class ConfigurationReader
                             {
                                 if (tabNode.hasAttribute("OnDemand") && tabNode.getBooleanAttribute("OnDemand"))
                                 {
-                                    String strTabID="";
-                                    ArrayList<String> MaskList = new ArrayList<>();
-                                    ArrayList<String> ExcludeList = new ArrayList<>();
-                                    for (FrameworkNode dynaNode : tabNode.getChildNodes(true))
+                                    DynamicItemInfoContainer dynaInfo = ReadOnDemandInfo(tabNode);
+                                    if (null != dynaInfo)
                                     {
-                                        if (dynaNode.getNodeName().equalsIgnoreCase("MatchPattern"))
-                                        {
-                                            String Mask = dynaNode.getTextContent();
-                                            if (InList(MaskList, Mask))
-                                            {
-                                                LOGGER.warning("On Demand Tab specified duplicate Namespace MatchPatterns.  Ignoring.");
-                                            }
-                                            else
-                                            {
-                                                MaskList.add(dynaNode.getTextContent());
-                                            }
-
-                                        }
-                                        else if (dynaNode.getNodeName().equalsIgnoreCase("TabID"))
-                                        {
-                                            strTabID = dynaNode.getTextContent();
-                                        }
-                                        else if (dynaNode.getNodeName().equalsIgnoreCase("ExcludePattern"))
-                                        {
-                                            String Exclude = dynaNode.getTextContent();
-                                            if (InList(ExcludeList, Exclude))
-                                            {
-                                                LOGGER.warning("On Demand Tab specified duplicate Namespace Exclude.  Ignoring.");
-                                            }
-
-                                            else
-                                            {
-                                                ExcludeList.add(dynaNode.getTextContent());
-                                            }
-
-                                            if (InList(MaskList, Exclude))
-                                            {
-                                                LOGGER.warning("On Demand Tab specified duplicate Namespace Exclude that matches Namespace Mask.");
-                                            }
-                                        }
+                                        dynaInfo.setID(ID);
+                                        Configuration.getConfig().getDynamicTabList().add(dynaInfo);
                                     }
-                                    if (MaskList.isEmpty())
-                                    {
-                                        LOGGER.severe("On Demand Tab with ID of " + ID + " did not specify a namespace");
-                                        return false;
-                                    }
-                                    DynamicItemInfoContainer dynaTab = new DynamicItemInfoContainer(MaskList,ExcludeList,ID,null,strTabID);
-                                    DynamicTabList.add(dynaTab);
                                 }
                                 else
                                 {
@@ -862,10 +821,105 @@ public class ConfigurationReader
         return NetworkSettingsRead;
     }
 
+    private DynamicItemInfoContainer ReadOnDemandInfo(FrameworkNode sourceNode)
+    {
+        ArrayList<String> namespaceMaskList = new ArrayList<>();
+        ArrayList<String> namespaceExcludeList = new ArrayList<>();
+        ArrayList<String> idMaskList = new ArrayList<>();
+        ArrayList<String> idExcludeList = new ArrayList<>();
+        String TabID = null;
+        
+        for (FrameworkNode dynaNode : sourceNode.getChildNodes(true))
+        {
+            if (dynaNode.getNodeName().equalsIgnoreCase("NamespaceTriggerPattern"))
+            {
+                String Mask = dynaNode.getTextContent();
+                if (InList(namespaceMaskList, Mask))
+                {
+                    LOGGER.warning("On Demand item specified duplicate NamespaceTriggerPattern.  Ignoring.");
+                }
+                else
+                {
+                    namespaceMaskList.add(dynaNode.getTextContent());
+                }
+
+            }
+            else if (dynaNode.getNodeName().equalsIgnoreCase("TabID"))
+            {
+                TabID = dynaNode.getTextContent();
+            }
+            else if (dynaNode.getNodeName().equalsIgnoreCase("NamespaceTriggerExcludePattern"))
+            {
+                String Exclude = dynaNode.getTextContent();
+                if (InList(namespaceExcludeList, Exclude))
+                {
+                    LOGGER.warning("On Demand item specified duplicate NamespaceTriggerExcludePattern.  Ignoring.");
+                }
+
+                else
+                {
+                    namespaceExcludeList.add(dynaNode.getTextContent());
+                }
+
+                if (InList(namespaceMaskList, Exclude))
+                {
+                    LOGGER.warning("On Demand item specified duplicate NamespaceTriggerExcludePattern that matches NamespaceTriggerExcludePattern.");
+                }
+            }
+            else if (dynaNode.getNodeName().equalsIgnoreCase("IDTriggerPattern"))
+            {
+                String Mask = dynaNode.getTextContent();
+                if (InList(idMaskList, Mask))
+                {
+                    LOGGER.warning("On Demand item specified duplicate IDTriggerPattern.  Ignoring.");
+                }
+                else
+                {
+                    idMaskList.add(dynaNode.getTextContent());
+                }
+
+            }
+            else if (dynaNode.getNodeName().equalsIgnoreCase("IDTriggerExcludePattern"))
+            {
+                String Exclude = dynaNode.getTextContent();
+                if (InList(idExcludeList, Exclude))
+                {
+                    LOGGER.warning("On Demand item specified duplicate IDTriggerExcludePattern.  Ignoring.");
+                }
+
+                else
+                {
+                    idExcludeList.add(dynaNode.getTextContent());
+                }
+
+                if (InList(idMaskList, Exclude))
+                {
+                    LOGGER.warning("On Demand item specified duplicate IDTriggerExcludePattern that matches IDTriggerExcludePattern.");
+                }
+            }
+        }
+        if (namespaceMaskList.isEmpty() && idMaskList.isEmpty())
+        {
+            LOGGER.severe("On Demand item did not specify a namespace or ID Trigger patterh");
+            return null;
+        }
+        
+        Pair<ArrayList<String>,ArrayList<String>> namespaceCriterea;
+        namespaceCriterea = new Pair<>(namespaceMaskList,namespaceExcludeList);
+        Pair<ArrayList<String>,ArrayList<String>> idCriterea = new Pair<>(idMaskList,idExcludeList);
+        
+        DynamicItemInfoContainer dynaInfo = new DynamicItemInfoContainer(namespaceCriterea, idCriterea,null);
+        if (null != TabID)
+        {
+            dynaInfo.setOther(TabID);
+        }
+        return dynaInfo;
+    }
+
     private void ReadDynamicTabs(Document doc)
     {
         FrameworkNode appNode = new FrameworkNode(doc.getChildNodes().item(0));
-        
+
         for (FrameworkNode node : appNode.getChildNodes("tab"))
         {
             if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
@@ -891,7 +945,7 @@ public class ConfigurationReader
             }
         }
     }
-            
+
     private boolean ReadUnregisteredDataInfo(FrameworkNode UnregisteredDataNode)
     {
         Utility.ValidateAttributes(new String[]
@@ -1017,7 +1071,6 @@ public class ConfigurationReader
         }
         return RetVal;
     }
-    
 
     /**
      * Allows one to define the tab contents (widgets) in an onother file Node

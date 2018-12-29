@@ -158,38 +158,6 @@ public class TaskManager
                 }
             }
         });
-        /*
-        fDone = true;
-        while (!fDone)
-        {
-            Task = null;
-            if (localDeferredTasksToRun.isEmpty())
-            {
-                fDone = true;
-            }
-            else
-            {
-                Task = localDeferredTasksToRun.remove(0);
-            }
-
-            if (null != Task)
-            {
-                // deferred tasks MUST be in GUI thread, so use runLater
-                final String strTask = Task;
-                Platform.runLater(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    { // go run this in a GUI thread
-                        // 
-                        PerformTask(strTask);
-                    }
-                });
-            }
-        }
-
-        fDone = false;
-         */
         // Now go and process all of the postponed tasks that need to be done in gui thread
 
         synchronized (_PostponedTaskObjectThatMustBeRunInGuiThreadList)
@@ -198,12 +166,7 @@ public class TaskManager
             localPostponedTaskstoRun.addAll(_PostponedTaskObjectThatMustBeRunInGuiThreadList);
             _PostponedTaskObjectThatMustBeRunInGuiThreadList.clear();
         }
-        /*
-        for (ITask objTask : localPostponedTaskstoRun )
-        {
-            PerformThreadedTask(objTask);
-        }
-         */
+        
         Platform.runLater(new Runnable()
         {
             @Override
@@ -220,19 +183,6 @@ public class TaskManager
         PerformPostponedTasks();
     }
 
-    /*
-    private void PerformThreadedTask(ITask objTask)
-    {
-        Platform.runLater(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                objTask.PerformTask();
-            }
-        });
-    }
-     */
     public void AddOnStartupTask(String TaskID, BaseTask objTaskToPerform)
     {
         if (false == _TaskMap.containsKey(TaskID.toUpperCase()))
