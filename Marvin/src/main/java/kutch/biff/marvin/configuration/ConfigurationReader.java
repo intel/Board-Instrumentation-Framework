@@ -41,6 +41,7 @@ import javafx.util.Pair;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.PromptManager;
 import kutch.biff.marvin.task.TaskManager;
@@ -52,6 +53,8 @@ import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.DynamicTabWidget;
 import kutch.biff.marvin.widget.TabWidget;
+import kutch.biff.marvin.widget.widgetbuilder.OnDemandTabBuilder;
+import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.OpenDefinitionFile;
 import org.w3c.dom.Document;
@@ -411,7 +414,7 @@ public class ConfigurationReader
 
     }
 
-    private boolean InList(ArrayList<String> list, String toCheck)
+    private static boolean InList(ArrayList<String> list, String toCheck)
     {
         for (String item : list)
         {
@@ -443,8 +446,7 @@ public class ConfigurationReader
         AliasMgr.ReadAliasFromRootDocument(doc);
         ReadAppAttributes(baseNode);
 
-        ArrayList<String> DeclaredTabList = new ArrayList<String>();
-        ArrayList<DynamicItemInfoContainer> DynamicTabList = Configuration.getConfig().getDynamicTabList();
+        ArrayList<String> DeclaredTabList = new ArrayList<>();
 
         for (FrameworkNode node : baseNode.getChildNodes())
         {
@@ -744,13 +746,14 @@ public class ConfigurationReader
                             String ID = tabNode.getAttribute("ID");
                             if (ID != null && ID.length() > 0)
                             {
-                                if (tabNode.hasAttribute("OnDemand") && tabNode.getBooleanAttribute("OnDemand"))
+                                if (tabNode.hasChild("OnDemand"))
                                 {
-                                    DynamicItemInfoContainer dynaInfo = ReadOnDemandInfo(tabNode);
+                                    DynamicItemInfoContainer dynaInfo = ReadOnDemandInfo(tabNode.getChild("OnDemand"));
+
                                     if (null != dynaInfo)
                                     {
-                                        dynaInfo.setID(ID);
-                                        Configuration.getConfig().getDynamicTabList().add(dynaInfo);
+                                        OnDemandTabBuilder objBuilder = new OnDemandTabBuilder(ID,0);
+                                        DataManager.getDataManager().AddOnDemandWidgetCriterea(dynaInfo, objBuilder);
                                     }
                                 }
                                 else
@@ -794,7 +797,7 @@ public class ConfigurationReader
             return true;
         }
 
-        if (DeclaredTabList.isEmpty() && DynamicTabList.isEmpty())
+        if (DeclaredTabList.isEmpty() && !DataManager.getDataManager().DynamicTabRegistered())
         {
             LOGGER.severe("No Tabs defined in <Application> section of configuration file.");
             return false;
@@ -809,7 +812,7 @@ public class ConfigurationReader
                 return false;
             }
         }
-        if (!Configuration.getConfig().getDynamicTabList().isEmpty())
+        if (DataManager.getDataManager().DynamicTabRegistered())
         {
             ReadDynamicTabs(doc);
         }
@@ -820,8 +823,12 @@ public class ConfigurationReader
         }
         return NetworkSettingsRead;
     }
-
-    private DynamicItemInfoContainer ReadOnDemandInfo(FrameworkNode sourceNode)
+    /***
+     * 
+     * @param sourceNode
+     * @return 
+     */
+    public static DynamicItemInfoContainer ReadOnDemandInfo(FrameworkNode sourceNode)
     {
         ArrayList<String> namespaceMaskList = new ArrayList<>();
         ArrayList<String> namespaceExcludeList = new ArrayList<>();
@@ -843,10 +850,6 @@ public class ConfigurationReader
                     namespaceMaskList.add(dynaNode.getTextContent());
                 }
 
-            }
-            else if (dynaNode.getNodeName().equalsIgnoreCase("TabID"))
-            {
-                TabID = dynaNode.getTextContent();
             }
             else if (dynaNode.getNodeName().equalsIgnoreCase("NamespaceTriggerExcludePattern"))
             {
@@ -897,10 +900,14 @@ public class ConfigurationReader
                     LOGGER.warning("On Demand item specified duplicate IDTriggerExcludePattern that matches IDTriggerExcludePattern.");
                 }
             }
+            else
+            {
+                LOGGER.warning("Unknown item in <OnDemand>: " + dynaNode.getNodeName());
+            }
         }
         if (namespaceMaskList.isEmpty() && idMaskList.isEmpty())
         {
-            LOGGER.severe("On Demand item did not specify a namespace or ID Trigger patterh");
+            LOGGER.severe("On Demand item did not specify a namespace or ID Trigger pattern");
             return null;
         }
         
@@ -909,10 +916,6 @@ public class ConfigurationReader
         Pair<ArrayList<String>,ArrayList<String>> idCriterea = new Pair<>(idMaskList,idExcludeList);
         
         DynamicItemInfoContainer dynaInfo = new DynamicItemInfoContainer(namespaceCriterea, idCriterea,null);
-        if (null != TabID)
-        {
-            dynaInfo.setOther(TabID);
-        }
         return dynaInfo;
     }
 
@@ -933,11 +936,15 @@ public class ConfigurationReader
                     if (node.hasAttribute("ID"))
                     {
                         String id = node.getAttribute("ID");
-                        for (DynamicItemInfoContainer item : Configuration.getConfig().getDynamicTabList())
+                        for (Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder> item : DataManager.getDataManager().getOnDemandList())
                         {
-                            if (item.getID().equalsIgnoreCase(id))
+                            if (item.getValue() instanceof OnDemandTabBuilder)
                             {
-                                item.setNode(node);
+                                OnDemandTabBuilder objBuilder = (OnDemandTabBuilder)item.getValue();
+                                if (objBuilder.getTabID().equalsIgnoreCase(id))
+                                {
+                                    objBuilder.setSourceNode(node);
+                                }
                             }
                         }
                     }

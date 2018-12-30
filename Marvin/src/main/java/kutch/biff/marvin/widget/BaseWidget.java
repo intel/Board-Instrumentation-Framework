@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2016 Intel Corporation
+ * #  Copyright (c) 2018 Intel Corporation
  * # 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author Patrick Kutch
+ * @author Patrick.Kutch@gmail.com
  */
 abstract public class BaseWidget implements Widget
 {
@@ -218,7 +218,7 @@ abstract public class BaseWidget implements Widget
             LOGGER.warning(" Attempted to se an already set default peekaboo action to: " + strDefault + ". Ignoring.");
         }
     }
-
+    
     public void SetToolTip(String newValue)
     {
         _ToolTip = newValue;

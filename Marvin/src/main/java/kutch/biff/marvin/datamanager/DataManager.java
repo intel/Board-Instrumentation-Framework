@@ -22,13 +22,14 @@
 package kutch.biff.marvin.datamanager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TabPane;
+import javafx.util.Pair;
 import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
@@ -38,6 +39,8 @@ import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.widget.TabWidget;
+import kutch.biff.marvin.widget.widgetbuilder.OnDemandTabBuilder;
+import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 
 /**
  *
@@ -45,27 +48,45 @@ import kutch.biff.marvin.widget.TabWidget;
  */
 public class DataManager
 {
-
     private static DataManager _DataManager = null;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     private ConcurrentHashMap<String, DataSet> _DataMap;
     private ConcurrentHashMap<String, List<WildcardListItem>> _WildcardDataMap;
-    private HashMap<String, String> _NamespaceMap;
+    private final List<Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder>> _OnDemandList;
     private long _UpdateCount;
     private long _UnassignedDataPoints;
-
+    private boolean __DynamicTabRegistered = false;
     public DataManager()
     {
         _DataMap = new ConcurrentHashMap<>();
         _WildcardDataMap = new ConcurrentHashMap<>();
-        _NamespaceMap = new HashMap<>();
-        //_NamespaceMap.put("MarvinLocalNamespace".toUpperCase(),"MarvinLocalNamespace".toUpperCase());
         _DataManager = this;
         _UpdateCount = 0;
         _UnassignedDataPoints = 0;
+        _OnDemandList = Collections.synchronizedList(new ArrayList<Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder>>());
     }
 
+    public boolean DynamicTabRegistered()
+    {
+        return __DynamicTabRegistered;
+    }
+    
+    public void AddOnDemandWidgetCriterea(DynamicItemInfoContainer criterea, OnDemandWidgetBuilder objBuilder)
+    {
+        _OnDemandList.add(new Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder>(criterea,objBuilder));
+        
+        if (objBuilder instanceof OnDemandTabBuilder)
+        {
+            __DynamicTabRegistered = true; // flag so can know if something is registered for startup check for any tabs
+        }
+    }
+
+    public List<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> getOnDemandList()
+    {
+        return _OnDemandList;
+    }
+    
     public static DataManager getDataManager()
     {
         return _DataManager;
@@ -156,52 +177,20 @@ public class DataManager
         return RetVal;
     }
 
-    private String GetOnDemandTabID(String configuredID)
-    {
-        int count = 1;
-        for (TabWidget tab : ConfigurationReader.GetConfigReader().getTabs())
-        {
-            if (tab.getMinionID().equalsIgnoreCase(configuredID))
-            {
-                count += 1;
-            }
-        }
-
-        return configuredID + "." + Integer.toString(count);
-    }
-
-    private void HandleDynamicTabCreation(DynamicItemInfoContainer item, String Namespace, String ID)
-    {
-        LOGGER.info("Creating OnDemand Tab for namespace: " + Namespace + ",  using Tab template ID: " + item.getID());
-        Configuration config = Configuration.getConfig();
-        TabPane parentPane = config.getPane();
-        String tabID = item.getOther();
-        tabID = GetOnDemandTabID(tabID);
-        TabWidget tab = new TabWidget(tabID);
-        AliasMgr.getAliasMgr().PushAliasList(true);
-        AliasMgr.getAliasMgr().AddAlias("TriggerdNamespace", Namespace); // So tab knows namespace
-        AliasMgr.getAliasMgr().AddAlias("TriggerdID", ID); // So tab knows namespace
-        tab = ConfigurationReader.ReadTab(item.getNode(), tab, tabID);
-        if (null != tab)
-        {
-            LateCreateTask lateBindTask = new LateCreateTask(tab, parentPane, 0);
-            TaskManager.getTaskManager().AddPostponedTask(lateBindTask, 0);
-        }
-        AliasMgr.getAliasMgr().PopAliasList();
-    }
-
     public void ChangeValue(String ID, String Namespace, String Value)
     {
         synchronized (this)
         {
-            for (DynamicItemInfoContainer item : Configuration.getConfig().getDynamicTabList())
+            for (Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder> entry :_OnDemandList)
             {
-                if (item.Matches(Namespace, ID))
+                if (entry.getKey().Matches(Namespace, ID))
                 {
-                    HandleDynamicTabCreation(item, Namespace, ID);
+                    LateCreateTask objTask = new LateCreateTask(entry.getValue(),Namespace,ID);
+                    TaskManager.getTaskManager().AddDeferredTaskObject(objTask);
                 }
             }
-            String Key = Namespace + ID.toUpperCase();
+            
+            String Key = Namespace.toUpperCase() + ID.toUpperCase();
 
             _UpdateCount++;
 

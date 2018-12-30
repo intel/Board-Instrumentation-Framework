@@ -47,7 +47,6 @@ import kutch.biff.marvin.widget.BaseWidget;
  */
 public class FrameworkNode
 {
-
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private static final AliasMgr aMGR = AliasMgr.getAliasMgr();
     private Node _node;
@@ -799,6 +798,23 @@ public class FrameworkNode
         return HandleMarvinMath(retString);
     }
 
+    public void DeleteChildNodes(String childName)
+    {
+        NodeList children = _node.getChildNodes();
+        ArrayList<Node> toNuke = new ArrayList<>();
+        for (int iLoop = 0; iLoop < children.getLength(); iLoop++)
+        {
+            Node child = children.item(iLoop);
+            if (child.getNodeName().equalsIgnoreCase(childName))
+            {
+                toNuke.add(child);
+            }
+        }
+        for (Node child : toNuke)
+        {
+            _node.removeChild(child);
+        }
+    }
     /**
      *
      * @param doc

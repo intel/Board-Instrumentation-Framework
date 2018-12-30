@@ -27,17 +27,15 @@ import javafx.util.Pair;
 
 /**
  *
- * @author Patrick
+ * @author Patrick.Kutch@gmail.com
  */
 public class DynamicItemInfoContainer
 {
-
     private final Pair<ArrayList<String>,ArrayList<String>> __namespaceCriterea;
     private final Pair<ArrayList<String>,ArrayList<String>> __idCriterea;
-    private String __ID;
     private FrameworkNode __node;
-    private String __other;
     private final HashMap<String,Boolean> __PreviouslyChecked;
+    private int __NumberOfMatchesUsingThisPattern;
     
     public DynamicItemInfoContainer(Pair<ArrayList<String>,ArrayList<String>> namespaceCriterea,
                                     Pair<ArrayList<String>,ArrayList<String>> idCriterea,
@@ -47,8 +45,7 @@ public class DynamicItemInfoContainer
         __namespaceCriterea = namespaceCriterea;
         __idCriterea = idCriterea;
         __node = node;
-        __other = this.toString();
-        __ID = "";
+        __NumberOfMatchesUsingThisPattern = 0;
     }
 
     public boolean Matches(String namespace, String ID)
@@ -73,8 +70,16 @@ public class DynamicItemInfoContainer
         {
             __PreviouslyChecked.put(namespace, matched);
         }
-
+        if (matched)
+        {
+            __NumberOfMatchesUsingThisPattern++;
+        }
         return matched;
+    }
+    
+    public int getMatchedCount()
+    {
+        return __NumberOfMatchesUsingThisPattern;
     }
     
     private boolean Matches(String compare, Pair<ArrayList<String>,ArrayList<String>> patternPair)
@@ -101,25 +106,6 @@ public class DynamicItemInfoContainer
             }
         }
         return false;
-    }
-
-    public String getID()
-    {
-        return __ID;
-    }
-    public void setID(String newID)
-    {
-        __ID = newID;
-    }
-
-    public String getOther()
-    {
-        return __other;
-    }
-    
-    public void setOther(String otherValue)
-    {
-        __other = otherValue;
     }
 
     public FrameworkNode getNode()

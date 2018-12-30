@@ -35,12 +35,14 @@ import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.splash.MySplash;
 import kutch.biff.marvin.utility.AliasMgr;
+import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.GridMacroMgr;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.DynamicGridWidget;
 import kutch.biff.marvin.widget.GridWidget;
+import kutch.biff.marvin.widget.OnDemandGridWidget;
 import kutch.biff.marvin.widget.Widget;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -839,6 +841,8 @@ public class WidgetBuilder
         String strRow = "0";
         String strColumn = "0";
         String WhatIsIt = "Grid";
+        boolean isOnDemand = false;
+        
         if (true == isFlipPanelGrid)
         {
             WhatIsIt = "FlipPanel";
@@ -867,6 +871,23 @@ public class WidgetBuilder
         {
             colSpan = gridNode.getAttribute("columnspan");
         }
+        
+        if (gridNode.hasChild("OnDemand"))
+        {
+            FrameworkNode demandNode = gridNode.getChild("OnDemand");
+            DynamicItemInfoContainer info = ConfigurationReader.ReadOnDemandInfo(demandNode);
+            OnDemandGridWidget objWidget = new OnDemandGridWidget(info);
+            if (demandNode.hasChild("Growth"))
+            {
+                objWidget.ReadGrowthInfo(demandNode.getChild("Growth"));
+            }
+            retWidget = objWidget;
+            WhatIsIt = "OnDemand Grid";
+            isOnDemand = true;
+            gridNode.DeleteChildNodes("OnDemand"); // delete the ondemand section, not needed anymore
+            info.setNode(gridNode);
+        }
+        
         if (true == gridNode.hasAttribute("Height"))
         {
             if (!retWidget.parseHeight(gridNode))
@@ -881,7 +902,7 @@ public class WidgetBuilder
                 return null;
             }
         }
-
+        
         if (false == isFlipPanelGrid)
         {
             strRow = gridNode.getAttribute("row");
@@ -897,7 +918,7 @@ public class WidgetBuilder
                 return null;
             }
         }
-
+        
         try
         {
             retWidget.setRow(Integer.parseInt(strRow));
@@ -912,6 +933,12 @@ public class WidgetBuilder
         }
         AliasMgr.getAliasMgr().UpdateCurrentColumn(Integer.parseInt(strColumn));
         AliasMgr.getAliasMgr().UpdateCurrentRow(Integer.parseInt(strRow));
+        if (isOnDemand)
+        {
+            return retWidget;
+        }
+
+
         AliasMgr.getAliasMgr().PushAliasList(true);
 
         if (true == gridNode.hasAttribute("File"))
@@ -946,15 +973,7 @@ public class WidgetBuilder
             AliasMgr.getAliasMgr().PopAliasList();
             DoneReadingExternalFile();
         }
-        /*
-        else
-        { // if not an external declaration, check for known options
-            Utility.ValidateAttributes(new String[]
-            {
-                "row", "column", "rowSpan", "colSpan", "columnspan", "hgap", "vgap", "Align", "File", "Height", "Width", "Macro"
-            }, gridNode);
-        }
-         */
+
         if (gridNode.hasAttribute("Macro"))
         {
             if (gridNode.hasAttribute("File"))

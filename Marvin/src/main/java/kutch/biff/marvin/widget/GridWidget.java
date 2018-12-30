@@ -41,7 +41,6 @@ import kutch.biff.marvin.utility.Utility;
  */
 public class GridWidget extends BaseWidget
 {
-
     protected ArrayList<Widget> _Widgets;
     private GridPane _GridPane = null;
     private int _hGap, _vGap;

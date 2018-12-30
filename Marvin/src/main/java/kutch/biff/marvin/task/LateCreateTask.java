@@ -26,6 +26,7 @@ import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.TabWidget;
+import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 
 /**
  *
@@ -33,71 +34,27 @@ import kutch.biff.marvin.widget.TabWidget;
  */
 public class LateCreateTask extends BaseTask
 {
-    private BaseWidget __lateCreateObject = null;
-    private GridPane   __parentPane = null;
-    private TabPane    __parentTabPane = null;
-    private int        __tabIndex;
+    private final OnDemandWidgetBuilder __builder;
+    private final String __Namespace;
+    private final String __ID;
 
-    public LateCreateTask(BaseWidget objWidget,TabPane parentTab,int index)
+    public LateCreateTask(OnDemandWidgetBuilder objBuilder, String Namespace, String ID)
     {
-        __lateCreateObject = objWidget;
-        __parentTabPane = parentTab;
-        __tabIndex = index;
+        __builder = objBuilder;
+        __Namespace = Namespace;
+        __ID = ID;
     }
     
-    public LateCreateTask(BaseWidget objWidget,GridPane parent)
-    {
-        __lateCreateObject = objWidget;
-        __parentPane = parent;
-    }
     @Override
     public  void PerformTask()
     {
-        if (null == __parentPane) // is null when a Tab
+        if (null != __builder) // is null when a Tab
         {
-            HandleCreateTab();
+            __builder.Build(__Namespace, __ID);
         }
         else
         {
-            HandleCreateWidget();
-        }
-    }
-    
-    private void HandleCreateTab()
-    {
-        if (null == __lateCreateObject)
-        {
-            LOGGER.severe("Attempted to perform LateCreateTask on object, however no object provided");
-            return;
-        }
-        TabWidget _tabObj = (TabWidget)__lateCreateObject;
-        if (_tabObj.Create(__parentTabPane, DataManager.getDataManager(),__tabIndex))
-        {
-            __lateCreateObject.PerformPostCreateActions(null, false);
-            ConfigurationReader.GetConfigReader().getTabs().add((TabWidget) _tabObj);
-            
-            LOGGER.info("Performed LateCreateTask on Tab: " + _tabObj.getName());
-        }
-        else
-        {
-            LOGGER.info("Error ocurred performing LateCreateTask on Tab: " + _tabObj.getName());
-        }
-    }
-    
-    private void HandleCreateWidget()
-    {
-        if (null == __lateCreateObject)
-        {
-            LOGGER.severe("Attempted to perform LateCreateTask on widget, however no widget provided");
-            return;
-        }
-        if (__lateCreateObject.Create(__parentPane, DataManager.getDataManager()))
-        {
-            LOGGER.info("Performed LateCreateTask on Widget: " + __lateCreateObject.getName());
-        }
-        else
-        {
-            LOGGER.info("Error ocurred performing LateCreateTask on Widget: " + __lateCreateObject.getName());
+            LOGGER.severe("LateCreateTask called, but builder was NULL");
         }
     }
 }

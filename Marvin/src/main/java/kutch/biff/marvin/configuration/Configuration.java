@@ -91,12 +91,7 @@ public class Configuration
     private int _CanvasWidth,_CanvasHeight;
     private boolean _RunInDebugger;
     private boolean _EnforceMediaSupport;
-    private ArrayList<DynamicItemInfoContainer> __DynamicTabList;
-
-    public ArrayList<DynamicItemInfoContainer> getDynamicTabList()
-    {
-        return __DynamicTabList;
-    }
+    
     public boolean getEnforceMediaSupport()
     {
         return _EnforceMediaSupport;
@@ -138,7 +133,7 @@ public class Configuration
         _Side = Side.TOP;
         _PrimaryScreen = Screen.getPrimary();
         _PrimaryScreenDetermined = false;
-       __DynamicTabList = new ArrayList<>();
+//       __DynamicTabList = new ArrayList<>();
         _ShuttingDown = false;
         
         _LastLiveDataReceived = 0;
