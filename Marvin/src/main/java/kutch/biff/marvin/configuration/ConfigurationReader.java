@@ -835,7 +835,6 @@ public class ConfigurationReader
         ArrayList<String> namespaceExcludeList = new ArrayList<>();
         ArrayList<String> idMaskList = new ArrayList<>();
         ArrayList<String> idExcludeList = new ArrayList<>();
-        String TabID = null;
         
         for (FrameworkNode dynaNode : sourceNode.getChildNodes(true))
         {
@@ -900,10 +899,6 @@ public class ConfigurationReader
                 {
                     LOGGER.warning("On Demand item specified duplicate IDTriggerExcludePattern that matches IDTriggerExcludePattern.");
                 }
-            }
-            else
-            {
-                LOGGER.warning("Unknown item in <OnDemand>: " + dynaNode.getNodeName());
             }
         }
         if (namespaceMaskList.isEmpty() && idMaskList.isEmpty())
