@@ -316,7 +316,7 @@ class DynamicCollector(Collector.Collector):
         objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
         return not objCollector == None
 
-    def AddCollectorFromPlugin(self, collectorID):
+    def AddCollectorFromPlugin(self, collectorID,customNamespaceString=None):
         if self.CollectorExistsFromPlugin(collectorID):
             Log.getLogger().error("User defined DynamicCollector tried to Add a collector with ID that already exists: " + collectorID)
             return False
@@ -328,6 +328,9 @@ class DynamicCollector(Collector.Collector):
             Log.getLogger().error("Error creating collector using User defined DynamicCollector ID: " + collectorID)
             return False
     
+        if None != customNamespaceString:
+            objCollector.SetOverrideNamespaceString(customNamespaceString)
+
         return True
 
     def SetCollectorValueFromPlugin(self,collectorID,Value,elapsedTime=None):

@@ -74,6 +74,11 @@ class Collector:
         self._Bound_Min=None
         self._Bound_Action=BoundAction.Invalid
         self._ReadyForConsumptionByAnother = False
+        self._NamespaceOverride=None
+
+
+    def SetOverrideNamespaceString(self,newNamespaceString):
+        self._NamespaceOverride = newNamespaceString
 
     def GetLastValue(self):
         return str(self._LastSentValue)
@@ -282,11 +287,15 @@ class Collector:
         if len(str(value)) == 0:
             Log.getLogger().warn("Collector [" + self.GetID() +"] returned empty string.  Dropping.")
             return None
+        if None == self._NamespaceOverride:
+            namespaceStr = str(self._NamespaceObject)
+        else:
+            namespaceStr = self._NamespaceOverride
         buffer = ""
         buffer = buffer + "<Minion Type=\"Data\">"
         buffer = buffer + "<Version>1</Version>"
         buffer = buffer + "<PacketNumber>" + str(self._NamespaceObject.getNextPacketNumber()) + "</PacketNumber>"
-        buffer = buffer + "<Namespace>" + str(self._NamespaceObject) + "</Namespace>"
+        buffer = buffer + "<Namespace>" + namespaceStr + "</Namespace>"
         buffer = buffer + "<ID>" + self.GetTransmitID() + "</ID>"
         buffer = buffer + "<Value>" + value + "</Value>"
         buffer = buffer + "<Normalized>" + str(normalized) + "</Normalized>"
