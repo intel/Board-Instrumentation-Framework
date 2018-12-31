@@ -68,22 +68,25 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
     public boolean Build(String Namespace, String ID)
     {
         LOGGER.info("Creating OnDemand Tab for namespace: " + Namespace + ",  using Tab template ID: " + __tabID);
-        __builtCount += 1;
         Configuration config = Configuration.getConfig();
         TabPane parentPane = config.getPane();
+        __builtCount++;
 
         String strTabID = __tabID + "." + Integer.toString(__builtCount);
         TabWidget tab = new TabWidget(strTabID);
         AliasMgr.getAliasMgr().PushAliasList(true);
         AliasMgr.getAliasMgr().AddAlias("TriggeredNamespace", Namespace); // So tab knows namespace
         AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); // So tab knows namespace
+        AliasMgr.getAliasMgr().AddAlias("TriggeredIndex", Integer.toString(__builtCount));
+        
         tab = ConfigurationReader.ReadTab(__node, tab, strTabID);
         if (null != tab)
         {
             if (tab.Create(parentPane, DataManager.getDataManager(), __tabIndex))
             {
+                ConfigurationReader.GetConfigReader().getTabs().add(0, tab);
+                //ConfigurationReader.GetConfigReader().getTabs().add(__tabIndex + __builtCount, tab);
                 tab.PerformPostCreateActions(null, false);
-                ConfigurationReader.GetConfigReader().getTabs().add(tab);
 
                 LOGGER.info("Performed LateCreateTask on Tab: " + tab.getName());
             }

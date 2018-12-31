@@ -20,12 +20,6 @@
  * ##############################################################################
  */
 package kutch.biff.marvin.task;
-import javafx.scene.control.TabPane;
-import javafx.scene.layout.GridPane;
-import kutch.biff.marvin.configuration.ConfigurationReader;
-import kutch.biff.marvin.datamanager.DataManager;
-import kutch.biff.marvin.widget.BaseWidget;
-import kutch.biff.marvin.widget.TabWidget;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 
 /**

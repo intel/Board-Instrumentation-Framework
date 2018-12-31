@@ -732,7 +732,7 @@ public class ConfigurationReader
                 {
                     continue;
                 }
-
+                int tabCount = 0;
                 for (FrameworkNode tabNode : node.getChildNodes(true))
                 {
                     if (tabNode.getNodeName().equalsIgnoreCase("#Text"))
@@ -752,7 +752,7 @@ public class ConfigurationReader
 
                                     if (null != dynaInfo)
                                     {
-                                        OnDemandTabBuilder objBuilder = new OnDemandTabBuilder(ID,0);
+                                        OnDemandTabBuilder objBuilder = new OnDemandTabBuilder(ID,tabCount);
                                         DataManager.getDataManager().AddOnDemandWidgetCriterea(dynaInfo, objBuilder);
                                     }
                                 }
@@ -760,6 +760,7 @@ public class ConfigurationReader
                                 {
                                     DeclaredTabList.add(ID);
                                 }
+                                tabCount ++;
                             }
                             else
                             {

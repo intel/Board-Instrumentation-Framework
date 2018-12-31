@@ -7,7 +7,6 @@ package kutch.biff.marvin.widget.widgetbuilder;
 
 import java.util.logging.Logger;
 import kutch.biff.marvin.configuration.Configuration;
-import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.AliasMgr;
@@ -48,6 +47,17 @@ public class OnDemandGridBuilder implements OnDemandWidgetBuilder
         AliasMgr.getAliasMgr().PushAliasList(true);
         AliasMgr.getAliasMgr().AddAlias("TriggeredNamespace", Namespace); // So tab knows namespace
         AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); // So tab knows namespace
+        AliasMgr.getAliasMgr().AddAlias("TriggeredIndex", Integer.toString(__builtCount));
+        // Let's throw in if it is odd or even :-)
+        if (__builtCount %2 == 0 )
+        {
+            AliasMgr.getAliasMgr().AddAlias("TriggeredEVEN", "TRUE");
+        }
+        else
+        {
+            AliasMgr.getAliasMgr().AddAlias("TriggeredEVEN", "FALSE");
+        }
+        
         Widget objWidget = WidgetBuilder.Build(__containerGrid.getCriterea().getNode());
         if (!(objWidget instanceof GridWidget))
         {
