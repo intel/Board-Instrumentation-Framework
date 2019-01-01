@@ -79,6 +79,10 @@ def ExecutableExists(strApplication,params):
                 subprocess.call(strApplication,params[0],params[1],params[2])
             elif 4 == paramCount:
                 subprocess.call(strApplication,params[0],params[1],params[2],params[3])
+            elif 5 == paramCount:
+                subprocess.call(strApplication,params[0],params[1],params[2],params[3],params[4])
+            elif 6 == paramCount:
+                subprocess.call(strApplication,params[0],params[1],params[2],params[3],params[4],params[5])
 
             else:
                 print("Too many parameters for the ExecutableExists fn - increase capabilities")

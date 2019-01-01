@@ -402,6 +402,10 @@ class Configuration():
                 if not objCollector.SetOverrideID(AltID):
                     return None
 
+            if "OverrideNamespace" in attributes.keys():
+                AltNS = Alias.Alias(attributes["OverrideNamespace"].nodeValue)
+                objCollector.SetOverrideNamespaceString(AltNS)
+
             if "Frequency" in attributes.keys():
                 if not IsInGroup:
                     Frequency = Alias.Alias(attributes["Frequency"].nodeValue)
@@ -566,6 +570,7 @@ class Configuration():
             else:
                 Log.getLogger().warning("DynamicCollector specified a frequency.  Ignoring since it is in a group.")
 
+
         if "OnlySendOnChange" in attributes.keys():  #  only sends if data changes
             strBool = Alias.Alias(attributes["OnlySendOnChange"].nodeValue)
             if strBool.lower() == "true" :
@@ -614,6 +619,10 @@ class Configuration():
                 tokenList = defaultTokenList # no tokens defined - so use default
 
             objDynaCollector.SetParseTokens(tokenList)
+
+        if "OverrideNamespace" in attributes.keys():
+            AltNS = Alias.Alias(attributes["OverrideNamespace"].nodeValue)
+            objDynaCollector.SetOverrideNamespaceString(AltNS)
 
         if "ProcessThread" in attributes.keys():
             objDynaCollector.SetProcessThreadID(Alias.Alias(attributes["ProcessThread"].nodeValue))
@@ -798,6 +807,10 @@ class Configuration():
             else:
                 Log.getLogger().error("An invalid frequency for a group specified: " + Frequency)
                 return None
+
+        if "OverrideNamespace" in attributes.keys():
+            AltNS = Alias.Alias(attributes["OverrideNamespace"].nodeValue)
+            objGroup.SetOverrideNamespaceString(AltNS)
 
         if "ProcessThread" in attributes.keys():
             objGroup.SetProcessThreadID(Alias.Alias(attributes["ProcessThread"].nodeValue))
