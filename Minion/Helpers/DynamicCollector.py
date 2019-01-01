@@ -58,6 +58,7 @@ class DynamicCollector(Collector.Collector):
         pluginInterface = self.CreatePluginInterfaceObject()
 
         self.__pluginInfo = UserPluginFramework.UserPluginFramework(pluginFile,pluginFunction,self._Parameters, pluginInterface, pluginSpawnThread)
+        self.__pluginInfo.kwargs = self._kwargs
         valid = self.__pluginInfo.ValidateUserPlugin()
         self.Collect = self.__CollectProcForPlugin # remap collect prox
         return valid

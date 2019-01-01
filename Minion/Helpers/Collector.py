@@ -47,6 +47,7 @@ class Collector:
         self._SendOnlyOnDelta = False
         self._SentValueCount = 0
         self._Parameters = []
+        self._kwargs=None
         self._LastCollectionTime = 0
         self._LastValue = Collector.__InitialMagicValue  #Magic number - indicating not initialized
         self._LastSentValue = Collector.__InitialMagicValue

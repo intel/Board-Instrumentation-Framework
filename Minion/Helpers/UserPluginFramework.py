@@ -22,6 +22,7 @@ import inspect
 from Helpers import Log
 from Helpers import ThreadManager
 from Helpers import DynamicPython
+from pprint import pprint as pprint
 
 class UserPluginFramework:
     Instance = 1
@@ -47,6 +48,10 @@ class UserPluginFramework:
             Log.getLogger().error("Unable to load User Plugin: " + self.FunctionName + " in " + self.ScriptName)
             return False
 
+        x = inspect.getargspec(self.ptrFunction)
+        
+        pprint(x)
+        
         paramCount = len(inspect.getargspec(self.ptrFunction).args)
         if paramCount != len(self.Params):
             Log.getLogger().error("Unable to load User Plugin: " + self.FunctionName + " in " + self.ScriptName + ". Wrong number of parameters found.")
@@ -79,37 +84,76 @@ class UserPluginFramework:
 
         try: #different fn calls based upon # of params.
             if 1 == lenCheck: 
-                RetVal = pFn(Parameters[offset])
+                if None != self.kwargs:
+                    RetVal = pFn(Parameters[offset],**self.kwargs)
+                else:
+                    RetVal = pFn(Parameters[offset])
 
             elif 2 == lenCheck:
-                RetVal = pFn(Parameters[offset],str(Parameters[offset+1]))
+                if None != self.kwargs:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),**self.kwargs)
+                else:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]))
 
             elif 3 == lenCheck:
-                RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]))
+                if None != self.kwargs:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),**self.kwargs)
+                else:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]))
 
             elif 4 == lenCheck:
-                RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]))
+                if None != self.kwargs:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),**self.kwargs)
+                else:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]))
 
-            elif 5 == lenCheck:
-                RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]))
+            elif 5 == lenCheck: 
+                if None != self.kwargs:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),**self.kwargs)
+                else:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]))
 
             elif 6 == lenCheck:
-                RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]))
+                if None != self.kwargs:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),**self.kwargs)
+                    
+                else:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]))
 
             elif 7 == lenCheck:
-                RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]))
+                if None != self.kwargs:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),**self.kwargs)
+                    
+                else:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]))
 
             elif 8 == lenCheck:
-                RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]))
+                if None != self.kwargs:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]),**self.kwargs)
+                    
+                else:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]))
 
             elif 9 == lenCheck:
-                RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]),str(Parameters[offset+8]))
+                if None != self.kwargs:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]),str(Parameters[offset+8]),**self.kwargs)
+                    
+                else:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]),str(Parameters[offset+8]))
 
             elif 10 == lenCheck:
-                RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]),str(Parameters[offset+8]),str(Parameters[offset+9]))
+                if None != self.kwargs:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]),str(Parameters[offset+8]),str(Parameters[offset+9]),**self.kwargs)
+                    
+                else:
+                    RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]),str(Parameters[offset+8]),str(Parameters[offset+9]))
 
             elif 11 == lenCheck:
-                RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]),str(Parameters[offset+8]),str(Parameters[offset+9]),str(Parameters[offset+10]))
+                if None != self.kwargs:
+                   RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]),str(Parameters[offset+8]),str(Parameters[offset+9]),str(Parameters[offset+10]),**self.kwargs)
+                    
+                else:
+                   RetVal = pFn(Parameters[offset],str(Parameters[offset+1]),str(Parameters[offset+2]),str(Parameters[offset+3]),str(Parameters[offset+4]),str(Parameters[offset+5]),str(Parameters[offset+6]),str(Parameters[offset+7]),str(Parameters[offset+8]),str(Parameters[offset+9]),str(Parameters[offset+10]))
             else:
                 Log.getLogger().error("Attempted to call external python plugin script with too many parameters, update UserPluginFramework.py to support more")
                 RetVal = "oops"

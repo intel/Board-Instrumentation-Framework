@@ -286,8 +286,17 @@ class Configuration():
                 _Which = 'Param'
                 for param in node.getElementsByTagName(_Which): # Make an array of the params for the script
                     strParam = Alias.Alias(param.firstChild.nodeValue)
-                    Param = CollectorParam.CheckForCollectorAsParam(strParam,objNamespace)
-                    objCollector._Parameters.append(Param)
+                    try:
+                        key,value=strParam.split('=')
+                        kwargs[key] = value
+                        if None == objCollector._kwargs:
+                            objCollector._kwargs={}
+                        objCollector._kwargs[key] = value
+                    except:
+                        params.append(strParam)
+
+                        Param = CollectorParam.CheckForCollectorAsParam(strParam,objNamespace)
+                        objCollector._Parameters.append(Param)
 
             except Exception:
                 pass
@@ -736,14 +745,21 @@ class Configuration():
             return None
 
         params=[]
+        kwargs={}
         try:
             _Which = 'Param'
             for param in pluginNode.getElementsByTagName(_Which): # Make an array of the params for the script
                 strParam = Alias.Alias(param.firstChild.nodeValue)
-                params.append(strParam)
+                try:
+                    key,value=strParam.split('=')
+                    kwargs[key] = value
+                except:
+                    params.append(strParam)
                 #Param = CollectorParam.CheckForCollectorAsParam(strParam,objNamespace)
 
             objDynaCollector._Parameters = params
+            if len(kwargs) > 0:
+                objDynaCollector._kwargs = kwargs
 
 
         except Exception:
@@ -1030,8 +1046,15 @@ class Configuration():
                 _Which = 'Param'
                 for param in actor.getElementsByTagName(_Which): # Make an array of the params for the script
                     strParam = Alias.Alias(param.firstChild.nodeValue)
-                    Param = CollectorParam.CheckForCollectorAsParam(strParam,objNamespace)
-                    objActor.Parameters.append(Param)
+                    try:
+                        key,value=strParam.split('=')
+                        kwargs[key] = value
+                        if None == objCollector._kwargs:
+                            objCollector._kwargs={}
+                        objCollector._kwargs[key] = value
+                    except:
+                        Param = CollectorParam.CheckForCollectorAsParam(strParam,objNamespace)
+                        objActor.Parameters.append(Param)
 
             except Exception as Ex: 
                 Log.getLogger().error(str(Ex))

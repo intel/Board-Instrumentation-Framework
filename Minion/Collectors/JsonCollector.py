@@ -67,6 +67,10 @@ def __WalkMap(dataMap, frameworkInterface,averageFlag,prefix=""):
             else:
                 frameworkInterface.SetCollectorValue(ID,value) # update the value with the ID, let the framework handle the interval
 
+def kwtest(frameworkInterface,arg1,arg2,**kwargs):
+    print(arg1)
+    print(arg2)
+    print(kwargs)
 
 def JSON_Network_Collector(frameworkInterface, IP, Port, averageDataStr): 
     Logger = frameworkInterface.Logger
