@@ -277,7 +277,7 @@ def __GetStaticInfo():
             coreCount = int(__GetDMI_Info("Processor Information",0,"Core Count"))
             threadCount = int(__GetDMI_Info("Processor Information",0,"Thread Count"))
 
-            if coreCount != threadCount:
+            if IsHyperthreadingEnabled():
                 retMap['system.hyperthreading_enabled'] = 'yes'
             else:
                 retMap['system.hyperthreading_enabled'] = 'no'
