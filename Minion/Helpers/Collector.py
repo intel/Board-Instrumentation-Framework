@@ -122,7 +122,7 @@ class Collector:
             self.ScaleValue = float(newVal)
             if self.ScaleValue != 1.0:
                 Log.getLogger().info("Setting Scale value for " + self.GetID() + " to: " + str(newVal))
-        except:
+        except Exception:
             Log.getLogger().error("Invalid Scale value: " + newVal)
             return False
 

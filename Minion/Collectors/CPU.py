@@ -23,7 +23,7 @@
 
 try:
     import psutil #requires psutil 3rd party library (google it)
-except:
+except Exception:
     pass
 import re
 import sys

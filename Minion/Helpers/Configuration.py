@@ -292,9 +292,7 @@ class Configuration():
                         if None == objCollector._kwargs:
                             objCollector._kwargs={}
                         objCollector._kwargs[key] = value
-                    except:
-                        params.append(strParam)
-
+                    except Exception:
                         Param = CollectorParam.CheckForCollectorAsParam(strParam,objNamespace)
                         objCollector._Parameters.append(Param)
 
@@ -762,7 +760,7 @@ class Configuration():
                 try:
                     key,value=strParam.split('=')
                     kwargs[key] = value
-                except:
+                except Exception:
                     params.append(strParam)
                 #Param = CollectorParam.CheckForCollectorAsParam(strParam,objNamespace)
 
@@ -1065,7 +1063,7 @@ class Configuration():
                         if None == objCollector._kwargs:
                             objCollector._kwargs={}
                         objCollector._kwargs[key] = value
-                    except:
+                    except Exception:
                         Param = CollectorParam.CheckForCollectorAsParam(strParam,objNamespace)
                         objActor.Parameters.append(Param)
 
