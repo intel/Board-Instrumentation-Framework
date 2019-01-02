@@ -138,6 +138,7 @@ def __GatherNetworkDeviceInfo(ethDev,retMap,slimDataset):
         retMap[baseName+ethDev + ".state"] = ReadFromFile(operStateFile)
         macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
         retMap[baseName+ethDev + ".macaddress"] = ReadFromFile(macAddrFile)
+        retMap[baseName+ethDev + ".driver"] = __GetDriver(ethDev)
 
         sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sckt.connect(("8.8.8.8", 80))
@@ -151,17 +152,31 @@ def __GatherNetworkDeviceInfo(ethDev,retMap,slimDataset):
             retMap[baseName+ethDev + "." + fname] = dataVal
 
     return retMap
+	
+def __GetDriver(device):
+    link = 	GetBaseDir() + '/' +device + '/device/driver/module/drivers'
+    for root, driver, files in os.walk(link):
+       driver = driver[0]
+       if None != driver[0] and ':' in driver:
+          parts = driver.split(':')
+          return parts[1]
+    return None
 
-def __GatherAllNetworkDeviceInfo(slimDataSet):
+def __IsPhysicalDevice(device):
+    return None != __GetDriver(device)
+
+def __GatherAllNetworkDeviceInfo(slimDataSet,pyhysicalOnly=True):
     tMap={}
     for root, dirs, files in os.walk(GetBaseDir()):
         for dir in dirs:
-           tMap= __GatherNetworkDeviceInfo(dir,tMap,slimDataSet)
+#		   print "{0} {1}".format(dir,__IsPhysicalDevice(dir))
+            if False == pyhysicalOnly or __IsPhysicalDevice(dir):
+                tMap= __GatherNetworkDeviceInfo(dir,tMap,slimDataSet)
 
     return tMap
 
 
-def CollectAllDevices(frameworkInterface,slimDataSetParam): 
+def CollectAllDevices(frameworkInterface,slimDataSetParam,**kwargs): 
     # frameworkInterface has the following:
     #  frameworkInterface.DoesCollectorExist(ID) # does a collector with ID  already exist
     #  frameworkInterface.AddCollector(ID) # Add a new collectr
@@ -178,12 +193,15 @@ def CollectAllDevices(frameworkInterface,slimDataSetParam):
             slimDataSet = True
         else:
             slimDataSet = False
-
+        if 'PhysicalDevicesOnly' in kwargs and kwargs['PhysicalDevicesOnly'].lower() == 'true':
+           physicalOnly = True
+        else:
+           physicalOnly = False		
         SleepTime = float(frameworkInterface.Interval)/1000.0   
 
         InitialRun = True
         while not frameworkInterface.KillThreadSignalled():
-            dataMap = __GatherAllNetworkDeviceInfo(slimDataSet)
+            dataMap = __GatherAllNetworkDeviceInfo(slimDataSet,physicalOnly)
             for entry in dataMap:
                 if InitialRun and not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
                     frameworkInterface.AddCollector(entry)    # Nope, so go add it
