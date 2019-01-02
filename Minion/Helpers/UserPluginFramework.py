@@ -48,10 +48,6 @@ class UserPluginFramework:
             Log.getLogger().error("Unable to load User Plugin: " + self.FunctionName + " in " + self.ScriptName)
             return False
 
-        x = inspect.getargspec(self.ptrFunction)
-        
-        pprint(x)
-        
         paramCount = len(inspect.getargspec(self.ptrFunction).args)
         if paramCount != len(self.Params):
             Log.getLogger().error("Unable to load User Plugin: " + self.FunctionName + " in " + self.ScriptName + ". Wrong number of parameters found.")
