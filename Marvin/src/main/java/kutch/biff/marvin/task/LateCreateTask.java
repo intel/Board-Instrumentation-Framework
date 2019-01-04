@@ -31,12 +31,14 @@ public class LateCreateTask extends BaseTask
     private final OnDemandWidgetBuilder __builder;
     private final String __Namespace;
     private final String __ID;
+    private final String __Value;
 
-    public LateCreateTask(OnDemandWidgetBuilder objBuilder, String Namespace, String ID)
+    public LateCreateTask(OnDemandWidgetBuilder objBuilder, String Namespace, String ID,String Value)
     {
         __builder = objBuilder;
         __Namespace = Namespace;
         __ID = ID;
+        __Value = Value;
     }
     
     @Override
@@ -44,7 +46,7 @@ public class LateCreateTask extends BaseTask
     {
         if (null != __builder) // is null when a Tab
         {
-            __builder.Build(__Namespace, __ID);
+            __builder.Build(__Namespace, __ID,__Value);
         }
         else
         {

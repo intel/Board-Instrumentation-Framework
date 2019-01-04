@@ -48,7 +48,6 @@ public class Conditional
 
     public enum Type
     {
-
         EQ, NE, GT, GE, LT, LE, CASE, Invalid
     };
     private String _Value1_ID;
@@ -56,7 +55,7 @@ public class Conditional
     private String _Value2_ID;
     private String _Value2_Namespace;
     private String _Value2;
-    private Type _type;
+    private final Type _type;
     private String _If_Task;
     private String _Else_Task;
     private boolean _CaseSensitive;

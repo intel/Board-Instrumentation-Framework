@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.Position;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -55,7 +56,6 @@ import org.xml.sax.SAXException;
  */
 public class WidgetBuilder
 {
-
     private final static Configuration CONFIG = Configuration.getConfig();
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static MySplash SPLASH = MySplash.getSplash();
@@ -885,6 +885,11 @@ public class WidgetBuilder
             WhatIsIt = "OnDemand Grid";
             isOnDemand = true;
             gridNode.DeleteChildNodes("OnDemand"); // delete the ondemand section, not needed anymore
+            int row = gridNode.getIntegerAttribute("row", 0);
+            int col = gridNode.getIntegerAttribute("column", 0);
+            gridNode.AddAttibute("GRID_COLUMN_ODD", col % 2 == 0 ? "FALSE" : "TRUE"); 
+            gridNode.AddAttibute("GRID_ROW_ODD", row % 2 ==0 ? "FALSE" : "TRUE"); 
+            
             info.setNode(gridNode);
         }
         
@@ -933,12 +938,14 @@ public class WidgetBuilder
         }
         AliasMgr.getAliasMgr().UpdateCurrentColumn(Integer.parseInt(strColumn));
         AliasMgr.getAliasMgr().UpdateCurrentRow(Integer.parseInt(strRow));
+       
         if (isOnDemand)
         {
             return retWidget;
         }
-
-
+        AliasMgr.getAliasMgr().AddUpdateAlias("GRID_ROW_ODD", AliasMgr.getAliasMgr().GetAlias("CurrentRowIsOddAlias"));
+        AliasMgr.getAliasMgr().AddUpdateAlias("GRID_COLUMN_ODD", AliasMgr.getAliasMgr().GetAlias("CurrentColumnIsOddAlias"));
+        
         AliasMgr.getAliasMgr().PushAliasList(true);
 
         if (true == gridNode.hasAttribute("File"))

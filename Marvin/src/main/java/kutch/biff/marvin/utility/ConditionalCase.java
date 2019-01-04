@@ -47,8 +47,8 @@ public class ConditionalCase extends Conditional
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
 
-    private ArrayList<String> _CaseValues;
-    private HashMap<String, String> _Tasks;
+    private final ArrayList<String> _CaseValues;
+    private final HashMap<String, String> _Tasks;
     private String _DefaultTask;
 
     public ConditionalCase(Type type)

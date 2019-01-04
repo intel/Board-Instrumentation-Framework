@@ -48,7 +48,7 @@ import kutch.biff.marvin.widget.BaseWidget;
 public class FrameworkNode
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    private static final AliasMgr aMGR = AliasMgr.getAliasMgr();
+    private static final AliasMgr ALIASMANAGER = AliasMgr.getAliasMgr();
     private Node _node;
     private NamedNodeMap _attributes;
 
@@ -354,8 +354,8 @@ public class FrameworkNode
         String strCountAlias = "";
         String strValueAlias = "";
 
-        AliasMgr.getAliasMgr().PushAliasList(false);
-        AliasMgr.getAliasMgr().AddAliasFromAttibuteList(repeatNode, new String[] // can define an alias list in <repeat>
+        ALIASMANAGER.PushAliasList(false);
+        ALIASMANAGER.AddAliasFromAttibuteList(repeatNode, new String[] // can define an alias list in <repeat>
                                                 {
                                                     "Count", "startvlaue", "currentCountAlias", "currentvalueAlias"
         });
@@ -412,23 +412,23 @@ public class FrameworkNode
 
         for (int iLoop = 0; iLoop < count; iLoop++)
         {
-            AliasMgr.getAliasMgr().PushAliasList(false);
+            ALIASMANAGER.PushAliasList(false);
             if (!strCountAlias.isEmpty())
             {
-                AliasMgr.getAliasMgr().AddAlias(strCountAlias, Integer.toString(iLoop));
+                ALIASMANAGER.AddAlias(strCountAlias, Integer.toString(iLoop));
             }
             if (!strValueAlias.isEmpty())
             {
-                AliasMgr.getAliasMgr().AddAlias(strValueAlias, Integer.toString(iLoop + start));
+                ALIASMANAGER.AddAlias(strValueAlias, Integer.toString(iLoop + start));
             }
             // Always have these aliases
-            AliasMgr.getAliasMgr().AddAlias("CurrentValueAlias", Integer.toString(iLoop + start));
-            AliasMgr.getAliasMgr().AddAlias("CurrentCountAlias", Integer.toString(iLoop));
+            ALIASMANAGER.AddAlias("CurrentValueAlias", Integer.toString(iLoop + start));
+            ALIASMANAGER.AddAlias("CurrentCountAlias", Integer.toString(iLoop));
 
             if (null != fnames)
             {
-                AliasMgr.getAliasMgr().AddAlias("CurrentFileAlias", fnames.get(2 * iLoop));
-                AliasMgr.getAliasMgr().AddAlias("CurrentFileWithPathAlias", fnames.get(2 * iLoop + 1));
+                ALIASMANAGER.AddAlias("CurrentFileAlias", fnames.get(2 * iLoop));
+                ALIASMANAGER.AddAlias("CurrentFileWithPathAlias", fnames.get(2 * iLoop + 1));
             }
 
             for (FrameworkNode node : repeatNode.getChildNodes())
@@ -447,10 +447,10 @@ public class FrameworkNode
                 //System.out.println(node._node.getTextContent());
                 list.add(node);
             }
-            AliasMgr.getAliasMgr().PopAliasList();
+            ALIASMANAGER.PopAliasList();
         }
 
-        AliasMgr.getAliasMgr().PopAliasList();
+        ALIASMANAGER.PopAliasList();
         return list;
     }
 
@@ -637,7 +637,7 @@ public class FrameworkNode
             {
                 String Alias = strData.substring(OutterIndex + 2, CloseParenIndex);
                 retString = strData.substring(0, OutterIndex);
-                retString += AliasMgr.getAliasMgr().GetAlias(Alias);
+                retString += ALIASMANAGER.GetAlias(Alias);
                 retString += strData.substring(CloseParenIndex + 1);
             }
         }
@@ -645,7 +645,7 @@ public class FrameworkNode
         {
             String Alias = strData.substring(OutterIndex + 2, CloseParenIndex);
             retString = strData.substring(0, OutterIndex);
-            retString += AliasMgr.getAliasMgr().GetAlias(Alias);
+            retString += ALIASMANAGER.GetAlias(Alias);
             retString += strData.substring(CloseParenIndex + 1);
         }
         else
@@ -682,7 +682,7 @@ public class FrameworkNode
             {
                 String Alias = strData.substring(OutterIndex + "MarvinMath(".length(), CloseParenIndex);
                 retString = strData.substring(0, OutterIndex);
-                retString += AliasMgr.getAliasMgr().GetAlias(Alias);
+                retString += ALIASMANAGER.GetAlias(Alias);
                 retString += strData.substring(CloseParenIndex + 1);
             }
         }
@@ -797,6 +797,11 @@ public class FrameworkNode
 
         return HandleMarvinMath(retString);
     }
+    
+    public void AddAttibute(String key, String value)
+    {
+        ((Element)_node).setAttribute(key, value);
+    }
 
     public void DeleteChildNodes(String childName)
     {
@@ -867,19 +872,19 @@ public class FrameworkNode
     private static String ProcessLoopVars(String strInp, String AliasList[])
     {
         String strRet = strInp;
-        if (AliasMgr.getAliasMgr().IsAliased("CurrentFileAlias")) // fugly little hack to implement iterating files in directory
+        if (ALIASMANAGER.IsAliased("CurrentFileAlias")) // fugly little hack to implement iterating files in directory
         {
-            strRet = replaceString(strRet, "$(" + "CurrentFileAlias" + ")", AliasMgr.getAliasMgr().GetAlias("CurrentFileAlias"));
+            strRet = replaceString(strRet, "$(" + "CurrentFileAlias" + ")", ALIASMANAGER.GetAlias("CurrentFileAlias"));
         }
-        if (AliasMgr.getAliasMgr().IsAliased("CurrentFileWithPathAlias")) // fugly little hack to implement iterating files in directory
+        if (ALIASMANAGER.IsAliased("CurrentFileWithPathAlias")) // fugly little hack to implement iterating files in directory
         {
-            strRet = replaceString(strRet, "$(" + "CurrentFileWithPathAlias" + ")", AliasMgr.getAliasMgr().GetAlias("CurrentFileWithPathAlias"));
+            strRet = replaceString(strRet, "$(" + "CurrentFileWithPathAlias" + ")", ALIASMANAGER.GetAlias("CurrentFileWithPathAlias"));
         }
         for (String strCheck : AliasList)
         {
             if (null != strCheck && strCheck.length() > 0)
             {
-                strRet = replaceString(strRet, "$(" + strCheck + ")", AliasMgr.getAliasMgr().GetAlias(strCheck));
+                strRet = replaceString(strRet, "$(" + strCheck + ")", ALIASMANAGER.GetAlias(strCheck));
             }
         }
         return strRet;
@@ -928,11 +933,11 @@ public class FrameworkNode
         // Add current count alias as an attribute = should then be available to grids and things withing a loop
         if (!parentNode.hasAttribute("CurrentValueAlias"))
         {
-            ((Element) parentNode.GetNode()).setAttribute("CurrentValueAlias", AliasMgr.getAliasMgr().GetAlias("CurrentValueAlias"));
+            ((Element) parentNode.GetNode()).setAttribute("CurrentValueAlias", ALIASMANAGER.GetAlias("CurrentValueAlias"));
         }
         if (!parentNode.hasAttribute("CurrentCountAlias"))
         {
-            ((Element) parentNode.GetNode()).setAttribute("CurrentCountAlias", AliasMgr.getAliasMgr().GetAlias("CurrentCountAlias"));
+            ((Element) parentNode.GetNode()).setAttribute("CurrentCountAlias", ALIASMANAGER.GetAlias("CurrentCountAlias"));
         }
 
         if (parentNode.hasChildren())

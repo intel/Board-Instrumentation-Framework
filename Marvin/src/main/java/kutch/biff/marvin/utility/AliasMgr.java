@@ -48,10 +48,11 @@ import org.w3c.dom.NodeList;
  */
 public class AliasMgr
 {
-
     private final ArrayList<Map> _AliasList;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static AliasMgr _Mgr = new AliasMgr();
+    private final static String strCurrentRowIsOddAlias = "CurrentRowIsOddAlias";
+    private final static String strCurrentColumnIsOddAlias = "CurrentColumnIsOddAlias";
     private final static String strCurrentRowAlias = "CurrentRowAlias";
     private final static String strNextRowAlias = "NextRowAlias";
     private final static String strCurrentColumnAlias = "CurrentColumnAlias";
@@ -97,6 +98,7 @@ public class AliasMgr
     public String GetAlias(String strAliasRequested)
     {
         String strAlias = strAliasRequested.toUpperCase();
+        
         for (Map map : _AliasList)
         {
             if (map.containsKey(strAlias))
@@ -192,6 +194,29 @@ public class AliasMgr
             map.put(Alias.toUpperCase(), Value);
         }
     }
+    public void AddUpdateAlias(String Alias, String Value)
+    {
+        if (null == Alias)
+        {
+            LOGGER.severe("Attempted to set an ALIAS ID to NULL");
+            return;
+        }
+        Map map = _AliasList.get(0);
+        if (map.containsKey(Alias.toUpperCase()))
+        {
+            UpdateAlias(Alias, Value);
+        }
+        if (null == Value)
+        {
+            String strError = "Alias [" + Alias + "] has NULL value!";
+            LOGGER.severe(strError);
+            map.put(Alias.toUpperCase(), strError);
+        }
+        else
+        {
+            map.put(Alias.toUpperCase(), Value);
+        }
+    }    
 
     public void AddRootAlias(String Alias, String Value)
     {
@@ -221,12 +246,14 @@ public class AliasMgr
     {
         UpdateAlias(strNextColumnAlias, Integer.toString(newValue + 1));
         UpdateAlias(strCurrentColumnAlias, Integer.toString(newValue));
+        UpdateAlias(strCurrentColumnIsOddAlias, (newValue % 2) == 0 ? "FALSE" : "TRUE"); 
     }
 
     public void UpdateCurrentRow(int newValue)
     {
         UpdateAlias(strNextRowAlias, Integer.toString(newValue + 1));
         UpdateAlias(strCurrentRowAlias, Integer.toString(newValue));
+        UpdateAlias(strCurrentRowIsOddAlias, (newValue % 2) == 0 ? "FALSE" : "TRUE"); 
     }
 
     @SuppressWarnings("unchecked")
@@ -257,6 +284,8 @@ public class AliasMgr
 
         if (addRowColAliases)
         {
+            AddAlias(strCurrentColumnIsOddAlias,"FALSE");
+            AddAlias(strCurrentRowIsOddAlias,"FALSE");
             AddAlias(strCurrentRowAlias, "0");
             AddAlias(strNextRowAlias, "1");
             AddAlias(strCurrentColumnAlias, "0");

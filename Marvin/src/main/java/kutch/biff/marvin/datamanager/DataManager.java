@@ -185,7 +185,7 @@ public class DataManager
             {
                 if (entry.getKey().Matches(Namespace, ID))
                 {
-                    LateCreateTask objTask = new LateCreateTask(entry.getValue(),Namespace,ID);
+                    LateCreateTask objTask = new LateCreateTask(entry.getValue(),Namespace,ID,Value);
                     TaskManager.getTaskManager().AddDeferredTaskObject(objTask);
                 }
             }

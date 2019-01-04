@@ -10,7 +10,6 @@ import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.AliasMgr;
-import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.GridWidget;
 import kutch.biff.marvin.widget.OnDemandGridWidget;
@@ -27,27 +26,24 @@ public class OnDemandGridBuilder implements OnDemandWidgetBuilder
     private static TaskManager TASKMAN = TaskManager.getTaskManager();
     private OnDemandGridWidget __containerGrid;
     private int __builtCount = 0;
-    private FrameworkNode __node;
     
     
     public OnDemandGridBuilder(OnDemandGridWidget objParent)
     {
         __containerGrid = objParent;
     }
-    public void setSourceNode(FrameworkNode sourceNode)
-    {
-        __node = sourceNode;
-    }
     
     @Override
-    public boolean Build(String Namespace, String ID)
+    public boolean Build(String Namespace, String ID, String Value)
     {
         LOGGER.info("Creating OnDemand Grid for namespace: " + Namespace + " and ID: " + ID);
         __builtCount += 1;
         AliasMgr.getAliasMgr().PushAliasList(true);
         AliasMgr.getAliasMgr().AddAlias("TriggeredNamespace", Namespace); // So tab knows namespace
-        AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); // So tab knows namespace
+        AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); 
+        AliasMgr.getAliasMgr().AddAlias("TriggeredValue", Value); 
         AliasMgr.getAliasMgr().AddAlias("TriggeredIndex", Integer.toString(__builtCount));
+        __containerGrid.getCriterea().tokenizeAndCreateAlias(ID);
         // Let's throw in if it is odd or even :-)
         if (__builtCount %2 == 0 )
         {

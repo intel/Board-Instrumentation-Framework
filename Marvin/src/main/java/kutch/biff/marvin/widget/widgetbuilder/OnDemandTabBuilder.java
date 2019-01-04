@@ -28,27 +28,28 @@ import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.AliasMgr;
+import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.TabWidget;
 
 /**
  *
- * @author Patrick
+ * @author Patrick.Kutch@gmail.com
  */
 public class OnDemandTabBuilder implements OnDemandWidgetBuilder
 {
-
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
     private String __tabID;
     private int __builtCount = 0;
     private FrameworkNode __node;
     private int __tabIndex;
+    DynamicItemInfoContainer __onDemandTrigger;
 
-    public OnDemandTabBuilder(String tabID, int index)
+    public OnDemandTabBuilder(String tabID, int index,DynamicItemInfoContainer info)
     {
         __tabID = tabID;
         __tabIndex = index;
+        __onDemandTrigger = info;
         __node = null;
     }
 
@@ -63,7 +64,7 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
     }
 
     @Override
-    public boolean Build(String Namespace, String ID)
+    public boolean Build(String Namespace, String ID, String Value)
     {
         LOGGER.info("Creating OnDemand Tab for namespace: " + Namespace + ",  using Tab template ID: " + __tabID);
         Configuration config = Configuration.getConfig();
@@ -74,8 +75,10 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         TabWidget tab = new TabWidget(strTabID);
         AliasMgr.getAliasMgr().PushAliasList(true);
         AliasMgr.getAliasMgr().AddAlias("TriggeredNamespace", Namespace); // So tab knows namespace
-        AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); // So tab knows namespace
+        AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); 
+        AliasMgr.getAliasMgr().AddAlias("TriggeredValue", Value); 
         AliasMgr.getAliasMgr().AddAlias("TriggeredIndex", Integer.toString(__builtCount));
+        __onDemandTrigger.tokenizeAndCreateAlias(ID);
         
         tab = ConfigurationReader.ReadTab(__node, tab, strTabID);
         if (null != tab)

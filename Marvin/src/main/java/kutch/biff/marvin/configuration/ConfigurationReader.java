@@ -752,7 +752,7 @@ public class ConfigurationReader
 
                                     if (null != dynaInfo)
                                     {
-                                        OnDemandTabBuilder objBuilder = new OnDemandTabBuilder(ID,tabCount);
+                                        OnDemandTabBuilder objBuilder = new OnDemandTabBuilder(ID,tabCount,dynaInfo);
                                         DataManager.getDataManager().AddOnDemandWidgetCriterea(dynaInfo, objBuilder);
                                     }
                                 }
@@ -911,7 +911,14 @@ public class ConfigurationReader
         namespaceCriterea = new Pair<>(namespaceMaskList,namespaceExcludeList);
         Pair<ArrayList<String>,ArrayList<String>> idCriterea = new Pair<>(idMaskList,idExcludeList);
         
-        DynamicItemInfoContainer dynaInfo = new DynamicItemInfoContainer(namespaceCriterea, idCriterea,null);
+        DynamicItemInfoContainer dynaInfo = new DynamicItemInfoContainer(namespaceCriterea, idCriterea);
+        if (sourceNode.hasAttribute("TriggeredIdToken"))
+        {
+            String strToken = sourceNode.getAttribute("TriggeredIdToken");
+            dynaInfo.setToken(strToken);
+        }
+        
+        
         return dynaInfo;
     }
 

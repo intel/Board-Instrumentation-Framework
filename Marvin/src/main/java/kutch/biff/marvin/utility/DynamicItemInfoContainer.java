@@ -23,7 +23,9 @@ package kutch.biff.marvin.utility;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import javafx.util.Pair;
+import kutch.biff.marvin.logger.MarvinLogger;
 
 /**
  *
@@ -31,20 +33,22 @@ import javafx.util.Pair;
  */
 public class DynamicItemInfoContainer
 {
+    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final Pair<ArrayList<String>,ArrayList<String>> __namespaceCriterea;
     private final Pair<ArrayList<String>,ArrayList<String>> __idCriterea;
     private FrameworkNode __node;
     private final HashMap<String,Boolean> __PreviouslyChecked;
     private int __NumberOfMatchesUsingThisPattern;
+    private String __TokenizerToken;
     
     public DynamicItemInfoContainer(Pair<ArrayList<String>,ArrayList<String>> namespaceCriterea,
-                                    Pair<ArrayList<String>,ArrayList<String>> idCriterea,
-                                    FrameworkNode node)
+                                    Pair<ArrayList<String>,ArrayList<String>> idCriterea)
     {
         __PreviouslyChecked = new HashMap<>();
         __namespaceCriterea = namespaceCriterea;
         __idCriterea = idCriterea;
-        __node = node;
+        __node = null;
+        __TokenizerToken = null;
         __NumberOfMatchesUsingThisPattern = 0;
     }
 
@@ -107,6 +111,16 @@ public class DynamicItemInfoContainer
         }
         return false;
     }
+    
+    public void setToken(String strToken)
+    {
+        __TokenizerToken = strToken;
+    }
+    
+    public String getToken()
+    {
+        return __TokenizerToken;
+    }
 
     public FrameworkNode getNode()
     {
@@ -118,4 +132,33 @@ public class DynamicItemInfoContainer
         __node = node;
     }
     
+    public String[] tokenize(String ID)
+    {
+        if (getToken().equalsIgnoreCase("."))
+        {
+            return ID.split("\\.");
+        }
+        return ID.split(getToken());
+    }
+    
+    public boolean tokenizeAndCreateAlias(String ID)
+    {
+        if (null == getToken())
+        {
+            return false;
+        }
+        String[] tokens = tokenize(ID);
+        if (tokens.length <= 0)
+        {
+            return false;
+        }
+        int index = 1;
+        for (String token : tokens)
+        {
+            String Alias = "TriggeredIDPart." + Integer.toString(index++);
+            LOGGER.info("Creating tokenized alias:" + Alias +"=" + token);
+            AliasMgr.getAliasMgr().AddAlias(Alias, token);
+        }
+        return true;
+    }
 }
