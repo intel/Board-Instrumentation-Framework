@@ -156,7 +156,6 @@ public class DynamicItemInfoContainer
         for (String token : tokens)
         {
             String Alias = "TriggeredIDPart." + Integer.toString(index++);
-            LOGGER.info("Creating tokenized alias:" + Alias +"=" + token);
             AliasMgr.getAliasMgr().AddAlias(Alias, token);
         }
         return true;
