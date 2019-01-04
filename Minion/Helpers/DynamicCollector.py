@@ -305,6 +305,8 @@ class DynamicCollector(Collector.Collector):
                 self.DoesCollectorExist = objDyna.CollectorExistsFromPlugin
                 self.AddCollector = objDyna.AddCollectorFromPlugin
                 self.SetCollectorValue = objDyna.SetCollectorValueFromPlugin
+                self.SetNormilization = objDyna.SetNormilizationFromPlugin
+                self.SetScale = objDyna.SetScaleFromPlugin
                 self.KillThreadSignalled = None
                 self.LockFileName = objDyna.GetLockFile()
                 self.Interval = objDyna._PollingInterval
@@ -312,6 +314,29 @@ class DynamicCollector(Collector.Collector):
                
         interface = UserPluginInterface(self)
         return interface
+
+    def SetNormilizationFromPlugin(self, collectorID, normilizationValue):
+        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
+
+        if None == objCollector:
+            Log.getLogger().error("User defined DynamicCollector tried to Set a value to a collector that does not exist, with ID: " + collectorID)
+            return
+
+        try:
+            objCollector._NormalizeValue = float(normilizationValue)
+            objCollector._Normalize=True
+        except:
+            Log.getLogger().error("User defined DynamicCollector tried to Set an invalid Normilization value of {0} to a collector that does not exist, with ID: {1}".format(normilizationValue),collectorID)
+
+    def SetScaleFromPlugin(self, collectorID, scaleValue):
+        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
+
+        if None == objCollector:
+            Log.getLogger().error("User defined DynamicCollector tried to Set a scale to a collector that does not exist, with ID: " + collectorID)
+            return
+
+        objCollector.SetScaleValue(scaleValue)
+
 
     def CollectorExistsFromPlugin(self, collectorID): 
         objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)

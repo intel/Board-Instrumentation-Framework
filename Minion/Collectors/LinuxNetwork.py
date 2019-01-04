@@ -151,6 +151,14 @@ def __GatherNetworkDeviceInfo(ethDev,retMap,slimDataset):
             dataVal = ReadFromFile(sFileName)
             retMap[baseName+ethDev + "." + fname] = dataVal
 
+    if baseName+ethDev+".rx_bytes" in retMap: # should ALWAYS be there
+        retMap[baseName+ethDev+".rx_gbps"] = retMap[baseName+ethDev+".rx_bytes"]
+        retMap[baseName+ethDev+".tx_gbps"] = retMap[baseName+ethDev+".tx_bytes"]
+        retMap[baseName+ethDev+".bx_gbps"] = str(float(retMap[baseName+ethDev+".tx_bytes"]) + float(retMap[baseName+ethDev+".rx_bytes"]))
+        retMap[baseName+ethDev+".rx_mbps"] = retMap[baseName+ethDev+".rx_bytes"]
+        retMap[baseName+ethDev+".tx_mbps"] = retMap[baseName+ethDev+".tx_bytes"]
+        retMap[baseName+ethDev+".bx_mbps"] = str(float(retMap[baseName+ethDev+".tx_bytes"]) + float(retMap[baseName+ethDev+".rx_bytes"]))
+		
     return retMap
 	
 def __GetDriver(device):
@@ -170,9 +178,9 @@ def __GatherAllNetworkDeviceInfo(slimDataSet,pyhysicalOnly=True):
     for root, dirs, files in os.walk(GetBaseDir()):
         for dir in dirs:
 #		   print "{0} {1}".format(dir,__IsPhysicalDevice(dir))
-            if False == pyhysicalOnly or __IsPhysicalDevice(dir):
-                tMap= __GatherNetworkDeviceInfo(dir,tMap,slimDataSet)
-
+           if False == pyhysicalOnly or __IsPhysicalDevice(dir):
+              tMap= __GatherNetworkDeviceInfo(dir,tMap,slimDataSet)
+           
     return tMap
 
 
@@ -205,6 +213,10 @@ def CollectAllDevices(frameworkInterface,slimDataSetParam,**kwargs):
             for entry in dataMap:
                 if InitialRun and not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
                     frameworkInterface.AddCollector(entry)    # Nope, so go add it
+                    if "_mbps" in entry:
+                       frameworkInterface.SetNormilization(entry,"0.00000008")					
+                    elif "_gbps" in entry:
+                       frameworkInterface.SetNormilization(entry,"0.000000008")					
                         
                 frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
 
@@ -243,6 +255,10 @@ def CollectDevice(frameworkInterface,DeviceName,slimDataSetParam):
             for entry in dataMap:
                 if InitialRun and not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
                     frameworkInterface.AddCollector(entry)    # Nope, so go add it
+                    if "_mbps" in entry:
+                       frameworkInterface.SetNormilization(entry,"0.00000008")					
+                    elif "_gbps" in entry:
+                       frameworkInterface.SetNormilization(entry,"0.000000008")					
                         
                 frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
 
