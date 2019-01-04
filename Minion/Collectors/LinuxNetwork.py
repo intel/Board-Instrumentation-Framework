@@ -139,6 +139,12 @@ def __GatherNetworkDeviceInfo(ethDev,retMap,slimDataset):
         macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
         retMap[baseName+ethDev + ".macaddress"] = ReadFromFile(macAddrFile)
         retMap[baseName+ethDev + ".driver"] = __GetDriver(ethDev)
+        speedFile = GetBaseDir() + "/"  + ethDev + "/speed"
+        try:
+            retMap[baseName+ethDev + ".speed"] = ReadFromFile(speedFile)
+        except:
+            retMap[baseName+ethDev + ".speed"] = "Unknown"
+                		
 
         sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sckt.connect(("8.8.8.8", 80))
@@ -214,7 +220,7 @@ def CollectAllDevices(frameworkInterface,slimDataSetParam,**kwargs):
                 if InitialRun and not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
                     frameworkInterface.AddCollector(entry)    # Nope, so go add it
                     if "_mbps" in entry:
-                       frameworkInterface.SetNormilization(entry,"0.00000008")					
+                       frameworkInterface.SetNormilization(entry,"0.000008")					
                     elif "_gbps" in entry:
                        frameworkInterface.SetNormilization(entry,"0.000000008")					
                         
@@ -256,7 +262,7 @@ def CollectDevice(frameworkInterface,DeviceName,slimDataSetParam):
                 if InitialRun and not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
                     frameworkInterface.AddCollector(entry)    # Nope, so go add it
                     if "_mbps" in entry:
-                       frameworkInterface.SetNormilization(entry,"0.00000008")					
+                       frameworkInterface.SetNormilization(entry,"0.000008")					
                     elif "_gbps" in entry:
                        frameworkInterface.SetNormilization(entry,"0.000000008")					
                         

@@ -273,9 +273,6 @@ def __GetStaticInfo():
             retMap['system.product_name'] = __GetDMI_Info("System Information",0,"Product Name") 
             retMap['system.serial_number'] = __GetDMI_Info("System Information",0,"Serial Number") 
             retMap['system.family'] = __GetDMI_Info("System Information",0,"Family") 
-            
-            coreCount = int(__GetDMI_Info("Processor Information",0,"Core Count"))
-            threadCount = int(__GetDMI_Info("Processor Information",0,"Thread Count"))
 
             if IsHyperthreadingEnabled():
                 retMap['system.hyperthreading_enabled'] = 'yes'
@@ -283,8 +280,7 @@ def __GetStaticInfo():
                 retMap['system.hyperthreading_enabled'] = 'no'
         except Exception as Ex:
             Logger.error("Unexpected problem in __GetStaticInfo() " + str(Ex))
-            for line in traceback.format_stack():
-                Logger.error(line.strip())
+
     else: #DMI decode not around, so look another way
         answer='yes'
         if not IsHyperthreadingEnabled():

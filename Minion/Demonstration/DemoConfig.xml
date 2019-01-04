@@ -26,7 +26,7 @@
 -->
 <Minion>
 	<AliasList>
-		<Alias BytesPerSec2MBPS=".00000008"/>
+		<Alias BytesPerSec2MBPS=".000008"/>
 		<Alias ButesPerSec2GBPS=".000000008"/>
 		<Alias MyFreq="750"/>
 	</AliasList>
