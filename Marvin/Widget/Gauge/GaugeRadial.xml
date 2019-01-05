@@ -33,4 +33,6 @@
     <MinorTicksSpace>5</MinorTicksSpace>
     <TickLableOrientation>Horizontal</TickLableOrientation>
     <EnhancedRateText>True</EnhancedRateText>
+	<MaxSteppedRange>10,100,1000</MaxSteppedRange>
+	<MinSteppedRange>0,-10,-100</MinSteppedRange>
 </Widget>

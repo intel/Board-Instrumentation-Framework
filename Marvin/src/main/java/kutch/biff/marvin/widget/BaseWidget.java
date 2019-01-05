@@ -91,8 +91,6 @@ abstract public class BaseWidget implements Widget
     protected double _WidthPercentOfParentGrid;
     protected double _HeightPercentOfParentGrid;
 
-//    private String _PeekabooID;
-//    private String _PeekabooNamespace;
     private String _PeekabooHideStr;
     private String _PeekabooShowStr;
     private Boolean _PeekabooShowDefault;
@@ -115,11 +113,12 @@ abstract public class BaseWidget implements Widget
     protected String _ToolTip = null;
     protected Tooltip _objToolTip = null;
     private List<String> _ToolTipStyle;
-
     protected boolean _Selected = false;
     protected ArrayList<String> _SelectedStyle;
     protected String _SelectedStyleCSS = null;
     protected String _SelectedStyleID = null;
+    private List<Double> _SteppedMaxRanges = null;
+    private List<Double> _SteppedMinRanges = null;
 
     private static CircularList<String> DebugStyles = null;
 
@@ -148,8 +147,6 @@ abstract public class BaseWidget implements Widget
         _VerticalPosition = VPos.CENTER;
         _Peekaboos = new ArrayList<>();
         _PeekabooShowDefault = true;
-//        _PeekabooID = null;
-//        _PeekabooNamespace = null;
         _DefinintionFileDirectory = DefaultWidgetDirectory;
         _PeekabooHideStr = "Hide";
         _PeekabooShowStr = "Show";
@@ -185,7 +182,103 @@ abstract public class BaseWidget implements Widget
             }
         }
     }
+    
+    public void setMaxSteppedRange(List<Double> newRange)
+    {
+        if (!SupportsSteppedRanges())
+        {
+            LOGGER.warning(getName() + " Does not support stepped ranges at this time.  Ignoring");
+            return;
+        }
+       
+        if (null != newRange)
+        {
+            _SteppedMaxRanges = newRange;
+        }
+        else
+        {
+            LOGGER.warning("Provided null list to setMaxSteppedRange");
+        }
+    }
 
+    public void setMinSteppedRange(List<Double> newRange)
+    {
+        if (!SupportsSteppedRanges())
+        {
+            LOGGER.warning(getName() + " Does not support stepped ranges at this time.  Ignoring");
+            return;
+        }
+        if (null != newRange)
+        {
+            _SteppedMinRanges = newRange;
+        }
+        else
+        {
+            LOGGER.warning("Provided null list to setMaxSteppedRange");
+        }
+    }
+    
+    public boolean getExceededMaxSteppedRange(double compareVal)
+    {
+        if (null == _SteppedMaxRanges)
+        {
+            return false;
+        }
+        if (_SteppedMaxRanges.size() == 1) // on last one
+        {
+            return false;
+        }
+        return (compareVal > _SteppedMaxRanges.get(0));
+    }
+    public boolean getExceededMinSteppedRange(double compareVal)
+    {
+        if (null == _SteppedMinRanges)
+        {
+            return false;
+        }
+        if (_SteppedMinRanges.size() == 1) // on last one
+        {
+            return false;
+        }
+        return (compareVal < _SteppedMinRanges.get(0));
+    }
+    
+    public double getNextMaxSteppedRange()
+    {
+        if (null == _SteppedMaxRanges)
+        {
+            LOGGER.severe("getNextMaxSteppedRange() called without having been configured.");
+            return 0.0;
+        }
+        if (_SteppedMaxRanges.size() == 1) // on last one
+        {
+            LOGGER.warning("getNextMaxSteppedRange() called when no more left in range.");
+        }
+        else
+        {
+            _SteppedMaxRanges.remove(0);
+        }
+        return _SteppedMaxRanges.get(0);
+    }
+    
+    public double getNextMinSteppedRange()
+    {
+        if (null == _SteppedMinRanges)
+        {
+            LOGGER.severe("getNextMinSteppedRange() called without having been configured.");
+            return 0.0;
+        }
+        if (_SteppedMinRanges.size() == 1) // on last one
+        {
+            LOGGER.warning("getNextMinSteppedRange() called when no more left in range.");
+        }
+        else
+        {
+            _SteppedMinRanges.remove(0);
+        }
+        return _SteppedMinRanges.get(0);
+    }
+    
     public double getWidthPercentOfParentGrid()
     {
         return _WidthPercentOfParentGrid;
@@ -1205,7 +1298,68 @@ abstract public class BaseWidget implements Widget
             widget.SetClickThroughTransparentRegion(node.getBooleanValue());
             return true;
         }
+        if (node.getNodeName().equalsIgnoreCase("MaxSteppedRange"))
+        {
+            return widget.HandleMaxSteppedRange(node);
+        }
+        if (node.getNodeName().equalsIgnoreCase("MinSteppedRange"))
+        {
+            return widget.HandleMinSteppedRange(node);
+        }
         return false;
+    }
+    
+    public boolean HandleMaxSteppedRange(FrameworkNode node)
+    {
+        List<Double> rangeList = ReadRange(node,true);
+        if (null == rangeList)
+        {
+            return false;
+        }
+        setMaxSteppedRange(rangeList);
+        return true;
+    }
+    public boolean HandleMinSteppedRange(FrameworkNode node)
+    {
+        List<Double> rangeList = ReadRange(node,false);
+        if (null == rangeList)
+        {
+            return false;
+        }
+        setMinSteppedRange(rangeList);
+        return true;
+    }
+    
+    private List<Double> ReadRange(FrameworkNode node, boolean mustIncrease)
+    {
+        List<Double> retList = new ArrayList<>();
+        for (String strVal :node.getTextContent().split(","))
+        {
+            try
+            {
+                double dVal = Double.parseDouble(strVal);
+                if (retList.size()>1)
+                {
+                    if (mustIncrease && retList.get(retList.size()-1) > dVal)
+                    {
+                        LOGGER.severe("MaxSteppedRange must increase in value for each number.: " + node.getTextContent());
+                        return null;
+                    }
+                    else if (!mustIncrease && dVal > retList.get(retList.size()-1) )
+                    {
+                        LOGGER.severe("MinSteppedRange must decrease in value for each number.: " + node.getTextContent());
+                        return null;
+                    }
+                }
+                retList.add(dVal);
+            }
+            catch (NumberFormatException ex)
+            {
+                LOGGER.severe("Invalid stepped range value:" + strVal);
+                return null;
+            }
+        }
+        return retList;
     }
 
     protected boolean ApplyCSS()
@@ -1925,4 +2079,9 @@ abstract public class BaseWidget implements Widget
         LOGGER.warning("Tried to perform Peekaboo ValueRange update for widget [" + this.getName() +"] that does not support this feature");
     }
 
+    @Override
+    public boolean SupportsSteppedRanges()
+    {
+        return false;
+    }
 }

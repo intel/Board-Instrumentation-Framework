@@ -38,6 +38,7 @@ public interface Widget
     public ObservableList<String> getStylesheets();
     public javafx.scene.Node getStylableObject();
     public boolean SupportsEnableDisable();
+    public boolean SupportsSteppedRanges();
     public void HandleCustomStyleOverride(FrameworkNode styleNode);
     public Region getRegionObject();
     public void UpdateTitle(String newTitle);
