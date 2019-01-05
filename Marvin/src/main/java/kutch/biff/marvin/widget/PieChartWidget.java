@@ -152,4 +152,9 @@ public class PieChartWidget extends BaseWidget
         _Chart.setTitle(strTitle);
     }
 
+    @Override
+    public boolean SupportsSteppedRanges()
+    {
+        return false;
+    }
 }

@@ -42,19 +42,20 @@ import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
  */
 abstract public class BaseChartWidget extends BaseWidget
 {
-    private Chart _chart;    
+
+    private Chart _chart;
     //private AreaChart<Number,Number> _chart;    
     private final ArrayList<SeriesDataSet> _Series;
     protected Axis _xAxis;
     protected Axis _yAxis;
-    protected String xAxisLabel,yAxisLabel;
-    protected double xAxisMaxCount,yAxisMaxCount;
+    protected String xAxisLabel, yAxisLabel;
+    protected double xAxisMaxCount, yAxisMaxCount;
     protected double yAxisMaxValue, yAxisMinValue;
     private boolean _Animated;
-    protected int xAxisMinorTick,yAxisMinorTick;
-    protected double xAxisMajorTick,yAxisMajorTick;
-    protected boolean xAxisTickVisible,yAxisTickVisible;
-    protected HashMap<SeriesDataSet,String> SyncronizeDataSetsMap;
+    protected int xAxisMinorTick, yAxisMinorTick;
+    protected double xAxisMajorTick, yAxisMajorTick;
+    protected boolean xAxisTickVisible, yAxisTickVisible;
+    protected HashMap<SeriesDataSet, String> SyncronizeDataSetsMap;
     protected boolean SynchronizeMulitSourceData;
     protected int MaxSynchronizeMulitSoureDataWait;
     protected long MaxSynchronizeMultiSourceLastUpdate;
@@ -63,11 +64,9 @@ abstract public class BaseChartWidget extends BaseWidget
     protected ArrayList<String> _SeriesOrder;
     protected boolean _HorizontalChart;
 
-
-    
     public BaseChartWidget()
     {
-        xAxisLabel="";
+        xAxisLabel = "";
         yAxisLabel = "";
         xAxisMaxCount = 20;
         yAxisMaxCount = 0;
@@ -76,12 +75,12 @@ abstract public class BaseChartWidget extends BaseWidget
         _Animated = false;
         yAxisMajorTick = 0;
         yAxisMinorTick = 0;
-        xAxisMajorTick=0;
+        xAxisMajorTick = 0;
         xAxisMinorTick = 0;
-        xAxisTickVisible=true;
+        xAxisTickVisible = true;
         yAxisTickVisible = true;
-        
-        _Series = new ArrayList<>();      
+
+        _Series = new ArrayList<>();
         _chart = null;
         setDefaultIsSquare(false);
         SyncronizeDataSetsMap = null;
@@ -92,28 +91,30 @@ abstract public class BaseChartWidget extends BaseWidget
         _SeriesOrder = new ArrayList<>();
         _HorizontalChart = false;
     }
-    
+
     /**
      * Routine nukes 1st entry, shifts everything left
+     *
      * @param series
-     * @param Max 
+     * @param Max
      */
     @SuppressWarnings("unchecked")
-    protected void ShiftSeries(XYChart.Series series,int Max)
+    protected void ShiftSeries(XYChart.Series series, int Max)
     {
         if (series.getData().size() < Max)
         {
             return;
         }
-        for (int iLoop =0; iLoop < series.getData().size()-1; iLoop++)
+        for (int iLoop = 0; iLoop < series.getData().size() - 1; iLoop++)
         {
-            XYChart.Data point = (XYChart.Data)series.getData().get(iLoop+1);
+            XYChart.Data point = (XYChart.Data) series.getData().get(iLoop + 1);
             point.setXValue(iLoop);
         }
         series.getData().remove(0);
-    }    
-    
+    }
+
     abstract Chart CreateChartObject();
+
     protected Chart getChart()
     {
         if (null == _chart)
@@ -122,39 +123,38 @@ abstract public class BaseChartWidget extends BaseWidget
         }
         return _chart;
     }
-    
-   
+
     protected void CreateChart()
     {
         CreateAxisObjects();
         //_xAxis = new NumberAxis(0d,xAxisMaxCount-1,xAxisMajorTick);
         //_yAxis = new NumberAxis(yAxisMinValue,yAxisMaxValue,yAxisMajorTick);
-        
+
         _xAxis.setTickLabelsVisible(xAxisTickVisible);
         _yAxis.setTickLabelsVisible(yAxisTickVisible);
-        
+
         _chart = CreateChartObject();
-        
+
         if (getTitle().length() > 0)
         {
             _chart.setTitle(getTitle());
         }
-        
+
         _xAxis.setLabel(xAxisLabel);
         _yAxis.setLabel(yAxisLabel);
         _chart.setAnimated(_Animated);
     }
-    
+
     public ArrayList<SeriesDataSet> getSeries()
     {
         return _Series;
     }
-    
+
     protected void CreateAxisObjects()
     {
-        _xAxis = new NumberAxis(0d,xAxisMaxCount-1,xAxisMajorTick);
-        _yAxis = new NumberAxis(yAxisMinValue,yAxisMaxValue,yAxisMajorTick);
-        
+        _xAxis = new NumberAxis(0d, xAxisMaxCount - 1, xAxisMajorTick);
+        _yAxis = new NumberAxis(yAxisMinValue, yAxisMaxValue, yAxisMajorTick);
+
         // Widget specifies interval, Java wants # of ticks, so convert
         int yTickCount = 0;
         if (yAxisMinorTick > 0)
@@ -166,9 +166,9 @@ abstract public class BaseChartWidget extends BaseWidget
         {
             xTickCount = (int) (xAxisMajorTick / xAxisMinorTick);
         }
-        
-        ((NumberAxis)(_yAxis)).minorTickCountProperty().set(yTickCount);
-        ((NumberAxis)(_xAxis)).minorTickCountProperty().set(xTickCount);
+
+        ((NumberAxis) (_yAxis)).minorTickCountProperty().set(yTickCount);
+        ((NumberAxis) (_xAxis)).minorTickCountProperty().set(xTickCount);
     }
 
     protected Axis getxAxis()
@@ -193,7 +193,7 @@ abstract public class BaseChartWidget extends BaseWidget
 
     public int getxAxisMaxCount()
     {
-        return (int)xAxisMaxCount;
+        return (int) xAxisMaxCount;
     }
 
     public double getyAxisMaxValue()
@@ -250,7 +250,7 @@ abstract public class BaseChartWidget extends BaseWidget
     {
         this.yAxisTickVisible = yAxisTickVisible;
     }
-    
+
     public boolean HandleChartSpecificAppSettings(FrameworkNode node)
     {
         if (node.getNodeName().equalsIgnoreCase("xAxis"))
@@ -319,12 +319,12 @@ abstract public class BaseChartWidget extends BaseWidget
 
             return true;
         }
-        
+
         else if (node.getNodeName().equalsIgnoreCase("SeriesSet"))
         {
             return ReadSeriesSet(node);
         }
-        
+
         if (node.getNodeName().equalsIgnoreCase("yAxis"))
         {
             if (node.hasAttribute("Label"))
@@ -370,11 +370,11 @@ abstract public class BaseChartWidget extends BaseWidget
                     return false;
                 }
             }
-            
+
             return true;
-        }    
+        }
         return false;
-    }    
+    }
 
     public boolean isAnimated()
     {
@@ -383,7 +383,7 @@ abstract public class BaseChartWidget extends BaseWidget
 
     public int getyAxisMaxCount()
     {
-        return (int)yAxisMaxCount;
+        return (int) yAxisMaxCount;
     }
 
     public void setyAxisMaxCount(int yAxisMaxCount)
@@ -435,12 +435,33 @@ abstract public class BaseChartWidget extends BaseWidget
     {
         this.xAxisMinorTick = xAxisMinorTick;
     }
+
+    protected void HandleSteppedRange(double newValue)
+    {
+        if (SupportsSteppedRanges())
+        {
+            if (getExceededMaxSteppedRange(newValue))
+            {
+                double newMax = getNextMaxSteppedRange();
+                setyAxisMaxValue(newMax);
+                UpdateValueRange();
+            }
+            else if (getExceededMinSteppedRange(newValue))
+            {
+                double newMin = getNextMinSteppedRange();
+                yAxisMinValue = newMin;
+                UpdateValueRange();
+            }
+        }
+    }
+
+
     /**
      * Sets range for widget - not valid for all widgets
+     *
      * @param rangeNode
      * @return
      */
-
     @Override
     public boolean HandleValueRange(FrameworkNode rangeNode)
     {
@@ -466,25 +487,26 @@ abstract public class BaseChartWidget extends BaseWidget
         }
         return true;
     }
+
     @Override
     public void UpdateTitle(String strTitle)
     {
         _chart.setTitle(strTitle);
     }
-    
+
     @Override
     public void UpdateValueRange()
     {
-        ((NumberAxis)(_yAxis)).setUpperBound(yAxisMaxValue);
-        ((NumberAxis)(_yAxis)).setLowerBound(yAxisMinValue);
+        ((NumberAxis) (_yAxis)).setUpperBound(yAxisMaxValue);
+        ((NumberAxis) (_yAxis)).setLowerBound(yAxisMinValue);
     }
-    
+
     public void SetSynchronizeInformation(boolean flag, int timeout)
     {
         SynchronizeMulitSourceData = flag;
         MaxSynchronizeMulitSoureDataWait = timeout;
     }
-    
+
     protected void ConfigureSynchronizationForMultiSource()
     {
         if (true == SynchronizeMulitSourceData)
@@ -493,32 +515,32 @@ abstract public class BaseChartWidget extends BaseWidget
             ClearSynchronizationForMultiSource();
         }
     }
-    
+
     protected void ClearSynchronizationForMultiSource()
     {
         for (SeriesDataSet ds : getSeries())        // create an entry for all
         {
-            SyncronizeDataSetsMap.put(ds,null);
+            SyncronizeDataSetsMap.put(ds, null);
         }
     }
-    
+
     protected void AddNewData(SeriesDataSet ds, String strNewValue)
     {
         double newValue = 0;
         try
         {
-            newValue = Double.parseDouble(strNewValue);        
+            newValue = Double.parseDouble(strNewValue);
         }
         catch (Exception ex)
         {
             LOGGER.severe("Invalid data for Chart received: " + strNewValue);
             return;
         }
-                 
+
         ShiftSeries(ds.getSeries(), getxAxisMaxCount());
         ds.getSeries().getData().add(new XYChart.Data<>(ds.getSeries().getData().size(), newValue));
     }
-    
+
     protected boolean AllDataSetsArrived()
     {
         for (SeriesDataSet ds : getSeries())        // create an entry for all
@@ -530,37 +552,37 @@ abstract public class BaseChartWidget extends BaseWidget
         }
         return true;
     }
-    
+
     protected void PushSynchronizedData()
     {
         String strVal;
         for (SeriesDataSet ds : getSeries())        // create an entry for all
         {
-            strVal = SyncronizeDataSetsMap.put(ds,null);
-            AddNewData(ds,strVal);
+            strVal = SyncronizeDataSetsMap.put(ds, null);
+            AddNewData(ds, strVal);
         }
     }
-    
+
     protected void OnDataArrived(SeriesDataSet ds, String strNewValue)
     {
         if (null == SyncronizeDataSetsMap)
         {
-            AddNewData(ds,strNewValue);
+            AddNewData(ds, strNewValue);
             return;
         }
-        SyncronizeDataSetsMap.put(ds,strNewValue);
-        if ( 0 == MaxSynchronizeMultiSourceLastUpdate)
+        SyncronizeDataSetsMap.put(ds, strNewValue);
+        if (0 == MaxSynchronizeMultiSourceLastUpdate)
         {
             MaxSynchronizeMultiSourceLastUpdate = System.currentTimeMillis();
         }
-        else if (AllDataSetsArrived() || 
-                 (MaxSynchronizeMulitSoureDataWait > 0 && System.currentTimeMillis() - MaxSynchronizeMultiSourceLastUpdate > MaxSynchronizeMulitSoureDataWait))
+        else if (AllDataSetsArrived()
+                 || (MaxSynchronizeMulitSoureDataWait > 0 && System.currentTimeMillis() - MaxSynchronizeMultiSourceLastUpdate > MaxSynchronizeMulitSoureDataWait))
         {
             PushSynchronizedData();
             MaxSynchronizeMultiSourceLastUpdate = System.currentTimeMillis();
         }
     }
-    
+
     protected boolean ReadSeriesSet(FrameworkNode setNode)
     {
         String title = "";
@@ -624,7 +646,8 @@ abstract public class BaseChartWidget extends BaseWidget
 
         return true;
     }
-     public boolean isHorizontal()
+
+    public boolean isHorizontal()
     {
         return _HorizontalChart;
     }
@@ -645,7 +668,7 @@ abstract public class BaseChartWidget extends BaseWidget
                 return;
             }
             objSeries.setName(strTitle);
-            
+
             for (SeriesDataSet objDs : objSeriesSet.getSeriesList())
             {
                 XYChart.Data objChartDataSet;
@@ -659,44 +682,49 @@ abstract public class BaseChartWidget extends BaseWidget
                 }
 
                 objSeries.getData().add(objChartDataSet);
-                
+
                 dataMgr.AddListener(objDs.getID(), objDs.getNamespace(), new ChangeListener()
-                {
-                    @Override
-                    public void changed(ObservableValue o, Object oldVal, Object newVal)
-                    {
-                        if (IsPaused())
-                        {
-                            return;
-                        }
-                        String strVal = newVal.toString();
-                        double newValue;
-                        try
-                        {
-                            newValue = Double.parseDouble(strVal);
-                        }
-                        catch (NumberFormatException ex)
-                        {
-                            LOGGER.severe("Invalid data for Line Chart received: " + strVal);
-                            return;
-                        }
-                        if (isHorizontal())
-                        {
-                            objChartDataSet.XValueProperty().set(newValue);
-                        }
-                        else
-                        {
-                            objChartDataSet.YValueProperty().set(newValue);
-                        }
-                    }
-                });
+                            {
+                                @Override
+                                public void changed(ObservableValue o, Object oldVal, Object newVal)
+                                {
+                                    if (IsPaused())
+                                    {
+                                        return;
+                                    }
+                                    String strVal = newVal.toString();
+                                    double newValue;
+                                    try
+                                    {
+                                        newValue = Double.parseDouble(strVal);
+                                        HandleSteppedRange(newValue);
+                                    }
+                                    catch (NumberFormatException ex)
+                                    {
+                                        LOGGER.severe("Invalid data for Line Chart received: " + strVal);
+                                        return;
+                                    }
+                                    if (isHorizontal())
+                                    {
+                                        objChartDataSet.XValueProperty().set(newValue);
+                                    }
+                                    else
+                                    {
+                                        objChartDataSet.YValueProperty().set(newValue);
+                                    }
+                                }
+                            });
 
             }
-           boolean fReturn = ((XYChart) getChart()).getData().add(objSeries);
-            
+            boolean fReturn = ((XYChart) getChart()).getData().add(objSeries);
 
         }
-        
+
     }
-    
+    @Override
+    public boolean SupportsSteppedRanges()
+    {
+        return true;
+    }    
+
 }

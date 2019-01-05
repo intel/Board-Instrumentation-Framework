@@ -88,6 +88,8 @@ public class LineChartWidget_MS extends BaseChartWidget
                                     try
                                     {
                                         newValue = Double.parseDouble(strVal);
+                                        HandleSteppedRange(newValue);
+
                                     }
                                     catch (Exception ex)
                                     {
@@ -106,7 +108,7 @@ public class LineChartWidget_MS extends BaseChartWidget
         SetupTaskAction();
         return ApplyCSS();
     }
-    
+
     @Override
     protected void CreateAxisObjects()
     {
@@ -116,7 +118,6 @@ public class LineChartWidget_MS extends BaseChartWidget
             _xAxis = new CategoryAxis();
         }
     }
-    
 
     @SuppressWarnings("unchecked")
     protected void _CreateChart()

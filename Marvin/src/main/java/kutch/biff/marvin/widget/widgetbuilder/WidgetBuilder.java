@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.text.Position;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -56,6 +55,7 @@ import org.xml.sax.SAXException;
  */
 public class WidgetBuilder
 {
+
     private final static Configuration CONFIG = Configuration.getConfig();
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static MySplash SPLASH = MySplash.getSplash();
@@ -337,6 +337,21 @@ public class WidgetBuilder
             else if (node.getNodeName().equalsIgnoreCase("Size"))
             {
                 if (false == HandleSizeSection(node, retWidget))
+                {
+                    return null;
+                }
+            }
+            else if (node.getNodeName().equalsIgnoreCase("MaxSteppedRange"))
+            {
+                if (!retWidget.HandleMaxSteppedRange(node))
+                {
+                    return null;
+                }
+
+            }
+            else if (node.getNodeName().equalsIgnoreCase("MinSteppedRange"))
+            {
+                if (!retWidget.HandleMinSteppedRange(node))
                 {
                     return null;
                 }
@@ -842,7 +857,7 @@ public class WidgetBuilder
         String strColumn = "0";
         String WhatIsIt = "Grid";
         boolean isOnDemand = false;
-        
+
         if (true == isFlipPanelGrid)
         {
             WhatIsIt = "FlipPanel";
@@ -871,7 +886,7 @@ public class WidgetBuilder
         {
             colSpan = gridNode.getAttribute("columnspan");
         }
-        
+
         if (gridNode.hasChild("OnDemand"))
         {
             FrameworkNode demandNode = gridNode.getChild("OnDemand");
@@ -887,12 +902,12 @@ public class WidgetBuilder
             gridNode.DeleteChildNodes("OnDemand"); // delete the ondemand section, not needed anymore
             int row = gridNode.getIntegerAttribute("row", 0);
             int col = gridNode.getIntegerAttribute("column", 0);
-            gridNode.AddAttibute("GRID_COLUMN_ODD", col % 2 == 0 ? "FALSE" : "TRUE"); 
-            gridNode.AddAttibute("GRID_ROW_ODD", row % 2 ==0 ? "FALSE" : "TRUE"); 
-            
+            gridNode.AddAttibute("GRID_COLUMN_ODD", col % 2 == 0 ? "FALSE" : "TRUE");
+            gridNode.AddAttibute("GRID_ROW_ODD", row % 2 == 0 ? "FALSE" : "TRUE");
+
             info.setNode(gridNode);
         }
-        
+
         if (true == gridNode.hasAttribute("Height"))
         {
             if (!retWidget.parseHeight(gridNode))
@@ -907,7 +922,7 @@ public class WidgetBuilder
                 return null;
             }
         }
-        
+
         if (false == isFlipPanelGrid)
         {
             strRow = gridNode.getAttribute("row");
@@ -923,7 +938,7 @@ public class WidgetBuilder
                 return null;
             }
         }
-        
+
         try
         {
             retWidget.setRow(Integer.parseInt(strRow));
@@ -938,14 +953,14 @@ public class WidgetBuilder
         }
         AliasMgr.getAliasMgr().UpdateCurrentColumn(Integer.parseInt(strColumn));
         AliasMgr.getAliasMgr().UpdateCurrentRow(Integer.parseInt(strRow));
-       
+
         if (isOnDemand)
         {
             return retWidget;
         }
         AliasMgr.getAliasMgr().AddUpdateAlias("GRID_ROW_ODD", AliasMgr.getAliasMgr().GetAlias("CurrentRowIsOddAlias"));
         AliasMgr.getAliasMgr().AddUpdateAlias("GRID_COLUMN_ODD", AliasMgr.getAliasMgr().GetAlias("CurrentColumnIsOddAlias"));
-        
+
         AliasMgr.getAliasMgr().PushAliasList(true);
 
         if (true == gridNode.hasAttribute("File"))

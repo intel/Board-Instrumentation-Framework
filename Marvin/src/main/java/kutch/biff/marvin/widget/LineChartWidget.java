@@ -84,6 +84,7 @@ public class LineChartWidget extends LineChartWidget_MS
                     try
                     {
                         newValue = Double.parseDouble(strValue);
+                        HandleSteppedRange(newValue);
                     }
                     catch (NumberFormatException ex)
                     {

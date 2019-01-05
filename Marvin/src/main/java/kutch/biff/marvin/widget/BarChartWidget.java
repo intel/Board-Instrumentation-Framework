@@ -79,62 +79,6 @@ public class BarChartWidget extends LineChartWidget
             return;
         }
         SetupSeriesSets(dataMgr);
-/*        
-        for (String key : _SeriesOrder)
-        {
-            SeriesSet objSeriesSet = _SeriesMap.get(key);
-            XYChart.Series objSeries = new XYChart.Series();
-            objSeries.setName(objSeriesSet.getTitle());
-            for (SeriesDataSet objDs : objSeriesSet.getSeriesList())
-            {
-                XYChart.Data objData;
-                if (isHorizontal())
-                {
-                    objData = new XYChart.Data<>(0, objDs.getTitle());
-                }
-                else
-                {
-                    objData = new XYChart.Data<>(objDs.getTitle(), 0);
-                }
-
-                objSeries.getData().add(objData);
-
-                dataMgr.AddListener(objDs.getID(), objDs.getNamespace(), new ChangeListener()
-                {
-                    @Override
-                    public void changed(ObservableValue o, Object oldVal, Object newVal)
-                    {
-                        if (IsPaused())
-                        {
-                            return;
-                        }
-                        String strVal = newVal.toString();
-                        double newValue;
-                        try
-                        {
-                            newValue = Double.parseDouble(strVal);
-                        }
-                        catch (NumberFormatException ex)
-                        {
-                            LOGGER.severe("Invalid data for Line Chart received: " + strVal);
-                            return;
-                        }
-                        if (isHorizontal())
-                        {
-                            objData.XValueProperty().set(newValue);
-                        }
-                        else
-                        {
-                            objData.YValueProperty().set(newValue);
-                        }
-                    }
-                });
-
-            }
-            ((BarChart) getChart()).getData().add(objSeries);
-
-        }
-        */
     }
 
     @SuppressWarnings("unchecked")
@@ -170,6 +114,7 @@ public class BarChartWidget extends LineChartWidget
                     try
                     {
                         newValue = Double.parseDouble(strValue);
+                        HandleSteppedRange(newValue);
                     }
                     catch (NumberFormatException ex)
                     {
