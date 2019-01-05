@@ -164,9 +164,18 @@ def __GatherNetworkDeviceInfo(ethDev,retMap,slimDataset):
         retMap[baseName+ethDev+".rx_mbps"] = retMap[baseName+ethDev+".rx_bytes"]
         retMap[baseName+ethDev+".tx_mbps"] = retMap[baseName+ethDev+".tx_bytes"]
         retMap[baseName+ethDev+".bx_mbps"] = str(float(retMap[baseName+ethDev+".tx_bytes"]) + float(retMap[baseName+ethDev+".rx_bytes"]))
-		
+
+    if baseName+ethDev+".tx_packets" in retMap:
+        retMap[baseName+ethDev+".tx_pps"] = retMap[baseName+ethDev+".tx_packets"]
+        retMap[baseName+ethDev+".rx_pps"] = retMap[baseName+ethDev+".rx_packets"]
+        retMap[baseName+ethDev+".bx_pps"] = str(float(retMap[baseName+ethDev+".rx_packets"]) + float(retMap[baseName+ethDev+".tx_packets"]))
+        retMap[baseName+ethDev+".tx_mpps"] = retMap[baseName+ethDev+".tx_packets"]
+        retMap[baseName+ethDev+".rx_mpps"] = retMap[baseName+ethDev+".rx_packets"]
+        retMap[baseName+ethDev+".bx_mpps"] = baseName+ethDev+".bx_pps"
+        
+
     return retMap
-	
+
 def __GetDriver(device):
     link = 	GetBaseDir() + '/' +device + '/device/driver/module/drivers'
     for root, driver, files in os.walk(link):
@@ -198,7 +207,8 @@ def CollectAllDevices(frameworkInterface,slimDataSetParam,**kwargs):
     #  frameworkInterface.KillThreadSignalled() # returns True if signalled to end your worker thread, else False
     #  frameworkInterface.LockFileName() # lockfile name for dynamic collector,  if specified
     #  frameworkInterface.Interval() # the frequency from the config file
-    
+    #  frameworkInterface.SetNormilization() # 
+    #  frameworkInterface.SetScale    
     global Logger
     Logger = frameworkInterface.Logger
     Logger.info("Starting LinuxNetwork Collector, collecting all Devices")
@@ -223,6 +233,10 @@ def CollectAllDevices(frameworkInterface,slimDataSetParam,**kwargs):
                        frameworkInterface.SetNormilization(entry,"0.000008")					
                     elif "_gbps" in entry:
                        frameworkInterface.SetNormilization(entry,"0.000000008")					
+                    elif "_pps" in entry:
+                       frameworkInterface.SetNormilization(entry,"1")					
+                    elif "_mpps" in entry:
+                       frameworkInterface.SetNormilization(entry,".000001")					
                         
                 frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
 
@@ -242,6 +256,8 @@ def CollectDevice(frameworkInterface,DeviceName,slimDataSetParam):
     #  frameworkInterface.KillThreadSignalled() # returns True if signalled to end your worker thread, else False
     #  frameworkInterface.LockFileName() # lockfile name for dynamic collector,  if specified
     #  frameworkInterface.Interval() # the frequency from the config file
+    #  frameworkInterface.SetNormilization() # 
+    #  frameworkInterface.SetScale
     
     global Logger
     Logger = frameworkInterface.Logger
@@ -265,6 +281,10 @@ def CollectDevice(frameworkInterface,DeviceName,slimDataSetParam):
                        frameworkInterface.SetNormilization(entry,"0.000008")					
                     elif "_gbps" in entry:
                        frameworkInterface.SetNormilization(entry,"0.000000008")					
+                    elif "_pps" in entry:
+                       frameworkInterface.SetNormilization(entry,"1")					
+                    elif "_mpps" in entry:
+                       frameworkInterface.SetNormilization(entry,".000001")					
                         
                 frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
 
