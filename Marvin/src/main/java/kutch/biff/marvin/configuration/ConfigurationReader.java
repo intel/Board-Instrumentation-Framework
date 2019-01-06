@@ -1256,7 +1256,11 @@ public class ConfigurationReader
                                 //AliasMgr.getAliasMgr().AddAlias("TabID", id); // Make TabID an alias = to the ID :-)
 
                                 tab = ConfigurationReader.ReadTab(node, tab, id);
-                                if (false)
+                                if (null == tab)
+                                {
+                                    return null;
+                                }
+                                if (false) // TODO - hmm, not sure about this.... why did I do this
                                 {
                                     if (node.hasAttribute("File")) // can externally define widgets within
                                     {
