@@ -117,6 +117,38 @@ public class SteelGaugeBuilder
                     return null;
                 }
             }
+            else if (node.getNodeName().equalsIgnoreCase("TickCount"))
+            {
+                double MajorTickVal = -1234;
+                double MinorTickVal = -1234;
+                
+                if (node.hasAttribute("Major"))
+                {
+                    MajorTickVal = node.getDoubleAttribute("Major", MajorTickVal);
+                    if (MajorTickVal != -1234)
+                    {
+                        sg.setMajorTickCount(MajorTickVal);
+                    }
+                    else
+                    {
+                        LOGGER.severe("Invalid TickCount ->" + node.getAttribute("Major"));
+                        return null;
+                    }
+                }
+                if (node.hasAttribute("Minor"))
+                {
+                    MinorTickVal = node.getDoubleAttribute("Minor", MinorTickVal);
+                    if (MinorTickVal != -1234)
+                    {
+                        sg.setMinorTickCount(MinorTickVal);
+                    }
+                    else
+                    {
+                        LOGGER.severe("Invalid TickCount:Minor ->" + node.getAttribute("Minor"));
+                        return null;
+                    }
+                }                
+            }
             else if (node.getNodeName().equalsIgnoreCase("MajorTicksSpace"))
             {
                 String str = node.getTextContent();

@@ -43,6 +43,7 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class SteelGaugeWidget extends BaseWidget
 {
+
     private String UnitText;
     private double MinValue;
     private double MaxValue;
@@ -50,17 +51,18 @@ public class SteelGaugeWidget extends BaseWidget
     private int DialRangeAngle;
     private double MajorTick;
     private double MinorTick;
+    private double MajorTickCount, MinorTickCount;
     private TickLabelOrientation eOrientation;
     private boolean EnhancedRateText;
     private boolean Shadowed;
     private boolean ShowMeasuredMax;
     private boolean ShowMeasuredMin;
     private List<Section> Sections;
-    private List<Pair<Double,Double>> SectionPercentages;
+    private List<Pair<Double, Double>> SectionPercentages;
     private Gauge _Gauge;  // remember that you need to disable mouse action in gaugeskin knob.setOnMousePressed(event -> ~ line 324
     private GridPane _ParentGridPane;
-    private double _InitialValue ;
-    
+    private double _InitialValue;
+
     public SteelGaugeWidget()
     {
         UnitText = "";
@@ -70,6 +72,8 @@ public class SteelGaugeWidget extends BaseWidget
         DialRangeAngle = 270;
         MajorTick = 0;
         MinorTick = 0;
+        MajorTickCount = 0;
+        MinorTickCount = 0;
         eOrientation = TickLabelOrientation.HORIZONTAL;
         EnhancedRateText = true;
         Shadowed = true;
@@ -100,13 +104,13 @@ public class SteelGaugeWidget extends BaseWidget
         EventHandler<MouseEvent> eh = SetupTaskAction(); // special because Gauge can be interactive
         if (null == eh)
         {
-                eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
+            eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
+            {
+                @Override
+                public void handle(MouseEvent event)
                 {
-                    @Override
-                    public void handle(MouseEvent event)
-                    {
-                    }
-                };
+                }
+            };
         }
         _Gauge.customKnobClickHandlerProperty().set(eh);
         SetupPeekaboo(dataMgr);
@@ -114,36 +118,53 @@ public class SteelGaugeWidget extends BaseWidget
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
         dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
-        {
-            @Override 
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
-            {
-                if (IsPaused())
-                {
-                    return;
-                }
+                    {
+                        @Override
+                        public void changed(ObservableValue o, Object oldVal, Object newVal)
+                        {
+                            if (IsPaused())
+                            {
+                                return;
+                            }
 
-                double newDialValue = 0;
-                double oldDialValue = 0;
-                String strVal = newVal.toString();
-                try
-                {
-                    newDialValue = Double.parseDouble(strVal);
-                    HandleSteppedRange(newDialValue);
+                            double newDialValue = 0;
+                            double oldDialValue = 0;
+                            String strVal = newVal.toString();
+                            try
+                            {
+                                newDialValue = Double.parseDouble(strVal);
+                                HandleSteppedRange(newDialValue);
 
-                    //oldDialValue = Double.parseDouble(oldVal.toString());
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Invalid data for Gauge received: " + strVal);
-                    return;
-                }
+                                //oldDialValue = Double.parseDouble(oldVal.toString());
+                            }
+                            catch (Exception ex)
+                            {
+                                LOGGER.severe("Invalid data for Gauge received: " + strVal);
+                                return;
+                            }
 
-                _Gauge.setValue(newDialValue);
-            }
-        });
+                            _Gauge.setValue(newDialValue);
+                        }
+                    });
 
         return ApplyCSS();
+    }
+
+    private void SetupTicksFromTickCount()
+    {
+        double range = abs(this.MaxValue - this.MinValue);
+        if (range == 0)
+        {
+            return;
+        }
+        if (MajorTickCount > 0)
+        {
+            MajorTick = range / MajorTickCount;
+            if (MinorTickCount > 0)
+            {
+                MinorTick = MajorTick/MinorTickCount;
+            }
+        }
     }
 
     private boolean SetupGauge()
@@ -162,7 +183,7 @@ public class SteelGaugeWidget extends BaseWidget
         {
             _Gauge.setTitle(getTitle());
         }
-
+        SetupTicksFromTickCount();
         if (MajorTick > 0)
         {
             _Gauge.setMajorTickSpace(MajorTick);
@@ -187,13 +208,9 @@ public class SteelGaugeWidget extends BaseWidget
         }
 
         _Gauge.setDecimals(getDecimalPlaces());
-//        _Gauge.setInteractive(true);
-
-        //_Gauge.setMouseTransparent(!CONFIG.isDebugMode());  // only allow in debug mode, is for displaying widget info on click
-        //_Gauge.setOnMouseClicked(null);
         return true;
     }
-    
+
     private void setSectionsFromPercentages()
     {
         if (null == SectionPercentages)
@@ -202,15 +219,16 @@ public class SteelGaugeWidget extends BaseWidget
         }
         List<Section> sections = new ArrayList<>();
         double range = abs(MaxValue - MinValue);
-        for (Pair<Double,Double> sect: SectionPercentages)
+        for (Pair<Double, Double> sect : SectionPercentages)
         {
-            double start,end;
-            start = MinValue + sect.getKey()/100 *  range;
-            end = MinValue + sect.getValue()/100 * range;
-            sections.add(new Section(start,end));
+            double start, end;
+            start = MinValue + sect.getKey() / 100 * range;
+            end = MinValue + sect.getValue() / 100 * range;
+            sections.add(new Section(start, end));
         }
         setSections(sections);
     }
+
     @Override
     public void SetInitialValue(String value)
     {
@@ -299,8 +317,8 @@ public class SteelGaugeWidget extends BaseWidget
     {
         this.Sections = Sections;
     }
-    
-    public void setPercentageSections(List<Pair<Double,Double>> Sections)
+
+    public void setPercentageSections(List<Pair<Double, Double>> Sections)
     {
         this.SectionPercentages = Sections;
     }
@@ -310,8 +328,10 @@ public class SteelGaugeWidget extends BaseWidget
     {
         return _Gauge.getStylesheets();
     }
+
     /**
      * Sets range for widget - not valid for all widgets
+     *
      * @param rangeNode
      * @return
      */
@@ -349,13 +369,13 @@ public class SteelGaugeWidget extends BaseWidget
             {
                 double MajorTickVal = -1234;
                 double MinorTickVal = -1234;
-                
+
                 if (node.hasAttribute("Major"))
                 {
                     MajorTickVal = node.getDoubleAttribute("Major", MajorTickVal);
                     if (MajorTickVal != -1234)
                     {
-                        setMajorTick((this.MaxValue - this.MinValue)/MajorTickVal);
+                        MajorTickCount = MajorTickVal;
                     }
                     else
                     {
@@ -368,7 +388,7 @@ public class SteelGaugeWidget extends BaseWidget
                     MinorTickVal = node.getDoubleAttribute("Minor", MinorTickVal);
                     if (MinorTickVal != -1234)
                     {
-                        setMinorTick((this.MaxValue - this.MinValue)/MinorTickVal);
+                        MajorTickCount = MinorTickVal;
                     }
                     else
                     {
@@ -381,15 +401,17 @@ public class SteelGaugeWidget extends BaseWidget
             {
                 return false;
             }
-            
+
         }
         return true;
     }
+
     @Override
     public void UpdateTitle(String strTitle)
     {
         _Gauge.setTitle(getTitle());
     }
+
     @Override
     public void UpdateValueRange()
     {
@@ -397,7 +419,7 @@ public class SteelGaugeWidget extends BaseWidget
         _Gauge.setMinValue(MinValue);
         _Gauge.setMaxValue(MaxValue);
     }
-    
+
     private void makeNewGauge()
     {
         Gauge oldGauge = _Gauge;
@@ -405,7 +427,7 @@ public class SteelGaugeWidget extends BaseWidget
         _Gauge.setAnimationDuration(400);
         GridPane pane = getParentPane();
         pane.getChildren().remove(oldGauge);
-        
+
         if (false == SetupGauge())
         {
             LOGGER.severe("Tried to re-create SteelGaugeWidget for Stepped Range, but something bad happened.");
@@ -418,13 +440,13 @@ public class SteelGaugeWidget extends BaseWidget
         EventHandler<MouseEvent> eh = SetupTaskAction(); // special because Gauge can be interactive
         if (null == eh)
         {
-                eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
+            eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
+            {
+                @Override
+                public void handle(MouseEvent event)
                 {
-                    @Override
-                    public void handle(MouseEvent event)
-                    {
-                    }
-                };
+                }
+            };
         }
         _Gauge.customKnobClickHandlerProperty().set(eh);
         SetupPeekaboo(DataManager.getDataManager());
@@ -432,7 +454,27 @@ public class SteelGaugeWidget extends BaseWidget
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
         ApplyCSS();
     }
-    
+
+    public double getMajorTickCount()
+    {
+        return MajorTickCount;
+    }
+
+    public void setMajorTickCount(double MajorTickCount)
+    {
+        this.MajorTickCount = MajorTickCount;
+    }
+
+    public double getMinorTickCount()
+    {
+        return MinorTickCount;
+    }
+
+    public void setMinorTickCount(double MinorTickCount)
+    {
+        this.MinorTickCount = MinorTickCount;
+    }
+
     protected void HandleSteppedRange(double newValue)
     {
         if (SupportsSteppedRanges())
@@ -449,10 +491,11 @@ public class SteelGaugeWidget extends BaseWidget
             }
         }
     }
+
     @Override
     public boolean SupportsSteppedRanges()
     {
         return true;
-    }    
- 
+    }
+
 }
