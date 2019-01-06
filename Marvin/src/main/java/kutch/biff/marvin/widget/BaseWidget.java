@@ -64,6 +64,7 @@ import org.xml.sax.SAXException;
  */
 abstract public class BaseWidget implements Widget
 {
+
     public static String DefaultWidgetDirectory = "Widget";
     private static int _WidgetCount = 0;
     private static final ArrayList<BaseWidget> _WidgetList = new ArrayList<>();
@@ -182,7 +183,39 @@ abstract public class BaseWidget implements Widget
             }
         }
     }
-    
+
+    public void initialSteppedRangeSetup(double min, double max)
+    {
+        if (!SupportsSteppedRanges())
+        {
+            return;
+        }
+        if (null != _SteppedMaxRanges)
+        {
+            while (getExceededMaxSteppedRange(max) && _SteppedMaxRanges.size() > 0)
+            {
+                _SteppedMaxRanges.remove(0);
+            }
+            if (_SteppedMaxRanges.isEmpty())
+            {
+                _SteppedMaxRanges = null;
+            }
+        }
+
+        if (null != _SteppedMinRanges)
+        {
+            while (getExceededMinSteppedRange(max) && _SteppedMinRanges.size() > 0)
+            {
+                _SteppedMinRanges.remove(0);
+            }
+            if (_SteppedMinRanges.isEmpty())
+            {
+                _SteppedMinRanges = null;
+            }
+        }
+
+    }
+
     public void setMaxSteppedRange(List<Double> newRange)
     {
         if (!SupportsSteppedRanges())
@@ -190,7 +223,7 @@ abstract public class BaseWidget implements Widget
             LOGGER.warning(getName() + " Does not support stepped ranges at this time.  Ignoring");
             return;
         }
-       
+
         if (null != newRange)
         {
             _SteppedMaxRanges = newRange;
@@ -217,7 +250,7 @@ abstract public class BaseWidget implements Widget
             LOGGER.warning("Provided null list to setMaxSteppedRange");
         }
     }
-    
+
     public boolean getExceededMaxSteppedRange(double compareVal)
     {
         if (null == _SteppedMaxRanges)
@@ -230,6 +263,7 @@ abstract public class BaseWidget implements Widget
         }
         return (compareVal > _SteppedMaxRanges.get(0));
     }
+
     public boolean getExceededMinSteppedRange(double compareVal)
     {
         if (null == _SteppedMinRanges)
@@ -242,8 +276,8 @@ abstract public class BaseWidget implements Widget
         }
         return (compareVal < _SteppedMinRanges.get(0));
     }
-    
-    public double getNextMaxSteppedRange()
+
+    public double getNextMaxSteppedRange(double currVal)
     {
         if (null == _SteppedMaxRanges)
         {
@@ -256,12 +290,15 @@ abstract public class BaseWidget implements Widget
         }
         else
         {
-            _SteppedMaxRanges.remove(0);
+            while (getExceededMaxSteppedRange(currVal))
+            {
+                _SteppedMaxRanges.remove(0);
+            }
         }
         return _SteppedMaxRanges.get(0);
     }
-    
-    public double getNextMinSteppedRange()
+
+    public double getNextMinSteppedRange(double currVal)
     {
         if (null == _SteppedMinRanges)
         {
@@ -274,11 +311,14 @@ abstract public class BaseWidget implements Widget
         }
         else
         {
-            _SteppedMinRanges.remove(0);
+            while (getExceededMinSteppedRange(currVal))
+            {
+                _SteppedMinRanges.remove(0);
+            }
         }
         return _SteppedMinRanges.get(0);
     }
-    
+
     public double getWidthPercentOfParentGrid()
     {
         return _WidthPercentOfParentGrid;
@@ -311,7 +351,7 @@ abstract public class BaseWidget implements Widget
             LOGGER.warning(" Attempted to se an already set default peekaboo action to: " + strDefault + ". Ignoring.");
         }
     }
-    
+
     public void SetToolTip(String newValue)
     {
         _ToolTip = newValue;
@@ -912,9 +952,9 @@ abstract public class BaseWidget implements Widget
     {
         Utility.ValidateAttributes(new String[]
         {
-            "Min", "Max" 
+            "Min", "Max"
         }, node);
-        
+
         String strMin = "";
         if (node.hasAttribute("Min"))
         {
@@ -939,7 +979,7 @@ abstract public class BaseWidget implements Widget
             LOGGER.warning("Received Invalid Peekaboo Marvin request for new ValueRange: " + node.toString());
         }
     }
-    
+
     private void HandleRemoteStyleOverride(FrameworkNode node)
     {
         if (false == StyleUpdatesFromConfigFinished)
@@ -1308,10 +1348,10 @@ abstract public class BaseWidget implements Widget
         }
         return false;
     }
-    
+
     public boolean HandleMaxSteppedRange(FrameworkNode node)
     {
-        List<Double> rangeList = ReadRange(node,true);
+        List<Double> rangeList = ReadRange(node, true);
         if (null == rangeList)
         {
             return false;
@@ -1319,9 +1359,10 @@ abstract public class BaseWidget implements Widget
         setMaxSteppedRange(rangeList);
         return true;
     }
+
     public boolean HandleMinSteppedRange(FrameworkNode node)
     {
-        List<Double> rangeList = ReadRange(node,false);
+        List<Double> rangeList = ReadRange(node, false);
         if (null == rangeList)
         {
             return false;
@@ -1329,23 +1370,23 @@ abstract public class BaseWidget implements Widget
         setMinSteppedRange(rangeList);
         return true;
     }
-    
+
     private List<Double> ReadRange(FrameworkNode node, boolean mustIncrease)
     {
         List<Double> retList = new ArrayList<>();
-        for (String strVal :node.getTextContent().split(","))
+        for (String strVal : node.getTextContent().split(","))
         {
             try
             {
                 double dVal = Double.parseDouble(strVal);
-                if (retList.size()>1)
+                if (retList.size() > 1)
                 {
-                    if (mustIncrease && retList.get(retList.size()-1) > dVal)
+                    if (mustIncrease && retList.get(retList.size() - 1) > dVal)
                     {
                         LOGGER.severe("MaxSteppedRange must increase in value for each number.: " + node.getTextContent());
                         return null;
                     }
-                    else if (!mustIncrease && dVal > retList.get(retList.size()-1) )
+                    else if (!mustIncrease && dVal > retList.get(retList.size() - 1))
                     {
                         LOGGER.severe("MinSteppedRange must decrease in value for each number.: " + node.getTextContent());
                         return null;
@@ -1656,7 +1697,7 @@ abstract public class BaseWidget implements Widget
         getStylableObject().setOnMouseEntered(eh);
         return eh;
     }
-    
+
     protected EventHandler<MouseEvent> SetupMouseExitedTask()
     {
         if (null == getTaskID() || true == CONFIG.getAllowTasks())
@@ -1674,7 +1715,7 @@ abstract public class BaseWidget implements Widget
         };
         getStylableObject().setOnMouseExited(eh);
         return eh;
-    }    
+    }
 
     public EventHandler<MouseEvent> SetupTaskAction()
     {
@@ -2072,11 +2113,11 @@ abstract public class BaseWidget implements Widget
     public void OnResumed()
     {
     }
-    
+
     @Override
     public void UpdateValueRange()
     {
-        LOGGER.warning("Tried to perform Peekaboo ValueRange update for widget [" + this.getName() +"] that does not support this feature");
+        LOGGER.warning("Tried to perform Peekaboo ValueRange update for widget [" + this.getName() + "] that does not support this feature");
     }
 
     @Override

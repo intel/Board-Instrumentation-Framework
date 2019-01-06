@@ -97,26 +97,11 @@ public class SteelGaugeWidget extends BaseWidget
             return false;
         }
         _Gauge.setValue(_InitialValue);
-
-        ConfigureDimentions();
-
-        ConfigureAlignment();
-        EventHandler<MouseEvent> eh = SetupTaskAction(); // special because Gauge can be interactive
-        if (null == eh)
-        {
-            eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
-            {
-                @Override
-                public void handle(MouseEvent event)
-                {
-                }
-            };
-        }
-        _Gauge.customKnobClickHandlerProperty().set(eh);
-        SetupPeekaboo(dataMgr);
+        initialSteppedRangeSetup(MinValue,MaxValue);
 
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
+        SetupPeekaboo(DataManager.getDataManager());
         dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
                     {
                         @Override
@@ -128,7 +113,6 @@ public class SteelGaugeWidget extends BaseWidget
                             }
 
                             double newDialValue = 0;
-                            double oldDialValue = 0;
                             String strVal = newVal.toString();
                             try
                             {
@@ -208,6 +192,23 @@ public class SteelGaugeWidget extends BaseWidget
         }
 
         _Gauge.setDecimals(getDecimalPlaces());
+        
+        ConfigureDimentions();
+
+        ConfigureAlignment();
+        EventHandler<MouseEvent> eh = SetupTaskAction(); // special because Gauge can be interactive
+        if (null == eh)
+        {
+            eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
+            {
+                @Override
+                public void handle(MouseEvent event)
+                {
+                }
+            };
+        }
+        _Gauge.customKnobClickHandlerProperty().set(eh);
+        
         return true;
     }
 
@@ -415,15 +416,17 @@ public class SteelGaugeWidget extends BaseWidget
     @Override
     public void UpdateValueRange()
     {
-        makeNewGauge();
         _Gauge.setMinValue(MinValue);
         _Gauge.setMaxValue(MaxValue);
+        makeNewGauge();
     }
 
     private void makeNewGauge()
     {
         Gauge oldGauge = _Gauge;
         _Gauge = new Gauge();
+        _Gauge.setVisible(oldGauge.isVisible());
+        
         _Gauge.setAnimationDuration(400);
         GridPane pane = getParentPane();
         pane.getChildren().remove(oldGauge);
@@ -434,23 +437,6 @@ public class SteelGaugeWidget extends BaseWidget
             _Gauge = oldGauge;
             return;
         }
-        _Gauge.setTitle("test");
-        ConfigureDimentions();
-        ConfigureAlignment();
-        EventHandler<MouseEvent> eh = SetupTaskAction(); // special because Gauge can be interactive
-        if (null == eh)
-        {
-            eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
-            {
-                @Override
-                public void handle(MouseEvent event)
-                {
-                }
-            };
-        }
-        _Gauge.customKnobClickHandlerProperty().set(eh);
-        SetupPeekaboo(DataManager.getDataManager());
-
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
         ApplyCSS();
     }
@@ -481,12 +467,12 @@ public class SteelGaugeWidget extends BaseWidget
         {
             if (getExceededMaxSteppedRange(newValue))
             {
-                MaxValue = getNextMaxSteppedRange();
+                MaxValue = getNextMaxSteppedRange(newValue);
                 UpdateValueRange();
             }
             else if (getExceededMinSteppedRange(newValue))
             {
-                MinValue = getNextMinSteppedRange();
+                MinValue = getNextMinSteppedRange(newValue);
                 UpdateValueRange();
             }
         }

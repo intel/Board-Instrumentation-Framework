@@ -43,7 +43,6 @@ import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
  */
 abstract public class BaseChartWidget extends BaseWidget
 {
-
     private Chart _chart;
     //private AreaChart<Number,Number> _chart;    
     private final ArrayList<SeriesDataSet> _Series;
@@ -473,13 +472,13 @@ abstract public class BaseChartWidget extends BaseWidget
         {
             if (getExceededMaxSteppedRange(newValue))
             {
-                double newMax = getNextMaxSteppedRange();
+                double newMax = getNextMaxSteppedRange(newValue);
                 setyAxisMaxValue(newMax);
                 UpdateValueRange();
             }
             else if (getExceededMinSteppedRange(newValue))
             {
-                double newMin = getNextMinSteppedRange();
+                double newMin = getNextMinSteppedRange(newValue);
                 yAxisMinValue = newMin;
                 UpdateValueRange();
             }
