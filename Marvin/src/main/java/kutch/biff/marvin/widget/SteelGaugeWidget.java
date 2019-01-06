@@ -24,6 +24,7 @@ package kutch.biff.marvin.widget;
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.gauge.Gauge;
 import eu.hansolo.enzo.gauge.Gauge.TickLabelOrientation;
+import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.beans.value.ChangeListener;
@@ -32,6 +33,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 
@@ -54,7 +56,7 @@ public class SteelGaugeWidget extends BaseWidget
     private boolean ShowMeasuredMax;
     private boolean ShowMeasuredMin;
     private List<Section> Sections;
-    private List<Double> SectionPercentages;
+    private List<Pair<Double,Double>> SectionPercentages;
     private Gauge _Gauge;  // remember that you need to disable mouse action in gaugeskin knob.setOnMousePressed(event -> ~ line 324
     private GridPane _ParentGridPane;
     private double _InitialValue ;
@@ -178,6 +180,7 @@ public class SteelGaugeWidget extends BaseWidget
         {
             _Gauge.setUnit(UnitText);
         }
+        setSectionsFromPercentages();
         if (null != Sections)
         {
             _Gauge.setSections(Sections);
@@ -189,6 +192,24 @@ public class SteelGaugeWidget extends BaseWidget
         //_Gauge.setMouseTransparent(!CONFIG.isDebugMode());  // only allow in debug mode, is for displaying widget info on click
         //_Gauge.setOnMouseClicked(null);
         return true;
+    }
+    
+    private void setSectionsFromPercentages()
+    {
+        if (null == SectionPercentages)
+        {
+            return;
+        }
+        List<Section> sections = new ArrayList<>();
+        double range = abs(MaxValue - MinValue);
+        for (Pair<Double,Double> sect: SectionPercentages)
+        {
+            double start,end;
+            start = MinValue + sect.getKey()/100 *  range;
+            end = MinValue + sect.getValue()/100 * range;
+            sections.add(new Section(start,end));
+        }
+        setSections(sections);
     }
     @Override
     public void SetInitialValue(String value)
@@ -274,9 +295,14 @@ public class SteelGaugeWidget extends BaseWidget
         this.ShowMeasuredMin = ShowMeasuredMin;
     }
 
-    public void setSections(ArrayList<Section> Sections)
+    public void setSections(List<Section> Sections)
     {
         this.Sections = Sections;
+    }
+    
+    public void setPercentageSections(List<Pair<Double,Double>> Sections)
+    {
+        this.SectionPercentages = Sections;
     }
 
     @Override
