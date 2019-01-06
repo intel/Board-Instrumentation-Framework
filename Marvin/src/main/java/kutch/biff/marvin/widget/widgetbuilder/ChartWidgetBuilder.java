@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.Utility;
-import kutch.biff.marvin.widget.AreaChartWidget; 
+import kutch.biff.marvin.widget.AreaChartWidget;
 import kutch.biff.marvin.widget.AreaChartWidget_MS;
 import kutch.biff.marvin.widget.BarChartWidget;
 import kutch.biff.marvin.widget.BaseChartWidget;
@@ -40,105 +40,107 @@ import kutch.biff.marvin.widget.StackedBarChartWidget;
  *
  * @author Patrick Kutch
  */
-public class ChartWidgetBuilder 
+public class ChartWidgetBuilder
 {
+
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     public static LineChartWidget_MS BuildMultiSourceLineChart(FrameworkNode masterNode, String widgetDefFilename)
     {
         LineChartWidget_MS objWidget = new LineChartWidget_MS();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode,objWidget,widgetDefFilename))
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
         {
             return null;
         }
-        
+
         return objWidget;
     }
+
     public static LineChartWidget BuildLineChart(FrameworkNode masterNode, String widgetDefFilename)
     {
         LineChartWidget objWidget = new LineChartWidget();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode,objWidget,widgetDefFilename))
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
         {
             return null;
         }
-        
+
         return objWidget;
     }
-    
+
     public static AreaChartWidget BuildAreaChart(FrameworkNode masterNode, String widgetDefFilename)
     {
         AreaChartWidget objWidget = new AreaChartWidget();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode,objWidget,widgetDefFilename))
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
         {
             return null;
         }
-        
+
         return objWidget;
     }
-    
+
     public static AreaChartWidget_MS BuildMultiSourceAreaChart(FrameworkNode masterNode, String widgetDefFilename)
     {
         AreaChartWidget_MS objWidget = new AreaChartWidget_MS();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode,objWidget,widgetDefFilename))
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
         {
             return null;
         }
-        
+
         return objWidget;
     }
 
     public static StackedAreaChartWidget_MS BuildMultiSourceStackedAreaChart(FrameworkNode masterNode, String widgetDefFilename)
     {
         StackedAreaChartWidget_MS objWidget = new StackedAreaChartWidget_MS();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode,objWidget,widgetDefFilename))
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
         {
             return null;
         }
-        
-        return objWidget;
-    }
-    
-    public static StackedAreaChartWidget BuildStackedAreaChart(FrameworkNode masterNode, String widgetDefFilename)
-    {
-        StackedAreaChartWidget objWidget = new StackedAreaChartWidget();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode,objWidget,widgetDefFilename))
-        {
-            return null;
-        }
-        
+
         return objWidget;
     }
 
-    
+    public static StackedAreaChartWidget BuildStackedAreaChart(FrameworkNode masterNode, String widgetDefFilename)
+    {
+        StackedAreaChartWidget objWidget = new StackedAreaChartWidget();
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
+        {
+            return null;
+        }
+
+        return objWidget;
+    }
+
     public static BarChartWidget BuildBarChart(FrameworkNode masterNode, String widgetDefFilename)
     {
         BarChartWidget objWidget = new BarChartWidget(false);
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode,objWidget,widgetDefFilename))
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
         {
             return null;
         }
-        
+
         return objWidget;
     }
+
     public static BarChartWidget BuildHorizontalBarChart(FrameworkNode masterNode, String widgetDefFilename)
     {
         BarChartWidget objWidget = new BarChartWidget(true);
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode,objWidget,widgetDefFilename))
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
         {
             return null;
         }
-        
+
         return objWidget;
     }
 
     public static BarChartWidget BuildStackedlBarChart(FrameworkNode masterNode, String widgetDefFilename)
     {
         StackedBarChartWidget objWidget = new StackedBarChartWidget();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode,objWidget,widgetDefFilename))
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
         {
             return null;
         }
-        
+
         return objWidget;
     }
 
@@ -164,16 +166,19 @@ public class ChartWidgetBuilder
                 else
                 {
                     LOGGER.severe("Invalid Chart Widget Definition File.  Animated should be True or False, not:" + str);
-                    return false;                
+                    return false;
                 }
             }
             else if (node.getNodeName().equalsIgnoreCase("Synchronized"))
             {
-                Utility.ValidateAttributes(new String[] {"MaxSyncWait"}, node);
+                Utility.ValidateAttributes(new String[]
+                {
+                    "MaxSyncWait"
+                }, node);
                 String str = node.getTextContent();
                 boolean flag;
                 int interval = 2500;
-                
+
                 if (0 == str.compareToIgnoreCase("True"))
                 {
                     flag = true;
@@ -185,8 +190,8 @@ public class ChartWidgetBuilder
                 else
                 {
                     LOGGER.severe("Invalid Chart Widget Definition File.  Synchronized should be True or False, not:" + str);
-                    return false;                
-                }                
+                    return false;
+                }
                 if (node.hasAttribute("MaxSyncWait"))
                 {
                     try
@@ -195,38 +200,79 @@ public class ChartWidgetBuilder
                     }
                     catch (Exception ex)
                     {
-                        LOGGER.severe("Invalid Chart Widget definition MaxSyncWait: " +node.getAttribute("MaxSyncWait") );
+                        LOGGER.severe("Invalid Chart Widget definition MaxSyncWait: " + node.getAttribute("MaxSyncWait"));
                         return false;
                     }
-                }                
-                chart.SetSynchronizeInformation(flag,interval);
-                
+                }
+                chart.SetSynchronizeInformation(flag, interval);
+
             }
-            
+
             else if (node.getNodeName().equalsIgnoreCase("xAxis"))
             {
-                Utility.ValidateAttributes(new String[] {"MajorTickInterval", "MinorTickInterval","TickLabelVisible"}, node);
+                Utility.ValidateAttributes(new String[]
+                {
+                    "MajorTickInterval", "MinorTickInterval", "TickLabelVisible", "MajorTickCount", "MinorTickCount"
+                }, node);
                 if (node.hasAttribute("MajorTickInterval"))
+                {
+                    if (node.hasAttribute("MajorTickCount"))
+                    {
+                        LOGGER.severe("Chart Widget definition has MajorTickInterval and MajorTickCount.  Ignoreing MajorTickInterval");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            chart.setxAxisMajorTick(Double.parseDouble(node.getAttribute("MajorTickInterval")));
+                        }
+                        catch (Exception ex)
+                        {
+                            LOGGER.severe("Invalid Chart Widget definition MajorTickInterval: " + node.getAttribute("MajorTickInterval"));
+                            return false;
+                        }
+                    }
+                }
+                if (node.hasAttribute("MajorTickCount"))
                 {
                     try
                     {
-                        chart.setxAxisMajorTick(Double.parseDouble(node.getAttribute("MajorTickInterval")));
+                        chart.setxAxisMajorTickCount(Double.parseDouble(node.getAttribute("MajorTickInterval")));
                     }
                     catch (Exception ex)
                     {
-                        LOGGER.severe("Invalid Chart Widget definition MajorTickInterval: " +node.getAttribute("MajorTickInterval") );
+                        LOGGER.severe("Invalid Chart Widget definition MajorTickCount: " + node.getAttribute("MajorTickCount"));
                         return false;
                     }
                 }
                 if (node.hasAttribute("MinorTickInterval"))
                 {
+                    if (node.hasAttribute("MinortTickCount"))
+                    {
+                        LOGGER.severe("Chart Widget definition has MinorTickInterval and MinorTickCount.  Ignoreing MinorTickInterval");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            chart.setxAxisMinorTick(Integer.parseInt(node.getAttribute("MinorTickInterval")));
+                        }
+                        catch (Exception ex)
+                        {
+                            LOGGER.severe("Invalid Chart Widget definition MinorTickInterval: " + node.getAttribute("MinorTickInterval"));
+                            return false;
+                        }
+                    }
+                }
+                if (node.hasAttribute("MinorTickCount"))
+                {
                     try
                     {
-                        chart.setxAxisMinorTick(Integer.parseInt(node.getAttribute("MinorTickInterval")));
+                        chart.setxAxisMinorTickCount(Double.parseDouble(node.getAttribute("MinorTickCount")));
                     }
                     catch (Exception ex)
                     {
-                        LOGGER.severe("Invalid Chart Widget definition MinorTickInterval: " +node.getAttribute("MinorTickInterval") );
+                        LOGGER.severe("Invalid Chart Widget definition inorTickCount: " + node.getAttribute("MinorTickCount"));
                         return false;
                     }
                 }
@@ -244,34 +290,75 @@ public class ChartWidgetBuilder
                     else
                     {
                         LOGGER.severe("Invalid Chart Widget Definition File.  TickLable Visible should be True or False, not:" + str);
-                        return false;                
+                        return false;
                     }
                 }
             }
             else if (node.getNodeName().equalsIgnoreCase("yAxis"))
             {
-                Utility.ValidateAttributes(new String[] {"MajorTickInterval", "MinorTickInterval","TickLabelVisible"}, node);
+                Utility.ValidateAttributes(new String[]
+                {
+                    "MajorTickInterval", "MinorTickInterval", "TickLabelVisible", "MajorTickCount", "MinorTickCount"
+                }, node);
                 if (node.hasAttribute("MajorTickInterval"))
+                {
+                    if (node.hasAttribute("MajorTickCount"))
+                    {
+                        LOGGER.severe("Chart Widget definition has MajorTickInterval and MajorTickCount.  Ignoreing MajorTickInterval");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            chart.setyAxisMajorTick(Double.parseDouble(node.getAttribute("MajorTickInterval")));
+                        }
+                        catch (Exception ex)
+                        {
+                            LOGGER.severe("Invalid Chart Widget definition MajorTickInterval: " + node.getAttribute("MajorTickInterval"));
+                            return false;
+                        }
+                    }
+                }
+                if (node.hasAttribute("MajorTickCount"))
                 {
                     try
                     {
-                        chart.setyAxisMajorTick(Double.parseDouble(node.getAttribute("MajorTickInterval")));
+                        chart.setyAxisMajorTickCount(Double.parseDouble(node.getAttribute("MajorTickCount")));
                     }
                     catch (Exception ex)
                     {
-                        LOGGER.severe("Invalid Chart Widget definition MajorTickInterval: " +node.getAttribute("MajorTickInterval") );
+                        LOGGER.severe("Invalid Chart Widget definition MajorTickCount: " + node.getAttribute("MajorTickCount"));
                         return false;
                     }
                 }
                 if (node.hasAttribute("MinorTickInterval"))
                 {
+                    if (node.hasAttribute("MinortTickCount"))
+                    {
+                        LOGGER.severe("Chart Widget definition has MinorTickInterval and MinorTickCount.  Ignoreing MinorTickInterval");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            chart.setyAxisMinorTick(Integer.parseInt(node.getAttribute("MinorTickInterval")));
+                        }
+                        catch (Exception ex)
+                        {
+                            LOGGER.severe("Invalid Chart Widget definition MinorTickInterval: " + node.getAttribute("MinorTickInterval"));
+                            return false;
+                        }
+                    }
+                }
+                if (node.hasAttribute("MinorTickCount"))
+                {
                     try
                     {
-                        chart.setyAxisMinorTick(Integer.parseInt(node.getAttribute("MinorTickInterval")));
+                        chart.setyAxisMinorTickCount(Double.parseDouble(node.getAttribute("MinorTickCount")));
                     }
                     catch (Exception ex)
                     {
-                        LOGGER.severe("Invalid Chart Widget definition MinorTickInterval: " +node.getAttribute("MinorTickInterval") );
+                        LOGGER.severe("Invalid Chart Widget definition inorTickCount: " + node.getAttribute("MinorTickCount"));
                         return false;
                     }
                 }
@@ -289,14 +376,14 @@ public class ChartWidgetBuilder
                     else
                     {
                         LOGGER.severe("Invalid Chart Widget Definition File.  TickLable Visible should be True or False, not:" + str);
-                        return false;                
+                        return false;
                     }
                 }
             }
 
         }
-        
+
         return true;
     }
-    
+
 }

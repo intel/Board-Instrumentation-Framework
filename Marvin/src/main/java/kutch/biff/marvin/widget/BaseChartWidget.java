@@ -21,6 +21,7 @@
  */
 package kutch.biff.marvin.widget;
 
+import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javafx.beans.value.ChangeListener;
@@ -63,6 +64,8 @@ abstract public class BaseChartWidget extends BaseWidget
     protected HashMap<String, SeriesSet> _SeriesMap;
     protected ArrayList<String> _SeriesOrder;
     protected boolean _HorizontalChart;
+    protected double yAxisMajorTickCount,xAxisMajorTickCount;
+    protected double yAxisMinorTickCount,xAxisMinorTickCount;
 
     public BaseChartWidget()
     {
@@ -77,6 +80,10 @@ abstract public class BaseChartWidget extends BaseWidget
         yAxisMinorTick = 0;
         xAxisMajorTick = 0;
         xAxisMinorTick = 0;
+        yAxisMajorTickCount = 0;
+        xAxisMajorTickCount = 0;
+        yAxisMinorTickCount = 0;
+        xAxisMinorTickCount = 0;
         xAxisTickVisible = true;
         yAxisTickVisible = true;
 
@@ -152,23 +159,30 @@ abstract public class BaseChartWidget extends BaseWidget
 
     protected void CreateAxisObjects()
     {
-        _xAxis = new NumberAxis(0d, xAxisMaxCount - 1, xAxisMajorTick);
-        _yAxis = new NumberAxis(yAxisMinValue, yAxisMaxValue, yAxisMajorTick);
-
-        // Widget specifies interval, Java wants # of ticks, so convert
-        int yTickCount = 0;
-        if (yAxisMinorTick > 0)
+        if (xAxisMajorTickCount > 0)
         {
-            yTickCount = (int) (yAxisMajorTick / yAxisMinorTick);
+            _xAxis = new NumberAxis(0d, xAxisMaxCount - 1, xAxisMaxCount / xAxisMajorTickCount);
         }
-        int xTickCount = 0;
-        if (xAxisMinorTick > 0)
+        else
         {
-            xTickCount = (int) (xAxisMajorTick / xAxisMinorTick);
+            _xAxis = new NumberAxis(0d, xAxisMaxCount - 1, xAxisMajorTick);
         }
-
-        ((NumberAxis) (_yAxis)).minorTickCountProperty().set(yTickCount);
-        ((NumberAxis) (_xAxis)).minorTickCountProperty().set(xTickCount);
+        
+        if (yAxisMajorTickCount > 0)
+        {
+            _yAxis = new NumberAxis(yAxisMinValue, yAxisMaxValue, yAxisMaxValue/yAxisMajorTickCount);
+        }
+        else
+        {
+            _yAxis = new NumberAxis(yAxisMinValue, yAxisMaxValue, yAxisMajorTick);
+        }
+        setupMinorTicks();
+    }
+    
+    protected void setupMinorTicks()
+    {
+        ((NumberAxis) (_yAxis)).setMinorTickCount((int)yAxisMinorTick+1);
+        ((NumberAxis) (_xAxis)).setMinorTickCount((int)xAxisMinorTick+1);
     }
 
     protected Axis getxAxis()
@@ -420,6 +434,23 @@ abstract public class BaseChartWidget extends BaseWidget
     {
         return xAxisMajorTick;
     }
+    
+    public void setxAxisMajorTickCount(double count)
+    {
+        xAxisMajorTickCount = count;
+    }
+    public void setyAxisMajorTickCount(double count)
+    {
+        yAxisMajorTickCount = count;
+    }
+    public void setxAxisMinorTickCount(double count)
+    {
+        xAxisMinorTickCount = count;
+    }
+    public void setyAxisMinorTickCount(double count)
+    {
+        yAxisMinorTickCount = count;
+    }
 
     public void setxAxisMajorTick(double xAxisMajorTick)
     {
@@ -497,8 +528,17 @@ abstract public class BaseChartWidget extends BaseWidget
     @Override
     public void UpdateValueRange()
     {
+        // if ranges changed, then change ticks
+        double currRange = abs(((NumberAxis) (_yAxis)).getUpperBound() - ((NumberAxis) (_yAxis)).getLowerBound());
+        double newRange = abs(yAxisMaxValue - yAxisMinValue);
+        double currTickCount =  currRange /((NumberAxis) (_yAxis)).getTickUnit();
+        double newTickUnit = newRange/currTickCount;
+
         ((NumberAxis) (_yAxis)).setUpperBound(yAxisMaxValue);
         ((NumberAxis) (_yAxis)).setLowerBound(yAxisMinValue);
+        ((NumberAxis) (_yAxis)).setTickUnit(newTickUnit);
+        
+        setupMinorTicks();
     }
 
     public void SetSynchronizeInformation(boolean flag, int timeout)

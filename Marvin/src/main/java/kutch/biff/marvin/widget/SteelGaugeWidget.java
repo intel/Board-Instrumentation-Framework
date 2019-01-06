@@ -25,6 +25,7 @@ import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.gauge.Gauge;
 import eu.hansolo.enzo.gauge.Gauge.TickLabelOrientation;
 import java.util.ArrayList;
+import java.util.List;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -52,7 +53,8 @@ public class SteelGaugeWidget extends BaseWidget
     private boolean Shadowed;
     private boolean ShowMeasuredMax;
     private boolean ShowMeasuredMin;
-    private ArrayList<Section> Sections;
+    private List<Section> Sections;
+    private List<Double> SectionPercentages;
     private Gauge _Gauge;  // remember that you need to disable mouse action in gaugeskin knob.setOnMousePressed(event -> ~ line 324
     private GridPane _ParentGridPane;
     private double _InitialValue ;
@@ -74,6 +76,7 @@ public class SteelGaugeWidget extends BaseWidget
         Sections = null;
         _Gauge = new Gauge();
         _Gauge.setAnimationDuration(400);
+        SectionPercentages = null;
         //_Gauge.setAnimated(false);
 
     }
@@ -124,6 +127,7 @@ public class SteelGaugeWidget extends BaseWidget
                 try
                 {
                     newDialValue = Double.parseDouble(strVal);
+                    HandleSteppedRange(newDialValue);
 
                     //oldDialValue = Double.parseDouble(oldVal.toString());
                 }
@@ -363,8 +367,66 @@ public class SteelGaugeWidget extends BaseWidget
     @Override
     public void UpdateValueRange()
     {
+        makeNewGauge();
         _Gauge.setMinValue(MinValue);
         _Gauge.setMaxValue(MaxValue);
     }
+    
+    private void makeNewGauge()
+    {
+        Gauge oldGauge = _Gauge;
+        _Gauge = new Gauge();
+        _Gauge.setAnimationDuration(400);
+        GridPane pane = getParentPane();
+        pane.getChildren().remove(oldGauge);
+        
+        if (false == SetupGauge())
+        {
+            LOGGER.severe("Tried to re-create SteelGaugeWidget for Stepped Range, but something bad happened.");
+            _Gauge = oldGauge;
+            return;
+        }
+        _Gauge.setTitle("test");
+        ConfigureDimentions();
+        ConfigureAlignment();
+        EventHandler<MouseEvent> eh = SetupTaskAction(); // special because Gauge can be interactive
+        if (null == eh)
+        {
+                eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
+                {
+                    @Override
+                    public void handle(MouseEvent event)
+                    {
+                    }
+                };
+        }
+        _Gauge.customKnobClickHandlerProperty().set(eh);
+        SetupPeekaboo(DataManager.getDataManager());
+
+        pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+        ApplyCSS();
+    }
+    
+    protected void HandleSteppedRange(double newValue)
+    {
+        if (SupportsSteppedRanges())
+        {
+            if (getExceededMaxSteppedRange(newValue))
+            {
+                MaxValue = getNextMaxSteppedRange();
+                UpdateValueRange();
+            }
+            else if (getExceededMinSteppedRange(newValue))
+            {
+                MinValue = getNextMinSteppedRange();
+                UpdateValueRange();
+            }
+        }
+    }
+    @Override
+    public boolean SupportsSteppedRanges()
+    {
+        return true;
+    }    
  
 }

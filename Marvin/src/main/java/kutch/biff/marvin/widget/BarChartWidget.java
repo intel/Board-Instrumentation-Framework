@@ -27,6 +27,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.Chart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.datamanager.DataManager;
@@ -165,10 +166,15 @@ public class BarChartWidget extends LineChartWidget
         return false;
     }
 
-
-
     protected CategoryAxis getAxis_X()
     {
         return this._xAxis;
     }
+    
+    protected void setupMinorTicks()
+    {
+        ((NumberAxis) (_yAxis)).setMinorTickCount((int)yAxisMinorTick+1);
+        // xAxis is not a number axis
+    }
+    
 }
