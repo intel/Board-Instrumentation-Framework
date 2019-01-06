@@ -65,6 +65,7 @@ public class SteelGauge180Widget extends BaseWidget
         return _Gauge.getStylesheets();
     }
 
+    @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
@@ -74,9 +75,7 @@ public class SteelGauge180Widget extends BaseWidget
         }
         _Gauge.setValue(_InitialValue);
 
-        ConfigureAlignment();
         SetupPeekaboo(dataMgr);
-        ConfigureDimentions();
 
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
@@ -95,6 +94,7 @@ public class SteelGauge180Widget extends BaseWidget
                 try
                 {
                     newDialValue = Double.parseDouble(strVal);
+                    HandleSteppedRange(newDialValue);
                 }
                 catch (NumberFormatException ex)
                 {
@@ -156,6 +156,8 @@ public class SteelGauge180Widget extends BaseWidget
         {
             _Gauge.setUnit(UnitText);
         }
+        ConfigureAlignment();
+        ConfigureDimentions();
 
         _Gauge.setDecimals(getDecimalPlaces());
         _Gauge.setAnimated(true);
@@ -205,9 +207,48 @@ public class SteelGauge180Widget extends BaseWidget
     @Override
     public void UpdateValueRange()
     {
-        _Gauge.setMinValue(MinValue);
-        _Gauge.setMaxValue(MaxValue);
+        makeNewGauge();
     }
     
+    private void makeNewGauge()
+    {
+        OneEightyGauge oldGauge = _Gauge;
+        _Gauge = new OneEightyGauge();
+        _Gauge.setVisible(oldGauge.isVisible());
+
+        GridPane pane = getParentPane();
+        pane.getChildren().remove(oldGauge);
+
+        if (false == SetupGauge())
+        {
+            LOGGER.severe("Tried to re-create OneEightyGauge for Stepped Range, but something bad happened.");
+            _Gauge = oldGauge;
+            return;
+        }
+        pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+        ApplyCSS();
+    }
+    protected void HandleSteppedRange(double newValue)
+    {
+        if (SupportsSteppedRanges())
+        {
+            if (getExceededMaxSteppedRange(newValue))
+            {
+                MaxValue = getNextMaxSteppedRange(newValue);
+                UpdateValueRange();
+            }
+            else if (getExceededMinSteppedRange(newValue))
+            {
+                MinValue = getNextMinSteppedRange(newValue);
+                UpdateValueRange();
+            }
+        }
+    }
+
+    @Override
+    public boolean SupportsSteppedRanges()
+    {
+        return true;
+    }
     
 }

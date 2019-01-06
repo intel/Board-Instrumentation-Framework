@@ -21,12 +21,9 @@
  */
 package kutch.biff.marvin.widget.widgetbuilder;
 
-import eu.hansolo.enzo.common.Section;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
-import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.SteelGauge180Widget;
 
@@ -88,50 +85,5 @@ public class SteelGauge180Builder
         }
         return sg;
     }
-    
-    private static ArrayList<Section> ProcessSections(FrameworkNode sections)
-    {
-        ArrayList<Section> sectList = new ArrayList<Section>();
-        for (FrameworkNode node : sections.getChildNodes())
-        {
-            if (node.getNodeName().equalsIgnoreCase("#Text"))
-            {
-                continue;
-            }
-            else if (node.getNodeName().equalsIgnoreCase("Section"))
-            {
-                Utility.ValidateAttributes(new String[] {"start","end"},node);              
-                
-                if (node.hasAttribute("start") && node.hasAttribute("end"))
-                {
-                    Section objSect = new Section();
-                    try
-                    {
-                        String str = node.getAttribute("start");
-                        objSect.setStart(Double.parseDouble(str));
-                        str = node.getAttribute("end");
-                        objSect.setStop(Double.parseDouble(str));
-                        sectList.add(objSect);
-                    }
-                    catch (Exception ex)
-                    {
-                        LOGGER.severe("Invalid <Sections> in SteelGauge Widget Definition File.");
-                        return null;
-                    }
-                    //TODO - add color.....
-                }
-                else
-                {
-                    LOGGER.severe("Invalid <Sections> in SteelGauge Widget Definition File.");
-                    return null;
-                }
-            }
-            else
-            {
-                LOGGER.severe("Invalid <Sections> in SteelGauge Widget Definition File. Unknown tag: " + node.getNodeName());
-                return null;
-            }
-        }
-        return sectList;
-    }
+   
 }

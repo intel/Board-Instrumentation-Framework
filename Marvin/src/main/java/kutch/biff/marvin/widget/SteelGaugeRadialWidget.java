@@ -357,7 +357,7 @@ public class SteelGaugeRadialWidget extends BaseWidget
 
         if (false == SetupGauge())
         {
-            LOGGER.severe("Tried to re-create SteelGaugeWidget for Stepped Range, but something bad happened.");
+            LOGGER.severe("Tried to re-create Radial for Stepped Range, but something bad happened.");
             _Gauge = oldGauge;
             return;
         }
