@@ -23,12 +23,15 @@ package kutch.biff.marvin.widget.widgetbuilder;
 
 import eu.hansolo.enzo.common.Section;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+import javafx.util.Pair;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.SteelSimpleGaugeWidget;
+import static kutch.biff.marvin.widget.widgetbuilder.SteelGaugeBuilder.ProcessPercentageSections;
 
 /**
  *
@@ -96,14 +99,22 @@ public class SteelSimpleGaugeBuilder
             
             else if (node.getNodeName().equalsIgnoreCase("Sections"))
             {
-                ArrayList<Section> sectList = ProcessSections(node);
-                if (null != sectList)
+                List<Pair<Double, Double>> percentSections = ProcessPercentageSections(node);
+                if (null != percentSections)
                 {
-                    sg.setSections(sectList);
+                    sg.setPercentageSections(percentSections);
                 }
                 else
                 {
-                    return null;
+                    List<Section> sectList = ProcessSections(node);
+                    if (null != sectList)
+                    {
+                        sg.setSections(sectList);
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
             
@@ -154,6 +165,67 @@ public class SteelSimpleGaugeBuilder
             else
             {
                 LOGGER.severe("Invalid <Sections> in SteelSimpleGauge Widget Definition File. Unknown tag: " + node.getNodeName());
+                return null;
+            }
+        }
+        return sectList;
+    }
+    protected static List<Pair<Double, Double>> ProcessPercentageSections(FrameworkNode sections)
+    {
+        ArrayList<Pair<Double, Double>> sectList = new ArrayList<>();
+
+        for (FrameworkNode node : sections.getChildNodes())
+        {
+            if (node.getNodeName().equalsIgnoreCase("#Text"))
+            {
+
+            }
+            else if (node.getNodeName().equalsIgnoreCase("Section"))
+            {
+                Utility.ValidateAttributes(new String[]
+                {
+                    "start", "end"
+                }, node);
+                if (node.hasAttribute("start") && node.hasAttribute("end"))
+                {
+                    try
+                    {
+                        double start, end;
+                        String str = node.getAttribute("start");
+                        if (str.contains("%"))
+                        {
+                            str = str.replace("%", "");
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                        start = Double.parseDouble(str);
+                        str = node.getAttribute("end");
+                        if (str.contains("%"))
+                        {
+                            str = str.replace("%", "");
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                        end = Double.parseDouble(str);
+                        sectList.add(new Pair<Double, Double>(start, end));
+                    }
+                    catch (Exception ex)
+                    {
+                        //LOGGER.severe("Invalid <Sections> in SteelGauge Widget Definition File.");
+                        return null;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
                 return null;
             }
         }

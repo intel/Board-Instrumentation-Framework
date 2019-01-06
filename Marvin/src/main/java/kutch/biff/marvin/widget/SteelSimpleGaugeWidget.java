@@ -23,11 +23,14 @@ package kutch.biff.marvin.widget;
 
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.gauge.SimpleGauge;
+import static java.lang.Math.abs;
 import java.util.ArrayList;
+import java.util.List;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.GridPane;
+import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 
@@ -40,7 +43,9 @@ public class SteelSimpleGaugeWidget extends BaseWidget
     private String UnitText;
     private double MinValue;
     private double MaxValue;
-    private ArrayList<Section> Sections;
+    private List<Section> Sections;
+    private List<Pair<Double, Double>> SectionPercentages = null;
+
     private SimpleGauge _Gauge;
     private double _InitialValue = 0;
     
@@ -76,8 +81,6 @@ public class SteelSimpleGaugeWidget extends BaseWidget
         }
         _Gauge.setValue(_InitialValue);
         
-        ConfigureDimentions();
-        ConfigureAlignment();
         SetupPeekaboo(dataMgr);
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
@@ -96,6 +99,7 @@ public class SteelSimpleGaugeWidget extends BaseWidget
                 try
                 {
                     newDialValue = Double.parseDouble(strVal);
+                    HandleSteppedRange(newDialValue);
                 }
                 catch (Exception ex)
                 {
@@ -122,7 +126,7 @@ public class SteelSimpleGaugeWidget extends BaseWidget
         }
     }
     
-    public void setSections(ArrayList<Section> objSections)
+    public void setSections(List<Section> objSections)
     {
         this.Sections = objSections;
     }
@@ -171,12 +175,14 @@ public class SteelSimpleGaugeWidget extends BaseWidget
             _Gauge.setPrefHeight(getWidth());
             _Gauge.setMaxWidth(getWidth());
         }
-
+        setSectionsFromPercentages();
         if (null != Sections)
         {
             _Gauge.setSections(Sections);
         }
         _Gauge.setDecimals(getDecimalPlaces());
+        ConfigureDimentions();
+        ConfigureAlignment();
         SetupTaskAction();
 
         return false != ApplyCSS();
@@ -221,8 +227,68 @@ public class SteelSimpleGaugeWidget extends BaseWidget
     @Override
     public void UpdateValueRange()
     {
-        _Gauge.setMinValue(MinValue);
-        _Gauge.setMaxValue(MaxValue);
+        makeNewGauge();
     }
-  
+    private void setSectionsFromPercentages()
+    {
+        if (null == SectionPercentages)
+        {
+            return;
+        }
+        List<Section> sections = new ArrayList<>();
+        double range = abs(MaxValue - MinValue);
+        for (Pair<Double, Double> sect : SectionPercentages)
+        {
+            double start, end;
+            start = MinValue + sect.getKey() / 100 * range;
+            end = MinValue + sect.getValue() / 100 * range;
+            sections.add(new Section(start, end));
+        }
+        setSections(sections);
+    }
+    public void setPercentageSections(List<Pair<Double, Double>> Sections)
+    {
+        this.SectionPercentages = Sections;
+    }
+
+    protected void HandleSteppedRange(double newValue)
+    {
+        if (SupportsSteppedRanges())
+        {
+            if (getExceededMaxSteppedRange(newValue))
+            {
+                MaxValue = getNextMaxSteppedRange(newValue);
+                UpdateValueRange();
+            }
+            else if (getExceededMinSteppedRange(newValue))
+            {
+                MinValue = getNextMinSteppedRange(newValue);
+                UpdateValueRange();
+            }
+        }
+    }
+
+    @Override
+    public boolean SupportsSteppedRanges()
+    {
+        return true;
+    }
+    private void makeNewGauge()
+    {
+        SimpleGauge oldGauge = _Gauge;
+        _Gauge = new SimpleGauge();
+        _Gauge.setVisible(oldGauge.isVisible());
+
+        GridPane pane = getParentPane();
+        pane.getChildren().remove(oldGauge);
+
+        if (false == SetupGauge())
+        {
+            LOGGER.severe("Tried to re-create SteelGaugeWidget for Stepped Range, but something bad happened.");
+            _Gauge = oldGauge;
+            return;
+        }
+        pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+        ApplyCSS();
+    }  
 }

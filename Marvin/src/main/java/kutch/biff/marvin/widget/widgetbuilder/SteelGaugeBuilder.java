@@ -359,7 +359,6 @@ public class SteelGaugeBuilder
             }
         }
         return sectList;
-
     }
 
     protected static List<Section> ProcessSections(FrameworkNode sections)

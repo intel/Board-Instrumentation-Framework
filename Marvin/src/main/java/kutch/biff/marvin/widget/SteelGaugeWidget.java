@@ -118,8 +118,6 @@ public class SteelGaugeWidget extends BaseWidget
                             {
                                 newDialValue = Double.parseDouble(strVal);
                                 HandleSteppedRange(newDialValue);
-
-                                //oldDialValue = Double.parseDouble(oldVal.toString());
                             }
                             catch (Exception ex)
                             {
