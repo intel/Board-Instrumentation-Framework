@@ -39,6 +39,7 @@ public class OnDemandGridBuilder implements OnDemandWidgetBuilder
         LOGGER.info("Creating OnDemand Grid for namespace: " + Namespace + " and ID: " + ID);
         __builtCount += 1;
         AliasMgr.getAliasMgr().PushAliasList(true);
+        __containerGrid.AddAliasListSnapshot();
         AliasMgr.getAliasMgr().AddAlias("TriggeredNamespace", Namespace); // So tab knows namespace
         AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); 
         AliasMgr.getAliasMgr().AddAlias("TriggeredValue", Value); 

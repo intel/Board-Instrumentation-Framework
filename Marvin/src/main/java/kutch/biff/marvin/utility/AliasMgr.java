@@ -28,6 +28,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -48,7 +49,8 @@ import org.w3c.dom.NodeList;
  */
 public class AliasMgr
 {
-    private final ArrayList<Map> _AliasList;
+
+    private final List<Map> _AliasList;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static AliasMgr _Mgr = new AliasMgr();
     private final static String strCurrentRowIsOddAlias = "CurrentRowIsOddAlias";
@@ -89,6 +91,7 @@ public class AliasMgr
         }
 
     }
+
     /**
      * Fetches the string associated with the alias if exists, else null
      *
@@ -98,7 +101,7 @@ public class AliasMgr
     public String GetAlias(String strAliasRequested)
     {
         String strAlias = strAliasRequested.toUpperCase();
-        
+
         for (Map map : _AliasList)
         {
             if (map.containsKey(strAlias))
@@ -194,6 +197,7 @@ public class AliasMgr
             map.put(Alias.toUpperCase(), Value);
         }
     }
+
     public void AddUpdateAlias(String Alias, String Value)
     {
         if (null == Alias)
@@ -216,7 +220,7 @@ public class AliasMgr
         {
             map.put(Alias.toUpperCase(), Value);
         }
-    }    
+    }
 
     public void AddRootAlias(String Alias, String Value)
     {
@@ -246,14 +250,14 @@ public class AliasMgr
     {
         UpdateAlias(strNextColumnAlias, Integer.toString(newValue + 1));
         UpdateAlias(strCurrentColumnAlias, Integer.toString(newValue));
-        UpdateAlias(strCurrentColumnIsOddAlias, (newValue % 2) == 0 ? "FALSE" : "TRUE"); 
+        UpdateAlias(strCurrentColumnIsOddAlias, (newValue % 2) == 0 ? "FALSE" : "TRUE");
     }
 
     public void UpdateCurrentRow(int newValue)
     {
         UpdateAlias(strNextRowAlias, Integer.toString(newValue + 1));
         UpdateAlias(strCurrentRowAlias, Integer.toString(newValue));
-        UpdateAlias(strCurrentRowIsOddAlias, (newValue % 2) == 0 ? "FALSE" : "TRUE"); 
+        UpdateAlias(strCurrentRowIsOddAlias, (newValue % 2) == 0 ? "FALSE" : "TRUE");
     }
 
     @SuppressWarnings("unchecked")
@@ -284,8 +288,8 @@ public class AliasMgr
 
         if (addRowColAliases)
         {
-            AddAlias(strCurrentColumnIsOddAlias,"FALSE");
-            AddAlias(strCurrentRowIsOddAlias,"FALSE");
+            AddAlias(strCurrentColumnIsOddAlias, "FALSE");
+            AddAlias(strCurrentRowIsOddAlias, "FALSE");
             AddAlias(strCurrentRowAlias, "0");
             AddAlias(strNextRowAlias, "1");
             AddAlias(strCurrentColumnAlias, "0");
@@ -498,7 +502,7 @@ public class AliasMgr
             AddRootAlias("WORKING_DIR", current);
 
             String path = new File(".").toURI().toString();
-            AddRootAlias("WORKING_DIR_URI", path);            
+            AddRootAlias("WORKING_DIR_URI", path);
         }
         catch (IOException ex)
         {
@@ -649,5 +653,19 @@ public class AliasMgr
     public void SetCurrentConfigFile(String strFname)
     {
         AddAlias("CurrentConfigFilename", strFname);
+    }
+
+    public Map<String, String> getSnapshot()
+    {
+        Map<String, String> retMap = new HashMap<>();
+        for (int i = _AliasList.size() - 1; i >= 0; i--)
+        {
+            Map<String, String> aliasMap = _AliasList.get(i);
+            for (String key : aliasMap.keySet())
+            {
+                retMap.put(key, aliasMap.get(key));
+            }
+        }
+        return retMap;
     }
 }

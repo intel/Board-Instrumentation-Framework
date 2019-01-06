@@ -21,9 +21,11 @@
  */
 package kutch.biff.marvin.widget;
 
+import java.util.Map;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
+import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandGridBuilder;
@@ -34,14 +36,14 @@ import kutch.biff.marvin.widget.widgetbuilder.OnDemandGridBuilder;
  */
 public class OnDemandGridWidget extends GridWidget
 {
-
     private String __strPrimaryGrowth = "HZ";
     private String __strSecondaryGrowth = "VT";
     private int __NewLineCount = 1;
-    private int __currentLineCount = 0;
+    private int __currentLineCount ;
     private int __nextPositionX = 0;
     private int __nextPositionY = 0;
     private DynamicItemInfoContainer __criterea;
+    private Map<String,String> __AliasListSnapshot = null;
 
     public OnDemandGridWidget(DynamicItemInfoContainer onDemandInfo)
     {
@@ -103,9 +105,23 @@ public class OnDemandGridWidget extends GridWidget
 
         OnDemandGridBuilder objBuilder = new OnDemandGridBuilder(this);
         dataMgr.AddOnDemandWidgetCriterea(__criterea, objBuilder);
+        // grab ALL aliases to use when contained widgets created
+        __AliasListSnapshot = AliasMgr.getAliasMgr().getSnapshot();
         return true;
     }
 
+    public void AddAliasListSnapshot()
+    {
+        if (null == __AliasListSnapshot)
+        {
+            return;
+        }
+        AliasMgr aMgr = AliasMgr.getAliasMgr();
+        for (String key : __AliasListSnapshot.keySet())
+        {
+            aMgr.AddAlias(key, __AliasListSnapshot.get(key));
+        }
+    }
     public DynamicItemInfoContainer getCriterea()
     {
         return __criterea;
