@@ -22,9 +22,6 @@
 package kutch.biff.marvin.utility;
 
 import java.io.File;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -803,6 +800,26 @@ public class FrameworkNode
         ((Element)_node).setAttribute(key, value);
     }
 
+    public boolean DeleteAttribute(String AttributeName)
+    {
+        if (!hasAttributes())
+        {
+            return false;
+        }
+
+        for (int index = 0; index < _node.getAttributes().getLength(); index++)
+        {
+            Node attribute = _node.getAttributes().item(index);
+            
+            if (attribute.getNodeName().equalsIgnoreCase(AttributeName))
+            {
+                _node.getAttributes().removeNamedItem(attribute.getNodeName());
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void DeleteChildNodes(String childName)
     {
         NodeList children = _node.getChildNodes();

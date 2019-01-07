@@ -896,6 +896,8 @@ public class WidgetBuilder
             {
                 objWidget.ReadGrowthInfo(demandNode.getChild("Growth"));
             }
+            // get hgap and all those good things
+            ReadGridAttributes(objWidget,gridNode,false);
             retWidget = objWidget;
             WhatIsIt = "OnDemand Grid";
             isOnDemand = true;
@@ -956,6 +958,13 @@ public class WidgetBuilder
 
         if (isOnDemand)
         {
+            // need to nuke these, otherwise the on-demand grid will suck them up, and that will be a problem.
+            gridNode.DeleteAttribute("rowspan");
+            gridNode.DeleteAttribute("colspan");
+            gridNode.DeleteAttribute("columnpan");
+            gridNode.DeleteAttribute("hgap");
+            gridNode.DeleteAttribute("vgap");
+            gridNode.DeleteAttribute("align");
             return retWidget;
         }
         AliasMgr.getAliasMgr().AddUpdateAlias("GRID_ROW_ODD", AliasMgr.getAliasMgr().GetAlias("CurrentRowIsOddAlias"));

@@ -88,14 +88,13 @@ public class GridWidget extends BaseWidget
 
         _hGapPercentOfParentGrid = 0;
         _vGapPercentOfParentGrid = 0;
-
     }
 
     public Image getImage(Color fillColor)
     {
         SnapshotParameters params = new SnapshotParameters();
         params.setFill(fillColor);
-        //params.setFill(Color.TRANSPARENT);
+        
         try
         {
             Image image = getGridPane().snapshot(params, null);
@@ -105,25 +104,6 @@ public class GridWidget extends BaseWidget
         {
             return null;
         }
-        /*
-         BufferedImage bufImageARGB = SwingFXUtils.fromFXImage(image, null);
-         BufferedImage bufImageRGB = new BufferedImage(bufImageARGB.getWidth(), bufImageARGB.getHeight(), BufferedImage.OPAQUE);
-
-        Graphics2D graphics = bufImageRGB.createGraphics();
-        graphics.drawImage(bufImageARGB, 0, 0, null);
-        
-           WritableImage wr = null;
-        if (bufImageARGB != null) {
-            wr = new WritableImage(bufImageARGB.getWidth(), bufImageARGB.getHeight());
-            PixelWriter pw = wr.getPixelWriter();
-            for (int x = 0; x < bufImageARGB.getWidth(); x++) {
-                for (int y = 0; y < bufImageARGB.getHeight(); y++) {
-                    pw.setArgb(x, y, bufImageARGB.getRGB(x, y));
-                }
-            }
-        }
-        return wr;
-         */
     }
 
     protected GridPane getGridPane()
