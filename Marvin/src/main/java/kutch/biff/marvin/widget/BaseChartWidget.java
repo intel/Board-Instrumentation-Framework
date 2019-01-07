@@ -43,6 +43,7 @@ import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
  */
 abstract public class BaseChartWidget extends BaseWidget
 {
+
     private Chart _chart;
     //private AreaChart<Number,Number> _chart;    
     private final ArrayList<SeriesDataSet> _Series;
@@ -63,8 +64,8 @@ abstract public class BaseChartWidget extends BaseWidget
     protected HashMap<String, SeriesSet> _SeriesMap;
     protected ArrayList<String> _SeriesOrder;
     protected boolean _HorizontalChart;
-    protected double yAxisMajorTickCount,xAxisMajorTickCount;
-    protected double yAxisMinorTickCount,xAxisMinorTickCount;
+    protected double yAxisMajorTickCount, xAxisMajorTickCount;
+    protected double yAxisMinorTickCount, xAxisMinorTickCount;
 
     public BaseChartWidget()
     {
@@ -149,6 +150,7 @@ abstract public class BaseChartWidget extends BaseWidget
         _xAxis.setLabel(xAxisLabel);
         _yAxis.setLabel(yAxisLabel);
         _chart.setAnimated(_Animated);
+        initialSteppedRangeSetup(yAxisMinValue, yAxisMaxValue);
     }
 
     public ArrayList<SeriesDataSet> getSeries()
@@ -166,10 +168,10 @@ abstract public class BaseChartWidget extends BaseWidget
         {
             _xAxis = new NumberAxis(0d, xAxisMaxCount - 1, xAxisMajorTick);
         }
-        
+
         if (yAxisMajorTickCount > 0)
         {
-            _yAxis = new NumberAxis(yAxisMinValue, yAxisMaxValue, yAxisMaxValue/yAxisMajorTickCount);
+            _yAxis = new NumberAxis(yAxisMinValue, yAxisMaxValue, yAxisMaxValue / yAxisMajorTickCount);
         }
         else
         {
@@ -177,11 +179,11 @@ abstract public class BaseChartWidget extends BaseWidget
         }
         setupMinorTicks();
     }
-    
+
     protected void setupMinorTicks()
     {
-        ((NumberAxis) (_yAxis)).setMinorTickCount((int)yAxisMinorTick+1);
-        ((NumberAxis) (_xAxis)).setMinorTickCount((int)xAxisMinorTick+1);
+        ((NumberAxis) (_yAxis)).setMinorTickCount((int) yAxisMinorTick + 1);
+        ((NumberAxis) (_xAxis)).setMinorTickCount((int) xAxisMinorTick + 1);
     }
 
     protected Axis getxAxis()
@@ -281,9 +283,17 @@ abstract public class BaseChartWidget extends BaseWidget
                 }
                 catch (NumberFormatException ex)
                 {
-                    LOGGER.severe("Invalid value for chart MaxEntires: " + strVal + " - ignoring.");
-                    return false;
+                    try
+                    {
+                        setxAxisMaxCount((int) Double.parseDouble(strVal));
+                    }
+                    catch (NumberFormatException ex1)
+                    {
+                        LOGGER.severe("Invalid value for chart MaxEntires: " + strVal + " - ignoring.");
+                        return false;
+                    }
                 }
+
             }
             // For a bar chart, isn't max entries, is count.  Is same thing, but gramatically Count is better
             if (node.hasAttribute("Count"))
@@ -433,19 +443,22 @@ abstract public class BaseChartWidget extends BaseWidget
     {
         return xAxisMajorTick;
     }
-    
+
     public void setxAxisMajorTickCount(double count)
     {
         xAxisMajorTickCount = count;
     }
+
     public void setyAxisMajorTickCount(double count)
     {
         yAxisMajorTickCount = count;
     }
+
     public void setxAxisMinorTickCount(double count)
     {
         xAxisMinorTickCount = count;
     }
+
     public void setyAxisMinorTickCount(double count)
     {
         yAxisMinorTickCount = count;
@@ -484,7 +497,6 @@ abstract public class BaseChartWidget extends BaseWidget
             }
         }
     }
-
 
     /**
      * Sets range for widget - not valid for all widgets
@@ -530,13 +542,13 @@ abstract public class BaseChartWidget extends BaseWidget
         // if ranges changed, then change ticks
         double currRange = abs(((NumberAxis) (_yAxis)).getUpperBound() - ((NumberAxis) (_yAxis)).getLowerBound());
         double newRange = abs(yAxisMaxValue - yAxisMinValue);
-        double currTickCount =  currRange /((NumberAxis) (_yAxis)).getTickUnit();
-        double newTickUnit = newRange/currTickCount;
+        double currTickCount = currRange / ((NumberAxis) (_yAxis)).getTickUnit();
+        double newTickUnit = newRange / currTickCount;
 
         ((NumberAxis) (_yAxis)).setUpperBound(yAxisMaxValue);
         ((NumberAxis) (_yAxis)).setLowerBound(yAxisMinValue);
         ((NumberAxis) (_yAxis)).setTickUnit(newTickUnit);
-        
+
         setupMinorTicks();
     }
 
@@ -760,10 +772,11 @@ abstract public class BaseChartWidget extends BaseWidget
         }
 
     }
+
     @Override
     public boolean SupportsSteppedRanges()
     {
         return true;
-    }    
+    }
 
 }

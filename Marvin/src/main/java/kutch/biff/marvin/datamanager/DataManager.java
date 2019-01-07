@@ -204,7 +204,7 @@ public class DataManager
                 {
                     _UnassignedDataPoints++;
 
-                    LOGGER.info("Received Data update not associated with a widget: " + Namespace + " : " + ID + " [" + Value + "]");
+                    //LOGGER.info("Received Data update not associated with a widget: " + Namespace + " : " + ID + " [" + Value + "]");
                     // nifty stuff to dynamically add a tab to show 'unregistered' data points.
                     if (kutch.biff.marvin.widget.DynamicTabWidget.isEnabled())
                     {

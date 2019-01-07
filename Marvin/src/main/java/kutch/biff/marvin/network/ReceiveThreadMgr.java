@@ -99,7 +99,7 @@ public class ReceiveThreadMgr implements Runnable
                             if (_WorkerThreadCount.get() > 1)
                             {
                                 _WorkerThreadCount.decrementAndGet();
-                                LOGGER.info("Reducing processing Thread Count");
+                                //LOGGER.info("Reducing processing Thread Count");
                                 return;
                             }
                             try
@@ -142,7 +142,7 @@ public class ReceiveThreadMgr implements Runnable
                         {
                             put(packet.getAddress(), trimmed);
 
-                            if (_WorkerThreadCount.get() < 1 || _DataQueue.size()/_WorkerThreadCount.get() > 100)
+                            if (_WorkerThreadCount.get() < 1 || _DataQueue.size()/_WorkerThreadCount.get() > 200)
                             {
                                 LOGGER.info("Traffic burst - adding processing Thread Count, there are " + Integer.toString(_DataQueue.size()) + " packets to process.");
                                 int threadNum = _WorkerThreadCount.incrementAndGet();

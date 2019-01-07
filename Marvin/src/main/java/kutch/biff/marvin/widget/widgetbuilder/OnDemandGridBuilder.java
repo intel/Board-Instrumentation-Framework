@@ -40,6 +40,7 @@ public class OnDemandGridBuilder implements OnDemandWidgetBuilder
         __builtCount += 1;
         AliasMgr.getAliasMgr().PushAliasList(true);
         __containerGrid.AddAliasListSnapshot();
+                AliasMgr.getAliasMgr().PushAliasList(true);
         AliasMgr.getAliasMgr().AddAlias("TriggeredNamespace", Namespace); // So tab knows namespace
         AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); 
         AliasMgr.getAliasMgr().AddAlias("TriggeredValue", Value); 
@@ -62,7 +63,7 @@ public class OnDemandGridBuilder implements OnDemandWidgetBuilder
             return false;
         }
         AliasMgr.getAliasMgr().PopAliasList();
-        
+         AliasMgr.getAliasMgr().PopAliasList();       
         BaseWidget objGridWidget = (BaseWidget)objWidget;
         return __containerGrid.AddOnDemandWidget(objGridWidget);
     }
