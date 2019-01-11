@@ -22,6 +22,7 @@ import subprocess
 import time
 import socket
 
+VersionStr="19.01.11"
 lscpiDataMap=None
 netdevInfoDir="/sys/class/net"
 
@@ -92,11 +93,11 @@ def __GetLSPCIData():
         for line in lspciList:
             line = line.decode('ascii')
             if checkStr in line:
-                busID=line[0:7]
-                devInfoStr = line[8+checkStrLen+1:]
+                busID=line.split(' ')[0]
+                devInfoStr = line[len(busID)+checkStrLen+2:]
                 lscpiDataMap[busID]=devInfoStr
 
-    except Exception:
+    except Exception as Ex:
         pass
 
     return lscpiDataMap
@@ -106,15 +107,14 @@ def __GetDeviceVendorInfo(ethDev):
         linkStr=os.readlink(GetBaseDir() + "/"  + ethDev + "/device")
         parts = linkStr.split("/")
         busID= parts[-1]
-        if busID.split(':')[0] == '0000': # it returns 4 byte bus#
-            busID=busID[5:]
 
         dataMap = __GetLSPCIData()
         if busID in dataMap:
             return dataMap[busID]
 
-    except Exception:
+    except Exception as ex:
         pass
+
     return "Unknown Vendor Information"
 
 def __GatherNetworkDeviceInfo(ethDev,retMap,slimDataset):
@@ -192,7 +192,6 @@ def __GatherAllNetworkDeviceInfo(slimDataSet,pyhysicalOnly=True):
     tMap={}
     for root, dirs, files in os.walk(GetBaseDir()):
         for dir in dirs:
-#		   print "{0} {1}".format(dir,__IsPhysicalDevice(dir))
            if False == pyhysicalOnly or __IsPhysicalDevice(dir):
               tMap= __GatherNetworkDeviceInfo(dir,tMap,slimDataSet)
            
@@ -211,7 +210,8 @@ def CollectAllDevices(frameworkInterface,slimDataSetParam,**kwargs):
     #  frameworkInterface.SetScale    
     global Logger
     Logger = frameworkInterface.Logger
-    Logger.info("Starting LinuxNetwork Collector, collecting all Devices")
+    Logger.info("Starting LinuxNetwork Collector {0}, collecting all devices: {1}".format(VersionStr,kwargs))
+
     try:
         if slimDataSetParam.lower() == "true":
             slimDataSet = True
@@ -261,7 +261,7 @@ def CollectDevice(frameworkInterface,DeviceName,slimDataSetParam):
     
     global Logger
     Logger = frameworkInterface.Logger
-    Logger.info("Starting LinuxNetwork Collector, collecting all Devices")
+    Logger.info("Starting LinuxNetwork Collector {0}, collecting single Device: {1}".format(VersionStr,DeviceName))
     try:
         if slimDataSetParam.lower() == "true":
             slimDataSet = True
