@@ -100,7 +100,6 @@ public class LineChartWidget extends LineChartWidget_MS
                     }
                     else
                     {
-
                         LOGGER.severe("Received More datapoints for Line Chart than was defined in application definition file. Received " + Integer.toString(strList.length) + " expecting " + Integer.toString(getSeries().size()));
                         return;
                     }

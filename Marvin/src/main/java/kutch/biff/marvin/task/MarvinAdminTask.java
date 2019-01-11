@@ -168,10 +168,12 @@ public class MarvinAdminTask extends BaseTask
         List<TabWidget> tabs = GetConfigReader().getTabs();
         for (int iLoop = 0; iLoop < tabs.size(); iLoop++)
         {
-            if (tabs.get(iLoop).getMinionID().equalsIgnoreCase(_Data))
+            TabWidget tabWidget = tabs.get(iLoop);
+           
+            if (tabWidget.getMinionID().equalsIgnoreCase(_Data))
             {
                 SingleSelectionModel<Tab> selectionModel = getConfig().getPane().getSelectionModel();
-                selectionModel.select(iLoop);
+                selectionModel.select(tabWidget.getTabIndex());
 
                 return;
             }

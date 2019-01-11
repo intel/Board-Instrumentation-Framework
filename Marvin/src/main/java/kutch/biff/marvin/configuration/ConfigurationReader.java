@@ -1252,8 +1252,6 @@ public class ConfigurationReader
 
                                 tab = new TabWidget(id);
                                 FrameworkNode tabNode = null;
-                                //AliasMgr.getAliasMgr().PushAliasList(true);
-                                //AliasMgr.getAliasMgr().AddAlias("TabID", id); // Make TabID an alias = to the ID :-)
 
                                 tab = ConfigurationReader.ReadTab(node, tab, id);
                                 if (null == tab)

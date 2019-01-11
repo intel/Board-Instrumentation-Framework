@@ -22,18 +22,23 @@
 package kutch.biff.marvin.widget;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import static kutch.biff.marvin.configuration.Configuration.getConfig;
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
+import kutch.biff.marvin.utility.NaturalComparator;
 import kutch.biff.marvin.utility.TranslationCalculator;
 import static kutch.biff.marvin.widget.BaseWidget.convertToFileURL;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
@@ -45,7 +50,6 @@ import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.HandlePeekabo
  */
 public class TabWidget extends GridWidget
 {
-
     private Tab _tab;
     private GridPane _BaseGridPane; // throw one down in tab to put all the goodies in
     private boolean _IsVisible;
@@ -56,6 +60,7 @@ public class TabWidget extends GridWidget
     private StackPane _stackReference;
     private String _TaskOnActivate;
     private boolean _IgnoreFirstSelect;
+    private boolean _CreatedOnDemand;
 
     public TabWidget(String tabID)
     {
@@ -67,7 +72,7 @@ public class TabWidget extends GridWidget
         _IsVisible = true;
         _TaskOnActivate = null;
         _IgnoreFirstSelect = false;
-
+        _CreatedOnDemand = false;
         basePane = new Pane();
 
         _UseScrollBars = CONFIG.getEnableScrollBars();
@@ -133,6 +138,11 @@ public class TabWidget extends GridWidget
 
             new TranslationCalculator(_stackReference, _BaseGridPane, CONFIG.getScaleProperty(), getPosition()); // handles all the resizing/scaling
 
+            if (getCreatedOnDemand())
+            {
+                int index = calcOnDemandIndex();
+                tabPane.getTabs().add(iIndex, _tab);
+            }
             tabPane.getTabs().add(_tab);
             SetupPeekaboo(dataMgr);
 
@@ -141,6 +151,88 @@ public class TabWidget extends GridWidget
         }
 
         return false;
+    }
+
+    private int calcOnDemandIndex()
+    {
+        return _TabIndex;
+    }
+    
+    public boolean Reindex(Tab compare, int newIndex)
+    {
+        if (compare == _tab)
+        {
+            _TabIndex = newIndex;
+            return true;
+        }
+        return false;
+    }
+    
+
+    private static void sortTabs(TabPane tabPane)
+    {
+        List<TabWidget> tabs = ConfigurationReader.GetConfigReader().getTabs();
+        NaturalComparator nc = new NaturalComparator();
+        Collections.sort(tabs, new Comparator<TabWidget>()
+        {
+            @Override
+            public int compare (TabWidget o1, TabWidget o2)
+            {
+                String S1 = o1.getTitle();
+                String S2 = o2.getTitle();
+                if (!o1.getCreatedOnDemand() && o2.getCreatedOnDemand())
+                {
+                    return -1;
+                }
+                if (o1.getCreatedOnDemand() && !o2.getCreatedOnDemand())
+                {
+                    
+                    return 0;
+                }
+                if (!o1.getCreatedOnDemand() && !o2.getCreatedOnDemand())
+                {
+                    return 0;
+                }
+                return o1.getTitle().compareToIgnoreCase(o2.getTitle());
+                //return nc.compare(o1.getTitle(),o2.getTitle());
+            }
+        }
+        );
+        int index =0;
+        for (TabWidget tabWidget : tabs)
+        {
+            boolean selected = false;
+            Tab objTab = tabWidget.getTabControl();
+            if (objTab.isSelected())
+            {
+                selected = true;
+            }
+            tabPane.getTabs().remove(objTab);
+            tabPane.getTabs().add(index, objTab);
+            if (selected)
+            {
+                SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+                selectionModel.select(index);
+            }
+            index++;
+        }
+    }
+    public static void ReIndexTabs(TabPane tabPane)
+    {
+        TabWidget.sortTabs(tabPane);
+        
+        int tabIndex = 0;
+        for (Tab tab : tabPane.getTabs())
+        {
+            for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs())
+            {
+                if (tabWidget.Reindex(tab, tabIndex))
+                {
+                    break;
+                }
+            }
+            tabIndex++;
+        }
     }
 
     @Override
@@ -329,5 +421,12 @@ public class TabWidget extends GridWidget
         }
         return super.PerformPostCreateActions(parentGrid, updateToolTipOnly);
     }
-
+    public void setCreatedOnDemand()
+    {
+        _CreatedOnDemand = true;
+    }
+    public boolean getCreatedOnDemand()
+    {
+        return _CreatedOnDemand;
+    }
 }

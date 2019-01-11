@@ -95,6 +95,7 @@ public class StackedBarChartWidget extends BarChartWidget
                         try
                         {
                             newValue = Double.parseDouble(strVal);
+                            HandleSteppedRange(newValue);
                         }
                         catch (Exception ex)
                         {

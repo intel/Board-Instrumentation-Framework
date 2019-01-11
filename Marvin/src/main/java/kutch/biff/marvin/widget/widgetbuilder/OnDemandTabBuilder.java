@@ -22,6 +22,8 @@
 package kutch.biff.marvin.widget.widgetbuilder;
 
 import java.util.logging.Logger;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
 import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.configuration.ConfigurationReader;
@@ -69,24 +71,30 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         LOGGER.info("Creating OnDemand Tab for namespace: " + Namespace + ",  using Tab template ID: " + __tabID);
         Configuration config = Configuration.getConfig();
         TabPane parentPane = config.getPane();
+        Scene appScene = parentPane.getScene();
+        Cursor currCursor = appScene.getCursor();
+        appScene.setCursor(Cursor.WAIT);
+        
         __builtCount++;
 
         String strTabID = __tabID + "." + Integer.toString(__builtCount);
-        TabWidget tab = new TabWidget(strTabID);
         AliasMgr.getAliasMgr().PushAliasList(true);
+        TabWidget tab = new TabWidget(strTabID);
         AliasMgr.getAliasMgr().AddAlias("TriggeredNamespace", Namespace); // So tab knows namespace
         AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); 
         AliasMgr.getAliasMgr().AddAlias("TriggeredValue", Value); 
         AliasMgr.getAliasMgr().AddAlias("TriggeredIndex", Integer.toString(__builtCount));
+        AliasMgr.getAliasMgr().AddAlias("TabID",strTabID);
         __onDemandTrigger.tokenizeAndCreateAlias(ID);
         
         tab = ConfigurationReader.ReadTab(__node, tab, strTabID);
+        tab.setCreatedOnDemand();
+        
         if (null != tab)
         {
             if (tab.Create(parentPane, DataManager.getDataManager(), __tabIndex))
             {
-                ConfigurationReader.GetConfigReader().getTabs().add(0, tab);
-                //ConfigurationReader.GetConfigReader().getTabs().add(__tabIndex + __builtCount, tab);
+                ConfigurationReader.GetConfigReader().getTabs().add(tab);
                 tab.PerformPostCreateActions(null, false);
 
                 LOGGER.info("Performed LateCreateTask on Tab: " + tab.getName());
@@ -100,6 +108,9 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
 //            TaskManager.getTaskManager().AddPostponedTask(lateBindTask, 0);
         }
         AliasMgr.getAliasMgr().PopAliasList();
+        TabWidget.ReIndexTabs(parentPane);
+        appScene.setCursor(currCursor);
+
         return true;
     }
 
