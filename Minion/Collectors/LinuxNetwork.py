@@ -22,7 +22,7 @@ import subprocess
 import time
 import socket
 
-VersionStr="19.01.11"
+VersionStr="v19.01.11"
 lscpiDataMap=None
 netdevInfoDir="/sys/class/net"
 

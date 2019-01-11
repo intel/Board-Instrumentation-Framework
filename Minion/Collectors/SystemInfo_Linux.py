@@ -37,6 +37,8 @@ from Collectors import Linux_CPU
 from pprint import pprint
 
 DMI_Data=None
+VersionStr="v19.01.11"
+
 
 def ReadFromFile(Filename):
     try:
@@ -312,29 +314,36 @@ def SystemUptimeLong():
     strTime="{0} days,  {1}:{2}".format(int(days),hours,minutes)
 
     return strTime    
-    
+	
 
-def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=False):
+def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=False,**kwargs):
     global Logger
     Logger = frameworkInterface.Logger
-    Logger.info("Starting CollectSystemInfo_Linux Collector")
+    Logger.info("Starting CollectSystemInfo_Linux Collector {0} {1}".format(VersionStr,kwargs))
     updatedCount = 0
     showHyperthreadingCoreDetails = str(showHyperthreadingCoreDetails).lower()
     if showHyperthreadingCoreDetails == 'true':
         showHyperthreadingCoreDetails = True
     else:
         showHyperthreadingCoreDetails = False
+		
+	if 'ShowFrequencyInfo' in kwargs and kwargs['ShowFrequencyInfo'].lower() == 'true':
+	   showFreq = True
+	else:
+	   showFreq = False		
+		
 
     if showHyperthreadingCoreDetails:
         showHyperthreadingCoreDetails = IsHyperthreadingEnabled() #don't bother doing if HT is not enabled
 
     try:
+
         dataMap = __GetStaticInfo()
         corecount = float(dataMap['system.core_count'])
         numaCount = int(dataMap['system.numa_count'])
         if True == showHyperthreadingCoreDetails:
             SiblingMap,CoreMap = __CreateNumaMap()
-        
+			
         while not frameworkInterface.KillThreadSignalled():
             dataMap["system.mem_available"] = GetMemoryInfo_Linux('MemAvailable')
             dataMap["system.hugepages_total"] = GetMemoryInfo_Linux('HugePages_Total')
@@ -346,6 +355,9 @@ def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=Fal
 
             try:
                 dataMap["system.cpu_util_list"],utilData = Linux_CPU.CreateUtilizationList(.1,2,True)
+                if showFreq:
+                     dataMap.update(Linux_CPU.getFrequencyInfo("system."))
+
                 if showHyperthreadingCoreDetails:
                     dataMap.update(__ProcessHyperthreadCPUInfo(CoreMap,SiblingMap,utilData))
 

@@ -22,6 +22,24 @@ from time import sleep
 import sys
 import os
 
+procInfoDir="/sys/devices/system/cpu"
+desiredFreqStats=["cpuinfo_min_freq","scaling_driver","energy_performance_preference","cpuinfo_max_freq","scaling_cur_freq","scaling_governor","scaling_available_governors"]
+
+def GetBaseDir():
+    global procInfoDir
+    return procInfoDir
+
+
+def ReadFromFile_Legacy(Filename):
+    try:
+        file = open(Filename,'rt')
+        if None == file:
+            return "N/A"
+    except Exception:
+        return "N/A"
+
+    return file.read().strip()
+
 def ReadFromFile(Filename):
     file = open(Filename,'rt')
     if None == file:
@@ -195,6 +213,42 @@ def CreateUtilizationList(interval=.1,precision=2,returnTuple=False):
         return (writeData,data)
 
     return writeData
+    
+def getFrequencyInfo(prefix=""):
+    retMap={}
+    coreCount=0
+    for cpuDir in os.listdir(GetBaseDir()):
+            if not 'cpu' in cpuDir:
+                continue
+            
+            if cpuDir in ['cpufreq','cpuidle']: #don't want these directories
+                continue
+                
+            coreCount+=1
+
+            nextDir = GetBaseDir() + "/"  + cpuDir + "/cpufreq"
+            for statRoot, statDirs, statFiles in os.walk(nextDir):
+                for file in statFiles:
+                    if file in desiredFreqStats:
+                        readFile = GetBaseDir() + "/"  + cpuDir + "/cpufreq/" + file
+                        key = "{0}.{1}".format(cpuDir,file)
+                        
+                        retMap[prefix+key] = ReadFromFile_Legacy(readFile)
+                        
+    
+    freqList=None
+    # create a comma separated list for graphing
+    for coreNum in range(0,coreCount-1):
+        key = "cpu{0}.scaling_cur_freq".format(coreNum)
+        if None == freqList: #1st one
+            freqList=retMap[prefix+key]
+        else:
+            freqList += ","+retMap[prefix+key]
+            
+    retMap[prefix+"cpu_frequency_list"] = freqList
+    
+    return retMap
+    
 
 def GetSystemAverageCPU(interval=.1,precision=2):
     interval=float(interval)
