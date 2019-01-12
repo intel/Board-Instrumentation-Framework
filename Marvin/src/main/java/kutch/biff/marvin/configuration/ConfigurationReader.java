@@ -849,7 +849,6 @@ public class ConfigurationReader
                 {
                     namespaceMaskList.add(dynaNode.getTextContent());
                 }
-
             }
             else if (dynaNode.getNodeName().equalsIgnoreCase("NamespaceTriggerExcludePattern"))
             {
@@ -912,6 +911,32 @@ public class ConfigurationReader
         Pair<ArrayList<String>,ArrayList<String>> idCriterea = new Pair<>(idMaskList,idExcludeList);
         
         DynamicItemInfoContainer dynaInfo = new DynamicItemInfoContainer(namespaceCriterea, idCriterea);
+        if (sourceNode.hasAttribute("SortBy"))
+        {
+            String strSortBy = sourceNode.getAttribute("SortBy");
+            if (strSortBy.equalsIgnoreCase("Namespace"))
+            {
+                dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NAMESPACE);
+            }
+            else if (strSortBy.equalsIgnoreCase("ID"))
+            {
+                dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.ID);
+            }
+            else if (strSortBy.equalsIgnoreCase("Value"))
+            {
+                dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.VALUE);
+            }
+            else if (strSortBy.equalsIgnoreCase("None"))
+            {
+                dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NONE);
+            }
+            else
+            {
+                LOGGER.severe("OnDemand item specified invalid SortBy: " + strSortBy +". Ignoring.");
+                dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NONE);
+            }
+        }
+        
         if (sourceNode.hasAttribute("TriggeredIdToken"))
         {
             String strToken = sourceNode.getAttribute("TriggeredIdToken");

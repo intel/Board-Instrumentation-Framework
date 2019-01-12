@@ -37,7 +37,6 @@ import javafx.scene.layout.StackPane;
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
-import kutch.biff.marvin.utility.NaturalComparator;
 import kutch.biff.marvin.utility.TranslationCalculator;
 import static kutch.biff.marvin.widget.BaseWidget.convertToFileURL;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
@@ -49,6 +48,7 @@ import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.HandlePeekabo
  */
 public class TabWidget extends GridWidget
 {
+
     private Tab _tab;
     private GridPane _BaseGridPane; // throw one down in tab to put all the goodies in
     private boolean _IsVisible;
@@ -60,6 +60,7 @@ public class TabWidget extends GridWidget
     private String _TaskOnActivate;
     private boolean _IgnoreFirstSelect;
     private boolean _CreatedOnDemand;
+    private String _OnDemandSortStr;
 
     public TabWidget(String tabID)
     {
@@ -72,6 +73,7 @@ public class TabWidget extends GridWidget
         _TaskOnActivate = null;
         _IgnoreFirstSelect = false;
         _CreatedOnDemand = false;
+        _OnDemandSortStr = null;
         basePane = new Pane();
 
         _UseScrollBars = CONFIG.getEnableScrollBars();
@@ -152,11 +154,21 @@ public class TabWidget extends GridWidget
         return false;
     }
 
+    public void setOnDemandSortBy(String sortStr)
+    {
+        _OnDemandSortStr = sortStr;
+    }
+
+    public String getOnDemandSortBy()
+    {
+        return _OnDemandSortStr;
+    }
+
     private int calcOnDemandIndex()
     {
         return _TabIndex;
     }
-    
+
     public boolean Reindex(Tab compare, int newIndex)
     {
         if (compare == _tab)
@@ -166,38 +178,46 @@ public class TabWidget extends GridWidget
         }
         return false;
     }
-    
 
     private static void sortTabs(TabPane tabPane)
     {
         List<TabWidget> tabs = ConfigurationReader.GetConfigReader().getTabs();
-        NaturalComparator nc = new NaturalComparator();
         Collections.sort(tabs, new Comparator<TabWidget>()
-        {
-            @Override
-            public int compare (TabWidget o1, TabWidget o2)
-            {
-                String S1 = o1.getTitle();
-                String S2 = o2.getTitle();
-                if (!o1.getCreatedOnDemand() && o2.getCreatedOnDemand())
-                {
-                    return -1;
-                }
-                if (o1.getCreatedOnDemand() && !o2.getCreatedOnDemand())
-                {
-                    
-                    return 0;
-                }
-                if (!o1.getCreatedOnDemand() && !o2.getCreatedOnDemand())
-                {
-                    return 0;
-                }
-                return o1.getTitle().compareToIgnoreCase(o2.getTitle());
-                //return nc.compare(o1.getTitle(),o2.getTitle());
-            }
-        }
+                 {
+                     @Override
+                     public int compare(TabWidget o1, TabWidget o2)
+                     {
+                         if (!o1.getCreatedOnDemand() && o2.getCreatedOnDemand())
+                         {
+                             return -1;
+                         }
+                         if (o1.getCreatedOnDemand() && !o2.getCreatedOnDemand())
+                         {
+
+                             return 0;
+                         }
+                         if (!o1.getCreatedOnDemand() && !o2.getCreatedOnDemand())
+                         {
+                             return 0;
+                         }
+                         if (null == o1.getOnDemandSortBy() && null == o2.getOnDemandSortBy())
+                         {
+                             return 0;
+                         }
+                         if (null == o1.getOnDemandSortBy() && null != o2.getOnDemandSortBy())
+                         {
+                             return 1;
+                         }
+                         if (null != o1.getOnDemandSortBy() && null == o2.getOnDemandSortBy())
+                         {
+                             return -1;
+                         }
+                         return o1.getOnDemandSortBy().compareToIgnoreCase(o2.getOnDemandSortBy());
+                         //return nc.compare(o1.getTitle(),o2.getTitle());
+                     }
+                 }
         );
-        int index =0;
+        int index = 0;
         for (TabWidget tabWidget : tabs)
         {
             boolean selected = false;
@@ -216,15 +236,18 @@ public class TabWidget extends GridWidget
             index++;
         }
     }
+
     public static void ReIndexTabs(TabPane tabPane)
     {
         TabWidget.sortTabs(tabPane);
-        
+
+        String Titles="";
         int tabIndex = 0;
         for (Tab tab : tabPane.getTabs())
         {
             for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs())
             {
+                Titles += tabWidget.getTitle() +" ";
                 if (tabWidget.Reindex(tab, tabIndex))
                 {
                     break;
@@ -232,6 +255,7 @@ public class TabWidget extends GridWidget
             }
             tabIndex++;
         }
+        LOGGER.info(Titles);
     }
 
     @Override
@@ -420,10 +444,12 @@ public class TabWidget extends GridWidget
         }
         return super.PerformPostCreateActions(parentGrid, updateToolTipOnly);
     }
+
     public void setCreatedOnDemand()
     {
         _CreatedOnDemand = true;
     }
+
     public boolean getCreatedOnDemand()
     {
         return _CreatedOnDemand;

@@ -181,9 +181,9 @@ public class DataManager
             boolean OnDemandItemFound = false;
             for (Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder> entry :_OnDemandQueue)
             {
-                if (entry.getKey().Matches(Namespace, ID))
+                if (entry.getKey().Matches(Namespace, ID,Value))
                 {
-                    LateCreateTask objTask = new LateCreateTask(entry.getValue(),Namespace,ID,Value);
+                    LateCreateTask objTask = new LateCreateTask(entry.getValue(),Namespace,ID,Value,entry.getKey().getLastMatchedSortStr());
                     TaskManager.getTaskManager().AddDeferredTaskObject(objTask);
                     OnDemandItemFound = true;
                 }

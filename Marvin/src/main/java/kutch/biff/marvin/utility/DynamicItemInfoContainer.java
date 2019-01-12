@@ -40,6 +40,9 @@ public class DynamicItemInfoContainer
     private final HashMap<String,Boolean> __PreviouslyChecked;
     private int __NumberOfMatchesUsingThisPattern;
     private String __TokenizerToken;
+    private String __MatchedSortString;
+    public enum SortMethod {NAMESPACE,ID,VALUE,NONE};
+    private SortMethod __SortMethod;
     
     public DynamicItemInfoContainer(Pair<ArrayList<String>,ArrayList<String>> namespaceCriterea,
                                     Pair<ArrayList<String>,ArrayList<String>> idCriterea)
@@ -50,10 +53,13 @@ public class DynamicItemInfoContainer
         __node = null;
         __TokenizerToken = null;
         __NumberOfMatchesUsingThisPattern = 0;
+        __MatchedSortString = null;
+        __SortMethod = SortMethod.NONE;
     }
 
-    public boolean Matches(String namespace, String ID)
+    public boolean Matches(String namespace, String ID, String Value)
     {
+        __MatchedSortString = null;
         // if already checked, no need to do it again
         if (__PreviouslyChecked.containsKey(namespace+ID))
         {
@@ -63,11 +69,12 @@ public class DynamicItemInfoContainer
         {
             return false;
         }
-            
-        Boolean matched = Matches(namespace,__namespaceCriterea);
+        
+        boolean matched = Matches(namespace,__namespaceCriterea);
         if (matched && !__idCriterea.getKey().isEmpty())
         {
             matched = Matches(ID,__idCriterea);
+            
             __PreviouslyChecked.put(namespace+ID, matched);
         }
         else
@@ -77,10 +84,31 @@ public class DynamicItemInfoContainer
         if (matched)
         {
             __NumberOfMatchesUsingThisPattern++;
+            if (getSortByMethod() == SortMethod.NAMESPACE)
+            {
+                __MatchedSortString = namespace;
+            }
+            else if (getSortByMethod() == SortMethod.ID)
+            {
+                __MatchedSortString = ID;
+            }
+            else if (getSortByMethod() == SortMethod.VALUE)
+            {
+                __MatchedSortString = Value;
+            }
+            else
+            {
+                __MatchedSortString = null;
+            }
+            
         }
         return matched;
     }
     
+    public String getLastMatchedSortStr()
+    {
+        return __MatchedSortString;
+    }
     public int getMatchedCount()
     {
         return __NumberOfMatchesUsingThisPattern;
@@ -159,5 +187,15 @@ public class DynamicItemInfoContainer
             AliasMgr.getAliasMgr().AddAlias(Alias, token);
         }
         return true;
+    }
+
+    public void setSortByMethod(SortMethod sortMethod)
+    {
+        __SortMethod = sortMethod;
+    }
+    
+    public SortMethod getSortByMethod()
+    {
+        return __SortMethod;
     }
 }

@@ -21,12 +21,17 @@
  */
 package kutch.biff.marvin.widget;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
+import kutch.biff.marvin.utility.DynamicItemInfoContainer.SortMethod;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandGridBuilder;
 
@@ -45,10 +50,12 @@ public class OnDemandGridWidget extends GridWidget
     private int __nextPositionY = 0;
     private DynamicItemInfoContainer __criterea;
     private Map<String, String> __AliasListSnapshot = null;
+    private List<Pair<BaseWidget,String>> __AddedGridList;
 
     public OnDemandGridWidget(DynamicItemInfoContainer onDemandInfo)
     {
         __criterea = onDemandInfo;
+        __AddedGridList = new ArrayList<>();
     }
 
     @Override
@@ -205,7 +212,35 @@ public class OnDemandGridWidget extends GridWidget
         return retObj;
     }
 
-    public boolean AddOnDemandWidget(BaseWidget objWidget)
+    private void sortGrids()
+    {
+        Collections.sort(__AddedGridList, new Comparator<Pair<BaseWidget,String>>()
+                 {
+                     @Override
+                     public int compare(Pair<BaseWidget,String> o1, Pair<BaseWidget,String> o2)
+                     {
+                         return o1.getValue().compareTo(o2.getValue());
+                     }
+                 }
+        );    
+    }
+        
+    private void resortWidgets()
+    {
+        sortGrids();
+        getGridPane().getChildren().clear();
+        __nextPositionX=0;
+        __nextPositionX=0;
+        for (Pair<BaseWidget,String> tuple : __AddedGridList)
+        {
+            BaseWidget objWidget = tuple.getKey();
+            Pair<Integer, Integer> position = getNextPosition();
+            getGridPane().add(objWidget.getStylableObject(), position.getKey(), position.getValue());
+        }
+        
+    }
+    
+    public boolean AddOnDemandWidget(BaseWidget objWidget, String sortStr)
     {
         Pair<Integer, Integer> position = getNextPosition();
 
@@ -216,7 +251,15 @@ public class OnDemandGridWidget extends GridWidget
 
         if (objWidget.Create(getGridPane(), DataManager.getDataManager()))
         {
-            return objWidget.PerformPostCreateActions(this, false);
+            if(objWidget.PerformPostCreateActions(this, false))
+            {
+                __AddedGridList.add(new Pair<BaseWidget,String>(objWidget,sortStr));
+                if (__criterea.getSortByMethod() != SortMethod.NONE)
+                {
+                    resortWidgets();
+                }
+                return true;
+            }
         }
 
         return false;

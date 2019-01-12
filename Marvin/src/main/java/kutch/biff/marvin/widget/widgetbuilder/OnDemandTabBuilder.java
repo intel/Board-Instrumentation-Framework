@@ -66,7 +66,7 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
     }
 
     @Override
-    public boolean Build(String Namespace, String ID, String Value)
+    public boolean Build(String Namespace, String ID, String Value, String strSortValue)
     {
         LOGGER.info("Creating OnDemand Tab for namespace: " + Namespace + ",  using Tab template ID: " + __tabID);
         Configuration config = Configuration.getConfig();
@@ -80,6 +80,7 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         String strTabID = __tabID + "." + Integer.toString(__builtCount);
         AliasMgr.getAliasMgr().PushAliasList(true);
         TabWidget tab = new TabWidget(strTabID);
+        tab.setOnDemandSortBy(strSortValue);
         AliasMgr.getAliasMgr().AddAlias("TriggeredNamespace", Namespace); // So tab knows namespace
         AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); 
         AliasMgr.getAliasMgr().AddAlias("TriggeredValue", Value); 

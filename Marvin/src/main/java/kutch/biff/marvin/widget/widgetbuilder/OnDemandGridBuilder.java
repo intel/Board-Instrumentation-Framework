@@ -27,14 +27,13 @@ public class OnDemandGridBuilder implements OnDemandWidgetBuilder
     private OnDemandGridWidget __containerGrid;
     private int __builtCount = 0;
     
-    
     public OnDemandGridBuilder(OnDemandGridWidget objParent)
     {
         __containerGrid = objParent;
     }
     
     @Override
-    public boolean Build(String Namespace, String ID, String Value)
+    public boolean Build(String Namespace, String ID, String Value, String sortStr)
     {
         LOGGER.info("Creating OnDemand Grid for namespace: " + Namespace + " and ID: " + ID);
         __builtCount += 1;
@@ -66,7 +65,7 @@ public class OnDemandGridBuilder implements OnDemandWidgetBuilder
         AliasMgr.getAliasMgr().PopAliasList();
         AliasMgr.getAliasMgr().PopAliasList();       
         BaseWidget objGridWidget = (BaseWidget)objWidget;
-        return __containerGrid.AddOnDemandWidget(objGridWidget);
+        return __containerGrid.AddOnDemandWidget(objGridWidget, sortStr);
     }
     
 }

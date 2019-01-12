@@ -33,13 +33,15 @@ public class LateCreateTask extends BaseTask
     private final String __Namespace;
     private final String __ID;
     private final String __Value;
+    private final String __SortStr;
 
-    public LateCreateTask(OnDemandWidgetBuilder objBuilder, String Namespace, String ID,String Value)
+    public LateCreateTask(OnDemandWidgetBuilder objBuilder, String Namespace, String ID,String Value, String strSortBy)
     {
         __builder = objBuilder;
         __Namespace = Namespace;
         __ID = ID;
         __Value = Value;
+        __SortStr = strSortBy;
     }
     
     @Override
@@ -47,7 +49,7 @@ public class LateCreateTask extends BaseTask
     {
         if (null != __builder) // is null when a Tab
         {
-            __builder.Build(__Namespace, __ID,__Value);
+            __builder.Build(__Namespace, __ID,__Value,__SortStr);
             Configuration.getConfig().restoreCursor();
         }
         else
