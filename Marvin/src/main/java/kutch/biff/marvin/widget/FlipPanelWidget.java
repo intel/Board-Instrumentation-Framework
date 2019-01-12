@@ -37,7 +37,6 @@ import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.PanelSideInfo;
 import static kutch.biff.marvin.widget.BaseWidget.CONFIG;
 import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
-import kutch.biff.marvin.widget.dynamicgrid.DynamicGrid;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 
 /**

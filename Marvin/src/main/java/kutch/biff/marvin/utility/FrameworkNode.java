@@ -22,19 +22,19 @@
 package kutch.biff.marvin.utility;
 
 import java.io.File;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import kutch.biff.marvin.logger.MarvinLogger;
+import kutch.biff.marvin.widget.BaseWidget;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import kutch.biff.marvin.widget.BaseWidget;
 
 /**
  * This is a wrapper class for the XML Node object. It allows case non-sensitve

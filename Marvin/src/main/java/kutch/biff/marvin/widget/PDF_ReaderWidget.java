@@ -21,7 +21,6 @@
  */
 package kutch.biff.marvin.widget;
 
-import java.io.File;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -32,9 +31,6 @@ import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.task.MarvinTask;
 import kutch.biff.marvin.utility.FrameworkNode;
 import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
-import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
-//import org.jpedal.exception.PdfException;
-//import org.jpedal.objects.PdfPageData;
 
 /**
  *

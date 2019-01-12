@@ -34,7 +34,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import static kutch.biff.marvin.configuration.Configuration.getConfig;
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;

@@ -31,7 +31,6 @@ import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.SteelSimpleGaugeWidget;
-import static kutch.biff.marvin.widget.widgetbuilder.SteelGaugeBuilder.ProcessPercentageSections;
 
 /**
  *

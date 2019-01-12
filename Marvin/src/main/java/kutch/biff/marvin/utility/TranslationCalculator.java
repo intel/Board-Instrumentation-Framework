@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
