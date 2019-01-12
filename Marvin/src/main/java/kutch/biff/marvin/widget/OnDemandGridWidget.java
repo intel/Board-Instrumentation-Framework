@@ -36,14 +36,15 @@ import kutch.biff.marvin.widget.widgetbuilder.OnDemandGridBuilder;
  */
 public class OnDemandGridWidget extends GridWidget
 {
+
     private String __strPrimaryGrowth = "HZ";
     private String __strSecondaryGrowth = "VT";
     private int __NewLineCount = 1;
-    private int __currentLineCount ;
+    private int __currentLineCount;
     private int __nextPositionX = 0;
     private int __nextPositionY = 0;
     private DynamicItemInfoContainer __criterea;
-    private Map<String,String> __AliasListSnapshot = null;
+    private Map<String, String> __AliasListSnapshot = null;
 
     public OnDemandGridWidget(DynamicItemInfoContainer onDemandInfo)
     {
@@ -68,7 +69,7 @@ public class OnDemandGridWidget extends GridWidget
         }
         else if ("ZH".equals(__strPrimaryGrowth))
         {
-            __nextPositionX = __NewLineCount-1;
+            __nextPositionX = __NewLineCount - 1;
             if ("VT".equals(__strSecondaryGrowth))
             {
                 __nextPositionY = 0;
@@ -92,7 +93,7 @@ public class OnDemandGridWidget extends GridWidget
         }
         else if ("TV".equals(__strPrimaryGrowth))
         {
-            __nextPositionY = __NewLineCount-1;
+            __nextPositionY = __NewLineCount - 1;
             if ("HZ".equals(__strSecondaryGrowth))
             {
                 __nextPositionX = 0;
@@ -122,6 +123,7 @@ public class OnDemandGridWidget extends GridWidget
             aMgr.AddAlias(key, __AliasListSnapshot.get(key));
         }
     }
+
     public DynamicItemInfoContainer getCriterea()
     {
         return __criterea;
@@ -153,7 +155,7 @@ public class OnDemandGridWidget extends GridWidget
             if (__nextPositionX < 0)
             {
                 __currentLineCount++;
-                __nextPositionX = __NewLineCount-1;
+                __nextPositionX = __NewLineCount - 1;
                 if ("VT".equals(__strSecondaryGrowth))
                 {
                     __nextPositionY++;
@@ -188,7 +190,7 @@ public class OnDemandGridWidget extends GridWidget
             if (__nextPositionY < 0)
             {
                 __currentLineCount++;
-                __nextPositionY = __NewLineCount-1;
+                __nextPositionY = __NewLineCount - 1;
                 if ("HZ".equals(__strSecondaryGrowth))
                 {
                     __nextPositionX++;
@@ -259,8 +261,16 @@ public class OnDemandGridWidget extends GridWidget
 
         if (null == strSecondary)
         {
-            strSecondary = "HZ";
-            secondaryIsHorizontal = true;
+            if (primaryIsHorizontal)
+            {
+                strSecondary = "VT";
+                secondaryIsHorizontal = false;
+            }
+            else
+            {
+                __strSecondaryGrowth = "HZ";
+                secondaryIsHorizontal = true;
+            }
         }
         else if ("Horizontal".equalsIgnoreCase(strSecondary) || "HZ".equalsIgnoreCase(strSecondary))
         {

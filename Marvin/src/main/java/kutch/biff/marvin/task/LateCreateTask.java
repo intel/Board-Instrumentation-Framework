@@ -20,6 +20,7 @@
  * ##############################################################################
  */
 package kutch.biff.marvin.task;
+import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 
 /**
@@ -47,6 +48,7 @@ public class LateCreateTask extends BaseTask
         if (null != __builder) // is null when a Tab
         {
             __builder.Build(__Namespace, __ID,__Value);
+            Configuration.getConfig().restoreCursor();
         }
         else
         {

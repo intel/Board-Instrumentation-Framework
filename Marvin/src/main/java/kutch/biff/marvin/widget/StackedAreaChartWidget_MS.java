@@ -37,6 +37,7 @@ public class StackedAreaChartWidget_MS extends AreaChartWidget_MS
 {
     public StackedAreaChartWidget_MS()
     {
+        _isStackedChart = true;
     }
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)

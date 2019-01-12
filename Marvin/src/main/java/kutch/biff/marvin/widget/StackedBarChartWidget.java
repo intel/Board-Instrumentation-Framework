@@ -43,6 +43,7 @@ public class StackedBarChartWidget extends BarChartWidget
     public StackedBarChartWidget()
     {
         super(false);
+        _isStackedChart = true;
     }
 
     @Override

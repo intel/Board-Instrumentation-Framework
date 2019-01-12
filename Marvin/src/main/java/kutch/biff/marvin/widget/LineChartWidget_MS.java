@@ -89,8 +89,8 @@ public class LineChartWidget_MS extends BaseChartWidget
                                     {
                                         newValue = Double.parseDouble(strVal);
                                         HandleSteppedRange(newValue);
-
                                     }
+                                    
                                     catch (Exception ex)
                                     {
                                         LOGGER.severe("Invalid data for Chart received: " + strVal);

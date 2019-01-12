@@ -66,6 +66,7 @@ abstract public class BaseChartWidget extends BaseWidget
     protected boolean _HorizontalChart;
     protected double yAxisMajorTickCount, xAxisMajorTickCount;
     protected double yAxisMinorTickCount, xAxisMinorTickCount;
+    protected boolean _isStackedChart;
 
     public BaseChartWidget()
     {
@@ -97,6 +98,7 @@ abstract public class BaseChartWidget extends BaseWidget
         _SeriesMap = new HashMap<>();
         _SeriesOrder = new ArrayList<>();
         _HorizontalChart = false;
+        _isStackedChart = false;
     }
 
     /**
@@ -607,10 +609,19 @@ abstract public class BaseChartWidget extends BaseWidget
     protected void PushSynchronizedData()
     {
         String strVal;
+        double tVal=0.0;
         for (SeriesDataSet ds : getSeries())        // create an entry for all
         {
             strVal = SyncronizeDataSetsMap.put(ds, null);
             AddNewData(ds, strVal);
+            if (_isStackedChart = true)
+            {   // for stacked charts, stepped range must use the aggregate value, not an individual
+                tVal += Double.parseDouble(strVal);
+            }
+        }
+        if (_isStackedChart = true)
+        {
+            HandleSteppedRange(tVal);
         }
     }
 

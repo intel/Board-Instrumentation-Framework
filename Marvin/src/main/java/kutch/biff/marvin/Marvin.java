@@ -540,20 +540,16 @@ public class Marvin extends Application
 
     private void checkSize(Stage stage, Scene scene, GridPane objGridPane)
     {
-        //if (1 == 1) return;
-//        stage.setMaximized(true);
         stage.centerOnScreen();
-        double a = stage.getWidth();
         double BorderWidth = abs((scene.getWidth() - stage.getWidth()) / 2);
         _Config.getConfiguration().setAppBorderWidth(BorderWidth);
 
-        //_Config.getConfiguration().setBottomOffset(_TestPane.getHeight());
-        double height = _TestPane.getHeight(); // tab + borders
+        double height;// = _TestPane.getHeight(); // tab + borders
         if (null != _Config.getConfiguration().getMenuBar() && true == _Config.getConfiguration().getShowMenuBar())
         {
             height = _TestPane.getHeight() + _Config.getConfiguration().getMenuBar().getHeight(); //menu + borders + tab
         }
-//        _Config.getConfiguration().setTopOffset(height);
+
         objGridPane.getChildren().remove(_TestPane);
     }
 
@@ -857,6 +853,7 @@ public class Marvin extends Application
 
         scene = new Scene(sceneGrid);
 
+        _Config.getConfiguration().setAppScene(scene);
         _Config.getConfiguration().getCurrentHeightProperty().bind(scene.heightProperty());
         _Config.getConfiguration().getCurrentWidthProperty().bind(scene.widthProperty());
         _objTabPane.prefWidthProperty().bind(scene.widthProperty());

@@ -35,7 +35,7 @@ public class StackedAreaChartWidget extends AreaChartWidget
 {
     public StackedAreaChartWidget()
     {
-        
+        _isStackedChart = true;
     }
   @Override
     protected Chart CreateChartObject()

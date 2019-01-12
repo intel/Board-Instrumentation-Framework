@@ -22,23 +22,20 @@
 package kutch.biff.marvin.datamanager;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
-import javafx.scene.control.TabPane;
 import javafx.util.Pair;
 import kutch.biff.marvin.configuration.Configuration;
-import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.DynamicDebugWidgetTask;
 import kutch.biff.marvin.task.LateCreateTask;
 import kutch.biff.marvin.task.TaskManager;
-import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
-import kutch.biff.marvin.widget.TabWidget;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandTabBuilder;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 
@@ -53,7 +50,7 @@ public class DataManager
 
     private ConcurrentHashMap<String, DataSet> _DataMap;
     private ConcurrentHashMap<String, List<WildcardListItem>> _WildcardDataMap;
-    private final List<Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder>> _OnDemandList;
+    private final Queue<Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder>> _OnDemandQueue; // a queue solves some of my concurency issues
     private long _UpdateCount;
     private long _UnassignedDataPoints;
     private boolean __DynamicTabRegistered = false;
@@ -64,7 +61,7 @@ public class DataManager
         _DataManager = this;
         _UpdateCount = 0;
         _UnassignedDataPoints = 0;
-        _OnDemandList = Collections.synchronizedList(new ArrayList<Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder>>());
+        _OnDemandQueue = new ConcurrentLinkedQueue<>();
     }
 
     public boolean DynamicTabRegistered()
@@ -74,7 +71,7 @@ public class DataManager
     
     public void AddOnDemandWidgetCriterea(DynamicItemInfoContainer criterea, OnDemandWidgetBuilder objBuilder)
     {
-        _OnDemandList.add(new Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder>(criterea,objBuilder));
+        _OnDemandQueue.add(new Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder>(criterea,objBuilder));
         
         if (objBuilder instanceof OnDemandTabBuilder)
         {
@@ -82,9 +79,9 @@ public class DataManager
         }
     }
 
-    public List<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> getOnDemandList()
+    public Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> getOnDemandList()
     {
-        return _OnDemandList;
+        return _OnDemandQueue;
     }
     
     public static DataManager getDataManager()
@@ -181,15 +178,23 @@ public class DataManager
     {
         synchronized (this)
         {
-            for (Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder> entry :_OnDemandList)
+            boolean OnDemandItemFound = false;
+            for (Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder> entry :_OnDemandQueue)
             {
                 if (entry.getKey().Matches(Namespace, ID))
                 {
                     LateCreateTask objTask = new LateCreateTask(entry.getValue(),Namespace,ID,Value);
                     TaskManager.getTaskManager().AddDeferredTaskObject(objTask);
+                    OnDemandItemFound = true;
                 }
             }
-            
+            if (OnDemandItemFound)
+            {
+                Configuration.getConfig().setCursorToWait();
+            }
+        }
+        synchronized (this)
+        {
             String Key = Namespace.toUpperCase() + ID.toUpperCase();
 
             _UpdateCount++;
