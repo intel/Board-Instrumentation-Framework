@@ -896,16 +896,19 @@ public class WidgetBuilder
             {
                 objWidget.ReadGrowthInfo(demandNode.getChild("Growth"));
             }
+            
+            objWidget.ReadStyles(demandNode);
             // get hgap and all those good things
             ReadGridAttributes(objWidget,gridNode,false);
             retWidget = objWidget;
             WhatIsIt = "OnDemand Grid";
             isOnDemand = true;
             gridNode.DeleteChildNodes("OnDemand"); // delete the ondemand section, not needed anymore
-            int row = gridNode.getIntegerAttribute("row", 0);
-            int col = gridNode.getIntegerAttribute("column", 0);
-            gridNode.AddAttibute("GRID_COLUMN_ODD", col % 2 == 0 ? "FALSE" : "TRUE");
-            gridNode.AddAttibute("GRID_ROW_ODD", row % 2 == 0 ? "FALSE" : "TRUE");
+            
+//            int row = gridNode.getIntegerAttribute("row", 0);
+//            int col = gridNode.getIntegerAttribute("column", 0);
+//            gridNode.AddAttibute("GRID_COLUMN_ODD", col % 2 == 0 ? "FALSE" : "TRUE");
+//            gridNode.AddAttibute("GRID_ROW_ODD", row % 2 == 0 ? "FALSE" : "TRUE");
 
             info.setNode(gridNode);
         }

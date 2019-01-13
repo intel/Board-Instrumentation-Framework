@@ -547,6 +547,15 @@ abstract public class BaseWidget implements Widget
             }
         }
     }
+    
+    public void addOnDemandStyle(List<String> newStyles)
+    {
+        _RemoteStyleOverrideList.clear();
+        for (String style: newStyles)
+        {
+            AddAdditionalStyleOverride(style);
+        }
+    }
 
     public void setInitiallyEnabled(boolean enabled)
     {
