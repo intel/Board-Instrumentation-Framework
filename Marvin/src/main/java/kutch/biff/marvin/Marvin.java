@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import static java.lang.Math.abs;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -51,6 +52,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -555,7 +557,7 @@ public class Marvin extends Application
 
     /**
      * Creates a dummy tab pane, so I can measure the height of the tab portion
-     * for other calcualations
+     * for other calculations
      *
      * @param basePlane
      */
@@ -726,6 +728,10 @@ public class Marvin extends Application
             stage.initStyle(StageStyle.UNDECORATED);
         }
 
+        URL resource = AboutBox.class.getResource("About.png");
+        Image iconImg = new Image(resource.toString());
+
+        stage.getIcons().add(iconImg);
         stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler<WindowEvent>()
                       {
                           @Override

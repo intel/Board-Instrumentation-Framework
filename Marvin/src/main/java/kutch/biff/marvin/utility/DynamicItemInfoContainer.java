@@ -35,7 +35,6 @@ import kutch.biff.marvin.widget.BaseWidget;
  */
 public class DynamicItemInfoContainer
 {
-
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final Pair<ArrayList<String>, ArrayList<String>> __namespaceCriterea;
     private final Pair<ArrayList<String>, ArrayList<String>> __idCriterea;
@@ -51,6 +50,8 @@ public class DynamicItemInfoContainer
     };
     private SortMethod __SortMethod;
     private List<String> _StyleOverrideEven, _StyleOverrideOdd;
+    private String _StyleOverrideFileEven, _StyleOverrideFileOdd;
+    private String _StyleOverrideIDEven, _StyleOverrideIDOdd;
 
     public DynamicItemInfoContainer(Pair<ArrayList<String>, ArrayList<String>> namespaceCriterea,
                                     Pair<ArrayList<String>, ArrayList<String>> idCriterea)
@@ -65,6 +66,8 @@ public class DynamicItemInfoContainer
         __SortMethod = SortMethod.NONE;
         _StyleOverrideEven = new ArrayList<>();
         _StyleOverrideOdd = new ArrayList<>();
+        _StyleOverrideFileEven = _StyleOverrideFileOdd = null;
+        _StyleOverrideIDEven = _StyleOverrideIDOdd = null;
     }
 
     public boolean Matches(String namespace, String ID, String Value)
@@ -214,12 +217,33 @@ public class DynamicItemInfoContainer
     {
         if (onDemandNode.hasChild("StyleOverride-Even"))
         {
-            _StyleOverrideEven = readStyleItems(onDemandNode.getChild("StyleOverride-Even"));
+            FrameworkNode evenNode = onDemandNode.getChild("StyleOverride-Even");
+            _StyleOverrideEven = readStyleItems(evenNode);
+
+            if (evenNode.hasAttribute("File"))
+            {
+                _StyleOverrideFileEven = evenNode.getAttribute("File");
+            }
+            if (evenNode.hasAttribute("ID"))
+            {
+                _StyleOverrideIDEven = evenNode.getAttribute("ID");
+
+            }
         }
 
         if (onDemandNode.hasChild("StyleOverride-Odd"))
         {
-            _StyleOverrideOdd = readStyleItems(onDemandNode.getChild("StyleOverride-Odd"));
+            FrameworkNode oddNode = onDemandNode.getChild("StyleOverride-Odd");
+            _StyleOverrideOdd = readStyleItems(oddNode);
+
+            if (oddNode.hasAttribute("File"))
+            {
+                _StyleOverrideFileOdd = oddNode.getAttribute("File");
+            }
+            if (oddNode.hasAttribute("ID"))
+            {
+                _StyleOverrideIDOdd = oddNode.getAttribute("ID");
+            }
         }
     }
 
@@ -258,10 +282,26 @@ public class DynamicItemInfoContainer
     {
         if (number % 2 == 0)
         {
+            if (null != _StyleOverrideFileEven)
+            {
+                objWidget.setBaseCSSFilename(_StyleOverrideFileEven);
+            }
+            if (null != _StyleOverrideIDEven)
+            {
+                objWidget.setStyleID(_StyleOverrideIDEven);
+            }
             objWidget.addOnDemandStyle(getStyleOverrideEven());
         }
         else
         {
+            if (null != _StyleOverrideFileOdd)
+            {
+                objWidget.setBaseCSSFilename(_StyleOverrideFileOdd);
+            }
+            if (null != _StyleOverrideIDOdd)
+            {
+                objWidget.setStyleID(_StyleOverrideIDOdd);
+            }
             objWidget.addOnDemandStyle(getStyleOverrideOdd());
         }
     }
