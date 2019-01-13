@@ -45,20 +45,17 @@ public class OnDemandGridWidget extends GridWidget
     private String __strPrimaryGrowth = "HZ";
     private String __strSecondaryGrowth = "VT";
     private int __NewLineCount = 1;
-    private int __currentLineCount;
+    private int __currentLineCount = 0;
     private int __nextPositionX = 0;
     private int __nextPositionY = 0;
     private DynamicItemInfoContainer __criterea;
     private Map<String, String> __AliasListSnapshot = null;
     private List<Pair<BaseWidget, String>> __AddedGridList;
-    private List<String> _StyleOverrideEven, _StyleOverrideOdd;
 
     public OnDemandGridWidget(DynamicItemInfoContainer onDemandInfo)
     {
         __criterea = onDemandInfo;
         __AddedGridList = new ArrayList<>();
-        _StyleOverrideEven = new ArrayList<>();
-        _StyleOverrideOdd = new ArrayList<>();
     }
 
     @Override
@@ -241,23 +238,9 @@ public class OnDemandGridWidget extends GridWidget
             BaseWidget objWidget = tuple.getKey();
             Pair<Integer, Integer> position = getNextPosition();
             getGridPane().add(objWidget.getStylableObject(), position.getKey(), position.getValue());
-            ApplyOddEvenStyle(objWidget,widgetNum);
+            __criterea.ApplyOddEvenStyle(objWidget,widgetNum);
         }
 
-    }
-
-    private void ApplyOddEvenStyle(BaseWidget objWidget, int number)
-    {
-        if (number % 2 == 0)
-        {
-            objWidget.addOnDemandStyle(_StyleOverrideEven);
-            objWidget.ApplyCSS();
-        }
-        else
-        {
-            objWidget.addOnDemandStyle(_StyleOverrideOdd);
-            objWidget.ApplyCSS();
-        }
     }
 
     public boolean AddOnDemandWidget(BaseWidget objWidget, String sortStr)
@@ -280,7 +263,7 @@ public class OnDemandGridWidget extends GridWidget
                 }
                 else
                 {
-                   ApplyOddEvenStyle(objWidget,__AddedGridList.size());
+                   __criterea.ApplyOddEvenStyle(objWidget,__AddedGridList.size());
                 }
                 return true;
             }
@@ -289,40 +272,7 @@ public class OnDemandGridWidget extends GridWidget
         return false;
     }
 
-    private List<String> readStyleItems(FrameworkNode styleNode)
-    {
-        ArrayList<String> retList = new ArrayList<>();
-        for (FrameworkNode node : styleNode.getChildNodes())
-        {
-            if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
-            {
-                continue;
-            }
-            if (node.getNodeName().equalsIgnoreCase("Item"))
-            {
-                retList.add(node.getTextContent());
-            }
-            else
-            {
-                LOGGER.severe("Unknown Tag under Selected : " + node.getNodeName());
-            }
-        }
-        return retList;
-    }
-
-    public void ReadStyles(FrameworkNode onDemandNode)
-    {
-        if (onDemandNode.hasChild("StyleOverride-Even"))
-        {
-            _StyleOverrideEven = readStyleItems(onDemandNode.getChild("StyleOverride-Even"));
-        }
-
-        if (onDemandNode.hasChild("StyleOverride-Odd"))
-        {
-            _StyleOverrideOdd = readStyleItems(onDemandNode.getChild("StyleOverride-Odd"));
-        }
-    }
-
+    
     public boolean ReadGrowthInfo(FrameworkNode growthNode)
     {
         String strPrimary = growthNode.getAttribute("Primary");

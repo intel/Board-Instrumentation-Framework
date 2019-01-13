@@ -183,9 +183,11 @@ public class Configuration
 
     public void setCursorToWait()
     {
-        _BusyCursorRequestCount++;
-        _prevCursor = getAppScene().getCursor();
-        getAppScene().setCursor(Cursor.WAIT);
+        if (_BusyCursorRequestCount++ == 0)
+        {
+            _prevCursor = getAppScene().getCursor();
+            getAppScene().setCursor(Cursor.WAIT);
+        }
     }
 
     public void restoreCursor()

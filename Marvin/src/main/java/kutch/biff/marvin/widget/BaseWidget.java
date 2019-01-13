@@ -555,6 +555,7 @@ abstract public class BaseWidget implements Widget
         {
             AddAdditionalStyleOverride(style);
         }
+        ApplyCSS();
     }
 
     public void setInitiallyEnabled(boolean enabled)

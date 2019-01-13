@@ -23,9 +23,11 @@ package kutch.biff.marvin.utility;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 import javafx.util.Pair;
 import kutch.biff.marvin.logger.MarvinLogger;
+import kutch.biff.marvin.widget.BaseWidget;
 
 /**
  *
@@ -33,19 +35,25 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 public class DynamicItemInfoContainer
 {
+
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    private final Pair<ArrayList<String>,ArrayList<String>> __namespaceCriterea;
-    private final Pair<ArrayList<String>,ArrayList<String>> __idCriterea;
+    private final Pair<ArrayList<String>, ArrayList<String>> __namespaceCriterea;
+    private final Pair<ArrayList<String>, ArrayList<String>> __idCriterea;
     private FrameworkNode __node;
-    private final HashMap<String,Boolean> __PreviouslyChecked;
+    private final HashMap<String, Boolean> __PreviouslyChecked;
     private int __NumberOfMatchesUsingThisPattern;
     private String __TokenizerToken;
     private String __MatchedSortString;
-    public enum SortMethod {NAMESPACE,ID,VALUE,NONE};
+
+    public enum SortMethod
+    {
+        NAMESPACE, ID, VALUE, NONE
+    };
     private SortMethod __SortMethod;
-    
-    public DynamicItemInfoContainer(Pair<ArrayList<String>,ArrayList<String>> namespaceCriterea,
-                                    Pair<ArrayList<String>,ArrayList<String>> idCriterea)
+    private List<String> _StyleOverrideEven, _StyleOverrideOdd;
+
+    public DynamicItemInfoContainer(Pair<ArrayList<String>, ArrayList<String>> namespaceCriterea,
+                                    Pair<ArrayList<String>, ArrayList<String>> idCriterea)
     {
         __PreviouslyChecked = new HashMap<>();
         __namespaceCriterea = namespaceCriterea;
@@ -55,13 +63,15 @@ public class DynamicItemInfoContainer
         __NumberOfMatchesUsingThisPattern = 0;
         __MatchedSortString = null;
         __SortMethod = SortMethod.NONE;
+        _StyleOverrideEven = new ArrayList<>();
+        _StyleOverrideOdd = new ArrayList<>();
     }
 
     public boolean Matches(String namespace, String ID, String Value)
     {
         __MatchedSortString = null;
         // if already checked, no need to do it again
-        if (__PreviouslyChecked.containsKey(namespace+ID))
+        if (__PreviouslyChecked.containsKey(namespace + ID))
         {
             return false;
         }
@@ -69,13 +79,13 @@ public class DynamicItemInfoContainer
         {
             return false;
         }
-        
-        boolean matched = Matches(namespace,__namespaceCriterea);
+
+        boolean matched = Matches(namespace, __namespaceCriterea);
         if (matched && !__idCriterea.getKey().isEmpty())
         {
-            matched = Matches(ID,__idCriterea);
-            
-            __PreviouslyChecked.put(namespace+ID, matched);
+            matched = Matches(ID, __idCriterea);
+
+            __PreviouslyChecked.put(namespace + ID, matched);
         }
         else
         {
@@ -100,21 +110,22 @@ public class DynamicItemInfoContainer
             {
                 __MatchedSortString = null;
             }
-            
+
         }
         return matched;
     }
-    
+
     public String getLastMatchedSortStr()
     {
         return __MatchedSortString;
     }
+
     public int getMatchedCount()
     {
         return __NumberOfMatchesUsingThisPattern;
     }
-    
-    private boolean Matches(String compare, Pair<ArrayList<String>,ArrayList<String>> patternPair)
+
+    private boolean Matches(String compare, Pair<ArrayList<String>, ArrayList<String>> patternPair)
     {
         ArrayList<String> patternList = patternPair.getKey();
         ArrayList<String> excludePatternList = patternPair.getValue();
@@ -139,12 +150,12 @@ public class DynamicItemInfoContainer
         }
         return false;
     }
-    
+
     public void setToken(String strToken)
     {
         __TokenizerToken = strToken;
     }
-    
+
     public String getToken()
     {
         return __TokenizerToken;
@@ -159,7 +170,7 @@ public class DynamicItemInfoContainer
     {
         __node = node;
     }
-    
+
     public String[] tokenize(String ID)
     {
         if (getToken().equalsIgnoreCase("."))
@@ -168,7 +179,7 @@ public class DynamicItemInfoContainer
         }
         return ID.split(getToken());
     }
-    
+
     public boolean tokenizeAndCreateAlias(String ID)
     {
         if (null == getToken())
@@ -193,9 +204,66 @@ public class DynamicItemInfoContainer
     {
         __SortMethod = sortMethod;
     }
-    
+
     public SortMethod getSortByMethod()
     {
         return __SortMethod;
     }
+
+    public void ReadStyles(FrameworkNode onDemandNode)
+    {
+        if (onDemandNode.hasChild("StyleOverride-Even"))
+        {
+            _StyleOverrideEven = readStyleItems(onDemandNode.getChild("StyleOverride-Even"));
+        }
+
+        if (onDemandNode.hasChild("StyleOverride-Odd"))
+        {
+            _StyleOverrideOdd = readStyleItems(onDemandNode.getChild("StyleOverride-Odd"));
+        }
+    }
+
+    private List<String> readStyleItems(FrameworkNode styleNode)
+    {
+        ArrayList<String> retList = new ArrayList<>();
+        for (FrameworkNode node : styleNode.getChildNodes())
+        {
+            if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
+            {
+                continue;
+            }
+            if (node.getNodeName().equalsIgnoreCase("Item"))
+            {
+                retList.add(node.getTextContent());
+            }
+            else
+            {
+                LOGGER.severe("Unknown Tag under Selected : " + node.getNodeName());
+            }
+        }
+        return retList;
+    }
+
+    public List<String> getStyleOverrideOdd()
+    {
+        return _StyleOverrideOdd;
+    }
+
+    public List<String> getStyleOverrideEven()
+    {
+        return _StyleOverrideEven;
+    }
+
+    public void ApplyOddEvenStyle(BaseWidget objWidget, int number)
+    {
+        if (number % 2 == 0)
+        {
+            objWidget.addOnDemandStyle(getStyleOverrideEven());
+        }
+        else
+        {
+            objWidget.addOnDemandStyle(getStyleOverrideOdd());
+        }
+    }
+
 }

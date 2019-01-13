@@ -911,6 +911,9 @@ public class ConfigurationReader
         Pair<ArrayList<String>,ArrayList<String>> idCriterea = new Pair<>(idMaskList,idExcludeList);
         
         DynamicItemInfoContainer dynaInfo = new DynamicItemInfoContainer(namespaceCriterea, idCriterea);
+        
+        dynaInfo.ReadStyles(sourceNode);
+        
         if (sourceNode.hasAttribute("SortBy"))
         {
             String strSortBy = sourceNode.getAttribute("SortBy");

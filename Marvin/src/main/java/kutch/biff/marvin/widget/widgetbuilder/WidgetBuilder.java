@@ -897,7 +897,6 @@ public class WidgetBuilder
                 objWidget.ReadGrowthInfo(demandNode.getChild("Growth"));
             }
             
-            objWidget.ReadStyles(demandNode);
             // get hgap and all those good things
             ReadGridAttributes(objWidget,gridNode,false);
             retWidget = objWidget;

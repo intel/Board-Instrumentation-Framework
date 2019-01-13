@@ -72,8 +72,6 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         Configuration config = Configuration.getConfig();
         TabPane parentPane = config.getPane();
         Scene appScene = parentPane.getScene();
-        Cursor currCursor = appScene.getCursor();
-        appScene.setCursor(Cursor.WAIT);
         
         __builtCount++;
 
@@ -104,13 +102,19 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
             {
                 LOGGER.info("Error ocurred performing LateCreateTask on Tab: " + tab.getName());
             }
-
-//            LateCreateTask lateBindTask = new LateCreateTask(tab, parentPane, 0);
-//            TaskManager.getTaskManager().AddPostponedTask(lateBindTask, 0);
         }
         AliasMgr.getAliasMgr().PopAliasList();
         TabWidget.ReIndexTabs(parentPane);
-        appScene.setCursor(currCursor);
+        
+        int iIndex = 0;
+        for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs() )
+        {
+            if (tabWidget.getCreatedOnDemand())
+            {
+                __onDemandTrigger.ApplyOddEvenStyle(tabWidget, iIndex);
+            }
+            iIndex++;
+        }
 
         return true;
     }
