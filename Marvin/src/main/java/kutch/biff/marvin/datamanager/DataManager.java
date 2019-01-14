@@ -32,6 +32,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.util.Pair;
 import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.logger.MarvinLogger;
+import kutch.biff.marvin.task.ApplyOnDemandTabStyle;
 import kutch.biff.marvin.task.DynamicDebugWidgetTask;
 import kutch.biff.marvin.task.LateCreateTask;
 import kutch.biff.marvin.task.TaskManager;
@@ -45,15 +46,17 @@ import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
  */
 public class DataManager
 {
+
     private static DataManager _DataManager = null;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     private ConcurrentHashMap<String, DataSet> _DataMap;
     private ConcurrentHashMap<String, List<WildcardListItem>> _WildcardDataMap;
-    private final Queue<Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder>> _OnDemandQueue; // a queue solves some of my concurency issues
+    private final Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> _OnDemandQueue; // a queue solves some of my concurency issues
     private long _UpdateCount;
     private long _UnassignedDataPoints;
     private boolean __DynamicTabRegistered = false;
+
     public DataManager()
     {
         _DataMap = new ConcurrentHashMap<>();
@@ -68,11 +71,11 @@ public class DataManager
     {
         return __DynamicTabRegistered;
     }
-    
+
     public void AddOnDemandWidgetCriterea(DynamicItemInfoContainer criterea, OnDemandWidgetBuilder objBuilder)
     {
-        _OnDemandQueue.add(new Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder>(criterea,objBuilder));
-        
+        _OnDemandQueue.add(new Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>(criterea, objBuilder));
+
         if (objBuilder instanceof OnDemandTabBuilder)
         {
             __DynamicTabRegistered = true; // flag so can know if something is registered for startup check for any tabs
@@ -83,7 +86,7 @@ public class DataManager
     {
         return _OnDemandQueue;
     }
-    
+
     public static DataManager getDataManager()
     {
         return _DataManager;
@@ -176,16 +179,21 @@ public class DataManager
 
     public void ChangeValue(String ID, String Namespace, String Value)
     {
+        boolean OnDemandItemFound = false;
+        boolean OnDemandTabFound = false;
         synchronized (this)
         {
-            boolean OnDemandItemFound = false;
-            for (Pair<DynamicItemInfoContainer,OnDemandWidgetBuilder> entry :_OnDemandQueue)
+            for (Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder> entry : _OnDemandQueue)
             {
-                if (entry.getKey().Matches(Namespace, ID,Value))
+                if (entry.getKey().Matches(Namespace, ID, Value))
                 {
-                    LateCreateTask objTask = new LateCreateTask(entry.getValue(),Namespace,ID,Value,entry.getKey().getLastMatchedSortStr());
+                    LateCreateTask objTask = new LateCreateTask(entry.getValue(), Namespace, ID, Value, entry.getKey().getLastMatchedSortStr());
                     TaskManager.getTaskManager().AddDeferredTaskObject(objTask);
                     OnDemandItemFound = true;
+                    if (entry.getValue() instanceof OnDemandTabBuilder)
+                    {
+                        OnDemandTabFound = true;
+                    }
                 }
             }
             if (OnDemandItemFound)
@@ -222,6 +230,11 @@ public class DataManager
             {
                 _DataMap.get(Key).setLatestValue(Value);
             }
+        }
+        if (true == OnDemandTabFound)
+        {
+//            ApplyOnDemandTabStyle objTask = new ApplyOnDemandTabStyle();
+//            TaskManager.getTaskManager().AddPostponedTask(objTask, 1000);
         }
     }
 

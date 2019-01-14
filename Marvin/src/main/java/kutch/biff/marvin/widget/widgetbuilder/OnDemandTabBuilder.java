@@ -21,14 +21,16 @@
  */
 package kutch.biff.marvin.widget.widgetbuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
-import javafx.scene.Cursor;
-import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
 import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.logger.MarvinLogger;
+import kutch.biff.marvin.task.ApplyOnDemandTabStyle;
+import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.utility.FrameworkNode;
@@ -46,6 +48,7 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
     private FrameworkNode __node;
     private int __tabIndex;
     DynamicItemInfoContainer __onDemandTrigger;
+    private List<TabWidget> __createdTabs;
 
     public OnDemandTabBuilder(String tabID, int index,DynamicItemInfoContainer info)
     {
@@ -53,6 +56,7 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         __tabIndex = index;
         __onDemandTrigger = info;
         __node = null;
+        __createdTabs = new ArrayList<TabWidget>();
     }
 
     public String getTabID()
@@ -71,13 +75,13 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         LOGGER.info("Creating OnDemand Tab for namespace: " + Namespace + ",  using Tab template ID: " + __tabID);
         Configuration config = Configuration.getConfig();
         TabPane parentPane = config.getPane();
-        Scene appScene = parentPane.getScene();
         
         __builtCount++;
 
         String strTabID = __tabID + "." + Integer.toString(__builtCount);
         AliasMgr.getAliasMgr().PushAliasList(true);
         TabWidget tab = new TabWidget(strTabID);
+        __createdTabs.add(tab);
         tab.setOnDemandSortBy(strSortValue);
         AliasMgr.getAliasMgr().AddAlias("TriggeredNamespace", Namespace); // So tab knows namespace
         AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); 
@@ -106,17 +110,23 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         AliasMgr.getAliasMgr().PopAliasList();
         TabWidget.ReIndexTabs(parentPane);
         
-        int iIndex = 0;
-        for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs() )
-        {
-            if (tabWidget.getCreatedOnDemand())
-            {
-                __onDemandTrigger.ApplyOddEvenStyle(tabWidget, iIndex);
-            }
-            iIndex++;
-        }
-
+            ApplyOnDemandTabStyle objTask = new ApplyOnDemandTabStyle();
+            TaskManager.getTaskManager().AddPostponedTask(objTask, 1000);
+        
+        
         return true;
     }
 
+    public void ApplyOddEvenStyle()
+    {
+        int iIndex = 1;
+        for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs() )
+        {
+            if (__createdTabs.contains(tabWidget))  // on demand tab, that was created by this builder
+            {
+                __onDemandTrigger.ApplyOddEvenStyle(tabWidget, iIndex,tabWidget.getTitle());
+            }
+            iIndex++;
+        }
+    }
 }

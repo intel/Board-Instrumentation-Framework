@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javafx.util.Pair;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.widget.BaseWidget;
+import kutch.biff.marvin.widget.TabWidget;
 
 /**
  *
@@ -280,7 +281,7 @@ public class DynamicItemInfoContainer
 
     public void ApplyOddEvenStyle(BaseWidget objWidget, int number)
     {
-        if (number % 2 == 0)
+        if (number % 2 == 0) // even style
         {
             if (null != _StyleOverrideFileEven)
             {
@@ -294,6 +295,36 @@ public class DynamicItemInfoContainer
         }
         else
         {
+            if (null != _StyleOverrideFileOdd)
+            {
+                objWidget.setBaseCSSFilename(_StyleOverrideFileOdd);
+            }
+            if (null != _StyleOverrideIDOdd)
+            {
+                objWidget.setStyleID(_StyleOverrideIDOdd);
+            }
+            objWidget.addOnDemandStyle(getStyleOverrideOdd());
+        }
+    }
+    
+    public void ApplyOddEvenStyle(TabWidget objWidget, int number,String Title)
+    {
+        if (number % 2 == 0) // even style
+        {
+            LOGGER.severe("Applying Even Style to Tab " + Title);
+            if (null != _StyleOverrideFileEven)
+            {
+                objWidget.setBaseCSSFilename(_StyleOverrideFileEven);
+            }
+            if (null != _StyleOverrideIDEven)
+            {
+                objWidget.setStyleID(_StyleOverrideIDEven);
+            }
+            objWidget.addOnDemandStyle(getStyleOverrideEven());
+        }
+        else
+        {
+            LOGGER.severe("Applying Odd Style to Tab " + Title);
             if (null != _StyleOverrideFileOdd)
             {
                 objWidget.setBaseCSSFilename(_StyleOverrideFileOdd);

@@ -247,7 +247,6 @@ public class TabWidget extends GridWidget
         {
             for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs())
             {
-                Titles += tabWidget.getTitle() +" ";
                 if (tabWidget.Reindex(tab, tabIndex))
                 {
                     break;
@@ -255,41 +254,18 @@ public class TabWidget extends GridWidget
             }
             tabIndex++;
         }
-        LOGGER.info(Titles);
     }
 
     @Override
     public javafx.scene.Node getStylableObject()
     {
         return basePane;
-//        return _BaseGridPane;
     }
 
     @Override
     public ObservableList<String> getStylesheets()
     {
         return basePane.getStylesheets();
-//        return _BaseGridPane.getStylesheets();
-    }
-
-    @Override
-    protected String GetCSS_File()
-    {
-        String strFile = "";
-        if (null != getBaseCSSFilename())
-        {
-            //strFile = getBaseCSSFilename();
-            strFile = strFile + getDefinintionFileDirectory() + File.separatorChar + getBaseCSSFilename();
-
-            File file = new File(strFile);
-            if (false == file.exists())
-            {
-                LOGGER.severe("Unable to locate Tab Stylesheet: " + strFile + " : " + getBaseCSSFilename());
-                return null;
-            }
-            return convertToFileURL(strFile);
-        }
-        return null;
     }
 
     public void setOnActivateTask(String taskID)

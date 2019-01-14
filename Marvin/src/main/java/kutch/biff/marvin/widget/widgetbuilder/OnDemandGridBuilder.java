@@ -56,9 +56,13 @@ public class OnDemandGridBuilder implements OnDemandWidgetBuilder
         }
         
         Widget objWidget = WidgetBuilder.Build(__containerGrid.getCriterea().getNode());
+        if (null ==objWidget)
+        {
+            return false;
+        }
         if (!(objWidget instanceof GridWidget))
         {
-            LOGGER.severe("Tried to build somethign that was not a Grid");
+            LOGGER.severe("Tried to build something that was not a Grid " + objWidget.getClass().toString());
             return false;
         }
         // once for this grid's aliases and another for the 'super set' stored

@@ -815,7 +815,7 @@ public class ConfigurationReader
         }
         if (DataManager.getDataManager().DynamicTabRegistered())
         {
-            ReadDynamicTabs(doc);
+            ReadOnDemandTabs(doc);
         }
 
         if (false == NetworkSettingsRead)
@@ -946,11 +946,10 @@ public class ConfigurationReader
             dynaInfo.setToken(strToken);
         }
         
-        
         return dynaInfo;
     }
 
-    private void ReadDynamicTabs(Document doc)
+    private void ReadOnDemandTabs(Document doc)
     {
         FrameworkNode appNode = new FrameworkNode(doc.getChildNodes().item(0));
 
