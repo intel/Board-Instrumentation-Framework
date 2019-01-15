@@ -24,6 +24,7 @@ package kutch.biff.marvin.utility;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import javafx.util.Pair;
 import kutch.biff.marvin.logger.MarvinLogger;
@@ -44,6 +45,7 @@ public class DynamicItemInfoContainer
     private int __NumberOfMatchesUsingThisPattern;
     private String __TokenizerToken;
     private String __MatchedSortString;
+    private Map<String, String> __AliasListSnapshot = null;
 
     public enum SortMethod
     {
@@ -71,6 +73,10 @@ public class DynamicItemInfoContainer
         _StyleOverrideIDEven = _StyleOverrideIDOdd = null;
     }
 
+    public void TakeAliasSnapshot()
+    {
+        __AliasListSnapshot = AliasMgr.getAliasMgr().getSnapshot();
+    }
     public boolean Matches(String namespace, String ID, String Value)
     {
         __MatchedSortString = null;
@@ -337,4 +343,16 @@ public class DynamicItemInfoContainer
         }
     }
 
+    public void putAliasListSnapshot()
+    {
+        if (null == __AliasListSnapshot)
+        {
+            return;
+        }
+        AliasMgr aMgr = AliasMgr.getAliasMgr();
+        for (String key : __AliasListSnapshot.keySet())
+        {
+            aMgr.AddAlias(key, __AliasListSnapshot.get(key));
+        }
+    }
 }

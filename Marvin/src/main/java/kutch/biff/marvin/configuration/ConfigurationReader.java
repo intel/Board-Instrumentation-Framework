@@ -74,6 +74,7 @@ public class ConfigurationReader
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private static ConfigurationReader _ConfigReader;
     private static HashMap<Conditional, Conditional> _conditionalMap = new HashMap<>();
+    private static List<String> _OnDemandID_List= new ArrayList<>();
 
     public ConfigurationReader()
     {
@@ -754,6 +755,7 @@ public class ConfigurationReader
                                     {
                                         OnDemandTabBuilder objBuilder = new OnDemandTabBuilder(ID,tabCount,dynaInfo);
                                         DataManager.getDataManager().AddOnDemandWidgetCriterea(dynaInfo, objBuilder);
+                                        _OnDemandID_List.add(ID.toUpperCase());
                                     }
                                 }
                                 else
@@ -1340,9 +1342,12 @@ public class ConfigurationReader
                         {
                             AliasMgr.getAliasMgr().PopAliasList();
                         }
-                        else
+                        else 
                         {
-                            LOGGER.warning("<Tab ID=" + id + "> found, but not used in <Tabs>.");
+                            if (! _OnDemandID_List.contains(id.toUpperCase()))
+                            {
+                                LOGGER.warning("<Tab ID=" + id + "> found, but not used in <Tabs>.");
+                            }
                             continue;
                         }
                     }

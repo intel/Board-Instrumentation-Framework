@@ -55,7 +55,6 @@ import org.xml.sax.SAXException;
  */
 public class WidgetBuilder
 {
-
     private final static Configuration CONFIG = Configuration.getConfig();
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static MySplash SPLASH = MySplash.getSplash();
@@ -857,6 +856,7 @@ public class WidgetBuilder
         String strColumn = "0";
         String WhatIsIt = "Grid";
         boolean isOnDemand = false;
+        DynamicItemInfoContainer info = null;
 
         if (true == isFlipPanelGrid)
         {
@@ -890,7 +890,7 @@ public class WidgetBuilder
         if (gridNode.hasChild("OnDemand"))
         {
             FrameworkNode demandNode = gridNode.getChild("OnDemand");
-            DynamicItemInfoContainer info = ConfigurationReader.ReadOnDemandInfo(demandNode);
+            info = ConfigurationReader.ReadOnDemandInfo(demandNode);
             OnDemandGridWidget objWidget = new OnDemandGridWidget(info);
             if (demandNode.hasChild("Growth"))
             {
@@ -967,6 +967,12 @@ public class WidgetBuilder
             gridNode.DeleteAttribute("hgap");
             gridNode.DeleteAttribute("vgap");
             gridNode.DeleteAttribute("align");
+            AliasMgr.getAliasMgr().PushAliasList(false);
+            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]{
+                                                        "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "File", "Height", "Width"
+            });
+            info.TakeAliasSnapshot(); // have to do this way down here, after the other stuff
+            AliasMgr.getAliasMgr().PopAliasList();
             return retWidget;
         }
         AliasMgr.getAliasMgr().AddUpdateAlias("GRID_ROW_ODD", AliasMgr.getAliasMgr().GetAlias("CurrentRowIsOddAlias"));

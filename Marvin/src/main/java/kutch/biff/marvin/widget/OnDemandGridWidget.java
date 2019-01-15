@@ -37,11 +37,10 @@ import kutch.biff.marvin.widget.widgetbuilder.OnDemandGridBuilder;
 
 /**
  *
- * @author Patrick
+ * @author Patrick.Kutch@gmail.com
  */
 public class OnDemandGridWidget extends GridWidget
 {
-
     private String __strPrimaryGrowth = "HZ";
     private String __strSecondaryGrowth = "VT";
     private int __NewLineCount = 1;
@@ -49,7 +48,6 @@ public class OnDemandGridWidget extends GridWidget
     private int __nextPositionX = 0;
     private int __nextPositionY = 0;
     private DynamicItemInfoContainer __criterea;
-    private Map<String, String> __AliasListSnapshot = null;
     private List<Pair<BaseWidget, String>> __AddedGridList;
 
     public OnDemandGridWidget(DynamicItemInfoContainer onDemandInfo)
@@ -114,22 +112,21 @@ public class OnDemandGridWidget extends GridWidget
         OnDemandGridBuilder objBuilder = new OnDemandGridBuilder(this);
         dataMgr.AddOnDemandWidgetCriterea(__criterea, objBuilder);
         // grab ALL aliases to use when contained widgets created
-        __AliasListSnapshot = AliasMgr.getAliasMgr().getSnapshot();
         return true;
     }
 
-    public void AddAliasListSnapshot()
-    {
-        if (null == __AliasListSnapshot)
-        {
-            return;
-        }
-        AliasMgr aMgr = AliasMgr.getAliasMgr();
-        for (String key : __AliasListSnapshot.keySet())
-        {
-            aMgr.AddAlias(key, __AliasListSnapshot.get(key));
-        }
-    }
+//    public void AddAliasListSnapshot()
+//    {
+//        if (null == __AliasListSnapshot)
+//        {
+//            return;
+//        }
+//        AliasMgr aMgr = AliasMgr.getAliasMgr();
+//        for (String key : __AliasListSnapshot.keySet())
+//        {
+//            aMgr.AddAlias(key, __AliasListSnapshot.get(key));
+//        }
+//    }
 
     public DynamicItemInfoContainer getCriterea()
     {
