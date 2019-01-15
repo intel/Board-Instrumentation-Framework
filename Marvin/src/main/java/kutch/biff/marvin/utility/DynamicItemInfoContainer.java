@@ -65,7 +65,7 @@ public class DynamicItemInfoContainer
         __node = null;
         __TokenizerToken = null;
         __NumberOfMatchesUsingThisPattern = 0;
-        __MatchedSortString = null;
+        __MatchedSortString = "";
         __SortMethod = SortMethod.NONE;
         _StyleOverrideEven = new ArrayList<>();
         _StyleOverrideOdd = new ArrayList<>();
@@ -79,7 +79,7 @@ public class DynamicItemInfoContainer
     }
     public boolean Matches(String namespace, String ID, String Value)
     {
-        __MatchedSortString = null;
+        __MatchedSortString = "";
         // if already checked, no need to do it again
         if (__PreviouslyChecked.containsKey(namespace + ID))
         {
@@ -317,7 +317,7 @@ public class DynamicItemInfoContainer
     {
         if (number % 2 == 0) // even style
         {
-            LOGGER.severe("Applying Even Style to Tab " + Title);
+            //LOGGER.severe("Applying Even Style to Tab " + Title);
             if (null != _StyleOverrideFileEven)
             {
                 objWidget.setBaseCSSFilename(_StyleOverrideFileEven);
@@ -330,7 +330,7 @@ public class DynamicItemInfoContainer
         }
         else
         {
-            LOGGER.severe("Applying Odd Style to Tab " + Title);
+            //LOGGER.severe("Applying Odd Style to Tab " + Title);
             if (null != _StyleOverrideFileOdd)
             {
                 objWidget.setBaseCSSFilename(_StyleOverrideFileOdd);
@@ -352,7 +352,7 @@ public class DynamicItemInfoContainer
         AliasMgr aMgr = AliasMgr.getAliasMgr();
         for (String key : __AliasListSnapshot.keySet())
         {
-            aMgr.AddAlias(key, __AliasListSnapshot.get(key));
+            aMgr.SilentAddAlias(key, __AliasListSnapshot.get(key));
         }
     }
 }

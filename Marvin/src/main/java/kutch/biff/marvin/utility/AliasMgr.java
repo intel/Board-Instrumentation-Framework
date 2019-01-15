@@ -163,6 +163,29 @@ public class AliasMgr
         }
         return false;
     }
+    
+    public void SilentAddAlias(String Alias, String Value)
+    {
+        if (null == Alias)
+        {
+            return;
+        }
+        Map map = _AliasList.get(0);
+        if (map.containsKey(Alias.toUpperCase()))
+        {
+            return;
+        }
+        if (null == Value)
+        {
+            String strError = "Alias [" + Alias + "] has NULL value!";
+            map.put(Alias.toUpperCase(), strError);
+        }
+        else
+        {
+            map.put(Alias.toUpperCase(), Value);
+        }        
+    }
+
 
     /**
      *

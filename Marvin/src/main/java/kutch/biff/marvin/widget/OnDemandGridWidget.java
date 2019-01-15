@@ -115,19 +115,6 @@ public class OnDemandGridWidget extends GridWidget
         return true;
     }
 
-//    public void AddAliasListSnapshot()
-//    {
-//        if (null == __AliasListSnapshot)
-//        {
-//            return;
-//        }
-//        AliasMgr aMgr = AliasMgr.getAliasMgr();
-//        for (String key : __AliasListSnapshot.keySet())
-//        {
-//            aMgr.AddAlias(key, __AliasListSnapshot.get(key));
-//        }
-//    }
-
     public DynamicItemInfoContainer getCriterea()
     {
         return __criterea;
@@ -256,11 +243,11 @@ public class OnDemandGridWidget extends GridWidget
                 __AddedGridList.add(new Pair<BaseWidget, String>(objWidget, sortStr));
                 if (__criterea.getSortByMethod() != SortMethod.NONE)
                 {
-                    resortWidgets();
+                    resortWidgets(); // OddEven Style applied in here
                 }
                 else
-                {
-                   __criterea.ApplyOddEvenStyle(objWidget,__AddedGridList.size());
+                {   
+                    __criterea.ApplyOddEvenStyle(objWidget,__AddedGridList.size());
                 }
                 return true;
             }

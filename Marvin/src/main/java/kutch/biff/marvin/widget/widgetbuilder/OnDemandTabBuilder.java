@@ -42,6 +42,7 @@ import kutch.biff.marvin.widget.TabWidget;
  */
 public class OnDemandTabBuilder implements OnDemandWidgetBuilder
 {
+
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private String __tabID;
     private int __builtCount = 0;
@@ -50,7 +51,7 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
     DynamicItemInfoContainer __onDemandTrigger;
     private List<TabWidget> __createdTabs;
 
-    public OnDemandTabBuilder(String tabID, int index,DynamicItemInfoContainer info)
+    public OnDemandTabBuilder(String tabID, int index, DynamicItemInfoContainer info)
     {
         __tabID = tabID;
         __tabIndex = index;
@@ -75,7 +76,7 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         LOGGER.info("Creating OnDemand Tab for namespace: " + Namespace + ",  using Tab template ID: " + __tabID);
         Configuration config = Configuration.getConfig();
         TabPane parentPane = config.getPane();
-        
+
         __builtCount++;
 
         String strTabID = __tabID + "." + Integer.toString(__builtCount);
@@ -84,15 +85,15 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         __createdTabs.add(tab);
         tab.setOnDemandSortBy(strSortValue);
         AliasMgr.getAliasMgr().AddAlias("TriggeredNamespace", Namespace); // So tab knows namespace
-        AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID); 
-        AliasMgr.getAliasMgr().AddAlias("TriggeredValue", Value); 
+        AliasMgr.getAliasMgr().AddAlias("TriggeredID", ID);
+        AliasMgr.getAliasMgr().AddAlias("TriggeredValue", Value);
         AliasMgr.getAliasMgr().AddAlias("TriggeredIndex", Integer.toString(__builtCount));
-        AliasMgr.getAliasMgr().AddAlias("TabID",strTabID);
+        AliasMgr.getAliasMgr().AddAlias("TabID", strTabID);
         __onDemandTrigger.tokenizeAndCreateAlias(ID);
-        
+
         tab = ConfigurationReader.ReadTab(__node, tab, strTabID);
         tab.setCreatedOnDemand();
-        
+
         if (null != tab)
         {
             if (tab.Create(parentPane, DataManager.getDataManager(), __tabIndex))
@@ -109,22 +110,21 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         }
         AliasMgr.getAliasMgr().PopAliasList();
         TabWidget.ReIndexTabs(parentPane);
-        
-            ApplyOnDemandTabStyle objTask = new ApplyOnDemandTabStyle();
-            TaskManager.getTaskManager().AddPostponedTask(objTask, 1000);
-        
-        
+
+        ApplyOnDemandTabStyle objTask = new ApplyOnDemandTabStyle();
+        TaskManager.getTaskManager().AddPostponedTask(objTask, 1000);
+
         return true;
     }
 
     public void ApplyOddEvenStyle()
     {
         int iIndex = 1;
-        for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs() )
+        for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs())
         {
             if (__createdTabs.contains(tabWidget))  // on demand tab, that was created by this builder
             {
-                __onDemandTrigger.ApplyOddEvenStyle(tabWidget, iIndex,tabWidget.getTitle());
+                __onDemandTrigger.ApplyOddEvenStyle(tabWidget, iIndex, tabWidget.getTitle());
             }
             iIndex++;
         }

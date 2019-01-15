@@ -901,6 +901,18 @@ public class ConfigurationReader
                     LOGGER.warning("On Demand item specified duplicate IDTriggerExcludePattern that matches IDTriggerExcludePattern.");
                 }
             }
+            else if (dynaNode.getNodeName().equalsIgnoreCase("StyleOverride-Odd") || dynaNode.getNodeName().equalsIgnoreCase("StyleOverride-Even"))
+            {
+                
+            }
+            else if (dynaNode.getNodeName().equalsIgnoreCase("Growth"))
+            {
+                
+            }
+            else 
+            {
+                LOGGER.warning("Invalid Tag found in <OnDemand>: " + dynaNode.getNodeName());
+            }
         }
         if (namespaceMaskList.isEmpty() && idMaskList.isEmpty())
         {

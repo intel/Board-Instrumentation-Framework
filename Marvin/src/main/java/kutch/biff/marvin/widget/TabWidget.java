@@ -21,7 +21,6 @@
  */
 package kutch.biff.marvin.widget;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -38,7 +37,6 @@ import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.TranslationCalculator;
-import static kutch.biff.marvin.widget.BaseWidget.convertToFileURL;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.HandlePeekaboo;
 
@@ -48,7 +46,6 @@ import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.HandlePeekabo
  */
 public class TabWidget extends GridWidget
 {
-
     private Tab _tab;
     private GridPane _BaseGridPane; // throw one down in tab to put all the goodies in
     private boolean _IsVisible;
@@ -139,11 +136,6 @@ public class TabWidget extends GridWidget
 
             new TranslationCalculator(_stackReference, _BaseGridPane, CONFIG.getScaleProperty(), getPosition()); // handles all the resizing/scaling
 
-            if (getCreatedOnDemand())
-            {
-                int index = calcOnDemandIndex();
-                tabPane.getTabs().add(iIndex, _tab);
-            }
             tabPane.getTabs().add(_tab);
             SetupPeekaboo(dataMgr);
 
@@ -162,11 +154,6 @@ public class TabWidget extends GridWidget
     public String getOnDemandSortBy()
     {
         return _OnDemandSortStr;
-    }
-
-    private int calcOnDemandIndex()
-    {
-        return _TabIndex;
     }
 
     public boolean Reindex(Tab compare, int newIndex)
@@ -241,7 +228,7 @@ public class TabWidget extends GridWidget
     {
         TabWidget.sortTabs(tabPane);
 
-        String Titles="";
+        String Titles = "";
         int tabIndex = 0;
         for (Tab tab : tabPane.getTabs())
         {
