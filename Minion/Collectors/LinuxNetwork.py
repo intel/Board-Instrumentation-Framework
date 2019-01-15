@@ -22,7 +22,7 @@ import subprocess
 import time
 import socket
 
-VersionStr="v19.01.11"
+VersionStr="v19.01.15"
 lscpiDataMap=None
 netdevInfoDir="/sys/class/net"
 
@@ -107,10 +107,15 @@ def __GetDeviceVendorInfo(ethDev):
         linkStr=os.readlink(GetBaseDir() + "/"  + ethDev + "/device")
         parts = linkStr.split("/")
         busID= parts[-1]
-
+        
         dataMap = __GetLSPCIData()
         if busID in dataMap:
             return dataMap[busID]
+
+        ## some LSPCI dumps an abbreviated bus Id - fun!, so check for that
+        for key in dataMap:
+            if key in busID:
+               return dataMap[key]
 
     except Exception as ex:
         pass
@@ -171,7 +176,7 @@ def __GatherNetworkDeviceInfo(ethDev,retMap,slimDataset):
         retMap[baseName+ethDev+".bx_pps"] = str(float(retMap[baseName+ethDev+".rx_packets"]) + float(retMap[baseName+ethDev+".tx_packets"]))
         retMap[baseName+ethDev+".tx_mpps"] = retMap[baseName+ethDev+".tx_packets"]
         retMap[baseName+ethDev+".rx_mpps"] = retMap[baseName+ethDev+".rx_packets"]
-        retMap[baseName+ethDev+".bx_mpps"] = baseName+ethDev+".bx_pps"
+        retMap[baseName+ethDev+".bx_mpps"] = str(float(retMap[baseName+ethDev+".rx_packets"]) + float(retMap[baseName+ethDev+".tx_packets"]))
         
 
     return retMap
