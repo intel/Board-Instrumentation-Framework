@@ -37,7 +37,7 @@ from Collectors import Linux_CPU
 from pprint import pprint
 
 DMI_Data=None
-VersionStr="v19.01.11"
+VersionStr="v19.01.15"
 
 
 def ReadFromFile(Filename):
@@ -314,7 +314,6 @@ def SystemUptimeLong():
     strTime="{0} days,  {1}:{2}".format(int(days),hours,minutes)
 
     return strTime    
-	
 
 def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=False,**kwargs):
     global Logger
@@ -326,12 +325,12 @@ def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=Fal
         showHyperthreadingCoreDetails = True
     else:
         showHyperthreadingCoreDetails = False
-		
-	if 'ShowFrequencyInfo' in kwargs and kwargs['ShowFrequencyInfo'].lower() == 'true':
-	   showFreq = True
-	else:
-	   showFreq = False		
-		
+
+    if 'ShowFrequencyInfo' in kwargs and kwargs['ShowFrequencyInfo'].lower() == 'true':
+        showFreq = True
+    else:
+        showFreq = False		
+
 
     if showHyperthreadingCoreDetails:
         showHyperthreadingCoreDetails = IsHyperthreadingEnabled() #don't bother doing if HT is not enabled
@@ -343,7 +342,7 @@ def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=Fal
         numaCount = int(dataMap['system.numa_count'])
         if True == showHyperthreadingCoreDetails:
             SiblingMap,CoreMap = __CreateNumaMap()
-			
+
         while not frameworkInterface.KillThreadSignalled():
             dataMap["system.mem_available"] = GetMemoryInfo_Linux('MemAvailable')
             dataMap["system.hugepages_total"] = GetMemoryInfo_Linux('HugePages_Total')
