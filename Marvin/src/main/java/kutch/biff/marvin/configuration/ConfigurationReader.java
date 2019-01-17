@@ -1163,6 +1163,10 @@ public class ConfigurationReader
                 LOGGER.severe("Invalid tab definition file: " + node.getAttribute("File"));
                 return null;
             }
+            if (tabNode.hasAttribute("OnDemandTask"))
+            {
+                tab.setOnDemandTask(tabNode.getAttribute("OnDemandTask"));
+            }
 
             AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
                                                     {
@@ -1185,10 +1189,6 @@ public class ConfigurationReader
                 "ID", "File", "Align", "hgap", "vgap", "Task"
             }, node);
             tabNode = node;
-        }
-        if (null == tabNode)
-        {
-            return null;
         }
         if (false == tab.LoadConfiguration(tabNode))
         {
