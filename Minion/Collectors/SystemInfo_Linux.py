@@ -89,7 +89,7 @@ def NumaNodeExists(nodeNum):
 
 def GetNumaInfo(nodeNum):
     retMap={}
-    retMap['system.numa.node' + str(nodeNum) +'.cpu_list'] = ReadFromFile('/sys/devices/system/node/node'+str(nodeNum)+'/cpulist')
+    retMap['system.numa.node' + str(nodeNum) +'.core_list'] = ReadFromFile('/sys/devices/system/node/node'+str(nodeNum)+'/cpulist')
     return retMap
 
 def __GetNumaStats(nodeCount):
@@ -375,9 +375,11 @@ def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=Fal
             dataMap["system.uptime.long"] = SystemUptimeLong()
 
             for entry in dataMap:
-                if updatedCount < 5: # no need to check each on over and over, so just a few times to make sure all are in there
-                    if not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
-                        frameworkInterface.AddCollector(entry)    # Nope, so go add it
+                if not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
+                    frameworkInterface.AddCollector(entry)    # Nope, so go add it
+
+                    if ".core_list" in entry: # list of cores, so no need to precision
+                        frameworkInterface.SetPrecisionFromPlugin(entry,0)
                         
                 frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
 

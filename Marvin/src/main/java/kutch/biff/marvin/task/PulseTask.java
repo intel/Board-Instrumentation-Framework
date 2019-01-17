@@ -21,6 +21,8 @@
  */
 package kutch.biff.marvin.task;
 
+import kutch.biff.marvin.datamanager.DataManager;
+
 /**
  *
  * @author Patrick
@@ -54,7 +56,16 @@ public class PulseTask extends BaseTask
         currValue = TASKMAN.getDataMgr().GetValue(_ID, _Namespace);
         if (null == currValue)
         {
-            LOGGER.warning("Pulse Task failed [" + getTaskID() +"] beause the data point does not exist (yet).");
+            int pulseCount = DataManager.getDataManager().PulseDataPoint(_Namespace, _ID);
+            if (pulseCount > 0)
+            {
+                LOGGER.info(String.format("Pulsed %d datapoints with criterea of: [%s:%s]",pulseCount,_Namespace,_ID));
+            }
+        }
+
+        if (null == currValue)
+        {
+            LOGGER.warning("Pulse Task failed [" + getTaskID() +"] beause the data point [" + _Namespace +":"+_ID+"] does not exist (yet).");
         }
         else
         {

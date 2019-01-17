@@ -49,7 +49,26 @@ public class GridWidget extends BaseWidget
     private boolean _PropagateExplicitlyConfigured;
     protected double _hGapPercentOfParentGrid;
     protected double _vGapPercentOfParentGrid;
+    private String _OnDemandTask;
 
+    public GridWidget()
+    {
+        _Widgets = new ArrayList<>();
+        _GridPane = new GridPane();
+        _PropagateClickThrough = false;
+        _PropagateExplicitlyConfigured = false;
+
+        _hGap = -1;
+        _vGap = -1;
+
+        _Position = Pos.TOP_CENTER; // default for both Tab and Grids
+        _insetTop = _insetBottom = _insetLeft = _insetRight = -1;
+        setDefaultIsSquare(false);
+
+        _hGapPercentOfParentGrid = 0;
+        _vGapPercentOfParentGrid = 0;
+        _OnDemandTask = null;
+    }
     //private Pos _Position; // this could be a problem
     protected boolean isPropagateClickThrough()
     {
@@ -70,24 +89,6 @@ public class GridWidget extends BaseWidget
     public boolean getExplicitPropagate()
     {
         return _PropagateExplicitlyConfigured;
-    }
-
-    public GridWidget()
-    {
-        _Widgets = new ArrayList<>();
-        _GridPane = new GridPane();
-        _PropagateClickThrough = false;
-        _PropagateExplicitlyConfigured = false;
-
-        _hGap = -1;
-        _vGap = -1;
-
-        _Position = Pos.TOP_CENTER; // default for both Tab and Grids
-        _insetTop = _insetBottom = _insetLeft = _insetRight = -1;
-        setDefaultIsSquare(false);
-
-        _hGapPercentOfParentGrid = 0;
-        _vGapPercentOfParentGrid = 0;
     }
 
     public Image getImage(Color fillColor)
@@ -705,6 +706,15 @@ public class GridWidget extends BaseWidget
         }
 
         return listTasks;
+    }
+    public void setOnDemandTask(String TaskID)
+    {
+        _OnDemandTask=TaskID;
+    }
+    
+    public String getOnDemandTask()
+    {
+        return _OnDemandTask;
     }
 
 }

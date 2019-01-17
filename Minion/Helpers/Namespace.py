@@ -51,7 +51,7 @@ class Namespace():
     ##### These 2 are deprecated and need to be remove and cleaned up 
     _UseSingleCollectorThreadPerNamespace = False  
     _UseMultiThreadPerNamespace = True
-
+    _AlternateNamespacesUsedByCollectors={}
 
     def __init__(self,ID,TargetIP,TargetPort,DefaultInterval):
         self.__TargetIP = TargetIP
@@ -97,6 +97,12 @@ class Namespace():
 
     def __str__(self):
         return self._ID
+
+    def addAltNamespaceInCollector(self,altNS):
+        self._AlternateNamespacesUsedByCollectors[altNS.toupper()] = altNS
+
+    def hasAlternateNamespace(self,altNs):
+        return altNs.toupper() in self._AlternateNamespacesUsedByCollectors
 
     def getCollectorCount(self):
         return len(self._Collectors)

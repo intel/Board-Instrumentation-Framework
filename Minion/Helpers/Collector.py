@@ -24,6 +24,7 @@ from Util import Time
 from Util import Utility
 from Helpers import ThreadManager
 from Helpers import Worker
+from Helpers import Configuration
 
 class BoundAction():
     Invalid = 0
@@ -77,9 +78,12 @@ class Collector:
         self._ReadyForConsumptionByAnother = False
         self._NamespaceOverride=None
 
-
     def SetOverrideNamespaceString(self,newNamespaceString):
         self._NamespaceOverride = newNamespaceString
+        for ns in Configuration.GetNamespace:
+            if ns.GetID().lower() == strNamespaceID.lower():
+                Log.getLogger().warning("Setting OverrideNamespace for collector {0} to {1}.  However that Namespace already exists - conflicts may occur.".format(newNamespaceString,self.GetID()))
+                break
 
     def GetLastValue(self):
         return str(self._LastSentValue)
@@ -198,7 +202,6 @@ class Collector:
 
         if None == self._Bound_Max and None == self._Bound_Min:
             return sendValue
-
         
         try:
             value = float(sendValue)

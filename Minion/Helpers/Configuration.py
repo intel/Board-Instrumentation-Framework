@@ -1152,7 +1152,7 @@ def GetNamespace(strNamespaceID):
     retObj = None
     if None != Configuration._Instance:
         for ns in Configuration._Instance.GetNamespaces():
-            if ns.GetID().lower() == strNamespaceID.lower():
+            if ns.GetID().lower() == strNamespaceID.lower()  or ns.hasAlternateNamespace(strNamespaceID):
                 retObj = ns
                 break
 

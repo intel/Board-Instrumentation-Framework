@@ -32,7 +32,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 public class MinionTask extends BaseTask
 {
-    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    protected final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private TaskManager TASKMAN = TaskManager.getTaskManager();
     private String _Namespace;
     private String _ID;

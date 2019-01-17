@@ -26,7 +26,6 @@ package kutch.biff.marvin.task;
  */
 public class MathematicTask extends PulseTask
 {
-
     private double _Value;
     private boolean validVal = false;
     private String _Operation = null;

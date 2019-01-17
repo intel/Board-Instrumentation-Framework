@@ -113,6 +113,11 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
 
         ApplyOnDemandTabStyle objTask = new ApplyOnDemandTabStyle();
         TaskManager.getTaskManager().AddPostponedTask(objTask, 1000);
+        if (null != tab.getOnDemandTask())
+        {
+            TaskManager.getTaskManager().AddDeferredTask(tab.getOnDemandTask());
+        }
+        
 
         return true;
     }

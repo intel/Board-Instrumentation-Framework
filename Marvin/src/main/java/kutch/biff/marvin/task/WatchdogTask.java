@@ -68,7 +68,6 @@ public class WatchdogTask extends BaseTask
             FirstWatchdogMessage = false;  // only reset flag after successful transmit
             LOGGER.info("Sent Request Refresh message");
         }
-
     }
     // Backdoor kludge to improve initial startup time
     public static void OnInitialOscarConnection()

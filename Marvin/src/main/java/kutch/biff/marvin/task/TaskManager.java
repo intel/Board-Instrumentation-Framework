@@ -71,7 +71,7 @@ public class TaskManager
         _LoopsWithManyTasks = 0;
     }
 
-    // this is where a task comes in on a woker thread (like remote marvin) 
+    // this is where a task comes in on a worker thread (like remote marvin) 
     public void AddDeferredTask(String newTask)
     {
         if (null == newTask)

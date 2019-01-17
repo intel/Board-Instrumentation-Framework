@@ -69,7 +69,11 @@ public class OnDemandGridBuilder implements OnDemandWidgetBuilder
         // once for this grid's aliases and another for the 'super set' stored
         AliasMgr.getAliasMgr().PopAliasList();
         AliasMgr.getAliasMgr().PopAliasList();       
-        BaseWidget objGridWidget = (BaseWidget)objWidget;
+        GridWidget objGridWidget = (GridWidget)objWidget;
+        if (null != objGridWidget.getOnDemandTask())
+        {
+            TaskManager.getTaskManager().AddDeferredTask(objGridWidget.getOnDemandTask());
+        }
         return __containerGrid.AddOnDemandWidget(objGridWidget, sortStr);
     }
     

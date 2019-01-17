@@ -1208,7 +1208,10 @@ public class ConfigurationReader
         {
             tab.setOnActivateTask(node.getAttribute("task"));
         }
-
+        if (node.hasAttribute("OnDemandTask"))
+        {
+            tab.setOnDemandTask(node.getAttribute("OnDemandTask"));
+        }
         if (node.hasAttribute("hgap"))
         {
             try

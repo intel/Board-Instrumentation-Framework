@@ -70,11 +70,20 @@ public class WidgetBuilder
         else if (node.getNodeName().equalsIgnoreCase("Grid"))
         {
             Widget objGrid = BuildGrid(node, false);
+            if (node.hasAttribute("OnDemandTask")  && null !=objGrid )
+            {
+                ((GridWidget)(objGrid)).setOnDemandTask(node.getAttribute("OnDemandTask"));
+            }
+            
             return objGrid;
         }
         else if (node.getNodeName().equalsIgnoreCase("DynamicGrid"))
         {
             Widget objDynaGrid = BuildDynamicGrid(node);
+            if (node.hasAttribute("OnDemandTask") && null != objDynaGrid)
+            {
+                ((GridWidget)(objDynaGrid)).setOnDemandTask(node.getAttribute("OnDemandTask"));
+            }
 
             return objDynaGrid;
         }

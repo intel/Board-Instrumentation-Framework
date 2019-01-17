@@ -306,6 +306,7 @@ class DynamicCollector(Collector.Collector):
                 self.AddCollector = objDyna.AddCollectorFromPlugin
                 self.SetCollectorValue = objDyna.SetCollectorValueFromPlugin
                 self.SetNormilization = objDyna.SetNormilizationFromPlugin
+                self.SetPrecision = objDyna.SetPrecisionFromPlugin
                 self.SetScale = objDyna.SetScaleFromPlugin
                 self.KillThreadSignalled = None
                 self.LockFileName = objDyna.GetLockFile()
@@ -314,6 +315,18 @@ class DynamicCollector(Collector.Collector):
                
         interface = UserPluginInterface(self)
         return interface
+
+    def SetPrecisionFromPlugin(self, collectorID, preicsionValue):
+        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
+
+        if None == objCollector:
+            Log.getLogger().error("User defined DynamicCollector tried to Set a value to a collector that does not exist, with ID: " + collectorID)
+            return
+
+        try:
+            objCollector.Precision = float(preicsionValue)
+        except:
+            Log.getLogger().error("User defined DynamicCollector tried to Set an invalid Precision value of {0} to a collector that does not exist, with ID: {1}".format(preicsionValue),collectorID)
 
     def SetNormilizationFromPlugin(self, collectorID, normilizationValue):
         objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)

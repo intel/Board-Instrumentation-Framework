@@ -37,6 +37,7 @@ import kutch.biff.marvin.task.DynamicDebugWidgetTask;
 import kutch.biff.marvin.task.LateCreateTask;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
+import kutch.biff.marvin.utility.Glob;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandTabBuilder;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 
@@ -56,6 +57,7 @@ public class DataManager
     private long _UpdateCount;
     private long _UnassignedDataPoints;
     private boolean __DynamicTabRegistered = false;
+    private static String __KeyConjunction="MarvinKeyJoinerString";
 
     public DataManager()
     {
@@ -106,6 +108,11 @@ public class DataManager
     {
         return _UnassignedDataPoints;
     }
+    
+    private String createKey(String Namespace, String ID)
+    {
+        return Namespace.toUpperCase() + __KeyConjunction + ID.toUpperCase();
+    }
 
     public void AddListener(String ID, String Namespace, ChangeListener listener)
     {
@@ -114,7 +121,7 @@ public class DataManager
             return;
         }
 
-        String Key = Namespace.toUpperCase() + ID.toUpperCase();
+        String Key = createKey(Namespace,ID);
 
         if (false == _DataMap.containsKey(Key))
         {
@@ -203,7 +210,7 @@ public class DataManager
         }
         synchronized (this)
         {
-            String Key = Namespace.toUpperCase() + ID.toUpperCase();
+            String Key = createKey(Namespace,ID);
 
             _UpdateCount++;
 
@@ -248,7 +255,7 @@ public class DataManager
                 return null;
             }
 
-            String Key = Namespace.toUpperCase() + ID.toUpperCase();
+            String Key = createKey(Namespace,ID);
 
             if (_DataMap.containsKey(Key))
             {
@@ -268,7 +275,7 @@ public class DataManager
                 return null;
             }
 
-            String Key = Namespace.toUpperCase() + ID.toUpperCase();
+            String Key = createKey(Namespace,ID);
 
             if (_DataMap.containsKey(Key))
             {
@@ -296,5 +303,38 @@ public class DataManager
             }
         }
         return updatesPerformed;
+    }
+    
+    public int PulseDataPoint(String namespaceCriterea, String idCriterea)
+    {
+        int count = 0;
+        if (null == namespaceCriterea || null == idCriterea )
+        {
+            return count;
+        }
+        
+        String strCompare = createKey(namespaceCriterea,idCriterea);
+        
+        for (String Key : _DataMap.keySet())
+        {
+            if (Glob.check(strCompare, Key))
+            {
+                String parts[] = Key.split(__KeyConjunction);
+                if (parts.length != 2)
+                {
+                    LOGGER.severe("Unknown problem trying to perform PulseDataPoint. Key=" + Key);
+                }
+                else
+                {
+                    String Namespace = parts[0];
+                    String ID = parts[1];
+                    String Value = _DataMap.get(Key).getLatestValue();
+                    ChangeValue(ID, Namespace, Value);
+                    count++;
+                }
+            }
+        }
+        
+        return count;
     }
 }
