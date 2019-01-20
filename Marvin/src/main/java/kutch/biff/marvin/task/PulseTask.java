@@ -60,6 +60,7 @@ public class PulseTask extends BaseTask
             if (pulseCount > 0)
             {
                 LOGGER.info(String.format("Pulsed %d datapoints with criterea of: [%s:%s]",pulseCount,_Namespace,_ID));
+                return;
             }
         }
 

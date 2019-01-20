@@ -110,14 +110,13 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         }
         AliasMgr.getAliasMgr().PopAliasList();
         TabWidget.ReIndexTabs(parentPane);
-
+        TaskManager tm = TaskManager.getTaskManager();
         ApplyOnDemandTabStyle objTask = new ApplyOnDemandTabStyle();
-        TaskManager.getTaskManager().AddPostponedTask(objTask, 1000);
+        tm.AddPostponedTask(objTask, 1000);
         if (null != tab.getOnDemandTask())
         {
-            TaskManager.getTaskManager().AddDeferredTask(tab.getOnDemandTask());
+            tm.AddDeferredTask(tab.getOnDemandTask());
         }
-        
 
         return true;
     }

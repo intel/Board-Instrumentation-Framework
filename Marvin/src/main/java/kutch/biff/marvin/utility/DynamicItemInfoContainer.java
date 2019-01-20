@@ -80,6 +80,8 @@ public class DynamicItemInfoContainer
     public boolean Matches(String namespace, String ID, String Value)
     {
         __MatchedSortString = "";
+        namespace=namespace.toUpperCase();
+        ID = ID.toUpperCase();
         // if already checked, no need to do it again
         if (__PreviouslyChecked.containsKey(namespace + ID))
         {
