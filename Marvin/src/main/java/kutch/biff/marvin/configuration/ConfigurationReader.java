@@ -1022,6 +1022,9 @@ public class ConfigurationReader
                     return null;
                 }
             }
+            else if (node.getNodeName().equalsIgnoreCase("Refresh"))
+            { // handle below
+            }
             else
             {
                 LOGGER.severe("Unknown entry in <GenerateDatapoint>: " + node.getNodeName());
@@ -1047,19 +1050,55 @@ public class ConfigurationReader
             LOGGER.severe("Invalid Method specified for GenerateDatapoint: " + inputNode.getAttribute("Method"));
             return null;
         }
-        if (inputNode.hasAttribute("MinFrequency"))
+        if (inputNode.hasChild("Refresh"))
         {
-            int freq = inputNode.getIntegerAttribute("MinFrequency", -1);
-            if (freq > 0)
+            FrameworkNode rfNode = inputNode.getChild("Refresh");
+            if (rfNode.hasAttribute("Frequency"))
             {
-                info.setMinFrequency(freq);
+                int freq = rfNode.getIntegerAttribute("Frequency", -1);
+                if (freq > 0)
+                {
+                    info.setMinFrequency(freq);
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
+                LOGGER.severe("<GenerateDatapoint> specified <Refresh> without a Frequency.");
                 return null;
             }
+            if (rfNode.hasAttribute("Policy"))
+            {
+                String strPolicy = rfNode.getAttribute("Policy");
+                if (strPolicy.equalsIgnoreCase("REMOVE"))
+                {
+                    info.setPolicy(GenerateDatapointInfo.RefreshPolicy.REMOVE);
+                }
+                else if (strPolicy.equalsIgnoreCase("REUSE"))
+                {
+                    info.setPolicy(GenerateDatapointInfo.RefreshPolicy.REUSE);
+                }
+                else if (strPolicy.equalsIgnoreCase("ZERO_OUT"))
+                {
+                    info.setPolicy(GenerateDatapointInfo.RefreshPolicy.ZERO_OUT);
+                }
+                else
+                {
+                    LOGGER.severe("<GenerateDatapoint> specified invalid <Refresh> without a policy: " + strPolicy);
+                    return null;
+                }
+            }
+            else
+            {
+                LOGGER.severe("<GenerateDatapoint> specified <Refresh> without a Policy.");
+                return null;
+            }
+
         }
-        
+
         info.setPrecision(precision);
         return info;
     }

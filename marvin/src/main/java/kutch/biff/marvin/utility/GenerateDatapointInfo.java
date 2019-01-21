@@ -24,6 +24,7 @@ package kutch.biff.marvin.utility;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -43,8 +44,9 @@ public class GenerateDatapointInfo
     private final ArrayList<Pair<String,String>> __includeCriterea;
     private final ArrayList<Pair<String,String>> __excludeCriterea;
     private final String __Namespace,__ID;
-    private final HashMap<String, Boolean> __PreviouslyChecked;
-    private final HashMap<String,Pair<Float,Boolean>> __dirtyMap;
+    private final Map<String, Boolean> __PreviouslyChecked;
+    private final Map<String,Pair<Float,Boolean>> __dirtyMap;
+    private final Map<String,ChangeListener> _listenerMap;
     private int __precision;
     private int __minFrequency;
     private long __lastUpdate;
@@ -52,14 +54,22 @@ public class GenerateDatapointInfo
     public enum GenerateMethod
     {
         ADD, AVERAGE, INVALID
-    };    
+    };  
+    
+    public enum RefreshPolicy
+    {
+        REMOVE,REUSE,ZERO_OUT,INVALD
+    };
     private GenerateMethod _Method;
+    private RefreshPolicy _Policy;
     public GenerateDatapointInfo(String namespace, String id,ArrayList<Pair<String,String>> includeList, ArrayList<Pair<String,String>> excludeList)
     {
         _Method = GenerateMethod.INVALID;
+        _Policy = RefreshPolicy.INVALD;
         __includeCriterea = includeList;
         __excludeCriterea = excludeList;
         __dirtyMap = new HashMap<>();
+        _listenerMap = new HashMap<>();
         __Namespace = namespace;
         __ID = id;
         __PreviouslyChecked = new HashMap<>();
@@ -76,6 +86,16 @@ public class GenerateDatapointInfo
     public int getPrecision()
     {
         return __precision;
+    }
+
+    public RefreshPolicy getPolicy()
+    {
+        return _Policy;
+    }
+
+    public void setPolicy(RefreshPolicy _Policy)
+    {
+        this._Policy = _Policy;
     }
 
     public void setPrecision(int __precision)
@@ -126,6 +146,42 @@ public class GenerateDatapointInfo
         return false;
     }
     
+    private void ZeroOutStaleEntries()
+    {
+        for ( String key :__dirtyMap.keySet())
+        {
+            if (!__dirtyMap.get(key).getValue())
+            {
+                Pair<Float,Boolean> entry = new Pair<>(new Float(0.0),false);
+                __dirtyMap.put(key, entry);
+            }
+        }
+    }
+    
+    private void RemoveOutStaleEntries()
+    {
+        Map<String,Pair<Float,Boolean>> newDirtyMap = new HashMap<>();
+        
+        for ( String key :__dirtyMap.keySet())
+        {
+            if (__dirtyMap.get(key).getValue()) // have received an update recently, so keep
+            {
+                newDirtyMap.put(key, __dirtyMap.get(key));
+            }
+            else
+            {
+                ChangeListener objListener = _listenerMap.get(key);
+                _listenerMap.remove(key);
+                LOGGER.info("Removing Stale GenerateDataPoing Input: " + key);
+                // very inefficeint - this should be re-woredk.
+                DataManager.getDataManager().RemoveListener(objListener);
+                __PreviouslyChecked.remove(key); // in case it comes back
+            }
+        }
+        __dirtyMap.clear();
+        __dirtyMap.putAll(newDirtyMap);
+    }
+    
     private void CheckForUpdate()
     {
         float Total = 0;
@@ -134,7 +190,18 @@ public class GenerateDatapointInfo
         {
             if (__lastUpdate + __minFrequency < System.currentTimeMillis())
             {
-                forceUpdate = true;
+                if (_Policy == RefreshPolicy.ZERO_OUT)
+                {
+                    ZeroOutStaleEntries();
+                }
+                else if (_Policy == RefreshPolicy.REUSE)
+                {
+                    forceUpdate = true;
+                }
+                else if (_Policy == RefreshPolicy.REMOVE)
+                {
+                    RemoveOutStaleEntries();
+                }
             }
         }
         for ( String key :__dirtyMap.keySet())
@@ -174,7 +241,7 @@ public class GenerateDatapointInfo
     public void BuildDatapoint(String inputNamespace, String inputID)
     {
        //LOGGER.info(String.format("Adding Input of %s:%s to Build Data point %s:%s",inputNamespace,inputID,__Namespace,__ID));
-        DataManager.getDataManager().AddListener(inputID, inputNamespace, new ChangeListener()
+        ChangeListener objListener = new ChangeListener()
         {
             @Override
             public void changed(ObservableValue o, Object oldVal, Object newVal)
@@ -190,6 +257,8 @@ public class GenerateDatapointInfo
                     LOGGER.severe(String.format("GenerateDatapoint can only accept inputs that are numberic. [%s,%s] does not meet this.",inputNamespace,inputID));
                 }
             }
-        });
+        };
+        DataManager.getDataManager().AddListener(inputID, inputNamespace, objListener);
+        _listenerMap.put(inputNamespace.toUpperCase() + inputID.toLowerCase(),objListener);
     }
 }

@@ -126,6 +126,29 @@ public class DataManager
         return Namespace.toUpperCase() + __KeyConjunction + ID.toUpperCase();
     }
 
+    public void RemoveListener(String ID, String Namespace, ChangeListener listener)
+    {
+        if (null == ID || null == Namespace)
+        {
+            return;
+        }
+
+        String Key = createKey(Namespace,ID);
+
+        if (_DataMap.containsKey(Key))
+        {
+            _DataMap.get(Key).removeListener(listener);
+        }
+    }
+    public void RemoveListener(ChangeListener listener)
+    {
+        // super inefficient.....
+        for (String key :_DataMap.keySet())
+        {
+            _DataMap.get(key).removeListener(listener);
+        }
+    }
+    
     public void AddListener(String ID, String Namespace, ChangeListener listener)
     {
         if (null == ID || null == Namespace)

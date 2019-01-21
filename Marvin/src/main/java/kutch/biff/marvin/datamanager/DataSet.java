@@ -77,6 +77,14 @@ public class DataSet
             _ObjectProperty.addListener(listener);
         }
     }
+    
+    public void removeListener(ChangeListener listener)
+    {
+        if (null != listener && null != _ObjectProperty)
+        {
+            _ObjectProperty.removeListener(listener);
+        }
+    }
 
     public int Update()
     {
