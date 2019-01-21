@@ -1047,6 +1047,19 @@ public class ConfigurationReader
             LOGGER.severe("Invalid Method specified for GenerateDatapoint: " + inputNode.getAttribute("Method"));
             return null;
         }
+        if (inputNode.hasAttribute("MinFrequency"))
+        {
+            int freq = inputNode.getIntegerAttribute("MinFrequency", -1);
+            if (freq > 0)
+            {
+                info.setMinFrequency(freq);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        
         info.setPrecision(precision);
         return info;
     }
