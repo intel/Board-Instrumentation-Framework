@@ -337,6 +337,14 @@ public class TabWidget extends GridWidget
             {
                 ConfigurationReader.ReadTaskList(node);
             }
+            else if (node.getNodeName().equalsIgnoreCase("GenerateDataPoint"))
+            {
+                if (!ConfigurationReader.ReadGenerateDataPoints(node))
+                {
+                    //return null;
+                }
+            }
+            
             else if (node.getNodeName().equalsIgnoreCase("Prompt"))
             {
                 ConfigurationReader.ReadPrompt(node);

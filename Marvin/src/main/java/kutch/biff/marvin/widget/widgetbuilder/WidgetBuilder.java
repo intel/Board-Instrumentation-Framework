@@ -55,6 +55,7 @@ import org.xml.sax.SAXException;
  */
 public class WidgetBuilder
 {
+
     private final static Configuration CONFIG = Configuration.getConfig();
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static MySplash SPLASH = MySplash.getSplash();
@@ -70,11 +71,11 @@ public class WidgetBuilder
         else if (node.getNodeName().equalsIgnoreCase("Grid"))
         {
             Widget objGrid = BuildGrid(node, false);
-            if (node.hasAttribute("OnDemandTask")  && null !=objGrid )
+            if (node.hasAttribute("OnDemandTask") && null != objGrid)
             {
-                ((GridWidget)(objGrid)).setOnDemandTask(node.getAttribute("OnDemandTask"));
+                ((GridWidget) (objGrid)).setOnDemandTask(node.getAttribute("OnDemandTask"));
             }
-            
+
             return objGrid;
         }
         else if (node.getNodeName().equalsIgnoreCase("DynamicGrid"))
@@ -82,7 +83,7 @@ public class WidgetBuilder
             Widget objDynaGrid = BuildDynamicGrid(node);
             if (node.hasAttribute("OnDemandTask") && null != objDynaGrid)
             {
-                ((GridWidget)(objDynaGrid)).setOnDemandTask(node.getAttribute("OnDemandTask"));
+                ((GridWidget) (objDynaGrid)).setOnDemandTask(node.getAttribute("OnDemandTask"));
             }
 
             return objDynaGrid;
@@ -905,19 +906,18 @@ public class WidgetBuilder
             {
                 objWidget.ReadGrowthInfo(demandNode.getChild("Growth"));
             }
-            
+
             // get hgap and all those good things
-            ReadGridAttributes(objWidget,gridNode,false);
+            ReadGridAttributes(objWidget, gridNode, false);
             retWidget = objWidget;
             WhatIsIt = "OnDemand Grid";
             isOnDemand = true;
             gridNode.DeleteChildNodes("OnDemand"); // delete the ondemand section, not needed anymore
-            
+
 //            int row = gridNode.getIntegerAttribute("row", 0);
 //            int col = gridNode.getIntegerAttribute("column", 0);
 //            gridNode.AddAttibute("GRID_COLUMN_ODD", col % 2 == 0 ? "FALSE" : "TRUE");
 //            gridNode.AddAttibute("GRID_ROW_ODD", row % 2 == 0 ? "FALSE" : "TRUE");
-
             info.setNode(gridNode);
         }
 
@@ -977,7 +977,8 @@ public class WidgetBuilder
             gridNode.DeleteAttribute("vgap");
             gridNode.DeleteAttribute("align");
             AliasMgr.getAliasMgr().PushAliasList(false);
-            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]{
+            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
+                                                    {
                                                         "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "File", "Height", "Width"
             });
             info.TakeAliasSnapshot(); // have to do this way down here, after the other stuff
@@ -1320,6 +1321,13 @@ public class WidgetBuilder
             else if (node.getNodeName().equalsIgnoreCase("Tasklist"))
             {
                 if (!ConfigurationReader.ReadTaskList(node))
+                {
+                    return null;
+                }
+            }
+            else if (node.getNodeName().equalsIgnoreCase("GenerateDataPoint"))
+            {
+                if (!ConfigurationReader.ReadGenerateDataPoints(node))
                 {
                     return null;
                 }

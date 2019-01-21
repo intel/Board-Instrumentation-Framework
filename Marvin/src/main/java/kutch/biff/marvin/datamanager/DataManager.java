@@ -32,11 +32,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.util.Pair;
 import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.logger.MarvinLogger;
-import kutch.biff.marvin.task.ApplyOnDemandTabStyle;
 import kutch.biff.marvin.task.DynamicDebugWidgetTask;
 import kutch.biff.marvin.task.LateCreateTask;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
+import kutch.biff.marvin.utility.GenerateDatapointInfo;
 import kutch.biff.marvin.utility.Glob;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandTabBuilder;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
@@ -54,6 +54,7 @@ public class DataManager
     private ConcurrentHashMap<String, DataSet> _DataMap;
     private ConcurrentHashMap<String, List<WildcardListItem>> _WildcardDataMap;
     private final Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> _OnDemandQueue; // a queue solves some of my concurency issues
+    private final Queue<GenerateDatapointInfo> __GenerateDatapointList;
     private long _UpdateCount;
     private long _UnassignedDataPoints;
     private boolean __DynamicTabRegistered = false;
@@ -67,6 +68,7 @@ public class DataManager
         _UpdateCount = 0;
         _UnassignedDataPoints = 0;
         _OnDemandQueue = new ConcurrentLinkedQueue<>();
+        __GenerateDatapointList = new ConcurrentLinkedQueue<>();
     }
 
     public boolean DynamicTabRegistered()
@@ -74,6 +76,16 @@ public class DataManager
         return __DynamicTabRegistered;
     }
 
+    public void AddGenerateDatapointInfo(GenerateDatapointInfo genInfo)
+    {
+        __GenerateDatapointList.add(genInfo);
+    }
+    
+    public Queue<GenerateDatapointInfo> getGenerateDatapointList()
+    {
+        return __GenerateDatapointList;
+    }
+    
     public void AddOnDemandWidgetCriterea(DynamicItemInfoContainer criterea, OnDemandWidgetBuilder objBuilder)
     {
         _OnDemandQueue.add(new Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>(criterea, objBuilder));
@@ -207,7 +219,16 @@ public class DataManager
             {
                 Configuration.getConfig().setCursorToWait();
             }
+            // go and handle any GenerateDatapoint stuff
+            for (GenerateDatapointInfo info : __GenerateDatapointList)
+            {
+                if (info.Matches(Namespace, ID))
+                {
+                    info.BuildDatapoint(Namespace, ID);
+                }
+            }
         }
+        
         synchronized (this)
         {
             String Key = createKey(Namespace,ID);

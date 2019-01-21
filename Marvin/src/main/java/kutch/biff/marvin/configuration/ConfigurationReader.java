@@ -49,6 +49,7 @@ import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.Conditional;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.utility.FrameworkNode;
+import kutch.biff.marvin.utility.GenerateDatapointInfo;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.DynamicTabWidget;
@@ -74,7 +75,7 @@ public class ConfigurationReader
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private static ConfigurationReader _ConfigReader;
     private static HashMap<Conditional, Conditional> _conditionalMap = new HashMap<>();
-    private static List<String> _OnDemandID_List= new ArrayList<>();
+    private static List<String> _OnDemandID_List = new ArrayList<>();
 
     public ConfigurationReader()
     {
@@ -753,7 +754,7 @@ public class ConfigurationReader
 
                                     if (null != dynaInfo)
                                     {
-                                        OnDemandTabBuilder objBuilder = new OnDemandTabBuilder(ID,tabCount,dynaInfo);
+                                        OnDemandTabBuilder objBuilder = new OnDemandTabBuilder(ID, tabCount, dynaInfo);
                                         DataManager.getDataManager().AddOnDemandWidgetCriterea(dynaInfo, objBuilder);
                                         _OnDemandID_List.add(ID.toUpperCase());
                                     }
@@ -762,7 +763,7 @@ public class ConfigurationReader
                                 {
                                     DeclaredTabList.add(ID);
                                 }
-                                tabCount ++;
+                                tabCount++;
                             }
                             else
                             {
@@ -826,10 +827,12 @@ public class ConfigurationReader
         }
         return NetworkSettingsRead;
     }
-    /***
-     * 
+
+    /**
+     * *
+     *
      * @param sourceNode
-     * @return 
+     * @return
      */
     public static DynamicItemInfoContainer ReadOnDemandInfo(FrameworkNode sourceNode)
     {
@@ -837,7 +840,7 @@ public class ConfigurationReader
         ArrayList<String> namespaceExcludeList = new ArrayList<>();
         ArrayList<String> idMaskList = new ArrayList<>();
         ArrayList<String> idExcludeList = new ArrayList<>();
-        
+
         for (FrameworkNode dynaNode : sourceNode.getChildNodes(true))
         {
             if (dynaNode.getNodeName().equalsIgnoreCase("NamespaceTriggerPattern"))
@@ -903,13 +906,13 @@ public class ConfigurationReader
             }
             else if (dynaNode.getNodeName().equalsIgnoreCase("StyleOverride-Odd") || dynaNode.getNodeName().equalsIgnoreCase("StyleOverride-Even"))
             {
-                
+
             }
             else if (dynaNode.getNodeName().equalsIgnoreCase("Growth"))
             {
-                
+
             }
-            else 
+            else
             {
                 LOGGER.warning("Invalid Tag found in <OnDemand>: " + dynaNode.getNodeName());
             }
@@ -919,15 +922,15 @@ public class ConfigurationReader
             LOGGER.severe("On Demand item did not specify a namespace or ID Trigger pattern");
             return null;
         }
-        
-        Pair<ArrayList<String>,ArrayList<String>> namespaceCriterea;
-        namespaceCriterea = new Pair<>(namespaceMaskList,namespaceExcludeList);
-        Pair<ArrayList<String>,ArrayList<String>> idCriterea = new Pair<>(idMaskList,idExcludeList);
-        
+
+        Pair<ArrayList<String>, ArrayList<String>> namespaceCriterea;
+        namespaceCriterea = new Pair<>(namespaceMaskList, namespaceExcludeList);
+        Pair<ArrayList<String>, ArrayList<String>> idCriterea = new Pair<>(idMaskList, idExcludeList);
+
         DynamicItemInfoContainer dynaInfo = new DynamicItemInfoContainer(namespaceCriterea, idCriterea);
-        
+
         dynaInfo.ReadStyles(sourceNode);
-        
+
         if (sourceNode.hasAttribute("SortBy"))
         {
             String strSortBy = sourceNode.getAttribute("SortBy");
@@ -949,18 +952,103 @@ public class ConfigurationReader
             }
             else
             {
-                LOGGER.severe("OnDemand item specified invalid SortBy: " + strSortBy +". Ignoring.");
+                LOGGER.severe("OnDemand item specified invalid SortBy: " + strSortBy + ". Ignoring.");
                 dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NONE);
             }
         }
-        
+
         if (sourceNode.hasAttribute("TriggeredIdToken"))
         {
             String strToken = sourceNode.getAttribute("TriggeredIdToken");
             dynaInfo.setToken(strToken);
         }
-        
+
         return dynaInfo;
+    }
+
+    private static Pair<String, String> getNamespaceAndIdPattern(FrameworkNode node)
+    {
+        if (node.hasAttribute("Namespace") && node.hasAttribute("ID"))
+        {
+            return new Pair<String, String>(node.getAttribute("Namespace"), node.getAttribute("ID"));
+        }
+        return null;
+    }
+
+    public static GenerateDatapointInfo ReadGenerateDatapointInfo(FrameworkNode inputNode)
+    {
+        ArrayList<Pair<String, String>> maskList = new ArrayList<>();
+        ArrayList<Pair<String, String>> excludeList = new ArrayList<>();
+        int precision = 2;
+
+        Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode);
+        if (null == genDPInfo)
+        {
+            LOGGER.severe("Invalid GenerateDatapoint.");
+            return null;
+        }
+
+        for (FrameworkNode node : inputNode.getChildNodes(true))
+        {
+            if (node.getNodeName().equalsIgnoreCase("InputPattern"))
+            {
+                Pair<String, String> input = getNamespaceAndIdPattern(node);
+                if (null == input)
+                {
+                    LOGGER.severe(String.format("Invalid GenerateDatapoing %s:%s -->%s", genDPInfo.getKey(), genDPInfo.getValue(), node.getAttributeList()));
+                    return null;
+                }
+                maskList.add(input);
+            }
+            else if (node.getNodeName().equalsIgnoreCase("ExcludePattern"))
+            {
+                Pair<String, String> exclude = getNamespaceAndIdPattern(node);
+                if (null == exclude)
+                {
+                    LOGGER.severe(String.format("Invalid GenerateDatapoing %s:%s -->%s", genDPInfo.getKey(), genDPInfo.getValue(), node.getAttributeList()));
+                    return null;
+                }
+                excludeList.add(exclude);
+            }
+            else if (node.getNodeName().equalsIgnoreCase("Decimals"))
+            {
+                try
+                {
+                    precision = node.getIntegerContent();
+                }
+                catch (NumberFormatException ex)
+                {
+                    LOGGER.severe("Invalid Decimals specified for <GenerateDatapoint>: " + node.getTextContent());
+                    return null;
+                }
+            }
+            else
+            {
+                LOGGER.severe("Unknown entry in <GenerateDatapoint>: " + node.getNodeName());
+                return null;
+            }
+        }
+        if (!inputNode.hasAttribute("Method"))
+        {
+            LOGGER.severe("GenerateDatapoint did not specify the Method of generate. ");
+            return null;
+        }
+        GenerateDatapointInfo info = new GenerateDatapointInfo(genDPInfo.getKey(), genDPInfo.getValue(), maskList, excludeList);
+        if (inputNode.getAttribute("Method").equalsIgnoreCase("Add"))
+        {
+            info.setMethod(GenerateDatapointInfo.GenerateMethod.ADD);
+        }
+        else if (inputNode.getAttribute("Method").equalsIgnoreCase("Average"))
+        {
+            info.setMethod(GenerateDatapointInfo.GenerateMethod.AVERAGE);
+        }
+        else
+        {
+            LOGGER.severe("Invalid Method specified for GenerateDatapoint: " + inputNode.getAttribute("Method"));
+            return null;
+        }
+        info.setPrecision(precision);
+        return info;
     }
 
     private void ReadOnDemandTabs(Document doc)
@@ -984,7 +1072,7 @@ public class ConfigurationReader
                         {
                             if (item.getValue() instanceof OnDemandTabBuilder)
                             {
-                                OnDemandTabBuilder objBuilder = (OnDemandTabBuilder)item.getValue();
+                                OnDemandTabBuilder objBuilder = (OnDemandTabBuilder) item.getValue();
                                 if (objBuilder.getTabID().equalsIgnoreCase(id))
                                 {
                                     objBuilder.setSourceNode(node);
@@ -1357,9 +1445,9 @@ public class ConfigurationReader
                         {
                             AliasMgr.getAliasMgr().PopAliasList();
                         }
-                        else 
+                        else
                         {
-                            if (! _OnDemandID_List.contains(id.toUpperCase()))
+                            if (!_OnDemandID_List.contains(id.toUpperCase()))
                             {
                                 LOGGER.warning("<Tab ID=" + id + "> found, but not used in <Tabs>.");
                             }
@@ -1424,6 +1512,14 @@ public class ConfigurationReader
             {
                 ConfigurationReader.ReadTaskList(node);
             }
+            else if (node.getNodeName().equalsIgnoreCase("GenerateDataPoint"))
+            {
+                if (!ConfigurationReader.ReadGenerateDataPoints(node))
+                {
+                    return null;
+                }
+            }
+
             else if (node.getNodeName().equalsIgnoreCase("Prompt"))
             {
                 ConfigurationReader.ReadPrompt(node);
@@ -1627,6 +1723,17 @@ public class ConfigurationReader
         }
 
         return retVal;
+    }
+
+    public static boolean ReadGenerateDataPoints(FrameworkNode node)
+    {
+        GenerateDatapointInfo info = ConfigurationReader.ReadGenerateDatapointInfo(node);
+        if (null == info)
+        {
+            return false;
+        }
+        DataManager.getDataManager().AddGenerateDatapointInfo(info);;
+        return true;
     }
 
     public static boolean ReadTaskList(FrameworkNode taskNode)
