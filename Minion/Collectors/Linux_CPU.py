@@ -23,7 +23,7 @@ import sys
 import os
 
 procInfoDir="/sys/devices/system/cpu"
-desiredFreqStats=["cpuinfo_min_freq","scaling_driver","energy_performance_preference","cpuinfo_max_freq","scaling_cur_freq","scaling_governor","scaling_available_governors"]
+desiredFreqStats=["cpuinfo_min_freq","scaling_driver","energy_performance_preference","cpuinfo_max_freq","cpuinfo_cur_freq","scaling_cur_freq","scaling_governor","scaling_available_governors"]
 
 def GetBaseDir():
     global procInfoDir
@@ -239,7 +239,7 @@ def getFrequencyInfo(prefix=""):
     freqList=None
     # create a comma separated list for graphing
     for coreNum in range(0,coreCount):
-        key = "cpu{0}.scaling_cur_freq".format(coreNum)
+        key = "cpu{0}.cpuinfo_cur_freq".format(coreNum)
         if None == freqList: #1st one
             freqList=retMap[prefix+key]
         else:
