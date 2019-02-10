@@ -238,7 +238,7 @@ def getFrequencyInfo(prefix=""):
     
     freqList=None
     # create a comma separated list for graphing
-    for coreNum in range(0,coreCount-1):
+    for coreNum in range(0,coreCount):
         key = "cpu{0}.scaling_cur_freq".format(coreNum)
         if None == freqList: #1st one
             freqList=retMap[prefix+key]
