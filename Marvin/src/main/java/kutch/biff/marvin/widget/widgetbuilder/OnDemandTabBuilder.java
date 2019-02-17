@@ -108,6 +108,10 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
                 LOGGER.info("Error ocurred performing LateCreateTask on Tab: " + tab.getName());
             }
         }
+        else
+        {
+            return false;
+        }
         AliasMgr.getAliasMgr().PopAliasList();
         TabWidget.ReIndexTabs(parentPane);
         TaskManager tm = TaskManager.getTaskManager();
