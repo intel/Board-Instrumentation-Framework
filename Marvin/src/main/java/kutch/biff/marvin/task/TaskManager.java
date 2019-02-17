@@ -166,7 +166,7 @@ public class TaskManager
             localPostponedTaskstoRun.addAll(_PostponedTaskObjectThatMustBeRunInGuiThreadList);
             _PostponedTaskObjectThatMustBeRunInGuiThreadList.clear();
         }
-        
+
         Platform.runLater(new Runnable()
         {
             @Override
@@ -477,6 +477,12 @@ public class TaskManager
                 {
                     objTaskItem = BuildDesktopTaskItem(ID, node);
                 }
+
+                else if (taskType.equalsIgnoreCase("DataSetFile"))
+                {
+                    objTaskItem = BuildDataSetFileTaskItem(ID, node);
+                }
+
                 else if (taskType.equalsIgnoreCase("LaunchApplication") || taskType.equalsIgnoreCase("LaunchApp") || taskType.equalsIgnoreCase("LaunchProgram")
                          || taskType.equalsIgnoreCase("RunProgram") || taskType.equalsIgnoreCase("RunApp"))
                 {
@@ -1004,9 +1010,9 @@ public class TaskManager
     {
         /**
          * <TaskList ID="ConnectToOscar">
-         *   <TaskItem Type="OscarBind">
-         *     <ConnectInfo IP="myOscar.myCompany" port="1234" key="My hash key"/>
-         *   </TaskItem>
+         * <TaskItem Type="OscarBind">
+         * <ConnectInfo IP="myOscar.myCompany" port="1234" key="My hash key"/>
+         * </TaskItem>
          * </TaskList>
          *
          */
@@ -1074,6 +1080,87 @@ public class TaskManager
         }
 
         return null;
+    }
+
+    private DataSetFileTask BuildDataSetFileTaskItem(String taskID, FrameworkNode taskNode)
+    {
+        /**
+         * <TaskItem Type="DataSetFile" File="Foo.csv" DataRate="1000">
+         * <Options RepeatCount="forever"> <!-- Forever, or count -->
+         * <Range Min="0" Max="9.3"/>
+         * <Flux>10</Flux>
+         * <Flux>1%</Flux>
+         * </Options>
+         * </TaskItem>
+         */
+
+        int DataRate;
+        String FileName;
+
+//	<TaskItem Type="DataSetFile" File="Foo.csv" DataRate="1000">
+//			<Options RepeatCount="forever"> <!-- Forever, or count -->                
+        if (false == taskNode.hasAttribute("File"))
+        {
+            LOGGER.severe("Task with ID: " + taskID + " contains an invalid definition. File Required");
+            return null;
+        }
+        if (false == taskNode.hasAttribute("DataRate"))
+        {
+            LOGGER.severe("Task with ID: " + taskID + " contains an invalid definition. DataRate Required");
+            return null;
+        }
+
+        FileName = taskNode.getAttribute("File");
+        DataRate = taskNode.getIntegerAttribute("DataRate", -3232);
+        if (DataRate < 100)
+        {
+            LOGGER.severe("Task with ID: " + taskID + " contains an invalid DataRate  of " + taskNode.getAttribute("DataRate"));
+            return null;
+
+        }
+
+        DataSetFileTask objTask = new DataSetFileTask(FileName, DataRate);
+
+        if (taskNode.hasChild("Options"))
+        {
+            FrameworkNode optionsNode = taskNode.getChild("Options");
+            if (optionsNode.hasAttribute("RepeatCount"))
+            {
+                int repeatCount = optionsNode.getIntegerAttribute("RepeatCount", 0);
+                if (repeatCount < 1)
+                {
+                    LOGGER.severe("DataSetFileTask with ID: " + taskID + " contains an invalid RepeatCount  of " + taskNode.getAttribute("RepeatCount"));
+                    return null;
+                }
+                objTask.setRepeatCount(repeatCount);
+            }
+            if (optionsNode.hasChild("RandomFluxRange"))				//<RandomFluxRange Lower=\"-.24\" Upper=\".4\"/>"))
+            {
+                FrameworkNode fluxNode = optionsNode.getChild("RandomFluxRange");
+                Double lower, upper;
+                if (! (fluxNode.hasAttribute("Lower") && fluxNode.hasAttribute("Upper")))
+                {
+                    LOGGER.severe("DataSetFileTask with ID: " + taskID + " specified RandomFlux range without Lower and Upper values");
+                    return null;
+                }
+
+                lower = fluxNode.getDoubleAttribute("Lower", -323232);
+                if (lower == 323232)
+                {
+                    LOGGER.severe("DataSetFileTask with ID: " + taskID + " specified Invalid RandomFlux lower: " + fluxNode.getAttribute("Lower"));
+                    return null;
+                }
+                upper = fluxNode.getDoubleAttribute("Upper", -323232);
+                if (lower == 323232)
+                {
+                    LOGGER.severe("DataSetFileTask with ID: " + taskID + " specified Invalid RandomFlux upper: " + fluxNode.getAttribute("upper"));
+                    return null;
+                }
+                objTask.setFluxRange(lower, upper);
+            }
+        }
+
+        return objTask;
     }
 
     private DesktopTask BuildDesktopTaskItem(String taskID, FrameworkNode taskNode)
