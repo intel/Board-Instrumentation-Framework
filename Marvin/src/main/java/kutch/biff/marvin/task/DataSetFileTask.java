@@ -64,7 +64,8 @@ public class DataSetFileTask extends BaseTask
     @Override
     public void PerformTask()
     {
-        String fname = convertToFileOSSpecific(_strFileName);
+        String fname = getDataValue(_strFileName);
+        fname = convertToFileOSSpecific(_strFileName);
         int count = HandleDataFile(fname);
     }
 

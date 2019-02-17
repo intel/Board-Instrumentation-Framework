@@ -1837,13 +1837,11 @@ public class ConfigurationReader
 
     private static boolean ReadPrompts(Document doc)
     {
-        PromptManager PROMPTMAN = PromptManager.getPromptManager();
         boolean retVal = true;
 
         NodeList prompts = doc.getElementsByTagName("Prompt");
         if (prompts.getLength() < 1)
         {
-            //LOGGER.info("No Tasks defined in config file.");
             return true;
         }
         for (int iLoop = 0; iLoop < prompts.getLength(); iLoop++)

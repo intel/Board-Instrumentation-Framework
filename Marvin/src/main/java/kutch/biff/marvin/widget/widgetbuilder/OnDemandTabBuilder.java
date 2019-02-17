@@ -92,10 +92,10 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         __onDemandTrigger.tokenizeAndCreateAlias(ID);
 
         tab = ConfigurationReader.ReadTab(__node, tab, strTabID);
-        tab.setCreatedOnDemand();
 
         if (null != tab)
         {
+            tab.setCreatedOnDemand();
             if (tab.Create(parentPane, DataManager.getDataManager(), __tabIndex))
             {
                 ConfigurationReader.GetConfigReader().getTabs().add(tab);

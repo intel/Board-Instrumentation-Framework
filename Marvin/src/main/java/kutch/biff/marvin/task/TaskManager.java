@@ -482,6 +482,10 @@ public class TaskManager
                 {
                     objTaskItem = BuildDataSetFileTaskItem(ID, node);
                 }
+                else if (taskType.equalsIgnoreCase("SaveScreenshot"))
+                {
+                    objTaskItem = BuildSaveScreenshotTaskItem(ID, node);
+                }
 
                 else if (taskType.equalsIgnoreCase("LaunchApplication") || taskType.equalsIgnoreCase("LaunchApp") || taskType.equalsIgnoreCase("LaunchProgram")
                          || taskType.equalsIgnoreCase("RunProgram") || taskType.equalsIgnoreCase("RunApp"))
@@ -1082,6 +1086,47 @@ public class TaskManager
         return null;
     }
 
+    private SaveScreenshotTask BuildSaveScreenshotTaskItem(String taskID, FrameworkNode taskNode)
+    {
+        /*
+            <TaskItem Type="SaveScreenshot" DestFile="Foo.csv" SavePolidy="Overwrite"/> <!-- overwrite,sequence or prompt -->
+        */
+        if (false == taskNode.hasAttribute("DestFile"))
+        {
+            LOGGER.severe("SaveScreenShotTask with ID: " + taskID + " contains an invalid definition. DestFile Required");
+            return null;
+        }
+        String strFilename =  taskNode.getAttribute("DestFile");
+        
+        String strMode="overwrite";
+        SaveScreenshotTask.SaveMode mode;
+        if (taskNode.hasAttribute("SavePolicy"))
+        {
+            strMode = taskNode.getAttribute("SavePolicy");
+        }
+        if (strMode.equalsIgnoreCase("Overwrite"))
+        {
+            mode = SaveScreenshotTask.SaveMode.OVERWRITE;
+        }
+        else if (strMode.equalsIgnoreCase("SEQUENCE"))
+        {
+            mode = SaveScreenshotTask.SaveMode.SEQUENCE;
+        }
+        /*
+        else if (strMode.equalsIgnoreCase("Prompt"))
+        {
+            mode = SaveScreenshotTask.SaveMode.PROMPT;
+        }
+        */
+        else
+        {
+            LOGGER.severe("SaveScreenShotTask with ID: " + taskID + " contains an invalid definition. SavePolicy = " + strMode);
+            return null;
+        }
+        
+        SaveScreenshotTask objTask = new SaveScreenshotTask(strFilename,mode);
+        return objTask;
+    }
     private DataSetFileTask BuildDataSetFileTaskItem(String taskID, FrameworkNode taskNode)
     {
         /**
