@@ -772,7 +772,6 @@ class Configuration():
         except Exception:
             pass
 
-
         if not objDynaCollector.SetPluginInfo(PythonFile, functionName, spawnThread):
             objDynaCollector = None
 
@@ -1148,7 +1147,7 @@ def GetMaxTransmitBufferBeforeRest():
 def GetTimesToRepeatPacket():
     return Configuration._RepeatPktCnt
 
-def GetNamespace(strNamespaceID):
+def GetNGetNamespace(strNamespaceID):
     retObj = None
     if None != Configuration._Instance:
         for ns in Configuration._Instance.GetNamespaces():
@@ -1158,4 +1157,10 @@ def GetNamespace(strNamespaceID):
 
     return retObj
 
+def GetNamespaces():
+    retObj = None
+    if None != Configuration._Instance:
+        retObj = Configuration._Instance.GetNamespaces()
+
+    return retObj
 

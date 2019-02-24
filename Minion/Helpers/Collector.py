@@ -80,8 +80,9 @@ class Collector:
 
     def SetOverrideNamespaceString(self,newNamespaceString):
         self._NamespaceOverride = newNamespaceString
-        for ns in Configuration.GetNamespace:
-            if ns.GetID().lower() == strNamespaceID.lower():
+        
+        for ns in Configuration.GetNamespaces():
+            if ns.GetID().lower() == newNamespaceString.lower():
                 Log.getLogger().warning("Setting OverrideNamespace for collector {0} to {1}.  However that Namespace already exists - conflicts may occur.".format(newNamespaceString,self.GetID()))
                 break
 

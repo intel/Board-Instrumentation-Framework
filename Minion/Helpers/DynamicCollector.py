@@ -131,7 +131,7 @@ class DynamicCollector(Collector.Collector):
     # Goes though the specified file, updates existing collectors, and creates
     # ones that don't exist
     def Collect(self):
-        AddedNewDynamicCollectors = False
+        #AddedNewDynamicCollectors = False
         try:
             fname = FileCollector.convertPath(self.__FileName)
             
@@ -293,7 +293,6 @@ class DynamicCollector(Collector.Collector):
         
         return objCollector
 
-
     def SetLastCollectionTime(self,timeVal):
         self._LastElapsedTimePeriod = timeVal - self._LastCollectionTime 
         self._LastCollectionTime = timeVal 
@@ -326,7 +325,7 @@ class DynamicCollector(Collector.Collector):
         try:
             objCollector.Precision = float(preicsionValue)
         except:
-            Log.getLogger().error("User defined DynamicCollector tried to Set an invalid Precision value of {0} to a collector that does not exist, with ID: {1}".format(preicsionValue),collectorID)
+            Log.getLogger().error("User defined DynamicCollector tried to Set an invalid Precision value of {0} to a collector that does not exist, with ID: {1}".format(preicsionValue,collectorID))
 
     def SetNormilizationFromPlugin(self, collectorID, normilizationValue):
         objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
@@ -339,7 +338,7 @@ class DynamicCollector(Collector.Collector):
             objCollector._NormalizeValue = float(normilizationValue)
             objCollector._Normalize=True
         except:
-            Log.getLogger().error("User defined DynamicCollector tried to Set an invalid Normilization value of {0} to a collector that does not exist, with ID: {1}".format(normilizationValue),collectorID)
+            Log.getLogger().error("User defined DynamicCollector tried to Set an invalid Normilization value of {0} to a collector that does not exist, with ID: {1}".format(normilizationValue,collectorID))
 
     def SetScaleFromPlugin(self, collectorID, scaleValue):
         objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
