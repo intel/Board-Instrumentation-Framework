@@ -121,12 +121,10 @@ class Entry:
         return entry
 
 class Measurement:
-    def __init__(self,configMap):
+    def __init__(self,configMap,name):
         self._MeasurementList = None
-        if not 'name' in configMap:
-            raise ValueError("Measurement must have 'name' field for identification")
 
-        self._Name = configMap['name']
+        self._Name = name
 
         if 'separator' in configMap:
             self._separator = configMap['separator']
@@ -305,7 +303,7 @@ def CollectFunction(frameworkInterface,target,username,password,database,**filte
     for key in filterList:
         filter = filterList[key]
         dbFilter = _ValidateInputFilter(filter)
-        FilterSet.append(Measurement(dbFilter))
+        FilterSet.append(Measurement(dbFilter,key))
 
     if not ':' in target:
         raise ValueError("InfluxDB requires 1st Parameter to be IP:Port")

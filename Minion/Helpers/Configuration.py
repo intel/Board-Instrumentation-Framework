@@ -707,8 +707,6 @@ class Configuration():
 
         return objDynaCollector
 
-
-
     def ReadUserPluginSettings(self,baseNode,objDynaCollector):
 
 #        <DynamicCollector Prefix="MyPrefix" DoNotSend="True" Frequency="1000">
