@@ -82,6 +82,7 @@ def getCategories(client):
 
     return categories
 
+## Helper to use for fields in Database entry or hard coded string
 class Entry:
     def __init__(self,key,value):
         self._fixed = True
@@ -109,7 +110,6 @@ class Entry:
 
         else:
             return None 
-
 
     def _evaluate(self,entry) :
         if len(entry) > 3:

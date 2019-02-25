@@ -24,7 +24,6 @@ from Util import Time
 from Util import Utility
 from Helpers import ThreadManager
 from Helpers import Worker
-from Helpers import Configuration
 
 class BoundAction():
     Invalid = 0
@@ -79,6 +78,8 @@ class Collector:
         self._NamespaceOverride=None
 
     def SetOverrideNamespaceString(self,newNamespaceString):
+        from Helpers import Configuration
+
         self._NamespaceOverride = newNamespaceString
         
         for ns in Configuration.GetNamespaces():
