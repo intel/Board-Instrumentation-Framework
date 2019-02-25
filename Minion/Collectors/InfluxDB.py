@@ -263,7 +263,7 @@ class Measurement:
                 
                 else:
                     retMap[instanceName]+= "," + self._value.evaluate(entry)
-                    retMap[instanceName+self._separator +"size"] = str(len(retMap[instanceName])) # so we can know how many are in list
+                    retMap[instanceName+self._separator +"size"] = str(1 + retMap[instanceName].count(',')) # so we can know how many are in list
             
             if (isInstance and not self._makeListOnly) or not isInstance:
                 retMap[ID] = self._value.evaluate(entry)
