@@ -82,7 +82,6 @@ def getCategories(client):
 
     return categories
 
-## Helper to use for fields in Database entry or hard coded string
 class Entry:
     def __init__(self,key,value):
         self._fixed = True
@@ -110,6 +109,7 @@ class Entry:
 
         else:
             return None 
+
 
     def _evaluate(self,entry) :
         if len(entry) > 3:
@@ -258,11 +258,11 @@ class Measurement:
             if self._makeList and isInstance: # generate a list if a bunch of instances
                 instanceName += self._separator + "list"
                 if not instanceName in retMap:
-                    retMap[instanceName] = []
-                    retMap[instanceName].append(self._value.evaluate(entry))
+                    retMap[instanceName] = ""
+                    retMap[instanceName] += self._value.evaluate(entry)
                 
                 else:
-                    retMap[instanceName].append("," + self._value.evaluate(entry))
+                    retMap[instanceName]+= "," + self._value.evaluate(entry)
                     retMap[instanceName+self._separator +"size"] = str(len(retMap[instanceName])) # so we can know how many are in list
             
             if (isInstance and not self._makeListOnly) or not isInstance:
