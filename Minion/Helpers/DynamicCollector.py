@@ -163,7 +163,7 @@ class DynamicCollector(Collector.Collector):
         lines = data.split('\n') # might need os.linesp here....
         
         ts = Time.GetFileTimestampMS(fname)
-        timeDelta =  ts - self.__PreviousTimestamp
+        #timeDelta =  ts - self.__PreviousTimestamp
         self.__PreviousTimestamp = ts
 #        print("File Time Delta: "  + str(timeDelta) + " Elapsed Time: " + str(elapsedTime) + "Entries: " + str(len(lines)))
 

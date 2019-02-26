@@ -499,7 +499,7 @@ class Configuration():
             ID = Alias.Alias(attributes["ID"].nodeValue)
 
         else:
-            Log.getLogger().error("DynamicCollector <Modifyr> without an ID")
+            Log.getLogger().error("DynamicCollector <Modifier> without an ID")
             return False
 
         if "DoNotSend" in attributes.keys():
@@ -756,7 +756,7 @@ class Configuration():
             for param in pluginNode.getElementsByTagName(_Which): # Make an array of the params for the script
                 strParam = Alias.Alias(param.firstChild.nodeValue)
                 try:
-                    key,value=strParam.split('=')
+                    key,value=strParam.split('=',1)
                     kwargs[key] = value
                 except Exception:
                     params.append(strParam)

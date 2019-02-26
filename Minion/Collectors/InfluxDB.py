@@ -220,6 +220,7 @@ class Measurement:
 
     def queryMeasurement(self,measurement,dbClient):
         query = "select {} from {} {}".format(self._select,measurement, self._where)
+        #query = "select * from cpu_value where 'instance GROUP BY *".format(self._select,measurement)
         logger.info("Querying with: " + query)
         resultList = []
 #        while 0 ==len(resultList):
@@ -237,10 +238,12 @@ class Measurement:
         else:
             NS = None
 
+        
         for entry in resultList:
             instanceName = measurement
             ID = measurement
             isInstance = False
+
             for id_part in self._id_keys:
                 idTag = id_part.evaluate(entry)
                 if None == idTag:
@@ -257,13 +260,18 @@ class Measurement:
 
             if self._makeList and isInstance: # generate a list if a bunch of instances
                 instanceName += self._separator + "list"
-                if not instanceName in retMap:
+                if not instanceName in retMap: 
+                    retMap[instanceName] = ""
+                    retMap[instanceName] += self._value.evaluate(entry)
+
+                # if grabbed multiple instances of same data (over a timespan), need to restart the list
+                elif instanceName+self._separator +"size" in retMap and int(idTag) < int(retMap[instanceName+self._separator +"size"]): 
                     retMap[instanceName] = ""
                     retMap[instanceName] += self._value.evaluate(entry)
                 
                 else:
                     retMap[instanceName]+= "," + self._value.evaluate(entry)
-                    retMap[instanceName+self._separator +"size"] = str(1 + retMap[instanceName].count(',')) # so we can know how many are in list
+                    retMap[instanceName+self._separator +"size"] = idTag # so we can know how many are in list
             
             if (isInstance and not self._makeListOnly) or not isInstance:
                 retMap[ID] = self._value.evaluate(entry)
@@ -284,7 +292,7 @@ class Measurement:
         return retMap
 
 def _ValidateInputFilter(inputStr):
-    filter = inputStr.replace('\n', '').replace('\r', '').replace('"',"'").strip()
+    filter = inputStr.replace('\n', '').replace('\r', '').strip()
     try:
         return ast.literal_eval(filter)
     except Exception as ex:
@@ -321,7 +329,15 @@ def CollectFunction(frameworkInterface,target,username,password,database,**filte
                 for entry in FilterSet:
                     dataMap.update(entry.performQuery(client))
 
-            except Exception: #influxDB does NOT have a robust Exception system :-(
+            except exceptions.InfluxDBClientError as Ex:
+                logger.error("InfluxDB Collector: {}".format(Ex))
+                return
+
+            except exceptions.InfluxDBServerError as Ex:
+                logger.error("InfluxDB Collector:  {}".format(Ex))
+                return
+
+            except Exception as Ex: #influxDB does NOT have a robust Exception system :-(
                 continue
 
             for ID in dataMap:
