@@ -238,11 +238,17 @@ class Measurement:
         else:
             NS = None
 
+        # if making lists, create a map of them for updating
+        # Need to do this in case the select statement grabs more than
+        # one instance of a data point!
+        if self._makeList:
+            listMap={}
         
         for entry in resultList:
             instanceName = measurement
             ID = measurement
             isInstance = False
+            isInstanceKey = None
 
             for id_part in self._id_keys:
                 idTag = id_part.evaluate(entry)
@@ -253,6 +259,7 @@ class Measurement:
                     try:
                         float(idTag) # if a number, and making a list, then this will not fail
                         isInstance = True
+                        isInstanceKey = idTag
                     except:                        
                         instanceName += self._separator + idTag
                     
@@ -260,22 +267,25 @@ class Measurement:
 
             if self._makeList and isInstance: # generate a list if a bunch of instances
                 instanceName += self._separator + "list"
-                if not instanceName in retMap: 
-                    retMap[instanceName] = ""
-                    retMap[instanceName] += self._value.evaluate(entry)
+                if not instanceName in listMap: 
+                    listMap[instanceName] = []
 
                 # if grabbed multiple instances of same data (over a timespan), need to restart the list
-                elif instanceName+self._separator +"size" in retMap and int(idTag) < int(retMap[instanceName+self._separator +"size"]): 
-                    retMap[instanceName] = ""
-                    retMap[instanceName] += self._value.evaluate(entry)
-                
+                # ASSUMING instances start with 0
+                if int(isInstanceKey) >= len(listMap[instanceName]):
+                    listMap[instanceName].append(self._value.evaluate(entry))
+
                 else:
-                    retMap[instanceName]+= "," + self._value.evaluate(entry)
-                    retMap[instanceName+self._separator +"size"] = idTag # so we can know how many are in list
+                    listMap[instanceName][int(isInstanceKey)] = self._value.evaluate(entry)
             
             if (isInstance and not self._makeListOnly) or not isInstance:
                 retMap[ID] = self._value.evaluate(entry)
-                
+
+        if self._makeList: # Made lists, now let's add to the returning data map
+            for listName in listMap:
+                retMap[listName + self._separator + "size"] = str(len(listMap[listName]))
+                retMap[listName] = ",".join(listMap[listName])
+
         for key in retMap: # in case they specified a Namespace override
             retMap[key] = (retMap[key],NS)
 
@@ -318,10 +328,9 @@ def CollectFunction(frameworkInterface,target,username,password,database,**filte
 
     hostname,port = target.split(":")
 
-    client = InfluxDBClient(hostname, port, username, password, database)
-
     try:
         while not frameworkInterface.KillThreadSignalled():
+            client = InfluxDBClient(hostname, port, username, password, database)
             SleepMs(frameworkInterface.Interval)
             dataMap={}
 
@@ -338,15 +347,18 @@ def CollectFunction(frameworkInterface,target,username,password,database,**filte
                 return
 
             except Exception as Ex: #influxDB does NOT have a robust Exception system :-(
+                logger.info("InfluxDB Collector:  {}".format(Ex))
                 continue
 
+            client.close()
+            
             for ID in dataMap:
                 Data, Namespace = dataMap[ID]
 
-                if not frameworkInterface.DoesCollectorExist(ID): # Do we already have this ID?
+                if not frameworkInterface.DoesCollectorExist(ID,Namespace): # Do we already have this ID?
                     frameworkInterface.AddCollector(ID,Namespace)    # Nope, so go add it, and maybe Custom NS!
 
-                frameworkInterface.SetCollectorValue(ID,Data)
+                frameworkInterface.SetCollectorValue(ID,Data,None,Namespace)
 
     except Exception as Ex:
         logger.error("Unrecoverable error in InfluxDB Collector plugin: " + str(Ex))

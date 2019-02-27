@@ -115,7 +115,7 @@ class Collector:
             return True
 
         Log.getLogger().error("Empty OverrideID specified.")
-        return false
+        return False
 
     def GetTransmitID(self):
         return self._OverrideID
