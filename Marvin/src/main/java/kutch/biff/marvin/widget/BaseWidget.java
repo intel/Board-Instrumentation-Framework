@@ -1253,18 +1253,18 @@ abstract public class BaseWidget implements Widget
     protected String GetCSS_File()
     {
         String strFile = getBaseCSSFilename();
-        if (null != getBaseCSSFilename())
+        if (null != strFile)
         {
             File file = new File(strFile); // first look for fully qualified path
 
             if (false == file.exists())
             { // if didn't find, look in same directory that widget was defined in
-                strFile = getDefinintionFileDirectory() + File.separatorChar + getBaseCSSFilename();
+                strFile = getDefinintionFileDirectory() + File.separatorChar + strFile;
                 file = new File(strFile);
 
                 if (false == file.exists())
                 {
-                    LOGGER.severe("Unable to locate Stylesheet: " + getBaseCSSFilename());
+                    LOGGER.severe("Unable to locate Stylesheet: " + strFile);
                     return null;
                 }
             }
@@ -1414,18 +1414,20 @@ abstract public class BaseWidget implements Widget
 
     protected boolean ApplyCSS()
     {
-        if (null != GetCSS_File())
+        String cssFile = GetCSS_File();
+        if (null != cssFile)
         {
             //getStylesheets().clear();
 
             boolean fRet = true;
-            LOGGER.config("Applying Stylesheet: " + GetCSS_File() + " to Widget [" + _DefinitionFile + "]");
+            LOGGER.config("Applying Stylesheet: " +cssFile + " to Widget [" + _DefinitionFile + "]");
             // This was a .add(), but changed to Sett all as there was kind of
             // memory leak when I changed style via Minion or MarvinTasks...
-            fRet = getStylesheets().setAll(GetCSS_File());
+            getStylesheets().clear();
+            fRet = getStylesheets().setAll(cssFile);
             if (false == fRet)
             {
-                LOGGER.severe("Failed to apply Stylesheet " + GetCSS_File());
+                LOGGER.severe("Failed to apply Stylesheet " + cssFile);
                 return false;
             }
         }

@@ -115,6 +115,7 @@ public class SteelGaugeRadialSteelWidget extends BaseWidget
                         }
                     });
 
+        this._Gauge.getStyleClass().clear();
         return ApplyCSS();
     }
 
