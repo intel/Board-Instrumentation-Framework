@@ -1423,7 +1423,6 @@ abstract public class BaseWidget implements Widget
             LOGGER.config("Applying Stylesheet: " +cssFile + " to Widget [" + _DefinitionFile + "]");
             // This was a .add(), but changed to Sett all as there was kind of
             // memory leak when I changed style via Minion or MarvinTasks...
-            getStylesheets().clear();
             fRet = getStylesheets().setAll(cssFile);
             if (false == fRet)
             {

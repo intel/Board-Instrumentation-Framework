@@ -97,6 +97,8 @@ public class TabWidget extends GridWidget
     public boolean Create(TabPane tabPane, DataManager dataMgr, int iIndex)
     {
         _TabIndex = iIndex;
+        setWidth(CONFIG.getCanvasWidth());
+        setHeight(CONFIG.getCanvasHeight());
 
         _BaseGridPane.setPadding(new Insets(getInsetTop(), getInsetRight(), getInsetBottom(), getInsetLeft()));
 
@@ -392,6 +394,10 @@ public class TabWidget extends GridWidget
     @Override
     public boolean PerformPostCreateActions(GridWidget parentGrid, boolean updateToolTipOnly)
     {
+        if (getHeight() == 0 && this.getHeightPercentOfParentGrid() == 0)
+        {
+            setHeightPercentOfParentGrid(100);
+        }
         if (null != _TaskOnActivate)
         {
 

@@ -10,7 +10,6 @@ import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.AliasMgr;
-import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.GridWidget;
 import kutch.biff.marvin.widget.OnDemandGridWidget;
 import kutch.biff.marvin.widget.Widget;

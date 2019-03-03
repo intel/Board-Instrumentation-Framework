@@ -976,6 +976,8 @@ public class WidgetBuilder
             gridNode.DeleteAttribute("hgap");
             gridNode.DeleteAttribute("vgap");
             gridNode.DeleteAttribute("align");
+            gridNode.DeleteAttribute("height");
+            gridNode.DeleteAttribute("width");
             AliasMgr.getAliasMgr().PushAliasList(false);
             AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
                                                     {
