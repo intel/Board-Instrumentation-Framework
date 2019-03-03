@@ -379,7 +379,7 @@ def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=Fal
                     frameworkInterface.AddCollector(entry)    # Nope, so go add it
 
                     if ".core_list" in entry: # list of cores, so no need to precision
-                        frameworkInterface.SetPrecisionFromPlugin(entry,0)
+                        frameworkInterface.SetPrecision(entry,0)
                         
                 frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
 

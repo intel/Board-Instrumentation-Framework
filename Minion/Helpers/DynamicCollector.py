@@ -131,7 +131,7 @@ class DynamicCollector(Collector.Collector):
     # Goes though the specified file, updates existing collectors, and creates
     # ones that don't exist
     def Collect(self):
-        AddedNewDynamicCollectors = False
+        #AddedNewDynamicCollectors = False
         try:
             fname = FileCollector.convertPath(self.__FileName)
             
@@ -163,7 +163,7 @@ class DynamicCollector(Collector.Collector):
         lines = data.split('\n') # might need os.linesp here....
         
         ts = Time.GetFileTimestampMS(fname)
-        timeDelta =  ts - self.__PreviousTimestamp
+        #timeDelta =  ts - self.__PreviousTimestamp
         self.__PreviousTimestamp = ts
 #        print("File Time Delta: "  + str(timeDelta) + " Elapsed Time: " + str(elapsedTime) + "Entries: " + str(len(lines)))
 
@@ -207,6 +207,7 @@ class DynamicCollector(Collector.Collector):
 
     def __createCollector(self,ID,fromPlugin=False):
         objCollector = Collector.Collector(self._NamespaceObject,ID,self._InGroup)
+
         objCollector._OnDemand = self._OnDemand
         objCollector._PollingInterval = self._PollingInterval
         objCollector.IsDynamicallyCreated = True
@@ -219,17 +220,22 @@ class DynamicCollector(Collector.Collector):
         objCollector.GetElapsedTimeSinceLast = objCollector.GetElapsedTimeForDynamicWidget #remap the fn called
         objCollector.SetLastCollectionTime = objCollector.SetLastCollectionTimeForDynamicWidget
         objCollector.SetProcessThreadID(self.GetProcessThreadID())
-        if fromPlugin:
-            objCollector.DynamicSuffix="" #=str(self)
-        else:
-            objCollector.DynamicSuffix=""
 
         if True == fromPlugin: # bit of a hack, only need this if from a plugin
+        # 'hack' to have multiple namespaces coming from same plugin - like influxdb
+            if ID[-2:] == "-]" :
+                ID = ID.split("[-")[0]
+                
             if len(self.__PrefixStr) > 0:
                 objCollector._OverrideID = self.__PrefixStr + ID
 
             if len(self.__SuffixStr) > 0:
                 objCollector._OverrideID = ID + self.__SuffixStr
+
+        if fromPlugin:
+            objCollector.DynamicSuffix="" #=str(self)
+        else:
+            objCollector.DynamicSuffix=""
 
         if float(self.ScaleValue) != 1.0:
             objCollector.SetScaleValue(self.ScaleValue)
@@ -248,7 +254,6 @@ class DynamicCollector(Collector.Collector):
                 Log.getLogger().error("Invalid RegEx patter for <ModifyCollector>: " + mod[0] + ": " + str(Ex))
                 return None
             
-
             if matched:
                 Log.getLogger().info("Applying Modifiers to DynamicCollector " + ID)
                 # data format
@@ -293,7 +298,6 @@ class DynamicCollector(Collector.Collector):
         
         return objCollector
 
-
     def SetLastCollectionTime(self,timeVal):
         self._LastElapsedTimePeriod = timeVal - self._LastCollectionTime 
         self._LastCollectionTime = timeVal 
@@ -316,8 +320,13 @@ class DynamicCollector(Collector.Collector):
         interface = UserPluginInterface(self)
         return interface
 
-    def SetPrecisionFromPlugin(self, collectorID, preicsionValue):
-        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
+    def __specialSuffix(self,customNamespaceString):
+        if None == customNamespaceString:
+            return ""
+        return "[-{}-]".format(customNamespaceString)
+
+    def SetPrecisionFromPlugin(self, collectorID, preicsionValue,customNamespaceString=None):
+        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr + self.__specialSuffix(customNamespaceString))
 
         if None == objCollector:
             Log.getLogger().error("User defined DynamicCollector tried to Set a value to a collector that does not exist, with ID: " + collectorID)
@@ -326,10 +335,10 @@ class DynamicCollector(Collector.Collector):
         try:
             objCollector.Precision = float(preicsionValue)
         except:
-            Log.getLogger().error("User defined DynamicCollector tried to Set an invalid Precision value of {0} to a collector that does not exist, with ID: {1}".format(preicsionValue),collectorID)
+            Log.getLogger().error("User defined DynamicCollector tried to Set an invalid Precision value of {0} to a collector that does not exist, with ID: {1}".format(preicsionValue,collectorID))
 
-    def SetNormilizationFromPlugin(self, collectorID, normilizationValue):
-        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
+    def SetNormilizationFromPlugin(self, collectorID, normilizationValue,customNamespaceString=None):
+        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr+ self.__specialSuffix(customNamespaceString))
 
         if None == objCollector:
             Log.getLogger().error("User defined DynamicCollector tried to Set a value to a collector that does not exist, with ID: " + collectorID)
@@ -339,20 +348,19 @@ class DynamicCollector(Collector.Collector):
             objCollector._NormalizeValue = float(normilizationValue)
             objCollector._Normalize=True
         except:
-            Log.getLogger().error("User defined DynamicCollector tried to Set an invalid Normilization value of {0} to a collector that does not exist, with ID: {1}".format(normilizationValue),collectorID)
+            Log.getLogger().error("User defined DynamicCollector tried to Set an invalid Normilization value of {0} to a collector that does not exist, with ID: {1}".format(normilizationValue,collectorID))
 
-    def SetScaleFromPlugin(self, collectorID, scaleValue):
-        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
+    def SetScaleFromPlugin(self, collectorID, scaleValue,customNamespaceString=None):
+        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr+ self.__specialSuffix(customNamespaceString))
 
         if None == objCollector:
             Log.getLogger().error("User defined DynamicCollector tried to Set a scale to a collector that does not exist, with ID: " + collectorID)
             return
 
         objCollector.SetScaleValue(scaleValue)
-
-
-    def CollectorExistsFromPlugin(self, collectorID): 
-        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
+ 
+    def CollectorExistsFromPlugin(self, collectorID,customNamespaceString=None): 
+        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr+ self.__specialSuffix(customNamespaceString))
         return not objCollector == None
 
     def AddCollectorFromPlugin(self, collectorID,customNamespaceString=None):
@@ -360,20 +368,21 @@ class DynamicCollector(Collector.Collector):
             Log.getLogger().error("User defined DynamicCollector tried to Add a collector with ID that already exists: " + collectorID)
             return False
 
-        objCollector = self.__createCollector(self.__PrefixStr +  collectorID + self.__SuffixStr,True)
-        objCollector._OverrideID = self.__PrefixStr +  collectorID + self.__SuffixStr
+        objCollector = self.__createCollector(self.__PrefixStr +  collectorID + self.__SuffixStr+ self.__specialSuffix(customNamespaceString),True)
 
         if objCollector == None:
             Log.getLogger().error("Error creating collector using User defined DynamicCollector ID: " + collectorID)
             return False
+            
+        objCollector._OverrideID = self.__PrefixStr +  collectorID + self.__SuffixStr
     
         if None != customNamespaceString:
             objCollector.SetOverrideNamespaceString(customNamespaceString)
 
         return True
 
-    def SetCollectorValueFromPlugin(self,collectorID,Value,elapsedTime=None):
-        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr)
+    def SetCollectorValueFromPlugin(self,collectorID,Value,elapsedTime=None,customNamespaceString=None):
+        objCollector = self._NamespaceObject.GetCollector(self.__PrefixStr +  collectorID + self.__SuffixStr+ self.__specialSuffix(customNamespaceString))
 
         if None == objCollector:
             Log.getLogger().error("User defined DynamicCollector tried to Set a value to a collector that does not exist, with ID: " + collectorID)

@@ -499,7 +499,7 @@ class Configuration():
             ID = Alias.Alias(attributes["ID"].nodeValue)
 
         else:
-            Log.getLogger().error("DynamicCollector <Modifyr> without an ID")
+            Log.getLogger().error("DynamicCollector <Modifier> without an ID")
             return False
 
         if "DoNotSend" in attributes.keys():
@@ -707,8 +707,6 @@ class Configuration():
 
         return objDynaCollector
 
-
-
     def ReadUserPluginSettings(self,baseNode,objDynaCollector):
 
 #        <DynamicCollector Prefix="MyPrefix" DoNotSend="True" Frequency="1000">
@@ -758,7 +756,7 @@ class Configuration():
             for param in pluginNode.getElementsByTagName(_Which): # Make an array of the params for the script
                 strParam = Alias.Alias(param.firstChild.nodeValue)
                 try:
-                    key,value=strParam.split('=')
+                    key,value=strParam.split('=',1)
                     kwargs[key] = value
                 except Exception:
                     params.append(strParam)
@@ -771,7 +769,6 @@ class Configuration():
 
         except Exception:
             pass
-
 
         if not objDynaCollector.SetPluginInfo(PythonFile, functionName, spawnThread):
             objDynaCollector = None
@@ -1148,7 +1145,7 @@ def GetMaxTransmitBufferBeforeRest():
 def GetTimesToRepeatPacket():
     return Configuration._RepeatPktCnt
 
-def GetNamespace(strNamespaceID):
+def GetNGetNamespace(strNamespaceID):
     retObj = None
     if None != Configuration._Instance:
         for ns in Configuration._Instance.GetNamespaces():
@@ -1158,4 +1155,10 @@ def GetNamespace(strNamespaceID):
 
     return retObj
 
+def GetNamespaces():
+    retObj = None
+    if None != Configuration._Instance:
+        retObj = Configuration._Instance.GetNamespaces()
+
+    return retObj
 

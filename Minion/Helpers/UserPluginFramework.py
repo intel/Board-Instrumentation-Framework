@@ -36,10 +36,11 @@ class UserPluginFramework:
         self.ptrFunction = None
         self.ThreadName = None
         self.SpawnThread = SpawnThread
+        self.kwargs = None
 
     def ValidateUserPlugin(self):
         if not self.ScriptName.lower().endswith(".py"):
-            Log.getLogger().error("User Defined collectors must be in a python (.py) file. Invalid file provided: " + ScriptName)
+            Log.getLogger().error("User Defined collectors must be in a python (.py) file. Invalid file provided: " + self.ScriptName)
             return False
 
         self.ptrFunction = DynamicPython.DynamicLoader.tryToLoadPythonScriptFunction(self.ScriptName,self.FunctionName)

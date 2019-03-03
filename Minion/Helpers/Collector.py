@@ -24,7 +24,6 @@ from Util import Time
 from Util import Utility
 from Helpers import ThreadManager
 from Helpers import Worker
-from Helpers import Configuration
 
 class BoundAction():
     Invalid = 0
@@ -79,9 +78,12 @@ class Collector:
         self._NamespaceOverride=None
 
     def SetOverrideNamespaceString(self,newNamespaceString):
+        from Helpers import Configuration
+
         self._NamespaceOverride = newNamespaceString
-        for ns in Configuration.GetNamespace:
-            if ns.GetID().lower() == strNamespaceID.lower():
+        
+        for ns in Configuration.GetNamespaces():
+            if ns.GetID().lower() == newNamespaceString.lower():
                 Log.getLogger().warning("Setting OverrideNamespace for collector {0} to {1}.  However that Namespace already exists - conflicts may occur.".format(newNamespaceString,self.GetID()))
                 break
 
@@ -113,7 +115,7 @@ class Collector:
             return True
 
         Log.getLogger().error("Empty OverrideID specified.")
-        return false
+        return False
 
     def GetTransmitID(self):
         return self._OverrideID
