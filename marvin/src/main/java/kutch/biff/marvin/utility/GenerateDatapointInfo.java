@@ -226,6 +226,7 @@ public class GenerateDatapointInfo
         //DataManager.getDataManager().ChangeValue(__ID, __Namespace, Float.toString(Total));
         MarvinTask mt = new MarvinTask();
         DecimalFormat df = new DecimalFormat();
+        df.setGroupingUsed(false);
         df.setMaximumFractionDigits(__precision);
         mt.AddDataset(__ID, __Namespace, df.format(Total));
         TaskManager.getTaskManager().AddDeferredTaskObject(mt);
