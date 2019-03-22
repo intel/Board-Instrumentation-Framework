@@ -60,6 +60,7 @@ import logging
 import ast
 import time
 from operator import itemgetter
+from pprint import pprint as pprint
 
 
 VersionStr="19.02.24 Build 1"
@@ -118,6 +119,7 @@ class Entry:
 class Measurement:
     def __init__(self,configMap,name):
         self._MeasurementList = None
+        self._listMap={}  # Keep it around, as member in case I get partial data
 
         self._Name = name
 
@@ -174,6 +176,8 @@ class Measurement:
 
             if 'csv_sort_by' in configMap:
                 self._sortBy = Entry('sortBy',configMap['csv_sort_by'])
+
+            self._csvSizeDetermined = False
 
         else:
             self._makeList = False
@@ -235,9 +239,45 @@ class Measurement:
         for entry in localList:
             if not entry in excludeList:
                 self._MeasurementList.append(entry)
-     
+
+        if self._makeList:
+            self._seriesSizes = self.getMeasurmentListSize(dbClient)
+
+    def createColumnStr(self, keyStr):
+        keys = keyStr.split(",")
+        retStr = keys[0]
+        for colInfo in keys[1:]:
+            colName, valueStr = colInfo.split("=")
+            try:
+                float(valueStr)
+
+            except Exception:
+                retStr += colInfo
+
+        return retStr
+
+    def getMeasurmentListSize(self,dbClient):
+        seriesMap={}
+        for measurement in self._MeasurementList:
+            query = "show series from {} ".format(measurement)
+            resultSet = dbClient.query(query)    
+            #pprint(resultSet)
+            seriesList = list(resultSet.get_points())
+            for series in seriesList:
+                columnsStr = self.createColumnStr(series['key'])
+
+                if not columnsStr in seriesMap: # make a map of unique columns sets, minus the 'instance'
+                    seriesMap[columnsStr] = 0
+
+                seriesMap[columnsStr] += 1
+
+        
+        return seriesMap
+
+            
 
     def queryMeasurement(self,measurement,dbClient):
+
         query = "select {} from {} {}".format(self._select,measurement, self._where)
         #query = "select * from cpu_value where 'instance GROUP BY *".format(self._select,measurement)
         logger.info("Querying with: " + query)
@@ -249,8 +289,10 @@ class Measurement:
 #                SleepMs(100)
         resultSet = dbClient.query(query)    
         resultList = list(resultSet.get_points())
+#        print(len(resultList))
 
         retMap={}
+
 
         if None != self._namespace and len(resultList) > 0:
             NS = self._namespace.evaluate(resultList[0])
@@ -261,13 +303,20 @@ class Measurement:
         # Need to do this in case the select statement grabs more than
         # one instance of a data point!
         if self._makeList:
-            listMap={}
+            mapsUpdatedThisLoop=[]
         
         for entry in resultList:
             instanceName = measurement
+            
             ID = measurement
             isInstance = False
             isInstanceKey = None
+
+            # if measurement == 'ipmi_value' and entry['type_instance'] == 'Agg Therm Mgn 1 system_board (7.1)':
+            #     pprint("-------start-----------")
+            #     pprint(entry['time'])
+            #     pprint("-------end-------------")
+            #     pass
 
             for id_part in self._id_keys:
                 idTag = id_part.evaluate(entry)
@@ -281,29 +330,40 @@ class Measurement:
                         isInstanceKey = idTag
                     except:                        
                         instanceName += self._separator + idTag
+                        #csvListLenKey += 
                     
                 ID += self._separator + idTag
 
             if self._makeList and isInstance: # generate a list if a bunch of instances
                 instanceName += self._separator + "list"
-                if not instanceName in listMap: 
-                    listMap[instanceName] = []
+                isInstanceKey = int(isInstanceKey)
 
-                # if grabbed multiple instances of same data (over a timespan), need to restart the list
-                # ASSUMING instances start with 0
-                if int(isInstanceKey) >= len(listMap[instanceName]):
-                    listMap[instanceName].append(self._value.evaluate(entry))
+                if not instanceName in self._listMap: # 1st time this list ahs been created
+                    if isInstanceKey != 0:
+                        self._listMap[instanceName] = [0] * (isInstanceKey +1)
+                        continue  # got data from middle of a set (say started getting at CPU #20 out of 88)
+                                  # during 1st loop, not likely to occur, but it can
 
-                else:
-                    listMap[instanceName][int(isInstanceKey)] = self._value.evaluate(entry)
+                    else:
+                        self._listMap[instanceName] = []
+
+
+                # if grabbed multiple instances of same data (over a timespan), need to append the list
+                if int(isInstanceKey) >= len(self._listMap[instanceName]):
+                    self._listMap[instanceName].append(self._value.evaluate(entry))
+
+                else: # otherwise just get latest value
+                    self._listMap[instanceName][int(isInstanceKey)] = self._value.evaluate(entry)
+
+                mapsUpdatedThisLoop.append(instanceName) #keep track of what was updated in this query, and only send those
             
             if (isInstance and not self._makeListOnly) or not isInstance:
                 retMap[ID] = self._value.evaluate(entry)
 
         if self._makeList: # Made lists, now let's add to the returning data map
-            for listName in listMap:
-                retMap[listName + self._separator + "size"] = str(len(listMap[listName]))
-                retMap[listName] = ",".join(listMap[listName])
+            for listName in mapsUpdatedThisLoop:  # But only the ones changed in this loop
+                retMap[listName + self._separator + "size"] = str(len(self._listMap[listName]))
+                retMap[listName] = ",".join(self._listMap[listName])
 
         for key in retMap: # in case they specified a Namespace override
             retMap[key] = (retMap[key],NS)
