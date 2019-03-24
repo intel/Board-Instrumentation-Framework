@@ -160,6 +160,18 @@ class Measurement:
         else:
             self._namespace = None
 
+        if 'other' in configMap:
+            self._other = configMap['other']
+        
+        else:
+            self._other = None
+
+        if 'instance' in configMap:
+            self._instance = configMap['instance']
+        
+        else:
+            self._instance = None
+
         if 'csv' in configMap:
             if 'makelist' == configMap['csv']:
                 self._makeList = True
@@ -189,13 +201,17 @@ class Measurement:
         else:
             self._where = "WHERE " + configMap['where']
 
-    def getCategories(self,client):
+    def getMeasurementList(self):
+        return self._MeasurementList
+
+    def __getCategories(self,client):
         categories=[]
         for category in client.get_list_measurements():
             categories.append(category['name'])
 
         return categories
 
+    # gets all the different possible different datapoint ID's for a category
     def getKeysForCategory(self,client,strMeasurement):
         query = "show series from {} ".format(strMeasurement)
         resultSet = client.query(query)    
@@ -224,7 +240,7 @@ class Measurement:
         excludeList=[]
         for measurement in self._Measurement:
             if measurement == "*":
-                allList = self.getCategories(dbClient)
+                allList = self.__getCategories(dbClient)
 
                 for item in allList:
                     if item not in excludeList and item not in localList:
@@ -274,22 +290,120 @@ class Measurement:
         
         return seriesMap
 
+
+    def queryHistoricalMeasurement(self,filter,measurement,dbClient):
+        retMap={}
+
+        if self._makeList:
+            if None == self._instance:
+                logger.error("Historical Query specified to make csv, but did not provide info on what instance is")
+                return (None,None)
+
+        try:
+            query = "show series from {} {}".format(measurement,self._where)
+            resultSet = dbClient.query(query)    
+            resultList = list(resultSet.get_points()) # this should now be a list with length = to the # of instances for this measurement
+            if not self._instance :
+                logger.error("Historical Query specified instance to make csv, but the instance of {} does not exist in measurement {}".format(self._instance,measurement))
+                return (None,None)
+
+            if len(resultList) == 0:
+                logger.error("Historical Query specified resulted in no data")
+                return (None,None)
+
+            # so now have the instance col name and the # of instances, go to work
+            instanceCount = len(resultList)
+            keyMap={}
+            columns = resultList[0]['key'].split(',')
             
+            # make a list of columns, so can make ID
+            for pair in columns[1:]:
+                key,value = pair.split("=")
+                keyMap[key]=value
+
+            ID = measurement
+            ListID = ID
+            instanceIsPartOfID = False
+            
+            for id_part in self._id_keys:
+                idTag = id_part.evaluate(keyMap)
+                if None == idTag:
+                    continue
+
+                if id_part.key() == self._instance:
+                    idTag="{}" # instance is part of tag, so fill it in later
+                    instanceIsPartOfID = True
+                else:
+                    ListID += self._separator + idTag
+
+                ID += self._separator + idTag
+
+            if None != self._namespace and len(keyMap) > 0:
+                NS = self._namespace.evaluate(keyMap)
+            else:
+                NS = None
+
+            ListID += self._separator + "list"
+
+            if self._makeList:
+                if not ListID in retMap:
+                    retMap[ListID] = (True,[]) # return Tuple, True means is 'list'
+
+            for inst in range(0,instanceCount):
+                query = "select {} from {} {} and {}='{}' {}".format(self._select,measurement, self._where,self._instance,inst,self._other)
+
+                logger.info("Querying with: " + query)
+                resultList = []
+
+                resultSet = dbClient.query(query)    
+                resultList = list(resultSet.get_points())
+
+                if True==instanceIsPartOfID:
+                    entryID = ID.format(inst)
+                else:
+                    entryID = ID
+
+                dataList=[]
+                for counter,dp in enumerate(resultList):
+                    dataPoint = str(self._value.evaluate(dp))
+                    if None == dataPoint:
+                        logger.error("Specified value of {} for historical collector not found".format(self._value.key()))
+                        return
+
+                    if self._makeList:
+                        if inst == 0:
+                            retMap[ListID][1].append(dataPoint)
+                        else:
+                            retMap[ListID][1][counter] += "," + dataPoint
+
+                    if False == self._makeListOnly:
+                        dataList.append(dataPoint)
+
+
+                if not self._makeListOnly:
+                    if not entryID in retMap:
+                        retMap[entryID] = (False,dataList)
+
+                    else:
+                        print("#@##@@#")
+
+        except Exception as Ex:
+            logger.error(str(Ex))
+            return (None,NS)
+
+        for key in retMap: # in case they specified a Namespace override
+            retMap[key] = (retMap[key],NS)
+
+        return retMap
 
     def queryMeasurement(self,measurement,dbClient):
-
         query = "select {} from {} {}".format(self._select,measurement, self._where)
-        #query = "select * from cpu_value where 'instance GROUP BY *".format(self._select,measurement)
+
         logger.info("Querying with: " + query)
         resultList = []
-#        while 0 ==len(resultList):
-#            resultSet = dbClient.query(query)    
-#            resultList = list(resultSet.get_points())
-#            if 0 == len(resultList):
-#                SleepMs(100)
+
         resultSet = dbClient.query(query)    
         resultList = list(resultSet.get_points())
-#        print(len(resultList))
 
         retMap={}
 
@@ -393,8 +507,6 @@ def PointCollectFunction(frameworkInterface,target,username,password,database,**
     logger = frameworkInterface.Logger
     logger.info("Starting InfluxDB Collector {0}".format(VersionStr))
 
-    #GetDBInfoCollectFunction(frameworkInterface,target,username,password,database)
-
     if 0 == len(filterList):
         raise ValueError("No filters specified for InfluxDB collector")
 
@@ -447,83 +559,81 @@ def PointCollectFunction(frameworkInterface,target,username,password,database,**
     except Exception as Ex:
         logger.error("Unrecoverable error in InfluxDB Collector plugin: " + str(Ex))
 
-def GeColumns(frameworkInterface,target,username,password,database,**filterList):
-    pass
 
-def generateSortedFetchList(keyList):
-    entryMap={}
+# def generateSortedFetchList(keyList):
+#     entryMap={}
 
-    for entry in keyList:
-        keys = entry['key'].split(',')
-        hashKey = keys[0] + "." + entry['key']
-        keyMap={}
-        sortByKey=None
-        for keyVal in keys[1:]:
-            key,value = keyVal.split('=')
+#     for entry in keyList:
+#         keys = entry['key'].split(',')
+#         hashKey = keys[0] + "." + entry['key']
+#         keyMap={}
+#         sortByKey=None
+#         for keyVal in keys[1:]:
+#             key,value = keyVal.split('=')
 
-            keyMap[key] = value
-            try:
-                fvalue = float(value)
-                sortByKey = key
-            except:
-                hashKey += value
+#             keyMap[key] = value
+#             try:
+#                 fvalue = float(value)
+#                 sortByKey = key
+#             except:
+#                 hashKey += value
 
             
-        if None != sortByKey:
-            hashKey = hashKey.replace(sortByKey + '=' + keyMap[sortByKey],'')
+#         if None != sortByKey:
+#             hashKey = hashKey.replace(sortByKey + '=' + keyMap[sortByKey],'')
 
-        if not hashKey in entryMap:
-            entryMap[hashKey] = []
+#         if not hashKey in entryMap:
+#             entryMap[hashKey] = []
 
-        else:
-            x = hashKey
-            pass
+#         else:
+#             x = hashKey
+#             pass
 
-        entryMap[hashKey].append((sortByKey,keyMap))
+#         entryMap[hashKey].append((sortByKey,keyMap))
 
-    for key in entryMap:
-        if not isinstance(entryMap[key],(list,)):
-            continue
+#     for key in entryMap:
+#         if not isinstance(entryMap[key],(list,)):
+#             continue
 
-        sortBy, keyMap = entryMap[key][0]
+#         sortBy, keyMap = entryMap[key][0]
 
-        #sortedL = sorted(entryMap[key],key=itemgetter(sortBy))
-        pass
-
-
-    return entryMap
+#         #sortedL = sorted(entryMap[key],key=itemgetter(sortBy))
+#         pass
 
 
-def GetDBInfoCollectFunction(frameworkInterface,target,username,password,database):
-    global logger
-    logger = frameworkInterface.Logger
-    logger.info("Starting InfluxDB GetDB Info Collector {0}".format(VersionStr))
-
-    hostname,port = target.split(":")
-
-    client = InfluxDBClient(hostname, port, username, password, database)
-    for category in client.get_list_measurements():
-        query = "show series from {} ".format(category['name'])
-        resultSet = client.query(query)    
-        seriesList = list(resultSet.get_points())
-
-        ID = category['name'] +".columns"        
-        keys = seriesList[0]['key'].split(",")
-        columns = None
-        for colInfo in keys[1:]:
-            colName,junk = colInfo.split("=")
-            if None == columns:
-                columns = colName
-            else:
-                columns += ","+colName
-
-        if not frameworkInterface.DoesCollectorExist(ID): # Do we already have this ID?
-                    frameworkInterface.AddCollector(ID)    # Nope, so go add it, and maybe Custom NS!
-        frameworkInterface.SetCollectorValue(ID,columns)
+#     return entryMap
 
 
+# def GetDBInfoCollectFunction(frameworkInterface,target,username,password,database):
+#     global logger
+#     logger = frameworkInterface.Logger
+#     logger.info("Starting InfluxDB GetDB Info Collector {0}".format(VersionStr))
 
-def HistoryCollectFunction(frameworkInterface,target,username,password,database,**filterList):
+#     hostname,port = target.split(":")
+
+#     client = InfluxDBClient(hostname, port, username, password, database)
+#     for category in client.get_list_measurements():
+#         query = "show series from {} ".format(category['name'])
+#         resultSet = client.query(query)    
+#         seriesList = list(resultSet.get_points())
+
+#         ID = category['name'] +".columns"        
+#         keys = seriesList[0]['key'].split(",")
+#         columns = None
+#         for colInfo in keys[1:]:
+#             colName,junk = colInfo.split("=")
+#             if None == columns:
+#                 columns = colName
+#             else:
+#                 columns += ","+colName
+
+#         if not frameworkInterface.DoesCollectorExist(ID): # Do we already have this ID?
+#                     frameworkInterface.AddCollector(ID)    # Nope, so go add it, and maybe Custom NS!
+#         frameworkInterface.SetCollectorValue(ID,columns)
+
+
+
+def HistoryCollectFunction(frameworkInterface,target,username,password,database,interval,**filterList):
     global logger
     logger = frameworkInterface.Logger
     logger.info("Starting InfluxDB History Collector {0}".format(VersionStr))
@@ -540,125 +650,62 @@ def HistoryCollectFunction(frameworkInterface,target,username,password,database,
     if not ':' in target:
         raise ValueError("InfluxDB requires 1st Parameter to be IP:Port")
 
+    try:
+        interval = int(interval)
+    except:
+        raise ValueError("invalid interval specified for InfluxDB HistoryCollectFunction: {}".format(interval))
+
     hostname,port = target.split(":")
 
     client = InfluxDBClient(hostname, port, username, password, database)
-    categories=[]
-    for category in client.get_list_measurements():
-        categories.append(category['name'])
+    dataMap={}
 
-                                # "select": "MEAN(value)", 
-                                # "namespace": "nd-wolfpass-105",
-                                # "where": ""WHERE time > now() - 24h  GROUP BY time(1h)",
-                                # "value" : "{value}",
-                                # "id" : ["{type_instance}","{instance}"],        
-
-    #query = "select '*' from 'cpufreq_value' where 'instance' = '0'"
     try:
-        strSelect = "*"
-        strMeasurement = "cpufreq_value"
-        strWhere = "where time > now() - 30s"
-        query = "select {} from {} {}".format(strSelect,strMeasurement, strWhere)
-        resultSet = client.query(query)    
-        resultList = list(resultSet.get_points())
-
-        strWhere = "where time > now() - 30s AND type_instance = '16'"
-        query = "select {} from {} {}".format(strSelect,strMeasurement, strWhere)
-        resultSet = client.query(query)    
-        resultList = list(resultSet.get_points())
-
-        # query = "select COUNT({}) from {} {}".format(strSelect,strMeasurement, strWhere)
-        # resultSet = client.query(query)    
-        # resultList = list(resultSet.get_points())
-        # count = resultList[0]['count_value']
-
         for filter in FilterSet:
-            for cat in filter.getCategories(client):
-                keyList = filter.getKeysForCategory(client,cat)
-                generateSortedFetchList(keyList)
-                pass
+            filter.determineMeasurementList(client)
 
+            for measurement in filter.getMeasurementList():
+                updateData = filter.queryHistoricalMeasurement(filter,measurement,client)
+                dataMap.update(updateData)
+                if frameworkInterface.KillThreadSignalled():
+                    return 
 
-        strMeasurement = "cpu_value"
-        strSelect = "*"
-        strWhere = "WHERE time > now() - 2m"
-        strWhere = "WHERE time > now() - 24h"
-        strWhere = ""
-        query = "show series from {} ".format(strMeasurement)
-        query = "show series from {} {}".format(strMeasurement, strWhere)
-        resultSet = client.query(query)    
-        
-        seriesList = list(resultSet.get_points())
-        strMeasurement = "cpu_value"
-        strSelect = "MEAN(value)"
-        strWhere = "WHERE time > now() - 24h"
+        ## Have not collected all the dataoints
+        client.close()
+        Done = False
 
-        for keyList in seriesList:
-            query = "select {} from {} {}".format(strSelect,strMeasurement, strWhere)
+        listIndex = 0 # which LIST in the list of lists for each entry
+        while not frameworkInterface.KillThreadSignalled() and not Done:
+            updatedCount = 0
 
-            keys = keyList['key'].split(',')
-            for keyVal in keys[1:]:
-                key,value = keyVal.split('=')
-                query += " AND {}='{}'".format(key,value)
-
-            query +=  " GROUP BY time(1h) Order by instance"
-            resultSet = client.query(query)    
-            resultList2 = list(resultSet.get_points())
-            print(resultList2)
-
-
-
-        strMeasurement = "cpu_value"
-        strSelect = "MEAN(value)"
-        strWhere = "WHERE time > now() - 24h GROUP BY time(1h)"
-        query = "select {} from {} {}".format(strSelect,strMeasurement, strWhere)
-        resultSet = client.query(query)    
-        x = dir(resultSet)
-        resultList2 = list(resultSet.get_points())
-        #print(resultList2[0])
-
-
-    except Exception as Ex:
-        print (query)
-        print(str(Ex))
-        pass
-
-    pass
-    return
-    try:
-        while not frameworkInterface.KillThreadSignalled():
-            client = InfluxDBClient(hostname, port, username, password, database)
-            SleepMs(frameworkInterface.Interval)
-            dataMap={}
-
-            try:
-                for entry in FilterSet:
-                    dataMap.update(entry.performQuery(client))
-
-            except exceptions.InfluxDBClientError as Ex:
-                logger.error("InfluxDB Collector: {}".format(Ex))
-                client.close()
-                continue
-
-            except exceptions.InfluxDBServerError as Ex:
-                logger.error("InfluxDB Collector:  {}".format(Ex))
-                client.close()
-                continue
-
-            except Exception as Ex: #influxDB does NOT have a robust Exception system :-(
-                logger.info("InfluxDB Collector:  {}".format(Ex))
-                client.close()
-                continue
-
-            client.close()
-            
             for ID in dataMap:
-                Data, Namespace = dataMap[ID]
+                isListAndData, Namespace = dataMap[ID]
+                isList,Data = isListAndData
+
+                if listIndex >= len(Data):
+                    continue
 
                 if not frameworkInterface.DoesCollectorExist(ID,Namespace): # Do we already have this ID?
                     frameworkInterface.AddCollector(ID,Namespace)    # Nope, so go add it, and maybe Custom NS!
 
-                frameworkInterface.SetCollectorValue(ID,Data,None,Namespace)
+                if not isList: # so is a list of list data points, 
+                    dVal = Data[listIndex]
+                    frameworkInterface.SetCollectorValue(ID,dVal,None,Namespace)
+                    updatedCount += 1
+
+                else:
+                    frameworkInterface.SetCollectorValue(ID,Data[listIndex],None,Namespace) # is a 'csv list' I created
+                    updatedCount += 1
+
+            if 0 == updatedCount:  # went through the entire list
+                Done = True
+
+            else:
+                SleepMs(interval)
+
+            listIndex+=1
+
+        logger.info("Exiting HistoryCollectFunction after {} sets of data sent".format(listIndex))
 
     except Exception as Ex:
         logger.error("Unrecoverable error in InfluxDB Collector plugin: " + str(Ex))
