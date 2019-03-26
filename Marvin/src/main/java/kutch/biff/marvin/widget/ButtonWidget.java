@@ -25,7 +25,9 @@ import java.io.File;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -40,10 +42,9 @@ import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
  */
 public class ButtonWidget extends BaseWidget
 {
-
     private Button _Button;
-    private String _ImageFileName;
-    private double _ImageWidthConstraint, _ImageHeightConstraint;
+    protected String _ImageFileName;
+    protected double _ImageWidthConstraint, _ImageHeightConstraint;
 
     public ButtonWidget()
     {
@@ -52,30 +53,36 @@ public class ButtonWidget extends BaseWidget
         _ImageWidthConstraint = 0;
         _ImageHeightConstraint = 0;
     }
+    
+    protected ButtonBase getButton()
+    {
+        return _Button;
+    }
 
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
-        _Button.disableProperty().set(!_InitiallyEnabled);
+        getButton().disableProperty().set(!_InitiallyEnabled);
 
         ConfigureDimentions();
 
         ConfigureAlignment();
         SetupPeekaboo(dataMgr);
-        _Button.setText(getTitle());
+        
+        getButton().setText(getTitle());
         if (false == SetupImage())
         {
             return false;
         }
-        pane.add(_Button, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+        pane.add(getButton(), getColumn(), getRow(), getColumnSpan(), getRowSpan());
         dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
         {
             @Override
             public void changed(ObservableValue o, Object oldVal, Object newVal)
             {
                 String strVal = newVal.toString();
-                _Button.setText(strVal);
+                getButton().setText(strVal);
             }
         });
 
@@ -86,13 +93,13 @@ public class ButtonWidget extends BaseWidget
     @Override
     public javafx.scene.Node getStylableObject()
     {
-        return _Button;
+        return getButton();
     }
 
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return _Button.getStylesheets();
+        return getButton().getStylesheets();
     }
 
     @Override
@@ -104,7 +111,7 @@ public class ButtonWidget extends BaseWidget
     @Override
     public void SetEnabled(boolean enabled)
     {
-        _Button.disableProperty().set(!enabled);
+        getButton().disableProperty().set(!enabled);
     }
 
     public void setImageFileName(String _ImageFileName)
@@ -133,7 +140,7 @@ public class ButtonWidget extends BaseWidget
                     view.setFitWidth(_ImageWidthConstraint);
                 }
 
-                _Button.setGraphic(view);
+                getButton().setGraphic(view);
 
                 LOGGER.config("Adding Image to Button - " + _ImageFileName);
                 return true;
@@ -191,7 +198,7 @@ public class ButtonWidget extends BaseWidget
     @Override
     public void UpdateTitle(String strTitle)
     {
-        _Button.setText(strTitle);
+        getButton().setText(strTitle);
     }
 
 }

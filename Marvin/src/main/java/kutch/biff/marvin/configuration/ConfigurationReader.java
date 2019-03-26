@@ -1953,43 +1953,70 @@ public class ConfigurationReader
         _Configuration.setMenuBar(objMenuBar);
         return true;
     }
-
-    private Menu ReadMenu(String Title, FrameworkNode menuNode)
+    
+    public MenuItem ReadMenuItem(FrameworkNode menuNode)
     {
-        Menu objMenu = new Menu(Title);
+        if (menuNode.getNodeName().equalsIgnoreCase("MenuItem"))
+        {
+            Utility.ValidateAttributes(new String[]
+            {
+                "Text", "Task"
+            }, menuNode);
+            if (menuNode.hasAttribute("Text") && menuNode.hasAttribute("Task"))
+            {
+                MenuItem objItem = new MenuItem(menuNode.getAttribute("Text"));
+
+                if (true == Configuration.getConfig().getAllowTasks())
+                {
+                    objItem.setOnAction(new EventHandler<ActionEvent>()
+                    {
+                        @Override
+                        public void handle(ActionEvent t)
+                        {
+                            TASKMAN.PerformTask(menuNode.getAttribute("Task"));
+                        }
+                    });
+                }
+                return objItem;
+            }
+        }
+       return null;
+    }
+
+    public List<MenuItem> ReadMenuItems(FrameworkNode menuNode)
+    {
+        ArrayList<MenuItem> retList = new ArrayList<>();
         for (FrameworkNode node : menuNode.getChildNodes())
         {
             if (node.getNodeName().equalsIgnoreCase("MenuItem"))
             {
-                Utility.ValidateAttributes(new String[]
+                MenuItem objItem = ReadMenuItem(node);
+                if (null != objItem)
                 {
-                    "Text", "Task"
-                }, node);
-                if (node.hasAttribute("Text") && node.hasAttribute("Task"))
-                {
-                    MenuItem objItem = new MenuItem(node.getAttribute("Text"));
-                    if (true == _Configuration.getAllowTasks())
-                    {
-                        objItem.setOnAction(new EventHandler<ActionEvent>()
-                        {
-                            @Override
-                            public void handle(ActionEvent t)
-                            {
-                                TASKMAN.PerformTask(node.getAttribute("Task"));
-                            }
-                        });
-                    }
-                    objMenu.getItems().add(objItem);
+                    retList.add(objItem);
                 }
                 else
                 {
-                    LOGGER.severe("Invalid Menu with Title of " + Title + " defined");
                     return null;
                 }
             }
+
         }
 
-        return objMenu;
+        return retList;
+    }
 
+    private Menu ReadMenu(String Title, FrameworkNode menuNode)
+    {
+        Menu objMenu = new Menu(Title);
+        List<MenuItem> items = ReadMenuItems(menuNode);
+        if (null == items)
+        {
+            LOGGER.severe("Invalid Menu with Title of " + Title + " defined");
+            return null;
+
+        }
+        objMenu.getItems().addAll(items);
+        return objMenu;
     }
 }
