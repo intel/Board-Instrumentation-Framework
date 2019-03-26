@@ -10,8 +10,8 @@
  */
 
 .root {
-    -fx-base: #FFFFFF;
-    -fx-background: #FFFFFF;
+    -fx-base: #000000;
+    -fx-background: derive(-fx-base,25%);
     -fx-control-inner-background: derive(-fx-base,80%);
     -fx-control-inner-background-alt: derive(-fx-control-inner-background,-2%);
     -fx-dark-text-color: black;
