@@ -1005,7 +1005,7 @@ public class ConfigurationReader
                 Pair<String, String> exclude = getNamespaceAndIdPattern(node);
                 if (null == exclude)
                 {
-                    LOGGER.severe(String.format("Invalid GenerateDatapoing %s:%s -->%s", genDPInfo.getKey(), genDPInfo.getValue(), node.getAttributeList()));
+                    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(), genDPInfo.getValue(), node.getAttributeList()));
                     return null;
                 }
                 excludeList.add(exclude);
@@ -1049,6 +1049,18 @@ public class ConfigurationReader
         {
             LOGGER.severe("Invalid Method specified for GenerateDatapoint: " + inputNode.getAttribute("Method"));
             return null;
+        }
+        if (inputNode.hasAttribute("Scale"))
+        {
+            try
+            {
+                double scale = Double.parseDouble(inputNode.getAttribute("Scale"));
+                info.setScale(scale);
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
         if (inputNode.hasChild("Refresh"))
         {

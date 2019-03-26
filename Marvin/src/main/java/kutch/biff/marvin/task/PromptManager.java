@@ -33,7 +33,6 @@ import kutch.biff.marvin.widget.BaseWidget;
  */
 public class PromptManager
 {
-
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private static PromptManager _PromptManager = null;
     private ArrayList<BasePrompt> _Prompts = null;
