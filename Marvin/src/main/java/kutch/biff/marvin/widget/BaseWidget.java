@@ -1549,7 +1549,7 @@ abstract public class BaseWidget implements Widget
         return null;
     }
 
-    static protected boolean ApplyStyleOverrides(javafx.scene.Node widget, List<String> Styles)
+    static public boolean ApplyStyleOverrides(javafx.scene.Node widget, List<String> Styles)
     {
         //return true;
         if (null == widget || null == Styles || Styles.size() < 1)

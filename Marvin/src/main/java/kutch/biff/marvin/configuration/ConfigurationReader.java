@@ -35,6 +35,8 @@ import javafx.geometry.Side;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.util.Pair;
@@ -52,6 +54,8 @@ import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.GenerateDatapointInfo;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
+import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
+import static kutch.biff.marvin.widget.BaseWidget.convertToFileURL;
 import kutch.biff.marvin.widget.DynamicTabWidget;
 import kutch.biff.marvin.widget.TabWidget;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandTabBuilder;
@@ -69,35 +73,35 @@ import org.xml.sax.SAXException;
  */
 public class ConfigurationReader
 {
-
+    
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private Configuration _Configuration = null;
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private static ConfigurationReader _ConfigReader;
     private static HashMap<Conditional, Conditional> _conditionalMap = new HashMap<>();
     private static List<String> _OnDemandID_List = new ArrayList<>();
-
+    
     public ConfigurationReader()
     {
         _ConfigReader = this;
     }
-
+    
     public Configuration getConfiguration()
     {
         return _Configuration;
     }
     private List<TabWidget> _tabs = null;
-
+    
     public static ConfigurationReader GetConfigReader()
     {
         return _ConfigReader;
     }
-
+    
     public List<TabWidget> getTabs()
     {
         return _tabs;
     }
-
+    
     private static Document _OpenXMLFile(String filename, boolean fReport)
     {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -147,17 +151,17 @@ public class ConfigurationReader
         }
         return null;
     }
-
+    
     public static Document OpenXMLFile(String filename)
     {
         return _OpenXMLFile(filename, true);
     }
-
+    
     public static Document OpenXMLFileQuietly(String filename)
     {
         return _OpenXMLFile(filename, false);
     }
-
+    
     public Configuration ReadStartupInfo(String filename)
     {
         Document doc = OpenXMLFile(filename);
@@ -173,11 +177,11 @@ public class ConfigurationReader
         {
             return null;
         }
-
+        
         AliasMgr.getAliasMgr().ClearAll(); // nuke anything already read, will start fresh
         return _Configuration;
     }
-
+    
     public Configuration ReadAppConfigFile(String filename)
     {
         Document doc = OpenXMLFile(filename);
@@ -192,7 +196,7 @@ public class ConfigurationReader
             {
                 return null;
             }
-
+            
             if (false == ReadTaskAndConditionals(doc))
             {
                 _Configuration = null;
@@ -208,7 +212,7 @@ public class ConfigurationReader
         }
         return _Configuration;
     }
-
+    
     private void CalculateScaling()
     {
         if (null == _Configuration)
@@ -218,7 +222,7 @@ public class ConfigurationReader
         if (_Configuration.isAutoScale() && _Configuration.getCreationHeight() > 0 && _Configuration.getCreationWidth() > 0)
         {
             Rectangle2D visualBounds = _Configuration.getPrimaryScreen().getVisualBounds();
-
+            
             double appWidth = visualBounds.getWidth();
             double appHeight = visualBounds.getHeight();
             // if app size specified
@@ -233,26 +237,26 @@ public class ConfigurationReader
             double createWidth = (double) _Configuration.getCreationWidth();
             double createHeight = (double) _Configuration.getCreationHeight();
             double widthScale, heightScale, appScale;
-
+            
             Font defFont = Font.getDefault();
             LOGGER.info("System Font info: " + defFont.toString());
-
+            
             if (appWidth == createWidth && appHeight == createHeight)
             {
                 LOGGER.info("Attempting to automatically scale, however current resolution is the same as specified <CreationSize>");
                 return;
             }
-
+            
             widthScale = appWidth / createWidth;
             heightScale = appHeight / createHeight;
-
+            
             appScale = widthScale;
             if (heightScale < widthScale)  // pick the smaller of the 2
             {
                 appScale = heightScale;
             }
             _Configuration.setScaleFactor(appScale);
-
+            
             String strCurr = " screen resolution: [" + Double.toString(appWidth) + "x" + Double.toString(appHeight) + "]";
             String strCreated = " created screen resolution: [" + Double.toString(createWidth) + "x" + Double.toString(createHeight) + "]";
             LOGGER.info("AutoScale set to " + Double.toString(appScale) + strCurr + strCreated);
@@ -273,7 +277,7 @@ public class ConfigurationReader
         Utility.ValidateAttributes(new String[]
         {
             "mode", "Width", "Height", "Scale", "ID", "EnableScrollBars", "MarvinLocalData"
-
+        
         }, appNode);
         if (appNode.hasAttribute("ID"))
         {
@@ -284,7 +288,7 @@ public class ConfigurationReader
         {
             LOGGER.config("Setting Scroll bars per configuration");
             _Configuration.setEnableScrollBars(appNode.getBooleanAttribute("EnableScrollBars"));
-
+            
         }
         if (appNode.hasAttribute("MarvinLocalData"))
         {
@@ -313,7 +317,7 @@ public class ConfigurationReader
                 _Configuration.setDebugMode(false);
             }
         }
-
+        
         if (appNode.hasAttribute("Width"))
         {
             String strWidth = appNode.getAttribute("Width");
@@ -358,7 +362,7 @@ public class ConfigurationReader
             }
         }
     }
-
+    
     private boolean ReadOscarConnection(FrameworkNode oscarNode)
     {
         Utility.ValidateAttributes(new String[]
@@ -369,7 +373,7 @@ public class ConfigurationReader
         int Port = -1;
         String Key = "Biff Rulz!"; // default key
         boolean retVal = false;
-
+        
         if (oscarNode.hasAttribute("IP") && oscarNode.hasAttribute("Port"))
         {
             IP = oscarNode.getAttribute("IP");
@@ -391,10 +395,10 @@ public class ConfigurationReader
         {
             _Configuration.addOscarBullhornEntry(IP, Port, Key);
         }
-
+        
         return retVal;
     }
-
+    
     private void FetchDimenstions(FrameworkNode node)
     {
         try
@@ -413,9 +417,9 @@ public class ConfigurationReader
         catch (Exception ex)
         {
         }
-
+        
     }
-
+    
     private static boolean InList(ArrayList<String> list, String toCheck)
     {
         for (String item : list)
@@ -427,7 +431,7 @@ public class ConfigurationReader
         }
         return false;
     }
-
+    
     private boolean ReadAppSettings(Document doc, boolean basicInfoOnly)
     {
         NodeList appStuff = doc.getElementsByTagName("Application");
@@ -443,20 +447,20 @@ public class ConfigurationReader
         boolean NetworkSettingsRead = false;
         FrameworkNode baseNode = new FrameworkNode(appStuff.item(0));
         FetchDimenstions(baseNode);
-
+        
         AliasMgr.getAliasMgr().addMarvinInfo();
         AliasMgr.ReadAliasFromRootDocument(doc);
         ReadAppAttributes(baseNode);
-
+        
         ArrayList<String> DeclaredTabList = new ArrayList<>();
-
+        
         for (FrameworkNode node : baseNode.getChildNodes())
         {
             if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
             {
                 continue;
             }
-
+            
             else if (node.getNodeName().equalsIgnoreCase("Title"))
             {
                 _Configuration.setAppTitle(node.getTextContent());
@@ -477,7 +481,7 @@ public class ConfigurationReader
             else if (node.getNodeName().equalsIgnoreCase("IgnoreWebCerts"))
             {
                 _Configuration.setIgnoreWebCerts(node.getBooleanValue());
-
+                
                 LOGGER.config("Ignoring Web Certifications");
             }
             else if (node.getNodeName().equalsIgnoreCase("MonitorNumber"))
@@ -499,7 +503,7 @@ public class ConfigurationReader
                         LOGGER.warning("<MonitorNumber> set to " + node.getTextContent() + " smallest valid value is 1.Ignoring");
                         continue;
                     }
-
+                    
                     if (monitorNum <= count)
                     {
                         Screen primary = Screen.getScreens().get(monitorNum - 1);
@@ -536,14 +540,14 @@ public class ConfigurationReader
                     LOGGER.severe("Invalid CreationSize specified");
                 }
             }
-
+            
             else if (node.getNodeName().equalsIgnoreCase("Tasks"))
             {
                 if (basicInfoOnly)
                 {
                     continue;
                 }
-
+                
                 Utility.ValidateAttributes(new String[]
                 {
                     "Enabled"
@@ -584,7 +588,7 @@ public class ConfigurationReader
                     LOGGER.config("No IP specified in <Network> settings. Will listen on all interfaces");
                     _Configuration.setAddress("0.0.0.0");
                 }
-
+                
                 if (node.hasAttribute("Port"))
                 {
                     String str = node.getAttribute("Port");
@@ -616,7 +620,7 @@ public class ConfigurationReader
                     {
                         continue;
                     }
-
+                    
                     else if (oscarNode.getNodeName().equalsIgnoreCase("Oscar"))
                     {
                         if (false == ReadOscarConnection(oscarNode))
@@ -632,7 +636,7 @@ public class ConfigurationReader
                 {
                     continue;
                 }
-
+                
                 Utility.ValidateAttributes(new String[]
                 {
                     "top", "bottom", "left", "right", "legacymode"
@@ -677,7 +681,7 @@ public class ConfigurationReader
                         LOGGER.config("Using LEGACY mode of padding.");
                     }
                 }
-
+                
             }
             else if (node.getNodeName().equalsIgnoreCase("MainMenu"))
             {
@@ -692,7 +696,7 @@ public class ConfigurationReader
                 {
                     continue;
                 }
-
+                
                 if (false == ReadUnregisteredDataInfo(node))
                 {
                     return false;
@@ -704,11 +708,11 @@ public class ConfigurationReader
                 {
                     "side"
                 }, node);
-
+                
                 if (node.hasAttribute("Side")) // where the tabs should be located.
                 {
                     String sideStr = node.getAttribute("Side");
-
+                    
                     if (sideStr.equalsIgnoreCase("Top"))
                     {
                         _Configuration.setSide(Side.TOP);
@@ -751,7 +755,7 @@ public class ConfigurationReader
                                 if (tabNode.hasChild("OnDemand"))
                                 {
                                     DynamicItemInfoContainer dynaInfo = ReadOnDemandInfo(tabNode.getChild("OnDemand"));
-
+                                    
                                     if (null != dynaInfo)
                                     {
                                         OnDemandTabBuilder objBuilder = new OnDemandTabBuilder(ID, tabCount, dynaInfo);
@@ -795,19 +799,19 @@ public class ConfigurationReader
                 LOGGER.warning("Unexpected section in <Application>: " + node.getNodeName());
             }
         }
-
+        
         if (basicInfoOnly)
         {
             return true;
         }
-
+        
         if (DeclaredTabList.isEmpty() && !DataManager.getDataManager().DynamicTabRegistered())
         {
             LOGGER.severe("No Tabs defined in <Application> section of configuration file.");
             return false;
         }
         _Configuration.setPrimaryScreenDetermined(true);
-
+        
         if (VerifyTabList(DeclaredTabList))
         {
             _tabs = ReadTabs(doc, DeclaredTabList);
@@ -820,7 +824,7 @@ public class ConfigurationReader
         {
             ReadOnDemandTabs(doc);
         }
-
+        
         if (false == NetworkSettingsRead)
         {
             LOGGER.severe("No <Network> section found in Application.xml");
@@ -840,7 +844,7 @@ public class ConfigurationReader
         ArrayList<String> namespaceExcludeList = new ArrayList<>();
         ArrayList<String> idMaskList = new ArrayList<>();
         ArrayList<String> idExcludeList = new ArrayList<>();
-
+        
         for (FrameworkNode dynaNode : sourceNode.getChildNodes(true))
         {
             if (dynaNode.getNodeName().equalsIgnoreCase("NamespaceTriggerPattern"))
@@ -862,12 +866,12 @@ public class ConfigurationReader
                 {
                     LOGGER.warning("On Demand item specified duplicate NamespaceTriggerExcludePattern.  Ignoring.");
                 }
-
+                
                 else
                 {
                     namespaceExcludeList.add(dynaNode.getTextContent());
                 }
-
+                
                 if (InList(namespaceMaskList, Exclude))
                 {
                     LOGGER.warning("On Demand item specified duplicate NamespaceTriggerExcludePattern that matches NamespaceTriggerExcludePattern.");
@@ -884,7 +888,7 @@ public class ConfigurationReader
                 {
                     idMaskList.add(dynaNode.getTextContent());
                 }
-
+                
             }
             else if (dynaNode.getNodeName().equalsIgnoreCase("IDTriggerExcludePattern"))
             {
@@ -893,12 +897,12 @@ public class ConfigurationReader
                 {
                     LOGGER.warning("On Demand item specified duplicate IDTriggerExcludePattern.  Ignoring.");
                 }
-
+                
                 else
                 {
                     idExcludeList.add(dynaNode.getTextContent());
                 }
-
+                
                 if (InList(idMaskList, Exclude))
                 {
                     LOGGER.warning("On Demand item specified duplicate IDTriggerExcludePattern that matches IDTriggerExcludePattern.");
@@ -906,11 +910,11 @@ public class ConfigurationReader
             }
             else if (dynaNode.getNodeName().equalsIgnoreCase("StyleOverride-Odd") || dynaNode.getNodeName().equalsIgnoreCase("StyleOverride-Even"))
             {
-
+                
             }
             else if (dynaNode.getNodeName().equalsIgnoreCase("Growth"))
             {
-
+                
             }
             else
             {
@@ -922,15 +926,15 @@ public class ConfigurationReader
             LOGGER.severe("On Demand item did not specify a namespace or ID Trigger pattern");
             return null;
         }
-
+        
         Pair<ArrayList<String>, ArrayList<String>> namespaceCriterea;
         namespaceCriterea = new Pair<>(namespaceMaskList, namespaceExcludeList);
         Pair<ArrayList<String>, ArrayList<String>> idCriterea = new Pair<>(idMaskList, idExcludeList);
-
+        
         DynamicItemInfoContainer dynaInfo = new DynamicItemInfoContainer(namespaceCriterea, idCriterea);
-
+        
         dynaInfo.ReadStyles(sourceNode);
-
+        
         if (sourceNode.hasAttribute("SortBy"))
         {
             String strSortBy = sourceNode.getAttribute("SortBy");
@@ -956,16 +960,16 @@ public class ConfigurationReader
                 dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NONE);
             }
         }
-
+        
         if (sourceNode.hasAttribute("TriggeredIdToken"))
         {
             String strToken = sourceNode.getAttribute("TriggeredIdToken");
             dynaInfo.setToken(strToken);
         }
-
+        
         return dynaInfo;
     }
-
+    
     private static Pair<String, String> getNamespaceAndIdPattern(FrameworkNode node)
     {
         if (node.hasAttribute("Namespace") && node.hasAttribute("ID"))
@@ -974,20 +978,20 @@ public class ConfigurationReader
         }
         return null;
     }
-
+    
     public static GenerateDatapointInfo ReadGenerateDatapointInfo(FrameworkNode inputNode)
     {
         ArrayList<Pair<String, String>> maskList = new ArrayList<>();
         ArrayList<Pair<String, String>> excludeList = new ArrayList<>();
         int precision = 2;
-
+        
         Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode);
         if (null == genDPInfo)
         {
             LOGGER.severe("Invalid GenerateDatapoint.");
             return null;
         }
-
+        
         for (FrameworkNode node : inputNode.getChildNodes(true))
         {
             if (node.getNodeName().equalsIgnoreCase("InputPattern"))
@@ -1059,7 +1063,7 @@ public class ConfigurationReader
             }
             catch (Exception ex)
             {
-
+                
             }
         }
         if (inputNode.hasChild("Refresh"))
@@ -1108,17 +1112,17 @@ public class ConfigurationReader
                 LOGGER.severe("<GenerateDatapoint> specified <Refresh> without a Policy.");
                 return null;
             }
-
+            
         }
-
+        
         info.setPrecision(precision);
         return info;
     }
-
+    
     private void ReadOnDemandTabs(Document doc)
     {
         FrameworkNode appNode = new FrameworkNode(doc.getChildNodes().item(0));
-
+        
         for (FrameworkNode node : appNode.getChildNodes("tab"))
         {
             if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
@@ -1148,14 +1152,14 @@ public class ConfigurationReader
             }
         }
     }
-
+    
     private boolean ReadUnregisteredDataInfo(FrameworkNode UnregisteredDataNode)
     {
         Utility.ValidateAttributes(new String[]
         {
             "Enabled", "Width", "Title"
         }, UnregisteredDataNode);
-
+        
         if (UnregisteredDataNode.hasAttributes())
         {
             if (UnregisteredDataNode.hasAttribute("Enabled"))
@@ -1179,14 +1183,14 @@ public class ConfigurationReader
         {
             return true;  // if no attributes, then it's not enabled, so we are outta here
         }
-
+        
         for (FrameworkNode node : UnregisteredDataNode.getChildNodes())
         {
             if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
             {
                 continue;
             }
-
+            
             if (node.getNodeName().equalsIgnoreCase("TitleStyle"))
             {
                 DynamicTabWidget.setTitleStyle(node.getTextContent());
@@ -1225,7 +1229,7 @@ public class ConfigurationReader
                     {
                         continue;
                     }
-
+                    
                     if (oddNode.getNodeName().equalsIgnoreCase("Background"))
                     {
                         DynamicTabWidget.setOdd_Background(oddNode.getTextContent());
@@ -1287,7 +1291,7 @@ public class ConfigurationReader
         FrameworkNode TabNode = OpenDefinitionFile(inputFilename, "Tab");
         return TabNode;
     }
-
+    
     private boolean TabAlreadyLoaded(ArrayList<TabWidget> tabs, String checkID)
     {
         for (TabWidget tab : tabs)
@@ -1299,7 +1303,7 @@ public class ConfigurationReader
         }
         return false;
     }
-
+    
     static public TabWidget ReadTab(FrameworkNode node, TabWidget tab, String id)
     {
         FrameworkNode tabNode = null;
@@ -1319,12 +1323,12 @@ public class ConfigurationReader
             {
                 tab.setOnDemandTask(tabNode.getAttribute("OnDemandTask"));
             }
-
+            
             AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
                                                     {
                                                         "ID", "File", "Align", "hgap", "vgap", "Task"
             });
-
+            
             if (false == AliasMgr.getAliasMgr().ReadAliasFromExternalFile(node.getAttribute("File")))
             {
                 return null;
@@ -1350,7 +1354,7 @@ public class ConfigurationReader
         {
             WidgetBuilder.DoneReadingExternalFile();
         }
-
+        
         if (true == node.hasAttribute("Align"))
         {
             String str = node.getAttribute("Align");
@@ -1397,13 +1401,13 @@ public class ConfigurationReader
         }
         return tab;
     }
-
+    
     private List<TabWidget> ReadTabs(Document doc, List<String> TabID_List)
     {
         FrameworkNode appNode = new FrameworkNode(doc.getChildNodes().item(0));
-
+        
         ArrayList<TabWidget> TabList = new ArrayList<>();
-
+        
         for (FrameworkNode node : appNode.getChildNodes(true))
         {
             if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
@@ -1415,12 +1419,12 @@ public class ConfigurationReader
                 LOGGER.warning("DemoFramework XML tag is deprecated.  Use 'Marvin'");
                 continue;
             }
-
+            
             if (node.getNodeName().equalsIgnoreCase("Marvin"))
             {
                 continue;
             }
-
+            
             if (node.getNodeName().equalsIgnoreCase("Application"))
             {
                 continue;
@@ -1439,16 +1443,16 @@ public class ConfigurationReader
                             LOGGER.severe("<Tab ID=" + id + "> defined twice in <Tabs>.");
                             return null;
                         }
-
+                        
                         for (String string : TabID_List)
                         {
                             if (0 == string.compareToIgnoreCase(id))
                             {
                                 found = true;
-
+                                
                                 tab = new TabWidget(id);
                                 FrameworkNode tabNode = null;
-
+                                
                                 tab = ConfigurationReader.ReadTab(node, tab, id);
                                 if (null == tab)
                                 {
@@ -1465,12 +1469,12 @@ public class ConfigurationReader
                                             LOGGER.severe("Invalid tab definition file: " + node.getAttribute("File"));
                                             return null;
                                         }
-
+                                        
                                         AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
                                                                                 {
                                                                                     "ID", "File", "Align", "hgap", "vgap", "Task"
                                         });
-
+                                        
                                         if (false == AliasMgr.getAliasMgr().ReadAliasFromExternalFile(node.getAttribute("File")))
                                         {
                                             return null;
@@ -1500,7 +1504,7 @@ public class ConfigurationReader
                                     {
                                         WidgetBuilder.DoneReadingExternalFile();
                                     }
-
+                                    
                                     break;
                                 }
                             }
@@ -1532,7 +1536,7 @@ public class ConfigurationReader
                     {
                         tab.setOnActivateTask(node.getAttribute("task"));
                     }
-
+                    
                     if (node.hasAttribute("hgap"))
                     {
                         try
@@ -1583,18 +1587,18 @@ public class ConfigurationReader
                     return null;
                 }
             }
-
+            
             else if (node.getNodeName().equalsIgnoreCase("Prompt"))
             {
                 ConfigurationReader.ReadPrompt(node);
             }
             else if (node.getNodeName().equalsIgnoreCase("AliasList"))
             {
-
+                
             }
             else if (node.getNodeName().equalsIgnoreCase("Conditional"))
             {
-
+                
             }
             else
             {
@@ -1605,18 +1609,18 @@ public class ConfigurationReader
         {
             return null;
         }
-
+        
         return SortTabs(TabList, TabID_List);
     }
-
+    
     private boolean VerifyDesiredTabsPresent(List<TabWidget> listTabs, List<String> TabID_List)
     {
         boolean RetVal = true;
-
+        
         for (String id : TabID_List)
         {
             boolean found = false;
-
+            
             for (TabWidget tab : listTabs)
             {
                 if (0 == id.compareToIgnoreCase(tab.getMinionID()))
@@ -1646,7 +1650,7 @@ public class ConfigurationReader
     private List<TabWidget> SortTabs(List<TabWidget> listTabs, List<String> TabID_List)
     {
         List<TabWidget> sortedTabs = new ArrayList<>(listTabs.size());
-
+        
         for (String id : TabID_List)
         {
             for (TabWidget tab : listTabs)
@@ -1658,14 +1662,14 @@ public class ConfigurationReader
                 }
             }
         }
-
+        
         return sortedTabs;
     }
-
+    
     public static boolean ReadTasksFromExternalFile(String filename)
     {
         Document doc = OpenXMLFile(filename);
-
+        
         if (null != doc)
         {
             if (ReadPrompts(doc))
@@ -1675,12 +1679,12 @@ public class ConfigurationReader
         }
         return false;
     }
-
+    
     private static Conditional ReadConditional(FrameworkNode condNode)
     {
         String strType = null;
         boolean CaseSensitive = false;
-
+        
         Utility.ValidateAttributes(new String[]
         {
             "CaseSensitive", "Type"
@@ -1694,7 +1698,7 @@ public class ConfigurationReader
         {
             CaseSensitive = condNode.getBooleanAttribute("CaseSensitive");
         }
-
+        
         strType = condNode.getAttribute("type");
         Conditional.Type type = Conditional.GetType(strType);
         if (type == Conditional.Type.Invalid)
@@ -1702,16 +1706,16 @@ public class ConfigurationReader
             LOGGER.severe("Conditional defined with invalid type: " + strType);
             return null;
         }
-
+        
         Conditional objConditional = Conditional.BuildConditional(type, condNode, true);
         if (null != objConditional)
         {
             objConditional.setCaseSensitive(CaseSensitive);
         }
-
+        
         return objConditional;
     }
-
+    
     private static boolean ReadConditionals(Document doc)
     {
         /*
@@ -1729,7 +1733,7 @@ public class ConfigurationReader
          */
         TaskManager TASKMAN = TaskManager.getTaskManager();
         boolean retVal = true;
-
+        
         NodeList conditionals = doc.getElementsByTagName("Conditional");
         if (conditionals.getLength() < 1)
         {
@@ -1756,17 +1760,17 @@ public class ConfigurationReader
                 objCond.Enable();
             }
         }
-
+        
         return retVal;
     }
-
+    
     private static boolean ReadTaskAndConditionals(Document doc)
     {
         TaskManager TASKMAN = TaskManager.getTaskManager();
         boolean retVal = true;
-
+        
         List<FrameworkNode> taskListNodes = FrameworkNode.GetChildNodes(doc, "TaskList");
-
+        
         if (taskListNodes.size() < 1)
         {
             //LOGGER.info("No Tasks defined in config file.");
@@ -1780,15 +1784,15 @@ public class ConfigurationReader
                 break;
             }
         }
-
+        
         if (true == retVal)
         {
             retVal = ReadConditionals(doc);
         }
-
+        
         return retVal;
     }
-
+    
     public static boolean ReadGenerateDataPoints(FrameworkNode node)
     {
         GenerateDatapointInfo info = ConfigurationReader.ReadGenerateDatapointInfo(node);
@@ -1799,16 +1803,16 @@ public class ConfigurationReader
         DataManager.getDataManager().AddGenerateDatapointInfo(info);;
         return true;
     }
-
+    
     public static boolean ReadTaskList(FrameworkNode taskNode)
     {
         TaskManager TASKMAN = TaskManager.getTaskManager();
         boolean retVal = true;
-
+        
         String taskID = null;
         String externFile = null;
         FrameworkNode nodeToPass = taskNode;
-
+        
         Utility.ValidateAttributes(new String[]
         {
             "ID", "File", "PerformOnStartup", "PerformOnConnect", "stepped"
@@ -1838,7 +1842,7 @@ public class ConfigurationReader
         }
         if (TASKMAN.CreateTask(taskID, nodeToPass))
         {
-
+            
         }
         else
         {
@@ -1846,11 +1850,11 @@ public class ConfigurationReader
         }
         return retVal;
     }
-
+    
     private static boolean ReadPrompts(Document doc)
     {
         boolean retVal = true;
-
+        
         NodeList prompts = doc.getElementsByTagName("Prompt");
         if (prompts.getLength() < 1)
         {
@@ -1865,20 +1869,20 @@ public class ConfigurationReader
                 break;
             }
         }
-
+        
         return retVal;
     }
-
+    
     public static boolean ReadPrompt(FrameworkNode promptNode)
     {
         PromptManager PROMPTMAN = PromptManager.getPromptManager();
         boolean retVal = true;
-
+        
         Utility.ValidateAttributes(new String[]
         {
             "ID", "Type", "Height", "Width"
         }, promptNode);
-
+        
         if (false == promptNode.hasAttribute("ID"))
         {
             LOGGER.warning("Prompt defined with no ID, ignoring");
@@ -1888,10 +1892,124 @@ public class ConfigurationReader
         {
             retVal = false;
         }
-
+        
         return retVal;
     }
+    
+    public static ImageView GetImage(String ImageFileName, double ImageHeightConstraint, double ImageWidthConstraint)
+    {
+        ImageView view = null;
+        if (null != ImageFileName)
+        {
+            String fname = convertToFileOSSpecific(ImageFileName);
+            File file = new File(fname);
+            if (file.exists())
+            {
+                String fn = "file:" + fname;
+                Image img = new Image(fn);
+                view = new ImageView(img);
+                
+                if (ImageHeightConstraint > 0)
+                {
+                    view.setFitHeight(ImageHeightConstraint);
+                }
+                if (ImageWidthConstraint > 0)
+                {
+                    view.setFitWidth(ImageWidthConstraint);
+                }
+                
+            }
+            else
+            {
+                LOGGER.severe("Invalid Image File specified for Widget: " + ImageFileName);
+            }
+        }
+        return view;
+    }    
+    
+    public static ImageView GetImage(FrameworkNode node)
+    {
+        if (node.getNodeName().equalsIgnoreCase("Image"))
+        {
+            String fName = node.getTextContent();
+            double ImageWidthConstraint = 0.0;
+            double ImageHeightConstraint = 0.0;
+            
+            Utility.ValidateAttributes(new String[]
+            {
+                "Height", "Width"
+            }, node);
+            if (node.hasAttribute("Width"))
+            {
+                try
+                {
+                    ImageWidthConstraint = Double.parseDouble(node.getAttribute("Width"));
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.severe("Widget Image has invalid Width specified: " + node.getAttribute("Width"));
+                    return null;
+                }
+            }
+            if (node.hasAttribute("Height"))
+            {
+                try
+                {
+                    ImageHeightConstraint = Double.parseDouble(node.getAttribute("Height"));
+                }
+                catch (NumberFormatException ex)
+                {
+                    LOGGER.severe("Widget Image has invalid Height specified: " + node.getAttribute("Height"));
+                    return null;
+                }
+            }
+            
+            return ConfigurationReader.GetImage(fName, ImageHeightConstraint, ImageWidthConstraint);
+        }
+        return null;
+    }
+    
+    private boolean HandleMenuStyleOverride(MenuItem menu, FrameworkNode menuNode)
+    {
+        List<String> styles = new ArrayList<>();
+        
+        FrameworkNode styleNode;
+        if (menuNode.hasChild("StyleOverride"))
+        {
+            styleNode = menuNode.getChild("StyleOverride");
+        }
+        else
+        {
+            return false;
+        }
 
+        for (FrameworkNode node : styleNode.getChildNodes())
+        {
+            if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
+            {
+                continue;
+            }
+            if (node.getNodeName().equalsIgnoreCase("Item"))
+            {
+                styles.add(node.getTextContent());
+            }
+            else
+            {
+                LOGGER.severe("Unknown Tag under <StyleOverride>: " + node.getNodeName());
+                return false;
+            }
+        }
+        String StyleString = "";
+        for (String Style : styles)
+        {
+            StyleString += Style + ";";
+        }
+
+        menu.setStyle(StyleString);
+        
+        return true;
+    }    
+    
     private boolean ReadAppMenu(FrameworkNode menuNode, boolean basicInfoOnly)
     {
         if (null != _Configuration.getMenuBar())
@@ -1923,6 +2041,7 @@ public class ConfigurationReader
             return true;
         }
         MenuBar objMenuBar = new MenuBar();
+        
         for (FrameworkNode node : menuNode.getChildNodes())
         {
             if (node.getNodeName().equalsIgnoreCase("Menu"))
@@ -1936,7 +2055,17 @@ public class ConfigurationReader
                     Menu objMenu = ReadMenu(node.getAttribute("Title"), node);
                     if (null != objMenu)
                     {
+                        HandleMenuStyleOverride(objMenu,node);
+                        
                         objMenuBar.getMenus().add(objMenu);
+                        if (node.hasChild("Image"))
+                        {
+                            ImageView iv = ConfigurationReader.GetImage(node.getChild("Image"));
+                            if (null != iv)
+                            {
+                                objMenu.setGraphic(iv);
+                            }
+                        }
                     }
                     else
                     {
@@ -1948,6 +2077,7 @@ public class ConfigurationReader
                     LOGGER.severe("Invalid Menu defined, no Title");
                     return false;
                 }
+                
             }
         }
         _Configuration.setMenuBar(objMenuBar);
@@ -1965,7 +2095,19 @@ public class ConfigurationReader
             if (menuNode.hasAttribute("Text") && menuNode.hasAttribute("Task"))
             {
                 MenuItem objItem = new MenuItem(menuNode.getAttribute("Text"));
+                                        HandleMenuStyleOverride(objItem,menuNode);
 
+                
+                        if (menuNode.hasChild("Image"))
+                        {
+                            ImageView iv = ConfigurationReader.GetImage(menuNode.getChild("Image"));
+                            if (null != iv)
+                            {
+                                objItem.setGraphic(iv);
+                            }
+                        }
+                
+                
                 if (true == Configuration.getConfig().getAllowTasks())
                 {
                     objItem.setOnAction(new EventHandler<ActionEvent>()
@@ -1980,9 +2122,9 @@ public class ConfigurationReader
                 return objItem;
             }
         }
-       return null;
+        return null;
     }
-
+    
     public List<MenuItem> ReadMenuItems(FrameworkNode menuNode)
     {
         ArrayList<MenuItem> retList = new ArrayList<>();
@@ -2000,12 +2142,12 @@ public class ConfigurationReader
                     return null;
                 }
             }
-
+            
         }
-
+        
         return retList;
     }
-
+    
     private Menu ReadMenu(String Title, FrameworkNode menuNode)
     {
         Menu objMenu = new Menu(Title);
@@ -2014,7 +2156,7 @@ public class ConfigurationReader
         {
             LOGGER.severe("Invalid Menu with Title of " + Title + " defined");
             return null;
-
+            
         }
         objMenu.getItems().addAll(items);
         return objMenu;
