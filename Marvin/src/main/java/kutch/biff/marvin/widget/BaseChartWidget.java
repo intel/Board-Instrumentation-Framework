@@ -792,9 +792,7 @@ abstract public class BaseChartWidget extends BaseWidget
 
             }
             boolean fReturn = ((XYChart) getChart()).getData().add(objSeries);
-
         }
-
     }
 
     @Override
