@@ -24,6 +24,7 @@ public class MenuButtonWidget extends ButtonWidget
     public MenuButtonWidget()
     {
         _Button = new MenuButton();
+        _Button.getStyleClass().add("kutch");
     }
     
     @Override

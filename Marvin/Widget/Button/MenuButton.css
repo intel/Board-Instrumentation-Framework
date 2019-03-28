@@ -2,6 +2,11 @@
     Document   : controlStyle1
 */
 
+/* Work around for bug in javafx */
+.kutch,
+.kutch > .label{
+     -fx-text-fill:black;
+}
 #default
 {
     -fx-background-color: 
