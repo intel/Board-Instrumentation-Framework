@@ -41,6 +41,11 @@ public class MenuButtonWidget extends ButtonWidget
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode)
     {
+        if (super.HandleWidgetSpecificSettings(widgetNode))
+        {
+            return true;
+        }
+            
         ConfigurationReader rdr = ConfigurationReader.GetConfigReader();
         MenuItem objItem = rdr.ReadMenuItem(widgetNode);
         if (null != objItem)
