@@ -33,6 +33,7 @@ public class SeriesDataSet
     private String Title;
     private String Namespace;
     private XYChart.Series _Series;
+    private double _ScaleValue;
     
     public SeriesDataSet(String title, String id, String namespace)
     {
@@ -41,8 +42,19 @@ public class SeriesDataSet
         Namespace = namespace;
         _Series = new XYChart.Series<>();
         _Series.setName(Title);
+        _ScaleValue = 1.0;
     }
 
+    public void setScaleValue(double dVal)
+    {
+        _ScaleValue = dVal;
+    }
+    
+    public double getScaleValue()
+    {
+        return _ScaleValue;
+    }
+    
     public String getID()
     {
         return ID;
