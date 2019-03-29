@@ -78,6 +78,16 @@ public class WidgetBuilder
 
             return objGrid;
         }
+        else if (node.getNodeName().equalsIgnoreCase("ListGrid"))
+        {
+            Widget objGrid = BuildGrid(node, false);
+            if (node.hasAttribute("OnDemandTask") && null != objGrid)
+            {
+                ((GridWidget) (objGrid)).setOnDemandTask(node.getAttribute("OnDemandTask"));
+            }
+
+            return objGrid;
+        }
         else if (node.getNodeName().equalsIgnoreCase("DynamicGrid"))
         {
             Widget objDynaGrid = BuildDynamicGrid(node);
@@ -1356,6 +1366,44 @@ public class WidgetBuilder
                 {
                     return null;
                 }
+            }
+            else if (name.equalsIgnoreCase("ListView"))
+            {
+                retWidget.setUseListView(true);
+                if (node.hasChild("StyleOverride"))
+                {
+                    FrameworkNode styleNode = node.getChild("StyleOverride");
+                    Utility.ValidateAttributes(new String[]
+                    {
+                        "File", "ID", "ScaleToShape"
+                    }, styleNode);
+                    if (styleNode.hasAttribute("File"))
+                    {
+                        retWidget.setListViewFileCSS(styleNode.getAttribute("File"));
+                    }
+                    if (styleNode.hasAttribute("ID"))
+                    {
+                        retWidget.setStyleID(styleNode.getAttribute("ID"));
+                    }
+                    List<String> itemList = new ArrayList<>();
+                    for (FrameworkNode sNode : styleNode.getChildNodes())
+                    {
+                        if (sNode.getNodeName().equalsIgnoreCase("#Text") || sNode.getNodeName().equalsIgnoreCase("#comment"))
+                        {
+                            continue;
+                        }
+                        if (sNode.getNodeName().equalsIgnoreCase("Item"))
+                        {
+                            itemList.add(sNode.getTextContent());
+                        }
+                        else
+                        {
+                            LOGGER.severe("Unknown Tag under <StyleOverride>: " + sNode.getNodeName());
+                        }
+                    }
+                    retWidget.setListStyleOverride(itemList);
+                }
+
             }
 
             else if (node.getNodeName().equalsIgnoreCase("For"))

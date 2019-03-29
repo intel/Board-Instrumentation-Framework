@@ -22,18 +22,25 @@
 package kutch.biff.marvin.widget;
 
 import java.awt.Dimension;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.Utility;
+import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
 
 /**
  *
@@ -41,6 +48,7 @@ import kutch.biff.marvin.utility.Utility;
  */
 public class GridWidget extends BaseWidget
 {
+
     protected ArrayList<Widget> _Widgets;
     private GridPane _GridPane = null;
     private int _hGap, _vGap;
@@ -50,6 +58,11 @@ public class GridWidget extends BaseWidget
     protected double _hGapPercentOfParentGrid;
     protected double _vGapPercentOfParentGrid;
     private String _OnDemandTask;
+    private boolean _UseListView;
+    private ListView _ListView;
+    private String _ListViewFileCSS;
+    private String _ListStyleID;
+    private List<String> _ListStyleOverride;
 
     public GridWidget()
     {
@@ -68,7 +81,13 @@ public class GridWidget extends BaseWidget
         _hGapPercentOfParentGrid = 0;
         _vGapPercentOfParentGrid = 0;
         _OnDemandTask = null;
+        _ListView = null;
+        _ListViewFileCSS = null;
+        _ListStyleID = null;
+        _ListStyleOverride = null;
+        _UseListView = false;
     }
+
     //private Pos _Position; // this could be a problem
     protected boolean isPropagateClickThrough()
     {
@@ -78,6 +97,21 @@ public class GridWidget extends BaseWidget
     protected void setPropagateClickThrough(boolean _PropagateClickThrough)
     {
         this._PropagateClickThrough = _PropagateClickThrough;
+    }
+
+    public boolean isUseListView()
+    {
+        return _UseListView;
+    }
+
+    public void setUseListView(boolean _UseListView)
+    {
+        if (null == _ListView)
+        {
+            _ListView = new ListView<GridPane>();
+        }
+
+        this._UseListView = _UseListView;
     }
 
     public void setExplicitPropagate(boolean _PropagateClickThrough)
@@ -95,7 +129,7 @@ public class GridWidget extends BaseWidget
     {
         SnapshotParameters params = new SnapshotParameters();
         params.setFill(fillColor);
-        
+
         try
         {
             Image image = getGridPane().snapshot(params, null);
@@ -132,7 +166,6 @@ public class GridWidget extends BaseWidget
         SetPadding();
 
         boolean RetVal = true;
-        //ApplyCSS();
 
         for (Widget _Widget : _Widgets)
         {
@@ -160,7 +193,16 @@ public class GridWidget extends BaseWidget
 
         if (parentPane != getGridPane())
         {
-            parentPane.add(_GridPane, getColumn(), getRow(), getColumnSpan(), getRowSpan()); // is a cycle since this is the parent of tab
+            Node addObj = _GridPane;
+            if (_UseListView)
+            {
+                ObservableList<GridPane> wList = FXCollections.observableArrayList();
+                wList.add(getGridPane());
+                _ListView.setItems(wList);
+                addObj = _ListView;
+            }
+
+            parentPane.add(addObj, getColumn(), getRow(), getColumnSpan(), getRowSpan()); // is a cycle since this is the parent of tab
         }
         SetupPeekaboo(dataMgr);
         SetupTaskAction();
@@ -170,6 +212,21 @@ public class GridWidget extends BaseWidget
     public void SetPadding()
     {
         getGridPane().setPadding(new Insets(getInsetTop(), getInsetRight(), getInsetBottom(), getInsetLeft()));
+    }
+
+    public void setListViewFileCSS(String _ListViewFileCSS)
+    {
+        this._ListViewFileCSS = _ListViewFileCSS;
+    }
+
+    public void setListStyleID(String _ListStyleID)
+    {
+        this._ListStyleID = _ListStyleID;
+    }
+
+    public void setListStyleOverride(List<String> _ListStyleOverride)
+    {
+        this._ListStyleOverride = _ListStyleOverride;
     }
 
     @Override
@@ -448,19 +505,19 @@ public class GridWidget extends BaseWidget
         Bounds local = this.getGridPane().getBoundsInLocal();
         Dimension configD = this.getConfiguredDimensions();
         Dimension viewD = this.getRealDimensions();
-        
+
         if (configD.getWidth() > 0)
         {
-            if (configD.getWidth() < local.getWidth() && local.getWidth() - configD.getWidth() > depth*2) // *2 is to account for borders in debug mode
+            if (configD.getWidth() < local.getWidth() && local.getWidth() - configD.getWidth() > depth * 2) // *2 is to account for borders in debug mode
             {
-                LOGGER.warning("Grid Widget[" + Integer.toString(getWidgetNumber()) +"] configured width is " + Integer.toString((int)configD.getWidth()) + ", but real width is " + Integer.toString((int)local.getWidth()));
+                LOGGER.warning("Grid Widget[" + Integer.toString(getWidgetNumber()) + "] configured width is " + Integer.toString((int) configD.getWidth()) + ", but real width is " + Integer.toString((int) local.getWidth()));
             }
         }
         if (configD.getHeight() > 0)
         {
-            if (configD.getHeight() < local.getHeight() && local.getHeight() -configD.getHeight() > depth*2 )
+            if (configD.getHeight() < local.getHeight() && local.getHeight() - configD.getHeight() > depth * 2)
             {
-                LOGGER.warning("Grid Widget[" + Integer.toString(getWidgetNumber()) +"]configured Height is " + Integer.toString((int)configD.getHeight()) + ", but real height is " + Integer.toString((int)local.getHeight()));
+                LOGGER.warning("Grid Widget[" + Integer.toString(getWidgetNumber()) + "]configured Height is " + Integer.toString((int) configD.getHeight()) + ", but real height is " + Integer.toString((int) local.getHeight()));
             }
         }
 
@@ -708,14 +765,84 @@ public class GridWidget extends BaseWidget
 
         return listTasks;
     }
+
     public void setOnDemandTask(String TaskID)
     {
-        _OnDemandTask=TaskID;
+        _OnDemandTask = TaskID;
     }
-    
+
     public String getOnDemandTask()
     {
         return _OnDemandTask;
+    }
+
+    @Override
+    protected boolean ApplyCSS()
+    {
+        if (_UseListView)
+        {
+            if (null != _ListViewFileCSS)
+            {
+                if (null != _ListViewFileCSS)
+                {
+                    File file = new File(_ListViewFileCSS); // first look for fully qualified path
+                    String strFile = null;
+
+                    if (false == file.exists())
+                    { // if didn't find, look in same directory that widget was defined in
+                        strFile = getDefinintionFileDirectory() + File.separatorChar + _ListViewFileCSS;
+                        file = new File(strFile);
+
+                        if (false == file.exists())
+                        {
+                            LOGGER.severe("Unable to locate Stylesheet: " + strFile);
+                        }
+                        strFile = null;
+                    }
+                    if (null != strFile)
+                    {
+                        strFile = convertToFileURL(strFile);
+                        //getStylesheets().clear();
+
+                        boolean fRet = true;
+                        fRet = _ListView.getStylesheets().setAll(strFile);
+                        if (false == fRet)
+                        {
+                            LOGGER.severe("Failed to apply Stylesheet " + strFile);
+                        }
+                    }
+                }
+                if (null != this._ListStyleID)
+                {
+                    _ListView.setId(getStyleID());
+                }
+            }
+        }
+        return super.ApplyCSS();
+    }
+
+    @Override
+    protected void ConfigureDimentions()
+    {
+        super.ConfigureDimentions();
+        if (_UseListView)
+        {
+            Region regionNode = _ListView;
+
+            PreConfigDimensions(regionNode);
+            if (getWidth() > 0)
+            {
+                regionNode.setPrefWidth(getWidth());
+                regionNode.setMinWidth(getWidth());
+                regionNode.setMaxWidth(getWidth());
+            }
+            if (getHeight() > 0)
+            {
+                regionNode.setPrefHeight(getHeight());
+                regionNode.setMinHeight(getHeight());
+                regionNode.setMaxHeight(getHeight());
+            }
+        }
     }
 
 }
