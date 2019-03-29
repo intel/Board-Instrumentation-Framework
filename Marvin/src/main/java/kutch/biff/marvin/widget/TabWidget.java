@@ -120,10 +120,13 @@ public class TabWidget extends GridWidget
 
             _stackReference.prefWidthProperty().bind(CONFIG.getCurrentWidthProperty());
             _stackReference.prefHeightProperty().bind(CONFIG.getCurrentHeightProperty());
+            _stackReference.prefHeightProperty().bind(basePane.heightProperty());
 
             if (_UseScrollBars)
             {
-                _ScrollPane.setContent(basePane);
+                _ScrollPane.setContent(_BaseGridPane);
+                _ScrollPane.setFitToWidth(true);
+                _ScrollPane.setFitToHeight(true);
 
                 _tab.setContent(_ScrollPane);
             }
@@ -400,7 +403,6 @@ public class TabWidget extends GridWidget
         }
         if (null != _TaskOnActivate)
         {
-
             if (_tab.isSelected())
             {
                 _IgnoreFirstSelect = true; // 1st tab will get the selection changed notification on startup, ignore it
@@ -419,6 +421,7 @@ public class TabWidget extends GridWidget
             }
             );
         }
+
         return super.PerformPostCreateActions(parentGrid, updateToolTipOnly);
     }
 
