@@ -108,7 +108,7 @@ public class GridWidget extends BaseWidget
     {
         if (null == _ListView)
         {
-            _ListView = new ListView<GridPane>();
+            _ListView = new ListView<>();
         }
 
         this._UseListView = _UseListView;
