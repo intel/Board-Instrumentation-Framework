@@ -776,6 +776,10 @@ public class WidgetBuilder
             {
                 retWidget = BarGaugeWidgetBuilder.Build(baseNode, Filename);
             }
+            else if (strWidget.equalsIgnoreCase("ListBoxText"))
+            {
+                retWidget = TextBuilder.ListBoxText_Build(baseNode, Filename);
+            }
 
             else
             {
