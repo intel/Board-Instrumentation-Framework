@@ -241,6 +241,7 @@ public class GenerateDatapointInfo
         DecimalFormat df = new DecimalFormat();
         df.setGroupingUsed(false);
         df.setMaximumFractionDigits(__precision);
+        df.setMinimumFractionDigits(__precision);
         mt.AddDataset(__ID, __Namespace, df.format(Total));
         TaskManager.getTaskManager().AddDeferredTaskObject(mt);
         
