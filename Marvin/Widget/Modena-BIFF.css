@@ -23,6 +23,40 @@
     -fx-faint-focus-color: derive(-fx-base,25%);
     -fx-color: -fx-base;
 
+    /* The color to use for -fx-text-fill when text is to be painted on top of
+     * a background filled with the -fx-background color.
+     */	
+	-fx-text-background-color: ladder(
+        -fx-color,
+        -fx-light-text-color 45%,
+        -fx-dark-text-color  46%,
+        -fx-dark-text-color  59%,
+        -fx-light-text-color   60%
+    );	
+	
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-base, -fx-color, and -fx-body-color.
+     */
+    -fx-text-base-color: ladder(
+        -fx-color,
+        -fx-light-text-color 45%,
+        -fx-dark-text-color  46%,
+        -fx-dark-text-color  59%,
+        -fx-mid-text-color   60%
+    );
+
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-control-inner-background.
+     */
+    -fx-text-inner-color: ladder(
+        -fx-control-inner-background,
+        -fx-light-text-color 45%,
+        -fx-dark-text-color  46%,
+        -fx-dark-text-color  59%,
+        -fx-mid-text-color   60%
+    );
+
+
     /* Chart Color Palette */
     CHART_COLOR_0: #61ede6; 
     CHART_COLOR_1: #a6ce39; 
@@ -105,8 +139,6 @@
     -fx-prompt-text-fill: transparent;
 }
 
-
-
 /*******************************************************************************
  *                                                                             *
  * Tooltip                                                                     *
@@ -137,7 +169,7 @@
     -fx-background-color: derive(-fx-background,25%);
 }
 .chart-content {
-    -fx-padding: 10px;
+    -fx-padding: 4px;
 }
 .chart-title {
     -fx-font-size: 1.4em;

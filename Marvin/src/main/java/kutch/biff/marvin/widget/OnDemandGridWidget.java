@@ -25,11 +25,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
-import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer.SortMethod;
 import kutch.biff.marvin.utility.FrameworkNode;
@@ -338,11 +336,5 @@ public class OnDemandGridWidget extends GridWidget
         }
 
         return true;
-    }
-
-    @Override
-    protected void ConfigureDimentions()
-    {
-
     }
 }

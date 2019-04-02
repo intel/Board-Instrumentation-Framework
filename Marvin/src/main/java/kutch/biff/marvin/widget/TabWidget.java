@@ -24,7 +24,10 @@ package kutch.biff.marvin.widget;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SingleSelectionModel;
@@ -97,6 +100,8 @@ public class TabWidget extends GridWidget
     public boolean Create(TabPane tabPane, DataManager dataMgr, int iIndex)
     {
         _TabIndex = iIndex;
+        setWidth(CONFIG.getCanvasWidth());
+        setHeight(CONFIG.getCanvasHeight());
 
         _BaseGridPane.setPadding(new Insets(getInsetTop(), getInsetRight(), getInsetBottom(), getInsetLeft()));
 
@@ -118,10 +123,13 @@ public class TabWidget extends GridWidget
 
             _stackReference.prefWidthProperty().bind(CONFIG.getCurrentWidthProperty());
             _stackReference.prefHeightProperty().bind(CONFIG.getCurrentHeightProperty());
+            _stackReference.prefHeightProperty().bind(basePane.heightProperty());
 
             if (_UseScrollBars)
             {
-                _ScrollPane.setContent(basePane);
+                _ScrollPane.setContent(_BaseGridPane);
+                _ScrollPane.setFitToWidth(true);
+                _ScrollPane.setFitToHeight(true);
 
                 _tab.setContent(_ScrollPane);
             }
@@ -392,9 +400,12 @@ public class TabWidget extends GridWidget
     @Override
     public boolean PerformPostCreateActions(GridWidget parentGrid, boolean updateToolTipOnly)
     {
+        if (getHeight() == 0 && this.getHeightPercentOfParentGrid() == 0)
+        {
+            setHeightPercentOfParentGrid(100);
+        }
         if (null != _TaskOnActivate)
         {
-
             if (_tab.isSelected())
             {
                 _IgnoreFirstSelect = true; // 1st tab will get the selection changed notification on startup, ignore it
@@ -413,6 +424,7 @@ public class TabWidget extends GridWidget
             }
             );
         }
+
         return super.PerformPostCreateActions(parentGrid, updateToolTipOnly);
     }
 

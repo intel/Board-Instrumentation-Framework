@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.BaseWidget;
+import kutch.biff.marvin.widget.ListBoxText;
 import kutch.biff.marvin.widget.TextWidget;
 
 /**
@@ -33,20 +34,21 @@ import kutch.biff.marvin.widget.TextWidget;
  */
 public class TextBuilder
 {
+
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     public static TextWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
         TextWidget _widget = new TextWidget();
-        
-        return ReadTextWidgetInfo(_widget,masterNode,widgetDefFilename);
+
+        return ReadTextWidgetInfo(_widget, masterNode, widgetDefFilename);
     }
-    
-    public static TextWidget ReadTextWidgetInfo(TextWidget _widget,FrameworkNode masterNode, String widgetDefFilename)
+
+    public static TextWidget ReadTextWidgetInfo(TextWidget _widget, FrameworkNode masterNode, String widgetDefFilename)
     {
-        for (FrameworkNode node :masterNode.getChildNodes())
+        for (FrameworkNode node : masterNode.getChildNodes())
         {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget,node))
+            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
             {
             }
             else if (node.getNodeName().equalsIgnoreCase("#comment"))
@@ -66,10 +68,26 @@ public class TextBuilder
                 else
                 {
                     LOGGER.severe("Invalid Text Widget Definition File.  ScaleToShape should be True or False, not:" + str);
-                    return null;                
+                    return null;
                 }
             }
         }
-        return _widget;        
+        return _widget;
     }
+
+    public static ListBoxText ListBoxText_Build(FrameworkNode masterNode, String widgetDefFilename)
+    {
+        ListBoxText _widget = new ListBoxText();
+        for (FrameworkNode node : masterNode.getChildNodes())
+        {
+            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
+            {
+            }
+            else if (node.getNodeName().equalsIgnoreCase("#comment"))
+            {
+            }
+        }
+        return _widget;
+    }
+
 }

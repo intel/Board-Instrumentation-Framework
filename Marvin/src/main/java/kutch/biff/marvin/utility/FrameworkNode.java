@@ -613,6 +613,10 @@ public class FrameworkNode
     private String HandleAlias(String strData)
     {
         String retString = "";
+        if (strData.contains("$(NS)"))
+        {
+            retString="";
+        }
         if (false == strData.contains("$("))
         {
             return HandleMarvinMath(strData);

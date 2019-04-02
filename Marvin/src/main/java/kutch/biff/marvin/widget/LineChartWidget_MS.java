@@ -88,7 +88,9 @@ public class LineChartWidget_MS extends BaseChartWidget
                                     try
                                     {
                                         newValue = Double.parseDouble(strVal);
+                                        newValue *= ds.getScaleValue();
                                         HandleSteppedRange(newValue);
+                                        strVal = Double.toString(newValue);
                                     }
                                     
                                     catch (Exception ex)
@@ -142,6 +144,7 @@ public class LineChartWidget_MS extends BaseChartWidget
         return ((LineChart) (getChart())).getStylesheets();
     }
 
+    @Override
     protected Chart CreateChartObject()
     {
         return new LineChart<Number, Number>(getxAxis(), getyAxis());
@@ -193,6 +196,17 @@ public class LineChartWidget_MS extends BaseChartWidget
                         return false;
                     }
                     SeriesDataSet objDS = new SeriesDataSet(Label, ID, Namespace);
+                    if (newNode.hasAttribute("Scale"))
+                    {
+                        double scaleVal = newNode.getDoubleAttribute("Scale", 0);
+                        if (scaleVal <=0)
+                        {
+                            LOGGER.severe("Series defined with invalid scale value" + newNode.getAttribute("Scale"));
+                            return false;
+                        }
+                        objDS.setScaleValue(scaleVal);
+                    }
+                    
                     getSeries().add(objDS);
                 }
             }

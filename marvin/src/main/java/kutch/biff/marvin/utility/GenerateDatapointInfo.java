@@ -50,6 +50,7 @@ public class GenerateDatapointInfo
     private int __precision;
     private int __minFrequency;
     private long __lastUpdate;
+    private double __Scale;
     
     public enum GenerateMethod
     {
@@ -76,11 +77,22 @@ public class GenerateDatapointInfo
         __precision = 2;
         __minFrequency = 0;
         __lastUpdate = System.currentTimeMillis();
+        __Scale = 1.0;
     }
     
     public void setMethod(GenerateMethod method)
     {
         _Method = method;
+    }
+
+    public double getScale()
+    {
+        return __Scale;
+    }
+
+    public void setScale(double __Scale)
+    {
+        this.__Scale = __Scale;
     }
 
     public int getPrecision()
@@ -222,11 +234,14 @@ public class GenerateDatapointInfo
         {
             Total/=__dirtyMap.size();
         }
+        Total *= __Scale;
         // this likely needs to be a postponted task - otherwise can have endless loop of a mobius strip (maybe a marvindata task...
         //DataManager.getDataManager().ChangeValue(__ID, __Namespace, Float.toString(Total));
         MarvinTask mt = new MarvinTask();
         DecimalFormat df = new DecimalFormat();
+        df.setGroupingUsed(false);
         df.setMaximumFractionDigits(__precision);
+        df.setMinimumFractionDigits(__precision);
         mt.AddDataset(__ID, __Namespace, df.format(Total));
         TaskManager.getTaskManager().AddDeferredTaskObject(mt);
         

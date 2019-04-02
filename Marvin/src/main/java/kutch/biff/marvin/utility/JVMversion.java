@@ -34,6 +34,10 @@ public class JVMversion
         {
             return true;
         }
+        if (version.charAt(0) == '1' &&  version.charAt(1) != '.') // tweak to support java > 9
+        {
+            return true;
+        }
         try
         {
             Integer.parseInt(String.valueOf(version.charAt(2)));

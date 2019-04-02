@@ -665,7 +665,7 @@ abstract public class BaseChartWidget extends BaseWidget
             {
                 Utility.ValidateAttributes(new String[]
                 {
-                    "ID", "Namespace", "SeriesID"
+                    "ID", "Namespace", "SeriesID","Scale"
                 }, node);
 
                 String ID, Namespace, SeriesID;
@@ -702,6 +702,18 @@ abstract public class BaseChartWidget extends BaseWidget
                     return false;
                 }
                 SeriesDataSet objDS = new SeriesDataSet(title, ID, Namespace);
+                
+                if (node.hasAttribute("Scale"))
+                {
+                    double scaleVal = node.getDoubleAttribute("Scale", 0);
+                    if (scaleVal <=0)
+                    {
+                        LOGGER.severe("Chart SeriesSet defined with invalid scale value" + node.getAttribute("Scale"));
+                        return false;
+                    }
+                    objDS.setScaleValue(scaleVal);
+                }
+                
                 _SeriesMap.get(SeriesID.toUpperCase()).AddSeries(objDS);
             }
         }
@@ -759,6 +771,7 @@ abstract public class BaseChartWidget extends BaseWidget
                                     try
                                     {
                                         newValue = Double.parseDouble(strVal);
+                                        newValue *= objDs.getScaleValue();
                                         HandleSteppedRange(newValue);
                                     }
                                     catch (NumberFormatException ex)
@@ -779,9 +792,7 @@ abstract public class BaseChartWidget extends BaseWidget
 
             }
             boolean fReturn = ((XYChart) getChart()).getData().add(objSeries);
-
         }
-
     }
 
     @Override

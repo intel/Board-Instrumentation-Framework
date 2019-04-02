@@ -35,6 +35,8 @@ import javafx.geometry.Side;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.util.Pair;
@@ -52,6 +54,7 @@ import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.GenerateDatapointInfo;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
+import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
 import kutch.biff.marvin.widget.DynamicTabWidget;
 import kutch.biff.marvin.widget.TabWidget;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandTabBuilder;
@@ -1005,7 +1008,7 @@ public class ConfigurationReader
                 Pair<String, String> exclude = getNamespaceAndIdPattern(node);
                 if (null == exclude)
                 {
-                    LOGGER.severe(String.format("Invalid GenerateDatapoing %s:%s -->%s", genDPInfo.getKey(), genDPInfo.getValue(), node.getAttributeList()));
+                    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(), genDPInfo.getValue(), node.getAttributeList()));
                     return null;
                 }
                 excludeList.add(exclude);
@@ -1049,6 +1052,18 @@ public class ConfigurationReader
         {
             LOGGER.severe("Invalid Method specified for GenerateDatapoint: " + inputNode.getAttribute("Method"));
             return null;
+        }
+        if (inputNode.hasAttribute("Scale"))
+        {
+            try
+            {
+                double scale = Double.parseDouble(inputNode.getAttribute("Scale"));
+                info.setScale(scale);
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
         if (inputNode.hasChild("Refresh"))
         {
@@ -1880,6 +1895,120 @@ public class ConfigurationReader
         return retVal;
     }
 
+    public static ImageView GetImage(String ImageFileName, double ImageHeightConstraint, double ImageWidthConstraint)
+    {
+        ImageView view = null;
+        if (null != ImageFileName)
+        {
+            String fname = convertToFileOSSpecific(ImageFileName);
+            File file = new File(fname);
+            if (file.exists())
+            {
+                String fn = "file:" + fname;
+                Image img = new Image(fn);
+                view = new ImageView(img);
+
+                if (ImageHeightConstraint > 0)
+                {
+                    view.setFitHeight(ImageHeightConstraint);
+                }
+                if (ImageWidthConstraint > 0)
+                {
+                    view.setFitWidth(ImageWidthConstraint);
+                }
+
+            }
+            else
+            {
+                LOGGER.severe("Invalid Image File specified for Widget: " + ImageFileName);
+            }
+        }
+        return view;
+    }
+
+    public static ImageView GetImage(FrameworkNode node)
+    {
+        if (node.getNodeName().equalsIgnoreCase("Image"))
+        {
+            String fName = node.getTextContent();
+            double ImageWidthConstraint = 0.0;
+            double ImageHeightConstraint = 0.0;
+
+            Utility.ValidateAttributes(new String[]
+            {
+                "Height", "Width"
+            }, node);
+            if (node.hasAttribute("Width"))
+            {
+                try
+                {
+                    ImageWidthConstraint = Double.parseDouble(node.getAttribute("Width"));
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.severe("Widget Image has invalid Width specified: " + node.getAttribute("Width"));
+                    return null;
+                }
+            }
+            if (node.hasAttribute("Height"))
+            {
+                try
+                {
+                    ImageHeightConstraint = Double.parseDouble(node.getAttribute("Height"));
+                }
+                catch (NumberFormatException ex)
+                {
+                    LOGGER.severe("Widget Image has invalid Height specified: " + node.getAttribute("Height"));
+                    return null;
+                }
+            }
+
+            return ConfigurationReader.GetImage(fName, ImageHeightConstraint, ImageWidthConstraint);
+        }
+        return null;
+    }
+
+    private boolean HandleMenuStyleOverride(MenuItem menu, FrameworkNode menuNode)
+    {
+        List<String> styles = new ArrayList<>();
+
+        FrameworkNode styleNode;
+        if (menuNode.hasChild("StyleOverride"))
+        {
+            styleNode = menuNode.getChild("StyleOverride");
+        }
+        else
+        {
+            return false;
+        }
+
+        for (FrameworkNode node : styleNode.getChildNodes())
+        {
+            if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
+            {
+                continue;
+            }
+            if (node.getNodeName().equalsIgnoreCase("Item"))
+            {
+                styles.add(node.getTextContent());
+            }
+            else
+            {
+                LOGGER.severe("Unknown Tag under <StyleOverride>: " + node.getNodeName());
+                return false;
+            }
+        }
+        String StyleString = "";
+        for (String Style : styles)
+        {
+            StyleString += Style + ";";
+        }
+
+        menu.setStyle(StyleString);
+
+        return true;
+    }
+
     private boolean ReadAppMenu(FrameworkNode menuNode, boolean basicInfoOnly)
     {
         if (null != _Configuration.getMenuBar())
@@ -1911,6 +2040,7 @@ public class ConfigurationReader
             return true;
         }
         MenuBar objMenuBar = new MenuBar();
+
         for (FrameworkNode node : menuNode.getChildNodes())
         {
             if (node.getNodeName().equalsIgnoreCase("Menu"))
@@ -1924,7 +2054,17 @@ public class ConfigurationReader
                     Menu objMenu = ReadMenu(node.getAttribute("Title"), node);
                     if (null != objMenu)
                     {
+                        HandleMenuStyleOverride(objMenu, node);
+
                         objMenuBar.getMenus().add(objMenu);
+                        if (node.hasChild("Image"))
+                        {
+                            ImageView iv = ConfigurationReader.GetImage(node.getChild("Image"));
+                            if (null != iv)
+                            {
+                                objMenu.setGraphic(iv);
+                            }
+                        }
                     }
                     else
                     {
@@ -1936,48 +2076,86 @@ public class ConfigurationReader
                     LOGGER.severe("Invalid Menu defined, no Title");
                     return false;
                 }
+
             }
         }
         _Configuration.setMenuBar(objMenuBar);
         return true;
     }
 
-    private Menu ReadMenu(String Title, FrameworkNode menuNode)
+    public MenuItem ReadMenuItem(FrameworkNode menuNode)
     {
-        Menu objMenu = new Menu(Title);
+        if (menuNode.getNodeName().equalsIgnoreCase("MenuItem"))
+        {
+            Utility.ValidateAttributes(new String[]
+            {
+                "Text", "Task"
+            }, menuNode);
+            if (menuNode.hasAttribute("Text") && menuNode.hasAttribute("Task"))
+            {
+                MenuItem objItem = new MenuItem(menuNode.getAttribute("Text"));
+                HandleMenuStyleOverride(objItem, menuNode);
+
+                if (menuNode.hasChild("Image"))
+                {
+                    ImageView iv = ConfigurationReader.GetImage(menuNode.getChild("Image"));
+                    if (null != iv)
+                    {
+                        objItem.setGraphic(iv);
+                    }
+                }
+
+                if (true == Configuration.getConfig().getAllowTasks())
+                {
+                    String strTask = menuNode.getAttribute("Task");
+                    objItem.setOnAction(new EventHandler<ActionEvent>()
+                    {
+                        @Override
+                        public void handle(ActionEvent t)
+                        {
+                            TASKMAN.PerformTask(strTask);
+                        }
+                    });
+                }
+                return objItem;
+            }
+        }
+        return null;
+    }
+
+    public List<MenuItem> ReadMenuItems(FrameworkNode menuNode)
+    {
+        ArrayList<MenuItem> retList = new ArrayList<>();
         for (FrameworkNode node : menuNode.getChildNodes())
         {
             if (node.getNodeName().equalsIgnoreCase("MenuItem"))
             {
-                Utility.ValidateAttributes(new String[]
+                MenuItem objItem = ReadMenuItem(node);
+                if (null != objItem)
                 {
-                    "Text", "Task"
-                }, node);
-                if (node.hasAttribute("Text") && node.hasAttribute("Task"))
-                {
-                    MenuItem objItem = new MenuItem(node.getAttribute("Text"));
-                    if (true == _Configuration.getAllowTasks())
-                    {
-                        objItem.setOnAction(new EventHandler<ActionEvent>()
-                        {
-                            @Override
-                            public void handle(ActionEvent t)
-                            {
-                                TASKMAN.PerformTask(node.getAttribute("Task"));
-                            }
-                        });
-                    }
-                    objMenu.getItems().add(objItem);
+                    retList.add(objItem);
                 }
                 else
                 {
-                    LOGGER.severe("Invalid Menu with Title of " + Title + " defined");
                     return null;
                 }
             }
         }
 
-        return objMenu;
+        return retList;
+    }
 
+    private Menu ReadMenu(String Title, FrameworkNode menuNode)
+    {
+        Menu objMenu = new Menu(Title);
+        List<MenuItem> items = ReadMenuItems(menuNode);
+        if (null == items)
+        {
+            LOGGER.severe("Invalid Menu with Title of " + Title + " defined");
+            return null;
+
+        }
+        objMenu.getItems().addAll(items);
+        return objMenu;
     }
 }

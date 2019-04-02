@@ -26,6 +26,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.ButtonWidget;
+import kutch.biff.marvin.widget.MenuButtonWidget;
 
 /**
  *
@@ -38,6 +39,18 @@ public class ButtonWidgetBuilder
     public static ButtonWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
         ButtonWidget btnWidget = new ButtonWidget();
+        for (FrameworkNode node : masterNode.getChildNodes())
+        {
+            if (BaseWidget.HandleCommonDefinitionFileConfig(btnWidget, node))
+            {
+                continue;
+            }
+        }
+        return btnWidget;
+    }
+    public static MenuButtonWidget BuildMenuButton(FrameworkNode masterNode, String widgetDefFilename)
+    {
+        MenuButtonWidget btnWidget = new MenuButtonWidget();
         for (FrameworkNode node : masterNode.getChildNodes())
         {
             if (BaseWidget.HandleCommonDefinitionFileConfig(btnWidget, node))

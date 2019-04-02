@@ -69,12 +69,12 @@ public class SteelGaugeRadialSteelWidget extends BaseWidget
 //        _Gauge.setAnimationDuration(400);
         _Gauge.setPrefWidth(200);
         _Gauge.setPrefHeight(200);
-        this.setDefaultIsSquare(true);
     }
 
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
+        setDefaultIsSquare(true);
         SetParent(pane);
         if (false == SetupGauge())
         {
