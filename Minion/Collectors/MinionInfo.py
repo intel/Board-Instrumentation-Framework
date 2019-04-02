@@ -20,6 +20,29 @@
 ##############################################################################
 import time
 from Helpers import Namespace
+from Helpers import Log
+from logging import StreamHandler
+
+MyLogger = None
+
+class MyHandler(StreamHandler):
+    def __init__(self):
+        StreamHandler.__init__(self)
+        self._latest = "No Log Entries Yet"
+
+    def emit(self,record):
+        self._latest = self.format(record)
+
+    def getLatest(self):
+        return self._latest
+
+def LatestLogEntry():
+    global MyLogger
+    if None == MyLogger:
+        MyLogger = MyHandler()
+        Log.getLogger().addHandler(MyLogger)
+
+    return MyLogger.getLatest()
 
 # For debugging, returns last actor information called
 def LatestTaskInfo(NamespaceID):
