@@ -28,7 +28,7 @@ def getLogToConsole():
     return Logger.LogToConsole
 
 def setLevel(level):
-    Logger.getLogger();
+    Logger.getLogger()
 
     if Logger._console != None:
         Logger._console.setLevel(level)
@@ -36,8 +36,6 @@ def setLevel(level):
     if Logger._logger != None:
         Logger._logger.setLevel(level)
     
-
-
 #My logger wrapper
 class Logger():
     _logger = None  #logger object

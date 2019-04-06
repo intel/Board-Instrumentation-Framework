@@ -238,8 +238,14 @@ def getFrequencyInfo(prefix=""):
     
     freqList=None
     # create a comma separated list for graphing
+    if "cpu0.cpuinfo_cur_freq" in retMap:
+        freqKey = "cpuinfo_cur_freq"
+
+    else:
+        freqKey = "scaling_cur_freq"
+
     for coreNum in range(0,coreCount):
-        key = "cpu{0}.cpuinfo_cur_freq".format(coreNum)
+        key = "cpu{0}.{1}".format(coreNum,freqKey)
         if None == freqList: #1st one
             freqList=retMap[prefix+key]
         else:

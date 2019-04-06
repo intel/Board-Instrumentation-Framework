@@ -89,10 +89,10 @@ def main():
     if 3 <= _VerboseLevel:
         Log.setLevel(logging.DEBUG)
 
-    elif 2 == _VerboseLevel:
+    elif 1 == _VerboseLevel:
         Log.setLevel(logging.WARNING)
 
-    elif 1 == _VerboseLevel:
+    elif 2 == _VerboseLevel:
         Log.setLevel(logging.INFO)
 
     else:
