@@ -27,6 +27,7 @@ import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.ButtonWidget;
 import kutch.biff.marvin.widget.MenuButtonWidget;
+import kutch.biff.marvin.widget.ToggleButtonWidget;
 
 /**
  *
@@ -51,6 +52,19 @@ public class ButtonWidgetBuilder
     public static MenuButtonWidget BuildMenuButton(FrameworkNode masterNode, String widgetDefFilename)
     {
         MenuButtonWidget btnWidget = new MenuButtonWidget();
+        for (FrameworkNode node : masterNode.getChildNodes())
+        {
+            if (BaseWidget.HandleCommonDefinitionFileConfig(btnWidget, node))
+            {
+                continue;
+            }
+        }
+        return btnWidget;
+    }
+    
+    public static ToggleButtonWidget BuildToggleButton(FrameworkNode masterNode, String widgetDefFilename)
+    {
+        ToggleButtonWidget btnWidget = new ToggleButtonWidget();
         for (FrameworkNode node : masterNode.getChildNodes())
         {
             if (BaseWidget.HandleCommonDefinitionFileConfig(btnWidget, node))

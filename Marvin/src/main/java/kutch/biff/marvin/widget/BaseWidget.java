@@ -64,6 +64,7 @@ import org.xml.sax.SAXException;
  */
 abstract public class BaseWidget implements Widget
 {
+
     public static String DefaultWidgetDirectory = "Widget";
     private static int _WidgetCount = 0;
     private static final ArrayList<BaseWidget> _WidgetList = new ArrayList<>();
@@ -120,7 +121,7 @@ abstract public class BaseWidget implements Widget
     private List<Double> _SteppedMaxRanges = null;
     private List<Double> _SteppedMinRanges = null;
 
-    private static CircularList<String> DebugStyles = null;
+    protected static CircularList<String> DebugStyles = null;
 
     public BaseWidget()
     {
@@ -546,11 +547,11 @@ abstract public class BaseWidget implements Widget
             }
         }
     }
-    
+
     public void addOnDemandStyle(List<String> newStyles)
     {
         _RemoteStyleOverrideList.clear();
-        for (String style: newStyles)
+        for (String style : newStyles)
         {
             AddAdditionalStyleOverride(style);
         }
@@ -1420,7 +1421,7 @@ abstract public class BaseWidget implements Widget
             //getStylesheets().clear();
 
             boolean fRet = true;
-            LOGGER.config("Applying Stylesheet: " +cssFile + " to Widget [" + _DefinitionFile + "]");
+            LOGGER.config("Applying Stylesheet: " + cssFile + " to Widget [" + _DefinitionFile + "]");
             // This was a .add(), but changed to Sett all as there was kind of
             // memory leak when I changed style via Minion or MarvinTasks...
             fRet = getStylesheets().setAll(cssFile);
@@ -1739,6 +1740,9 @@ abstract public class BaseWidget implements Widget
                     @Override
                     public void handle(MouseEvent event)
                     {
+                        mouseHandler(event);
+                    }
+                        /*
                         if (CONFIG.isDebugMode() && event.isShiftDown())
                         {
                             LOGGER.info(objWidget.toString(true));
@@ -1756,6 +1760,7 @@ abstract public class BaseWidget implements Widget
                             TASKMAN.PerformTask(getTaskID());
                         }
                     }
+                        */
                 };
                 getStylableObject().setOnMouseClicked(eh);
                 _MouseHasBeenSetup = true;
@@ -1765,7 +1770,29 @@ abstract public class BaseWidget implements Widget
         return null;
     }
 
-    public boolean isMouseHasBeenSetup()
+    public void mouseHandler(MouseEvent event)
+    {
+        BaseWidget objWidget = this;
+
+        if (CONFIG.isDebugMode() && event.isShiftDown())
+        {
+            LOGGER.info(objWidget.toString(true));
+        }
+        else if (CONFIG.isDebugMode() && event.isControlDown())
+        {
+            if (null != getStylableObject())
+            {
+                AddAdditionalStyleOverride(DebugStyles.GetNext());
+                ApplyCSS();
+            }
+        }
+        else if (null != getTaskID() && true == CONFIG.getAllowTasks())
+        {
+            TASKMAN.PerformTask(getTaskID());
+        }
+    }
+
+public boolean isMouseHasBeenSetup()
     {
         return _MouseHasBeenSetup;
     }
@@ -1776,13 +1803,13 @@ abstract public class BaseWidget implements Widget
     }
 
     @Override
-    public void HandleCustomStyleOverride(FrameworkNode styleNode)
+        public void HandleCustomStyleOverride(FrameworkNode styleNode)
     {
 
     }
 
     @Override
-    public Region getRegionObject()
+        public Region getRegionObject()
     {
         try
         {
@@ -1966,13 +1993,13 @@ abstract public class BaseWidget implements Widget
     }
 
     @Override
-    public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent)
+        public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent)
     {
         this._ClickThroughTransparentRegion = _CanClickOnTransparent;
     }
 
     @Override
-    public void PrepareForAppShutdown()
+        public void PrepareForAppShutdown()
     {
 
     }
@@ -2115,23 +2142,23 @@ abstract public class BaseWidget implements Widget
     }
 
     @Override
-    public void OnPaused()
+        public void OnPaused()
     {
     }
 
     @Override
-    public void OnResumed()
+        public void OnResumed()
     {
     }
 
     @Override
-    public void UpdateValueRange()
+        public void UpdateValueRange()
     {
         LOGGER.warning("Tried to perform Peekaboo ValueRange update for widget [" + this.getName() + "] that does not support this feature");
     }
 
     @Override
-    public boolean SupportsSteppedRanges()
+        public boolean SupportsSteppedRanges()
     {
         return false;
     }
