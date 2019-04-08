@@ -28,6 +28,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.logger.MarvinLogger;
@@ -97,6 +98,16 @@ public class TaskManager
     {
         return _TasksPerformed;
     }
+    
+    public int GetPostPonedTaskCount()
+    {
+        int retVal;
+        synchronized (_PostponedTaskObjectThatMustBeRunInGuiThreadList)
+        {
+            retVal = _PostponedTaskObjectThatMustBeRunInGuiThreadList.size();
+        }        
+        return retVal;
+    }
 
     public long GetPendingTaskCount()
     {
@@ -127,9 +138,11 @@ public class TaskManager
         synchronized (_DeferredTasks) // make a quick copy to reduce time in synchronized block
         {
             size = _DeferredTasks.size();
-
-            localDeferredTasksToRun.addAll(_DeferredTasks);
-            _DeferredTasks.clear();
+            if (size > 0)
+            {
+                localDeferredTasksToRun.addAll(_DeferredTasks);
+                _DeferredTasks.clear();
+            }
         }
 
         if (size > 256 && !_WarningAboutManyTasksSent)
@@ -163,8 +176,11 @@ public class TaskManager
         synchronized (_PostponedTaskObjectThatMustBeRunInGuiThreadList)
         {
             size = _PostponedTaskObjectThatMustBeRunInGuiThreadList.size();
-            localPostponedTaskstoRun.addAll(_PostponedTaskObjectThatMustBeRunInGuiThreadList);
-            _PostponedTaskObjectThatMustBeRunInGuiThreadList.clear();
+            if (size > 0)
+            {
+                localPostponedTaskstoRun.addAll(_PostponedTaskObjectThatMustBeRunInGuiThreadList);
+                _PostponedTaskObjectThatMustBeRunInGuiThreadList.clear();
+            }
         }
 
         Platform.runLater(new Runnable()
@@ -176,6 +192,10 @@ public class TaskManager
                 for (ITask objTask : localPostponedTaskstoRun)
                 {
                     objTask.PerformTask();
+                }
+                if (localPostponedTaskstoRun.size() > 0)
+                {
+                    Configuration.getConfig().requestImmediateRefresh();
                 }
             }
         });
@@ -232,8 +252,6 @@ public class TaskManager
             {
                 objTask.Perform();
             }
-
-            toRunList.clear(); // probably redundant,
         }
 
         synchronized (_PostponedTasksNew) // New postponed tasks came in while during processing of postponed tasks thread

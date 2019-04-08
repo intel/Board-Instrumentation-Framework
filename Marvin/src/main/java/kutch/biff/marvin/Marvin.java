@@ -910,11 +910,12 @@ public class Marvin extends Application
         _animationTimer = new AnimationTimer() // can't update the Widgets outside of GUI thread, so this is a little worker to do so
         {
             boolean Showing = false;
+            Configuration config = _Config.getConfiguration();
 
             @Override
             public void handle(long now)
             {
-                if (Configuration.getConfig().terminating())
+                if (config.terminating())
                 {
                     return;
                 }
@@ -942,19 +943,23 @@ public class Marvin extends Application
                     Showing = true;
                     return;
                 }
-
-                if (System.currentTimeMillis() > lastTimerCall + TimerInterval)
+                boolean refreshRequested = config.refreshRequested();
+                
+                if ( refreshRequested || System.currentTimeMillis() > lastTimerCall + TimerInterval)
                 {
                     _DataMgr.PerformUpdates();
-                    _Config.getConfiguration().DetermineMemorex();
-                    if (!strOldSuffix.equals(_Config.getConfiguration().TitleSuffix)) // title could be 'recorded' 'lived'
+                    config.DetermineMemorex();
+                    if (!strOldSuffix.equals(config.TitleSuffix)) // title could be 'recorded' 'lived'
                     {
-                        _stage.setTitle(_Config.getConfiguration().getAppTitle() + _Config.getConfiguration().TitleSuffix);
-                        strOldSuffix = _Config.getConfiguration().TitleSuffix;
+                        _stage.setTitle(config.getAppTitle() + config.TitleSuffix);
+                        strOldSuffix = config.TitleSuffix;
                     }
                     // for remote marvin admin updates, can't update gui outside of gui thread
                     TaskManager.getTaskManager().PerformDeferredTasks();
-                    lastTimerCall = System.currentTimeMillis();
+                    if (!refreshRequested)
+                    {
+                        lastTimerCall = System.currentTimeMillis();
+                    }
                 }
 
                 else if (ReportMemoryUsage && System.currentTimeMillis() > LastMemoryUsageReportingTime + MemoryUsageReportingInterval)

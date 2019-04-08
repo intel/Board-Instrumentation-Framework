@@ -1689,8 +1689,8 @@ abstract public class BaseWidget implements Widget
             GridPane.setHalignment(getStylableObject(), getHorizontalPosition());
         }
     }
-
-    protected EventHandler<MouseEvent> SetupMouseEnteredTask()
+/*
+    protected EventHandler<MouseEvent> SetupMouseEnteredTask_NukeThis()
     {
         if (null == getTaskID() || true == CONFIG.getAllowTasks())
         {
@@ -1727,7 +1727,7 @@ abstract public class BaseWidget implements Widget
         getStylableObject().setOnMouseExited(eh);
         return eh;
     }
-
+*/
     public EventHandler<MouseEvent> SetupTaskAction()
     {
         if (false == _MouseHasBeenSetup) // quick hack, as I call this from MOST widgets, but now want it from all.  Will eventually remove from individual widgets.
@@ -1741,6 +1741,8 @@ abstract public class BaseWidget implements Widget
                     public void handle(MouseEvent event)
                     {
                         mouseHandler(event);
+                        // to make menus and such much zippier
+                       CONFIG.requestImmediateRefresh();
                     }
                         /*
                         if (CONFIG.isDebugMode() && event.isShiftDown())
