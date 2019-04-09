@@ -64,7 +64,6 @@ import org.xml.sax.SAXException;
  */
 abstract public class BaseWidget implements Widget
 {
-
     public static String DefaultWidgetDirectory = "Widget";
     private static int _WidgetCount = 0;
     private static final ArrayList<BaseWidget> _WidgetList = new ArrayList<>();
@@ -1689,45 +1688,7 @@ abstract public class BaseWidget implements Widget
             GridPane.setHalignment(getStylableObject(), getHorizontalPosition());
         }
     }
-/*
-    protected EventHandler<MouseEvent> SetupMouseEnteredTask_NukeThis()
-    {
-        if (null == getTaskID() || true == CONFIG.getAllowTasks())
-        {
-            return null;
-        }
-        BaseWidget objWidget = this;
-        EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>()
-        {
-            @Override
-            public void handle(MouseEvent event)
-            {
-                TASKMAN.PerformTask(getTaskID());
-            }
-        };
-        getStylableObject().setOnMouseEntered(eh);
-        return eh;
-    }
 
-    protected EventHandler<MouseEvent> SetupMouseExitedTask()
-    {
-        if (null == getTaskID() || true == CONFIG.getAllowTasks())
-        {
-            return null;
-        }
-        BaseWidget objWidget = this;
-        EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>()
-        {
-            @Override
-            public void handle(MouseEvent event)
-            {
-                TASKMAN.PerformTask(getTaskID());
-            }
-        };
-        getStylableObject().setOnMouseExited(eh);
-        return eh;
-    }
-*/
     public EventHandler<MouseEvent> SetupTaskAction()
     {
         if (false == _MouseHasBeenSetup) // quick hack, as I call this from MOST widgets, but now want it from all.  Will eventually remove from individual widgets.

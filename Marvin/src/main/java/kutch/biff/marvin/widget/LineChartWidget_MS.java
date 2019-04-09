@@ -175,7 +175,7 @@ public class LineChartWidget_MS extends BaseChartWidget
                 {
                     Utility.ValidateAttributes(new String[]
                     {
-                        "ID", "Namespace"
+                        "ID", "Namespace","Scale"
                     }, newNode);
                     if (newNode.hasAttribute("ID"))
                     {

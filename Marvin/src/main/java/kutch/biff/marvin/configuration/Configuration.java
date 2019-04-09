@@ -140,7 +140,6 @@ public class Configuration
         _appScene = null;
         _BusyCursorRequestCount = 0;
         _ImmediateRefreshRequsted = false;
-
     }
 
     public boolean refreshRequested()

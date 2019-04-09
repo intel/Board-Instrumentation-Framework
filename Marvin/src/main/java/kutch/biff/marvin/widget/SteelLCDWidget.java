@@ -161,6 +161,7 @@ public class SteelLCDWidget extends BaseWidget
             _LCD.setMaxMeasuredValueVisible(ShowMeasuredMax);
             _LCD.setMaxValue(getMaxValue());
             _LCD.setKeepAspect(KeepAspectRatio);
+            int dp = getDecimalPlaces();
             _LCD.setDecimals(getDecimalPlaces());
         }
 

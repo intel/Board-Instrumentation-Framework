@@ -169,7 +169,7 @@ public class WidgetBuilder
         }
         Utility.ValidateAttributes(new String[]
         {
-            "File", "row", "column", "rowSpan", "colSpan", "columnSpan", "Align", "Height", "Width", "Task", "Enabled"
+            "File", "row", "column", "rowSpan", "colSpan", "columnSpan", "Align", "Height", "Width", "Task", "Enabled","ToggleTask"
         }, retWidget.GetCustomAttributes(), widgetNode);
 
         retWidget.HandleWidgetSpecificAttributes(widgetNode);
@@ -275,10 +275,22 @@ public class WidgetBuilder
             {
                 continue;
             }
+            
 
             if (node.getNodeName().equalsIgnoreCase("Title"))
             {
                 retWidget.setTitle(node.getTextContent());
+            }
+            else if (node.getNodeName().equalsIgnoreCase("Decimals"))
+            {
+                try
+                {
+                    retWidget.setDecimalPlaces(node.getIntegerContent());
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.severe("Invalid Decimals option: " + node.getTextContent() +". Ignoring" );
+                }
             }
             else if (node.getNodeName().equalsIgnoreCase("StyleOverride"))
             {
