@@ -238,6 +238,7 @@ class Measurement:
         self._MeasurementList=[]
         localList=[]
         excludeList=[]
+        self.__getCategories(dbClient)
         for measurement in self._Measurement:
             if measurement == "*":
                 allList = self.__getCategories(dbClient)
@@ -299,13 +300,16 @@ class Measurement:
                 logger.error("Historical Query specified to make csv, but did not provide info on what instance is")
                 return (None,None)
 
+        NS=""
         try:
             query = "show series from {} {}".format(measurement,self._where)
+            #query = "show series from {}".format(measurement)
             resultSet = dbClient.query(query)    
             resultList = list(resultSet.get_points()) # this should now be a list with length = to the # of instances for this measurement
-            if not self._instance :
-                logger.error("Historical Query specified instance to make csv, but the instance of {} does not exist in measurement {}".format(self._instance,measurement))
-                return (None,None)
+
+#            if not self._instance :
+#                logger.error("Historical Query specified instance to make csv, but the instance of {} does not exist in measurement {}".format(self._instance,measurement))
+#                return (None,None)
 
             if len(resultList) == 0:
                 logger.error("Historical Query specified resulted in no data")
@@ -350,7 +354,8 @@ class Measurement:
                     retMap[ListID] = (True,[]) # return Tuple, True means is 'list'
 
             for inst in range(0,instanceCount):
-                query = "select {} from {} {} and {}='{}' {}".format(self._select,measurement, self._where,self._instance,inst,self._other)
+                #query = "select {} from {} {} and {}='{}' {}".format(self._select,measurement, self._where,self._instance,inst,self._other)
+                query = "select {} from {} {}".format(self._select,measurement, self._where)
 
                 logger.info("Querying with: " + query)
                 resultList = []
@@ -698,7 +703,8 @@ def HistoryCollectFunction(frameworkInterface,target,username,password,database,
                     updatedCount += 1
 
             if 0 == updatedCount:  # went through the entire list
-                Done = True
+                #Done = True
+                pass
 
             else:
                 SleepMs(interval)

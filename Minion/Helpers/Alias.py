@@ -25,7 +25,12 @@ from Helpers import Log
 def Alias(input):
     orig = input
     index = input.find("$(")        #Alias is surrounded by -->$( ) <--
-    stopIndex = input.find(")")
+    stopIndex = input[index:].find(")")
+
+    if stopIndex < index:
+        otherIndex = input[index:].find(")")
+        stopIndex = index + otherIndex
+
     while index != -1 and stopIndex != -1:  # do it in a loop in case there are more than one alias
         strAlias = input[index+2:stopIndex]
         if AliasMgr.IsAliased(strAlias):
@@ -33,7 +38,7 @@ def Alias(input):
             newStr = newStr + input[0:index] + AliasMgr.GetAlias(strAlias) + input[stopIndex+1:len(input)]
             input = newStr
             index = input.find("$(")
-            stopIndex = input.find(")")
+            stopIndex = input[index:].find(")") + index
 
         else:        
             Log.getLogger().warn("Something looks like an Alias, but there is no alias registered for it --> " + input)
