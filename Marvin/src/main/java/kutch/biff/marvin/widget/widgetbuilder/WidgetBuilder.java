@@ -683,6 +683,10 @@ public class WidgetBuilder
             {
                 retWidget = ButtonWidgetBuilder.BuildMenuButton(baseNode, Filename);
             }
+            else if (strWidget.equalsIgnoreCase("ToggleButton"))
+            {
+                retWidget = ButtonWidgetBuilder.BuildToggleButton(baseNode, Filename);
+            }
             else if (strWidget.equalsIgnoreCase("MultiSourceLineChart"))
             {
                 retWidget = ChartWidgetBuilder.BuildMultiSourceLineChart(baseNode, Filename);

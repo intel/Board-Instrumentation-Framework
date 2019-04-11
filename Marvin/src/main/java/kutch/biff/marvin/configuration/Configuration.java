@@ -94,16 +94,7 @@ public class Configuration
     private boolean _EnforceMediaSupport;
     private Cursor _prevCursor = null;
     private int _BusyCursorRequestCount;
-
-    public boolean getEnforceMediaSupport()
-    {
-        return _EnforceMediaSupport;
-    }
-
-    public void setEnforceMediaSupport(boolean _EnforceMediaSupport)
-    {
-        this._EnforceMediaSupport = _EnforceMediaSupport;
-    }
+    private boolean _ImmediateRefreshRequsted;
 
     public Configuration()
     {
@@ -148,9 +139,25 @@ public class Configuration
         _RunInDebugger = false;
         _appScene = null;
         _BusyCursorRequestCount = 0;
+        _ImmediateRefreshRequsted = false;
 
     }
 
+    public boolean refreshRequested()
+    {
+        if (_ImmediateRefreshRequsted)
+        {
+            _ImmediateRefreshRequsted = false;
+            return true;
+        }
+        return false;
+    }
+    
+    public void requestImmediateRefresh()
+    {
+        _ImmediateRefreshRequsted = true;
+    }
+    
     public boolean isRunInDebugger()
     {
         return _RunInDebugger;
@@ -694,4 +701,14 @@ public class Configuration
     {
         return _OscarBullhornList;
     }
+    public boolean getEnforceMediaSupport()
+    {
+        return _EnforceMediaSupport;
+    }
+
+    public void setEnforceMediaSupport(boolean _EnforceMediaSupport)
+    {
+        this._EnforceMediaSupport = _EnforceMediaSupport;
+    }
+
 }
