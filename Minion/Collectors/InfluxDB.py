@@ -399,6 +399,11 @@ class Measurement:
         for key in retMap: # in case they specified a Namespace override
             retMap[key] = (retMap[key],NS)
 
+        if self._makeList:
+            dLen = len(retMap[ListID])
+            if dLen != 64:
+                print("not long enough")
+
         return retMap
 
     def queryMeasurement(self,measurement,dbClient):
@@ -506,6 +511,21 @@ def _ValidateInputFilter(inputStr):
     except Exception as ex:
         raise ValueError("invalid filter specified for InfluxDB collector: " + str(ex))
 
+def GetMeasurementInfo(target,username,password,database,measurement):
+    hostname,port = target.split(":")
+    dbClient = InfluxDBClient(hostname, port, username, password, database)
+
+    query = "show series from {}".format(measurement)
+    #query = "show series from {}".format(measurement)
+    resultSet = dbClient.query(query)    
+    resultList = list(resultSet.get_points()) # this should now be a list with length = to the # of instances for this measurement
+    pprint("Info for Measurement: " + measurement)
+    for entry in resultList:
+        for item in entry['key'].split(",")[1:]:
+            pprint("  " + item)
+    pass
+
+
 ## Dynamic Collector interface
 def PointCollectFunction(frameworkInterface,target,username,password,database,**filterList):
     global logger
@@ -525,6 +545,8 @@ def PointCollectFunction(frameworkInterface,target,username,password,database,**
         raise ValueError("InfluxDB requires 1st Parameter to be IP:Port")
 
     hostname,port = target.split(":")
+
+#    GetMeasurementInfo(target,username,password,database,"cpufreq_value")
 
     try:
         while not frameworkInterface.KillThreadSignalled():

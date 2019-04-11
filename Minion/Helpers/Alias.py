@@ -25,7 +25,7 @@ from Helpers import Log
 def Alias(input):
     orig = input
     index = input.find("$(")        #Alias is surrounded by -->$( ) <--
-    stopIndex = input[index:].find(")")
+    stopIndex = input[index:].find(")") + index
 
     if stopIndex < index:
         otherIndex = input[index:].find(")")

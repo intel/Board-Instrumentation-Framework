@@ -82,10 +82,13 @@ class Collector:
 
         self._NamespaceOverride = newNamespaceString
         
-        for ns in Configuration.GetNamespaces():
-            if ns.GetID().lower() == newNamespaceString.lower():
-                Log.getLogger().warning("Setting OverrideNamespace for collector {0} to {1}.  However that Namespace already exists - conflicts may occur.".format(newNamespaceString,self.GetID()))
-                break
+        try:
+            for ns in Configuration.GetNamespaces():
+                if ns.GetID().lower() == newNamespaceString.lower():
+                    Log.getLogger().warning("Setting OverrideNamespace for collector {0} to {1}.  However that Namespace already exists - conflicts may occur.".format(newNamespaceString,self.GetID()))
+                    break
+        except:
+            pass
 
     def GetLastValue(self):
         return str(self._LastSentValue)
