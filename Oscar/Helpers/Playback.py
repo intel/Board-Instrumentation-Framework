@@ -290,6 +290,11 @@ class Playback(object):
                 self.StartTime = None
 
     def WriteToFile(self,filename):
+        # if recorded then played, then a 'cached' version will be around, we dont' want this
+        for entry in self.PlaybackData:
+            if hasattr(entry,'xmlData'):
+                del entry.xmlData
+            
         with open(filename,'w+b') as fp:
            pickle.dump(self.PlaybackData, fp, pickle.DEFAULT_PROTOCOL)
 
