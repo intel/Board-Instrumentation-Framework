@@ -238,6 +238,7 @@ class Measurement:
         self._MeasurementList=[]
         localList=[]
         excludeList=[]
+        self.__getCategories(dbClient)
         for measurement in self._Measurement:
             if measurement == "*":
                 allList = self.__getCategories(dbClient)
@@ -299,13 +300,16 @@ class Measurement:
                 logger.error("Historical Query specified to make csv, but did not provide info on what instance is")
                 return (None,None)
 
+        NS=""
         try:
             query = "show series from {} {}".format(measurement,self._where)
+            #query = "show series from {}".format(measurement)
             resultSet = dbClient.query(query)    
             resultList = list(resultSet.get_points()) # this should now be a list with length = to the # of instances for this measurement
-            if not self._instance :
-                logger.error("Historical Query specified instance to make csv, but the instance of {} does not exist in measurement {}".format(self._instance,measurement))
-                return (None,None)
+
+#            if not self._instance :
+#                logger.error("Historical Query specified instance to make csv, but the instance of {} does not exist in measurement {}".format(self._instance,measurement))
+#                return (None,None)
 
             if len(resultList) == 0:
                 logger.error("Historical Query specified resulted in no data")
@@ -350,7 +354,8 @@ class Measurement:
                     retMap[ListID] = (True,[]) # return Tuple, True means is 'list'
 
             for inst in range(0,instanceCount):
-                query = "select {} from {} {} and {}='{}' {}".format(self._select,measurement, self._where,self._instance,inst,self._other)
+                #query = "select {} from {} {} and {}='{}' {}".format(self._select,measurement, self._where,self._instance,inst,self._other)
+                query = "select {} from {} {}".format(self._select,measurement, self._where)
 
                 logger.info("Querying with: " + query)
                 resultList = []
@@ -393,6 +398,11 @@ class Measurement:
 
         for key in retMap: # in case they specified a Namespace override
             retMap[key] = (retMap[key],NS)
+
+        if self._makeList:
+            dLen = len(retMap[ListID])
+            if dLen != 64:
+                print("not long enough")
 
         return retMap
 
@@ -501,6 +511,21 @@ def _ValidateInputFilter(inputStr):
     except Exception as ex:
         raise ValueError("invalid filter specified for InfluxDB collector: " + str(ex))
 
+def GetMeasurementInfo(target,username,password,database,measurement):
+    hostname,port = target.split(":")
+    dbClient = InfluxDBClient(hostname, port, username, password, database)
+
+    query = "show series from {}".format(measurement)
+    #query = "show series from {}".format(measurement)
+    resultSet = dbClient.query(query)    
+    resultList = list(resultSet.get_points()) # this should now be a list with length = to the # of instances for this measurement
+    pprint("Info for Measurement: " + measurement)
+    for entry in resultList:
+        for item in entry['key'].split(",")[1:]:
+            pprint("  " + item)
+    pass
+
+
 ## Dynamic Collector interface
 def PointCollectFunction(frameworkInterface,target,username,password,database,**filterList):
     global logger
@@ -520,6 +545,8 @@ def PointCollectFunction(frameworkInterface,target,username,password,database,**
         raise ValueError("InfluxDB requires 1st Parameter to be IP:Port")
 
     hostname,port = target.split(":")
+
+#    GetMeasurementInfo(target,username,password,database,"cpufreq_value")
 
     try:
         while not frameworkInterface.KillThreadSignalled():
@@ -698,7 +725,8 @@ def HistoryCollectFunction(frameworkInterface,target,username,password,database,
                     updatedCount += 1
 
             if 0 == updatedCount:  # went through the entire list
-                Done = True
+                #Done = True
+                pass
 
             else:
                 SleepMs(interval)

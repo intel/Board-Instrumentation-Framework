@@ -165,7 +165,7 @@ class Playback(object):
             Log.getLogger().warn("Tried to set playback speed to invalid value: " + str(newVal))
             return
 
-        if newVal > 0 and newVal < 100:
+        if newVal > 0 and newVal < 101:
             self.PlaybackSpeed = newVal
         else:
             Log.getLogger().warn("Tried to set playback speed to invalid value: " + str(newVal))
@@ -224,9 +224,7 @@ class Playback(object):
 
         self.CurrentIndex = self.startIndex
         self.StartTime = None
-
-        xmlList=[]
-        
+       
         while not fnKillSignalled(): # run until signalled to end - call passed function to check for the signal
             if self.Paused or self.Stopped:
                 Sleep.SleepMs(100)
@@ -236,8 +234,11 @@ class Playback(object):
                 self.StartTime = int(self.PlaybackData[self.CurrentIndex].ArrivalTime) - 10 # can't remember why I subract 10ms...
 
             objData = self.PlaybackData[self.CurrentIndex]
-            sleepVal = (int(objData.ArrivalTime)-self.StartTime)/self.PlaybackSpeed
-            Sleep.SleepMs(sleepVal)
+            if False and self.PlaybackSpeed > 10:
+                pass
+            else:
+                sleepVal = (int(objData.ArrivalTime)-self.StartTime)/self.PlaybackSpeed
+                Sleep.SleepMs(sleepVal)
 
             try: # when looping, this data will be here after the 1st loop
                 xmlData = self.PlaybackData[self.CurrentIndex].xmlData
@@ -271,7 +272,7 @@ class Playback(object):
                 self.endIndex = len(self.PlaybackData)-1
 
             if self.CurrentIndex >= self.endIndex:
-                preProcessingDone = True
+#                preProcessingDone = True
                 if self.LoopMode == RepeatMode.NONE:
                     GuiMgr.OnStopPlayback()
                     if Configuration.get().GetExitAfterAutoPlay():
@@ -289,6 +290,11 @@ class Playback(object):
                 self.StartTime = None
 
     def WriteToFile(self,filename):
+        # if recorded then played, then a 'cached' version will be around, we dont' want this
+        for entry in self.PlaybackData:
+            if hasattr(entry,'xmlData'):
+                del entry.xmlData
+            
         with open(filename,'w+b') as fp:
            pickle.dump(self.PlaybackData, fp, pickle.DEFAULT_PROTOCOL)
 

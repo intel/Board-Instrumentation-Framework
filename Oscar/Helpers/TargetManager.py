@@ -47,6 +47,7 @@ class TargetManager():
         self._UpstreamTargets = {} # data being sent towards Minion
         self._DownstreamTargets = {} # data being sent torwads Marvin
         TargetManager._instance = self
+    
 
         from Helpers import Configuration
 
@@ -63,6 +64,7 @@ class TargetManager():
         self.__DownstreamPacketLock = threading.Lock()
         self.__DownstreamPacketThreads = 0
         self.__DownstreamPacketThreadsLock = threading.Lock() 
+        self.__UseThreadedDownstreamBroadcast = False
 
 
     def GetUpstreamTarget(self,TargetID):
@@ -237,15 +239,19 @@ class TargetManager():
 
 
     def BroadcastDownstream(self,sendBuffer,ignoreTimeout,domNode,isGroup=False):
-        packet = (sendBuffer,ignoreTimeout,domNode,isGroup)
-        waiting = self.AddDownstreamPacket(packet)
-        threadCount = self.GetWorkerThreadCount()
-        if  threadCount < 1 or  waiting / threadCount > 25: # if > 25 items per thread, spawn another
-            newThread = threading.Thread(target=self.__SimpleWorker)
-            newThread.start()
-            threadCount = self.IncrementWorkerThreadCount()
-            #Log.getLogger().debug(str(waiting) + " outstanding packets, adding worker thread #" + str(threadCount))
+        if self.__UseThreadedDownstreamBroadcast:
+            packet = (sendBuffer,ignoreTimeout,domNode,isGroup)
+            waiting = self.AddDownstreamPacket(packet)
+            threadCount = self.GetWorkerThreadCount()
+            if  threadCount < 1 or  waiting / threadCount > 25: # if > 25 items per thread, spawn another
+                newThread = threading.Thread(target=self.__SimpleWorker)
+                newThread.start()
+                threadCount = self.IncrementWorkerThreadCount()
+                #Log.getLogger().debug(str(waiting) + " outstanding packets, adding worker thread #" + str(threadCount))
 
+        else: # don't thread it, faster for single inst
+            self._BroadcastDownstream(sendBuffer,ignoreTimeout,domNode,isGroup)
+       
 
     def _BroadcastDownstream(self,sendBuffer,ignoreTimeout,domNode,isGroup=False):
         from Helpers import Configuration

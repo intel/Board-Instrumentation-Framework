@@ -29,9 +29,10 @@ class MyHandler(StreamHandler):
     def __init__(self):
         StreamHandler.__init__(self)
         self._latest = "No Log Entries Yet"
+        self._datefmt='%m-%d %H:%M'
 
     def emit(self,record):
-        self._latest = self.format(record)
+        self._latest = time.strftime(self._datefmt) + ": " + self.format(record)
 
     def getLatest(self):
         return self._latest
