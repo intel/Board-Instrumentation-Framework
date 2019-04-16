@@ -58,9 +58,18 @@ public class OnDemandGridWidget extends GridWidget
     public boolean Create(GridPane parentPane, DataManager dataMgr)
     {
         super.Create(parentPane, dataMgr);
-        if ("HZ".equals(__strPrimaryGrowth))
+        setupPositioning();
+        OnDemandGridBuilder objBuilder = new OnDemandGridBuilder(this);
+        dataMgr.AddOnDemandWidgetCriterea(__criterea, objBuilder);
+        // grab ALL aliases to use when contained widgets created
+        return true;
+    }
+    
+    private void setupPositioning()
+    {
+       if ("HZ".equals(__strPrimaryGrowth))
         {
-            __nextPositionX = 0;
+            __nextPositionX = -1;
             if ("VT".equals(__strSecondaryGrowth))
             {
                 __nextPositionY = 0;
@@ -84,10 +93,10 @@ public class OnDemandGridWidget extends GridWidget
         }
         else if ("VT".equals(__strPrimaryGrowth))
         {
-            __nextPositionY = 0;
+            __nextPositionY = -1;
             if ("HZ".equals(__strSecondaryGrowth))
             {
-                __nextPositionX = 0;
+                __nextPositionX = -1;
             }
             else
             {
@@ -99,18 +108,13 @@ public class OnDemandGridWidget extends GridWidget
             __nextPositionY = __NewLineCount - 1;
             if ("HZ".equals(__strSecondaryGrowth))
             {
-                __nextPositionX = 0;
+                __nextPositionX = -1;
             }
             else
             {
                 __nextPositionX = 125;
             }
-        }
-
-        OnDemandGridBuilder objBuilder = new OnDemandGridBuilder(this);
-        dataMgr.AddOnDemandWidgetCriterea(__criterea, objBuilder);
-        // grab ALL aliases to use when contained widgets created
-        return true;
+        }        
     }
 
     public DynamicItemInfoContainer getCriterea()
@@ -120,7 +124,7 @@ public class OnDemandGridWidget extends GridWidget
 
     private Pair<Integer, Integer> getNextPosition()
     {
-        Pair<Integer, Integer> retObj = new Pair<>(__nextPositionX, __nextPositionY);
+        Pair<Integer, Integer> retObj = null;
         if ("HZ".equals(__strPrimaryGrowth))
         {
             __nextPositionX++;
@@ -191,6 +195,7 @@ public class OnDemandGridWidget extends GridWidget
             }
         }
 
+        retObj = new Pair<>(__nextPositionX, __nextPositionY);
         return retObj;
     }
 
@@ -209,10 +214,11 @@ public class OnDemandGridWidget extends GridWidget
 
     private void resortWidgets()
     {
-        sortGrids();
+        getGridPane().getChildren().removeAll(getGridPane().getChildren());
         getGridPane().getChildren().clear();
-        __nextPositionX = 0;
-        __nextPositionX = 0;
+        sortGrids();
+        
+        setupPositioning();
         int widgetNum = 0;
         for (Pair<BaseWidget, String> tuple : __AddedGridList)
         {
