@@ -119,6 +119,8 @@ abstract public class BaseWidget implements Widget
     protected String _SelectedStyleID = null;
     private List<Double> _SteppedMaxRanges = null;
     private List<Double> _SteppedMinRanges = null;
+    private boolean _widthEqualsHeight = false;
+    private boolean _heightEqualsWidth = false;
 
     protected static CircularList<String> DebugStyles = null;
 
@@ -2052,6 +2054,11 @@ public boolean isMouseHasBeenSetup()
                 }
                 setWidth(canvasWidth * (percentVal / 100.0));
             }
+            else if (str.equalsIgnoreCase("height"))
+            {
+                _widthEqualsHeight = true;
+                setDefaultIsSquare(true);
+            }
             else
             {
                 setWidth(Double.parseDouble(str));
@@ -2090,6 +2097,11 @@ public boolean isMouseHasBeenSetup()
                     canvasHeight = (int) visualBounds.getHeight();
                 }
                 setHeight(canvasHeight * (percentVal / 100.0));
+            }
+            else if (str.equalsIgnoreCase("width"))
+            {
+                _heightEqualsWidth = true;
+                setDefaultIsSquare(true);
             }
             else
             {
