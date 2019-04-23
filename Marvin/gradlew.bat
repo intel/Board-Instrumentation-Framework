@@ -12,7 +12,7 @@ set JAVA_OPTS=-Dhttp.proxyHost=%proxy% -Dhttp.proxyPort=%proxyport% -Dhttps.prox
 
 echo *** ENZO ***
 cd Dependencies\Enzo
-call gradlew %1
+rem call gradlew %1
 cd ..\..
 copy Dependencies\Enzo\Build\libs\Enzo-0.3.6a.jar Dependencies /y 
 

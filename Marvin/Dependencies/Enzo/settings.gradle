@@ -21,7 +21,7 @@ include 'Common', 'Fonts', 'CanvasLed', 'Led', 'Charts', 'Clock', 'Experimental'
 */
 
 include 'Common', 'Fonts', 'Experimental', 'Gauge', 'Led',
-        'Lcd', 'LedBargraph', 'FlipPanel'
+        'Lcd', 'LedBargraph', 'FlipPanel', 'ValidationPane', 'RoundLcdClock'
 
 
 rootProject.name = 'Enzo'
