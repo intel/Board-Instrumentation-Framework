@@ -15,6 +15,7 @@
  */
 
 // Enzo main build file
+import java.text.SimpleDateFormat 
 
 import org.gradle.api.XmlProvider
 import org.gradle.api.artifacts.maven.MavenDeployment
@@ -25,6 +26,7 @@ plugins {
 	id 'net.nemerosa.versioning' version '2.8.2'
 	id 'org.openjfx.javafxplugin' version '0.0.7'
 	id 'com.gradle.build-scan' version '2.1'
+
     id 'idea'
     id 'java'
 }
@@ -73,35 +75,25 @@ if(hasProperty("release")) {
 
 repositories {
     jcenter()
-}
-/*
-allprojects {
-    apply plugin: 'idea'
-    apply plugin: 'java'
-    apply plugin: 'maven'
-
-    idea {
-        project {
-            jdkName '1.8'
-            languageLevel '1.8'
-        }
-    }
+	mavenCentral()
 }
 
-subprojects {
-    // create a jar for the javadoc
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
+javafx {
+    version = "11"
+    modules = [ 'javafx.controls' ]
+} 
 
-    artifacts {
-        archives sourcesJar
-    }
-}
-*/
 subprojects.each {
     subproject -> evaluationDependsOn(subproject.path)
+}
+
+Date buildTimeAndDate = new Date()
+ext {
+    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
+    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+}
+dependencies {
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
 
@@ -111,9 +103,31 @@ task oneJar(type: Jar, dependsOn: subprojects.assemble) {
         subproject ->
             String fileBaseName = subproject.name
             System.out.println(fileBaseName)
-            //from subproject.configurations.archives.allArtifacts.files.filter { !it.name.endsWith("sources.jar") }.collect { zipTree(it) }
             from subproject.configurations.archives.allArtifacts.files.filter { it.name.endsWith("${fileBaseName}-${version}.jar") }.collect { zipTree(it) }
     }
+	    from {
+        configurations.runtimeClasspath.collect { 'build/classes' }
+    }
+
+    manifest {
+        attributes(
+                'Built-By': System.properties['user.name'],
+                'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
+                'Build-Date': project.buildDate,
+                'Build-Time': project.buildTime,
+                'Build-Revision': versioning.info.commit,
+                'Specification-Title': project.name,
+                'Specification-Version': project.version,
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Bundle-Name': project.name,
+                'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://www.eclipse.org/legal/eplfaq.php',
+                'Bundle-Description': 'enzo widgets',
+                'Bundle-SymbolicName': 'eu.hansolo.enzo',
+                'Automatic-Module-Name': 'eu.hansolo.enzo'
+        )
+    }
+	
 }
 
 
@@ -158,50 +172,4 @@ if (isReleaseBuild) {
 }
 
 
-// upload artifacts to maven
-uploadArchives {
-    repositories {
-        if (isDevBuild) {
-            //mavenLocal()
-        }
-        else {
-            mavenDeployer {
-                if(isReleaseBuild) {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-                }
 
-                repository(url: sonatypeRepositoryUrl) {
-                    authentication(userName: sonatypeUsername, password: sonatypePassword)
-                }
-
-                pom.project {
-                    name 'Enzo'
-                    packaging 'jar'
-                    description 'Enzo is a JavaFX 8 controls library'
-                    url 'https://bitbucket.org/hansolo/enzo/wiki/Home'
-
-                    scm {
-                        url 'scm:git@bitbucket.org:hansolo/enzo.git'
-                        connection 'scm:git@bitbucket.org:hansolo/enzo.git'
-                        developerConnection 'scm:git@bitbucket.org:hansolo/enzo.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                            distribution 'repo'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'HanSolo'
-                            name 'Gerrit Grunwald'
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
