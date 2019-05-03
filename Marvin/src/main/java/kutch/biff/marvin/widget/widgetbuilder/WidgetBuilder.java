@@ -336,8 +336,19 @@ public class WidgetBuilder
                 {
                     Utility.ValidateAttributes(new String[]
                     {
-                        "Namespace", "ID"
+                        "Namespace", "ID","Scale"
                     }, node);
+                    if (node.hasAttribute("Scale"))
+                    {
+                        double scaleVal = node.getDoubleAttribute("Scale", 0);
+                        if (scaleVal <= 0)
+                        {
+                            LOGGER.severe("Widget defined with invalid scale value" + node.getAttribute("Scale"));
+                            return null;
+                        }
+                        retWidget.setValueScale(scaleVal);
+                    }
+                    
                     if (node.hasAttribute("ID"))
                     {
                         retWidget.setMinionID(node.getAttribute("ID"));

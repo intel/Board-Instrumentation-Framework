@@ -87,7 +87,7 @@ abstract public class BaseChartWidget extends BaseWidget
         xAxisMinorTickCount = 0;
         xAxisTickVisible = true;
         yAxisTickVisible = true;
-
+        
         _Series = new ArrayList<>();
         _chart = null;
         setDefaultIsSquare(false);
@@ -100,6 +100,7 @@ abstract public class BaseChartWidget extends BaseWidget
         _HorizontalChart = false;
         _isStackedChart = false;
     }
+
 
     /**
      * Routine nukes 1st entry, shifts everything left

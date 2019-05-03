@@ -90,6 +90,8 @@ abstract public class BaseWidget implements Widget
     private boolean _ClickThroughTransparentRegion = false;
     protected double _WidthPercentOfParentGrid;
     protected double _HeightPercentOfParentGrid;
+    
+    private double _ValueScale;
 
     private String _PeekabooHideStr;
     private String _PeekabooShowStr;
@@ -121,7 +123,7 @@ abstract public class BaseWidget implements Widget
     private List<Double> _SteppedMinRanges = null;
     private boolean _widthEqualsHeight = false;
     private boolean _heightEqualsWidth = false;
-
+    
     protected static CircularList<String> DebugStyles = null;
 
     public BaseWidget()
@@ -170,6 +172,7 @@ abstract public class BaseWidget implements Widget
         _WidgetParentGridWidget = null;
         _WidthPercentOfParentGrid = 0;
         _HeightPercentOfParentGrid = 0;
+        _ValueScale = 1.0;
 
         if (CONFIG.isDebugMode())
         {
@@ -2137,4 +2140,16 @@ public boolean isMouseHasBeenSetup()
     {
         return false;
     }
+
+    public double getValueScale()
+    {
+        return _ValueScale;
+    }
+
+    public void setValueScale(double _ValueScale)
+    {
+        this._ValueScale = _ValueScale;
+    }
+        
+        
 }

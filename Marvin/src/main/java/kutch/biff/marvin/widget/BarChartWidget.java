@@ -115,6 +115,7 @@ public class BarChartWidget extends LineChartWidget
                     try
                     {
                         newValue = Double.parseDouble(strValue);
+                        newValue *= getValueScale();
                         HandleSteppedRange(newValue);
                     }
                     catch (NumberFormatException ex)
