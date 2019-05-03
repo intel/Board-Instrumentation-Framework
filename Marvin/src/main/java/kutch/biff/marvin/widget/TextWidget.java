@@ -39,15 +39,17 @@ import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
  */
 public class TextWidget extends BaseWidget
 {
+
     private String _TextString;
     private Label _TextControl;
     private static Label testLabel = null;
     protected Group _Group;
     private boolean _ScaleToFitBounderies;
     private boolean _NumericFormat = false;
-    private boolean _MoneraryFormat = false;
+    private boolean _MonetaryFormat = false;
     private boolean _PercentFormat = false;
     private String _Suffix = "";
+    boolean DecimalsSet = false;
 
     public TextWidget()
     {
@@ -89,6 +91,19 @@ public class TextWidget extends BaseWidget
                             }
 
                             _TextString = newVal.toString();
+                            if (DecimalsSet)
+                            {
+                                try
+                                {
+                                    String fmtString = "%." + Integer.toString(getDecimalPlaces()) + "f";
+                                    float fVal = Float.parseFloat(_TextString);
+                                    _TextString = String.format(fmtString, fVal);
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+                            }
                             if (true == _NumericFormat)
                             {
                                 try
@@ -100,7 +115,6 @@ public class TextWidget extends BaseWidget
                                     else
                                     {
                                         _TextString = NumberFormat.getNumberInstance().format(Long.parseLong(_TextString));
-
                                     }
                                 }
                                 catch (Exception Ex)
@@ -108,31 +122,30 @@ public class TextWidget extends BaseWidget
                                     //System.out.println(Ex.toString());
                                 }
                             }
-                            else if (true == _MoneraryFormat)
+                            else if (true == _MonetaryFormat)
                             {
-                                    if (_TextString.contains(".")) // good bet it's a float
-                                    {
-                                        _TextString = NumberFormat.getCurrencyInstance().format(Float.parseFloat(_TextString));
-                                    }
-                                    else
-                                    {
-                                        _TextString = NumberFormat.getCurrencyInstance().format(Long.parseLong(_TextString));
+                                if (_TextString.contains(".")) // good bet it's a float
+                                {
+                                    _TextString = NumberFormat.getCurrencyInstance().format(Float.parseFloat(_TextString));
+                                }
+                                else
+                                {
+                                    _TextString = NumberFormat.getCurrencyInstance().format(Long.parseLong(_TextString));
 
-                                    }
-                           }
+                                }
+                            }
                             else if (true == _PercentFormat)
                             {
-                                    if (_TextString.contains(".")) // good bet it's a float
-                                    {
-                                        _TextString = NumberFormat.getPercentInstance().format(Float.parseFloat(_TextString));
-                                    }
-                                    else
-                                    {
-                                        _TextString = NumberFormat.getPercentInstance().format(Long.parseLong(_TextString));
+                                if (_TextString.contains(".")) // good bet it's a float
+                                {
+                                    _TextString = NumberFormat.getPercentInstance().format(Float.parseFloat(_TextString));
+                                }
+                                else
+                                {
+                                    _TextString = NumberFormat.getPercentInstance().format(Long.parseLong(_TextString));
 
-                                    }
-                           }
-                            
+                                }
+                            }
                             _TextString += _Suffix;
 
                             if (_TextString.length() < 2) // seems a single character won't display - bug in Java
@@ -140,11 +153,19 @@ public class TextWidget extends BaseWidget
                                 _TextString += " ";
                             }
                             _TextControl.setText(_TextString);
+
                         }
                     });
 
         SetupTaskAction();
         return ApplyCSS();
+    }
+
+    @Override
+    public void setDecimalPlaces(int _DecimalPlaces)
+    {
+        super.setDecimalPlaces(_DecimalPlaces);
+        this.DecimalsSet = true;
     }
 
     @Override
@@ -219,19 +240,19 @@ public class TextWidget extends BaseWidget
             if (node.hasAttribute("Type"))
             {
                 String Type = node.getAttribute("Type");
-                if (Type.equalsIgnoreCase("Number")) 
+                if (Type.equalsIgnoreCase("Number"))
                 {
                     _NumericFormat = true;
                 }
                 else if (Type.equalsIgnoreCase("Money"))
                 {
-                    _MoneraryFormat = true;
+                    _MonetaryFormat = true;
                 }
                 else if (Type.equalsIgnoreCase("Percent"))
                 {
                     _PercentFormat = true;
                 }
-                    
+
                 else
                 {
                     LOGGER.warning("Unknown Text Widget Format type: " + Type);

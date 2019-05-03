@@ -214,7 +214,7 @@ public class OnDemandGridWidget extends GridWidget
 
     private void resortWidgets()
     {
-        getGridPane().getChildren().removeAll(getGridPane().getChildren());
+//        getGridPane().getChildren().removeAll(getGridPane().getChildren());
         getGridPane().getChildren().clear();
         sortGrids();
         
@@ -228,7 +228,6 @@ public class OnDemandGridWidget extends GridWidget
             getGridPane().add(objWidget.getStylableObject(), position.getKey(), position.getValue());
             __criterea.ApplyOddEvenStyle(objWidget,widgetNum);
         }
-
     }
 
     public boolean AddOnDemandWidget(BaseWidget objWidget, String sortStr)
@@ -244,7 +243,7 @@ public class OnDemandGridWidget extends GridWidget
         {
             if (objWidget.PerformPostCreateActions(this, false))
             {
-                __AddedGridList.add(new Pair<BaseWidget, String>(objWidget, sortStr));
+                __AddedGridList.add(new Pair<>(objWidget, sortStr));
                 if (__criterea.getSortByMethod() != SortMethod.NONE)
                 {
                     resortWidgets(); // OddEven Style applied in here
