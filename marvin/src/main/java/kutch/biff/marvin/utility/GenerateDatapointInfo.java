@@ -198,6 +198,8 @@ public class GenerateDatapointInfo
     {
         float Total = 0;
         boolean forceUpdate = false;
+        synchronized(__dirtyMap)
+        {
         if (__minFrequency > 0)
         {
             if (__lastUpdate + __minFrequency < System.currentTimeMillis())
@@ -218,13 +220,15 @@ public class GenerateDatapointInfo
         }
         for ( String key :__dirtyMap.keySet())
         {
+            // Value contains boolean, if false, then it isn't ready to be processed
+            // so dont' worry about it, and return.
             if (__dirtyMap.get(key).getValue() || forceUpdate)
             {
                 Total += __dirtyMap.get(key).getKey();
             }
             else
             {
-                return;
+                return; // not all of them had been updated
             }
         }
         if (_Method == GenerateMethod.ADD || Total == 0.0)
@@ -237,6 +241,13 @@ public class GenerateDatapointInfo
         Total *= __Scale;
         // this likely needs to be a postponted task - otherwise can have endless loop of a mobius strip (maybe a marvindata task...
         //DataManager.getDataManager().ChangeValue(__ID, __Namespace, Float.toString(Total));
+        
+        for ( String key :__dirtyMap.keySet())
+        {   // go flip the dirty bit
+            Pair<Float,Boolean> entry = new Pair<>(__dirtyMap.get(key).getKey(),false);
+            __dirtyMap.put(key, entry);
+        }        
+        }
         MarvinTask mt = new MarvinTask();
         DecimalFormat df = new DecimalFormat();
         df.setGroupingUsed(false);
@@ -244,12 +255,6 @@ public class GenerateDatapointInfo
         df.setMinimumFractionDigits(__precision);
         mt.AddDataset(__ID, __Namespace, df.format(Total));
         TaskManager.getTaskManager().AddDeferredTaskObject(mt);
-        
-        for ( String key :__dirtyMap.keySet())
-        {   // go flip the dirty bit
-            Pair<Float,Boolean> entry = new Pair<>(__dirtyMap.get(key).getKey(),false);
-            __dirtyMap.put(key, entry);
-        }        
         __lastUpdate = System.currentTimeMillis();
     }
     
@@ -269,7 +274,7 @@ public class GenerateDatapointInfo
                 }
                 catch (NumberFormatException ex)
                 {
-                    LOGGER.severe(String.format("GenerateDatapoint can only accept inputs that are numberic. [%s,%s] does not meet this.",inputNamespace,inputID));
+                    LOGGER.severe(String.format("GenerateDatapoint can only accept inputs that are numeric. [%s,%s] does not meet this.",inputNamespace,inputID));
                 }
             }
         };

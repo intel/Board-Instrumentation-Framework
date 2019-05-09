@@ -971,7 +971,9 @@ public class Marvin extends Application
                     usedMem /= 1024.0;
                     String MBMemStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem / 1024);
                     //String BytesStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem);
-                    LOGGER.info("Used Memory: " + MBMemStr + " MB.");
+                    //int qSize = DataManager.getDataManager().getQueuedSize();
+                    //LOGGER.info("Used Memory: " + MBMemStr + " MB. Outstanding DataPoints: " + Integer.toString(qSize));
+                    LOGGER.info("Used Memory: " + MBMemStr);
                 }
             }
         };

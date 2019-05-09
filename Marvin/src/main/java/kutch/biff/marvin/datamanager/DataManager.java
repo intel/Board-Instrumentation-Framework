@@ -111,6 +111,16 @@ public class DataManager
         return _DataMap.size();
     }
 
+    public int getQueuedSize()
+    {
+        int tSize = 0;
+        for (Map.Entry<String,DataSet> entry : _DataMap.entrySet())
+        {
+            DataSet objData = entry.getValue();
+            tSize += objData.getSize();
+        }
+        return tSize;
+    }
     public long getUpdateCount()
     {
         return _UpdateCount;
@@ -218,7 +228,7 @@ public class DataManager
 
         return RetVal;
     }
-
+    
     public void ChangeValue(String ID, String Namespace, String Value)
     {
         boolean OnDemandItemFound = false;

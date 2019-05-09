@@ -43,6 +43,11 @@ public class DataSet
         _LatestValue = "";
         _LatestValueForMath = "";
     }
+    
+    public int getSize()
+    {
+        return _DataUpdates.size();
+    }
 
     public String getLatestValueForMath()
     {
