@@ -88,7 +88,6 @@ public class Marvin extends Application
     private DataManager _DataMgr;
     private ConfigurationReader _Config;
     private static TabPane _objTabPane = null;
-    private static final int noOfNodes = 0;
     private Configuration appConfig = null;
     private Server _receiveServer;
     private AnimationTimer _animationTimer;

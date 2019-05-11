@@ -30,6 +30,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaMarkerEvent;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
@@ -260,7 +261,7 @@ public abstract class MediaPlayerWidget extends BaseWidget
             //Duration D = objPlayer.getTotalDuration();
             objPlayer.setOnError(() ->
             {
-                if (null != objMedia)
+                if (null != objMedia && null != objMedia.getError() )
                 {
                     LOGGER.severe("Unable to play media file: " + _MediaURI.get(strFileID) + ". " + objMedia.getError().getMessage());
                 }

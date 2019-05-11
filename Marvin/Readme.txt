@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2017 by Intel Corporation
+ * #  Copyright (c) 2019 by Intel Corporation
  * # 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -20,8 +20,37 @@ Marvin is the highly configurable UI component of the Intel Instrumentation
 Framework project.
 
 To compile, run:
+gradlew buildEnzo
+gradlew copyEnzoJar
 gradlew build
 
-Resulting Marvin.Jar will be in the build\libs directory. Copy this to where 
+Resulting BIFF.Marvin.Jar will be in the build\libs directory. Copy this to where 
 you have your application setup - the .jar file should be at same location as
-the Widgets directory.
+the Widgets directory.  This shoud look something like:
+
++---BIFF.Marvin.jar
++---Starter_Application
+|   +---Images
+|   \---Media
+\---Widget
+    +---Button
+    +---Chart
+    +---CPU
+    +---FlipPanel
+    +---Gauge
+    +---Image
+    +---Indicator
+    +---LCARS
+    +---LCD
+    +---LED
+    +---Media
+    +---Memory
+    +---Networking
+    +---PDF
+    +---Quick
+    +---Storage
+    +---SVG
+    +---System
+    +---Text
+    \---Web
+

@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2016 by Patrick Kutch https://github.com/PatrickKutch
+ * #  Copyright (c) 2019 by Patrick Kutch https://github.com/PatrickKutch
  * # 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -15,15 +15,38 @@
  * #  limitations under the License.
  * ##############################################################################
  * #    File Abstract: 
- * #    Gradle build file for the Marvin JAVA application
+ * #    Gradle build file for the Marvin JAVA application, Java 11 Builds a monolithic Jar
+ * #
+ * #	Steps to build:
+ * #	gradlew buildEnzo
+ * #	gradlew copyEnzoJar
+ * #	gradlew build
+ * #
+ * #
  * ##############################################################################
  */
  
-apply plugin: 'java'
-apply plugin: 'application'
+import java.text.SimpleDateFormat
+plugins {
+	id 'application'
+	id 'org.openjfx.javafxplugin' version '0.0.7'
+	id 'net.nemerosa.versioning' version '2.8.2'
+    id 'java'
+    id 'idea'
+	id 'com.gradle.build-scan' version '2.1'
+	/*id 'org.beryx.jlink' version '2.10.2'*/
+}
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+repositories {
+    jcenter()
+	mavenCentral()
+}
+
+javafx {
+    version = "11"
+    modules = [ 'javafx.controls', 'javafx.web', 'javafx.media', 'javafx.swing', 'javafx.graphics', 'javafx.base']
+} 
+
 
 repositories {
 	flatDir	{
@@ -31,24 +54,71 @@ repositories {
 	}
 }
 
-
 dependencies{
 	compile name: 'Enzo-0.3.6a'
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.12'
+task buildEnzo(type: GradleBuild) {
+	println "-------- Building ENZO Library ---------"
+	buildFile = "Dependencies/Enzo/build.gradle"
+	tasks = ['build']
 }
 
-mainClassName = 'kutch.biff.marvin.Marvin'
 
-jar {
-    baseName = 'BIFF.Marvin'
-    from files(sourceSets.main.output.classesDir)
-    from configurations.runtime.asFileTree.files.collect { zipTree(it) }
+task copyEnzoJar(type: Copy) {
+	println "-------- Copying ENZO Library ---------"
+	from 'Dependencies/Enzo/build/libs'
+	include '*.jar'
+	into 'Dependencies'
+}
 
-    manifest {
-	    attributes 'Main-Class': 'kutch.biff.marvin.Marvin'
+buildEnzo.doLast{
+	copyEnzoJar
+}	
 
+
+Date buildTimeAndDate = new Date()
+ext {
+    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
+    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+}
+
+mainClassName = '$moduleName/kutch.biff.marvin.Marvin' 
+/*
+jlink {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'Marvin'
     }
 }
+*/
+
+jar {
+	baseName = 'BIFF.Marvin'
+	
+    manifest {
+		/* attributes 'Main-Class': 'kutch.biff.marvin' */
+		attributes 'Main-Class': 'kutch.biff.marvin.Launcher' /* this one for FAT jar */
+        attributes(
+                'Built-By': System.properties['user.name'],
+                'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
+                'Build-Date': project.buildDate,
+                'Build-Time': project.buildTime,
+                'Build-Revision': versioning.info.commit,
+                'Specification-Title': project.name,
+                'Specification-Version': project.version,
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Bundle-Name': project.name,
+                'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://www.eclipse.org/legal/eplfaq.php',
+                'Bundle-Description': 'BIFF Marvin',
+                'Bundle-SymbolicName': 'kutch.biff.marvin.Marvin',
+                'Automatic-Module-Name': 'kutch.biff.marvin.Marvin'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}	
+
+	

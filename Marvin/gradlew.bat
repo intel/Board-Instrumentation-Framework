@@ -4,19 +4,9 @@
 @rem  Gradle startup script for Windows
 @rem
 @rem ##########################################################################
-
 set proxy=proxy-chain.intel.com
 set proxyport=911
 set JAVA_OPTS=-Dhttp.proxyHost=%proxy% -Dhttp.proxyPort=%proxyport% -Dhttps.proxyHost=%proxy% -Dhttps.proxyPort=%proxyport%
-
-
-echo *** ENZO ***
-cd Dependencies\Enzo
-call gradlew %1
-cd ..\..
-copy Dependencies\Enzo\Build\libs\Enzo-0.3.6a.jar Dependencies /y 
-
-echo *** Marvin ***
 
 
 @rem Set local scope for the variables with windows NT shell
@@ -60,7 +50,7 @@ echo location of your Java installation.
 goto fail
 
 :init
-@rem Get command-line arguments, handling Windows variants
+@rem Get command-line arguments, handling Windowz variants
 
 if not "%OS%" == "Windows_NT" goto win9xME_args
 if "%@eval[2+2]" == "4" goto 4NT_args
