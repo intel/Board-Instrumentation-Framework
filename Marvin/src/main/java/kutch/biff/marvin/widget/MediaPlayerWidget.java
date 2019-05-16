@@ -30,7 +30,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
-import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaMarkerEvent;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
@@ -39,7 +38,7 @@ import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.CircularList;
 import kutch.biff.marvin.utility.FrameworkNode;
-import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
+
 
 /**
  *

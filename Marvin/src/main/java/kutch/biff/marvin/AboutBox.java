@@ -58,7 +58,7 @@ public class AboutBox
 {
     public static void ShowAboutBox()
     {
-        Stage dialog = new Stage();
+        Stage dialog = new Stage(); 
         dialog.setTitle("About Marvin");
         dialog.initStyle(StageStyle.UNDECORATED);
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -66,12 +66,12 @@ public class AboutBox
         Scene scene = new Scene(AboutBox.Setup(dialog));
 
         dialog.setScene(scene);
-        dialog.showAndWait();
+        dialog.showAndWait(); 
     }
 
     private static Pane Setup(Stage stage)
     {
-        TaskManager TASKMAN = TaskManager.getTaskManager();
+        //TaskManager TASKMAN = TaskManager.getTaskManager();
         ConfigurationReader CONFIG = ConfigurationReader.GetConfigReader();
 
         GridPane grid = new GridPane();
