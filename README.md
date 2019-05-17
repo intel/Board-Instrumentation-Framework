@@ -6,6 +6,8 @@ Here are a couple of my YouTube videos that make use of this framework:
 https://www.youtube.com/watch?v=6UUFWZs-Sck
 https://www.youtube.com/watch?v=NYI8BDv17Lw
 
+Marvin is now a Java 10+ application.  If you need Java 8, checkout the JAVA_8 branch.
+
 
 
 Take a look at the 200+ page BIFF Instrumenation Framework User Guide.pdf file for details: https://github.com/intel/Board-Instrumentation-Framework/blob/master/BIFF%20Instrumentation%20Framework%20User%20Guide.pdf.

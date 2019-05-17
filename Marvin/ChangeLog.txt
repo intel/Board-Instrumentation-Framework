@@ -1,3 +1,6 @@
+Release 19.05
+Main branch is now only for Java 10+.  If you need Java 8/9 support checkout the JAVA_8 branch.
+
 Release 18.10
 Added Task for Tab that is called when task is activated 
 
