@@ -20,7 +20,9 @@ Marvin is the highly configurable UI component of the Intel Instrumentation
 Framework project.
 
 To compile, run:
-gradlew buildEnzo
+cd Dependencies\Enzo
+gradlew build
+cd ..\..
 gradlew copyEnzoJar
 gradlew build
 
