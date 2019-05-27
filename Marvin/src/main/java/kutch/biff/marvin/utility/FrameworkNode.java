@@ -850,7 +850,7 @@ public class FrameworkNode
      */
     public static List<FrameworkNode> GetChildNodes(Document doc, String childName)
     {
-        ArrayList<FrameworkNode> retList = new ArrayList();
+        ArrayList<FrameworkNode> retList = new ArrayList<FrameworkNode>();
         NodeList docChildren = doc.getChildNodes();
         for (int iLoop = 0; iLoop < docChildren.getLength(); iLoop++)
         {

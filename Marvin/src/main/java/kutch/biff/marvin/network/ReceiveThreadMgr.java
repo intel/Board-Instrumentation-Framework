@@ -60,7 +60,7 @@ public class ReceiveThreadMgr implements Runnable
     private final DatagramSocket _socket;
     private final DataManager _DataManager;
     private final HashMap<String, String> LastMarvinTaskReceived;
-    private final LinkedBlockingQueue _DataQueue;
+    private final LinkedBlockingQueue<HashMap<InetAddress, String>> _DataQueue;
     private final AtomicInteger _WorkerThreadCount;
 
     public ReceiveThreadMgr(DatagramSocket sock, DataManager DM)
@@ -70,7 +70,7 @@ public class ReceiveThreadMgr implements Runnable
         _socket = sock;
         _DataManager = DM;
         LastMarvinTaskReceived = new HashMap<>();
-        _DataQueue = new LinkedBlockingQueue();
+        _DataQueue = new LinkedBlockingQueue<HashMap<InetAddress, String>>();
         _WorkerThreadCount = new AtomicInteger();
         _WorkerThreadCount.set(0);
     }
@@ -104,7 +104,7 @@ public class ReceiveThreadMgr implements Runnable
                             }
                             try
                             {
-                                Thread.sleep(5);  // didn't read anything, socket read timed out, so take a nap
+                                Thread.sleep(2);  // didn't read anything, socket read timed out, so take a nap
                             }
                             catch (InterruptedException ex1)
                             {

@@ -73,6 +73,8 @@ import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.Heartbeat;
 import kutch.biff.marvin.utility.JVMversion;
 import kutch.biff.marvin.utility.MarvinLocalData;
+import kutch.biff.marvin.utility.MarvinPlayback;
+import kutch.biff.marvin.utility.MarvinPlaybackManager;
 import kutch.biff.marvin.version.Version;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.Widget;
@@ -1009,6 +1011,13 @@ public class Marvin extends Application
         {
             objLocalMarvinData = new MarvinLocalData(1);
         }
+
+        
+	MarvinPlayback pb = MarvinPlaybackManager.getMarvinPlayback("Test");
+	pb.loadFile("z:\\Biff VM share\\OscarSaveFile.bifm");
+	pb.Play(250, true);
+	
+        
     }
 
     public static void DumpThreads(boolean showStack)
