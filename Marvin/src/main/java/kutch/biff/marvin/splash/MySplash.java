@@ -54,7 +54,6 @@ public class MySplash
     private ProgressBar loadProgress;
     private Label progressText;
     private static int SPLASH_WIDTH = 676;
-    private static final int SPLASH_HEIGHT = 227;
     private final boolean _Show;
     Stage _Stage;
     AnimationTimer _splashAnimationTimer;

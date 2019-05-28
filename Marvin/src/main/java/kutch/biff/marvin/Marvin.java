@@ -21,10 +21,11 @@
  */
 package kutch.biff.marvin;
 
+import static java.lang.Math.abs;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import static java.lang.Math.abs;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.List;
@@ -32,6 +33,13 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.swing.JOptionPane;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -57,11 +65,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.swing.JOptionPane;
 import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
@@ -73,19 +76,16 @@ import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.Heartbeat;
 import kutch.biff.marvin.utility.JVMversion;
 import kutch.biff.marvin.utility.MarvinLocalData;
-import kutch.biff.marvin.utility.MarvinPlayback;
-import kutch.biff.marvin.utility.MarvinPlaybackManager;
 import kutch.biff.marvin.version.Version;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.Widget;
 
 /**
  *
- * @author Patrick
+ * @author Patrick.Kutch@gmail.com
  */
 public class Marvin extends Application
 {
-
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private DataManager _DataMgr;
     private ConfigurationReader _Config;
@@ -887,6 +887,7 @@ public class Marvin extends Application
         stage.setTitle(_Config.getConfiguration().getAppTitle());
         stage.setIconified(false);
         stage.setScene(scene);
+        stage.setMaximized(false);
         stage.setHeight(appHeight);
         stage.setWidth(appWidth);
 
@@ -1011,13 +1012,7 @@ public class Marvin extends Application
         {
             objLocalMarvinData = new MarvinLocalData(1);
         }
-
-        
-	MarvinPlayback pb = MarvinPlaybackManager.getMarvinPlayback("Test");
-	pb.loadFile("z:\\Biff VM share\\OscarSaveFile.bifm");
-	pb.Play(250, true);
-	
-        
+        _stage.setMaximized(true);
     }
 
     public static void DumpThreads(boolean showStack)
@@ -1039,9 +1034,7 @@ public class Marvin extends Application
                 {
                     dumpString += "\t\t" + element.toString() + "\n";
                 }
-
             }
-
         }
         LOGGER.info(dumpString);
     }

@@ -25,7 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import kutch.biff.marvin.logger.MarvinLogger;
-
+/**
+*
+* @author Patrick.Kutch@gmail.com
+*/
 public class MarvinPlaybackManager
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());

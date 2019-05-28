@@ -136,7 +136,7 @@ public class DataManager
         return Namespace.toUpperCase() + __KeyConjunction + ID.toUpperCase();
     }
 
-    public void RemoveListener(String ID, String Namespace, ChangeListener listener)
+    public void RemoveListener(String ID, String Namespace, ChangeListener<?> listener)
     {
         if (null == ID || null == Namespace)
         {
@@ -150,7 +150,7 @@ public class DataManager
             _DataMap.get(Key).removeListener(listener);
         }
     }
-    public void RemoveListener(ChangeListener listener)
+    public void RemoveListener(ChangeListener<?> listener)
     {
         // super inefficient.....
         for (String key :_DataMap.keySet())
@@ -159,7 +159,7 @@ public class DataManager
         }
     }
     
-    public void AddListener(String ID, String Namespace, ChangeListener listener)
+    public void AddListener(String ID, String Namespace, ChangeListener<?> listener)
     {
         if (null == ID || null == Namespace)
         {
@@ -176,8 +176,7 @@ public class DataManager
         _DataMap.get(Key).addListener(listener);
     }
 
-    @SuppressWarnings("unchecked")
-    public void AddWildcardListener(String ID, String Namespace, ChangeListener listener)
+    public void AddWildcardListener(String ID, String Namespace, ChangeListener<?> listener)
     {
         if (null == ID || null == Namespace)
         {
@@ -191,7 +190,7 @@ public class DataManager
         if (false == _WildcardDataMap.containsKey(Key))
         {
             WildcardListItem item = new WildcardListItem(ID);
-            ArrayList list = new ArrayList<>();
+            List<WildcardListItem> list = new ArrayList<>();
             list.add(item);
             _WildcardDataMap.put(Key, list);
         }
