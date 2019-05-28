@@ -382,7 +382,7 @@ class TargetManager():
         Log.getLogger().info("Received Foghorn message.  Changing")
         for target in self.GetDownstreamTargets():
             if target.ConfigurationDefinedTarget.lower() == ConfigAddr.lower():
-                target.m_IP_InUse = newAddr
+                target.m_IP_InUse = NewAddr
 
                 #what to keep DNS resolution from re-starting....
 
@@ -426,6 +426,8 @@ class TargetManager():
 
 
     def ShuntWorkerProc(self,fnKillSignalled,userData):
+        from Helpers import Configuration
+
         sleepTime = Configuration.get().GetShuntWorkerInterval()
         try:
             while not fnKillSignalled(): # run until signalled to end - call passed function to check for the signal

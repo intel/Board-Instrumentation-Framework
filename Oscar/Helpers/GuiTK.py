@@ -816,7 +816,7 @@ class MenuSystem():
 
     def HandleSave(self):
         options = {}
-        options['filetypes'] = [('Oscar Data files', '.biff')]
+        options['filetypes'] = [('Oscar Data files', '.biff'),('Marvin Format','.bifm')]
         options['initialfile'] = 'OscarSaveFile.biff'
         options['defaultextension'] = '.biff'
         options['parent'] = self.root
