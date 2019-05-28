@@ -385,7 +385,7 @@ class MarvinDataHandler(object):
     # is a remote marvin task, blast downstream, like a loopback
     def HandleRemoteMarvinTask(self,rawData):
         Statistics.GetStatistics().OnMarvinTaskReceived()
-        TargetManager.GetTargetManager().BroadcastDownstream(rawData,False,none)
+        TargetManager.GetTargetManager().BroadcastDownstream(rawData,False,None)
 
     # is a minion task, so send it upstream
     def HandleMinionTask(self,rawData,node):
@@ -511,5 +511,5 @@ class MarvinDataHandler(object):
 
 def GetDataHandler():
     if MarvinDataHandler._instance == None:
-        return OscarDataHandler()
-    return MarvinDataHandler._instance
+        return MarvinDataHandler()
+    return MarvinDataHandler._ingstance

@@ -19,6 +19,7 @@
 ##############################################################################
 from Helpers import  Log
 import pickle
+import struct
 import sys
 from Helpers import Log
 from Data import MarvinData
@@ -247,8 +248,9 @@ class Playback(object):
                 xmlData = objData.ToXML() # be more efficient if I create a list of already created xmldata
                 self.PlaybackData[self.CurrentIndex].xmlData = xmlData # LOVe how you can just add stuff to an object in Python!
                 if Configuration.get().GetShunting():
+                    import xml
                     try:
-                        dom = xml.dom.minidom.parseString(rawData)
+                        dom = xml.dom.minidom.parseString(xmlData)
                         node = dom._get_firstChild()
                     except Exception as ex:
                        Log.getLogger().error("Error Something bad in Trying to re-encode saved data" )
@@ -295,13 +297,57 @@ class Playback(object):
             if hasattr(entry,'xmlData'):
                 del entry.xmlData
             
-        with open(filename,'w+b') as fp:
-           pickle.dump(self.PlaybackData, fp, pickle.DEFAULT_PROTOCOL)
+        if '.bifm' in filename.lower(): #new MARVIN format
+            self.WriteToMarvinFile(filename)
+
+        else: #Oscar Format
+            with open(filename,'w+b') as fp:
+                pickle.dump(self.PlaybackData, fp, pickle.DEFAULT_PROTOCOL)
 
         from Helpers import Recorder
 
         if not Recorder.get().HasBeenSaved():
             Recorder.get().OnSaved()
+
+    def WriteMarvinString(self,fp,strItem):
+        binaryLen = struct.pack('!I',len(strItem))
+        fp.write(binaryLen)
+        fp.write(strItem.encode('ascii'))
+
+
+
+    def WriteToMarvinFile(self,filename):
+        dataList=[]
+        firstTime=None
+        for entry in self.PlaybackData:
+            # break groups down into just a list, don't need groups in Marvin
+            if isinstance(entry,MarvinGroupData.MarvinDataGroup):
+                for datapoint in entry._DataList:
+                    if None == firstTime:
+                        firstTime = datapoint.ArrivalTime
+
+                    dataList.append((datapoint.ID,datapoint.Namespace,datapoint.Value,datapoint.ArrivalTime-firstTime))
+            else:
+                if None == firstTime:
+                    firstTime = entry.ArrivalTime
+
+                dataList.append((entry.ID,entry.Namespace,entry.Value,entry.ArrivalTime-firstTime))
+
+        dataList.sort(key=lambda tup:tup[3]) # make sure sorted by arrival time
+
+        with open(filename,'wb') as fp:
+            fp.write("BIFM".encode('ascii')) # File 'Type' Marker
+            fp.write(struct.pack('B',1)) # File Format Version
+
+            fp.write(struct.pack('!L',len(dataList))) # number of entries
+            for entry in dataList:
+                ID,Namespace,Value,Time = entry
+
+                fp.write(struct.pack('!L',Time)) # Relative Arrival Time
+                self.WriteMarvinString(fp,ID)    # ID
+                self.WriteMarvinString(fp,Namespace) # Namespace
+                self.WriteMarvinString(fp,Value)    # Value
+
 
     def ReadFromFile(self,filename):
         from Helpers import GuiMgr
@@ -351,7 +397,7 @@ class Playback(object):
             Log.getLogger().error("Unable to convert Alpha formatted file.")
             Log.getLogger().error(str(ex))
             #GuiMgr.MessageBox_Error("Python Error","Unable to convert old file format.")
-            return none
+            return None
 
         return newList
 
@@ -366,7 +412,7 @@ class Playback(object):
             Log.getLogger().error("Unable to convert Beta formatted file.")
             Log.getLogger().error(str(ex))
             #GuiMgr.MessageBox_Error("Python Error","Unable to convert old file format.")
-            return none
+            return None
 
         return newList
 
