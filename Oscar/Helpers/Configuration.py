@@ -114,7 +114,7 @@ class Configuration():
         return self.__ReceiveBufferSize
 
     def GetShuntMap(self):
-        return self.__ShuntMap;
+        return self.__ShuntMap
 
     def GetResolvedShuntMap(self):
         return self.__ShuntMapResolved
@@ -228,6 +228,7 @@ class Configuration():
     def GetID(self):
         return self.__ID
 
+    @staticmethod
     def modification_date(filename):
         t = os.path.getmtime(filename)
         return datetime.datetime.fromtimestamp(t)
@@ -262,7 +263,7 @@ class Configuration():
                 ID = Alias.Alias(attributes["ID"].nodeValue)
 
         if None == ID:
-            Log.getLogger().error("No ID configured for Oscar");
+            Log.getLogger().error("No ID configured for Oscar")
             return False
 
         else:
@@ -290,8 +291,9 @@ class Configuration():
             if "PORT" in attributes:
                 try:
                    self.__FromDownstreamConnection.Port = int(Alias.Alias(attributes["PORT"].nodeValue))
+
                 except Exception as Ex:
-                    Log.getLogger().error(str(ex))
+                    Log.getLogger().error(str(Ex))
                     Log.getLogger().error("Invalid Port set for Incoming Minion Connection")
                     return  False
             else:
@@ -325,6 +327,25 @@ class Configuration():
             Log.getLogger().error("IncomingMinionConnection not defined")
             return False
 
+        OscarNode = nodeList[0].getElementsByTagName("Oscar")
+
+        if None != OscarNode:
+            Log.getLogger().info("Auto Connect Info found.")
+            
+            oscarAttributes = OscarNode[0].attributes
+            if None == oscarAttributes:
+                Log.getLogger().error("Invalid Auto Connect Configuration.")
+                return False
+            try:
+                autoIP = Alias.Alias(oscarAttributes["IP"].nodeValue)
+                autoPort = Alias.Alias(oscarAttributes["Port"].nodeValue)
+                autoKey = Alias.Alias(oscarAttributes["Key"].nodeValue)
+                self.SendBullHorn(autoIP,autoPort,autoKey)
+
+            except Exception as Ex:
+                Log.getLogger().error("Invalid Auto Connect Configuration.")
+                return False
+
         if False == self.__ReadAutoConnectInfo(domDoc):
             return False
 
@@ -341,6 +362,49 @@ class Configuration():
 
         self.Valid = True
         
+        return True
+
+
+    def SendBullHorn(self,IP,Port,Key):
+        #<Marvin Type="Bullhorn">
+        #    <Version>1.0</Version>
+        #    <UniqueID>3236</UniqueID>
+        #    <Hostname>pgkutch.beervana.net</Hostname>
+        #    <Key>md5 hash</Key>
+        #    <Port>5000</Port>
+        #</Marvin>
+                
+        hashGen = hashlib.md5(str.encode(Key))
+        HashOfKey = hashGen.hexdigest()
+        IP1 = socket.gethostbyname(socket.gethostname())
+        import random
+        uID = str(random.randint(0,500000))
+
+        sendString = ('<Marvin Type=\"Bullhorn\">'
+            '<Version>1.0</Version>')
+
+        sendString += '<UniqueID>{}</UniqueID>'.format(uID)
+
+        sendString += '<Hostname>{}</Hostname>'.format(IP1)
+        sendString += '<Key>{}</Key>'.format(HashOfKey)
+        sendString += '<Port>{}</Port>'.format(self.__FromUpstreamConnection.Port)
+        sendString += '</Marvin>'
+
+        fogHornSocket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM,socket.IPPROTO_UDP)
+        fogHornSocket.setblocking(True)
+        fogHornSocket.settimeout(0.001)
+
+        try:
+            fogHornSocket.sendto(bytes(sendString,'utf-8'),(IP,int(Port)))
+            
+            fogHornSocket.sendto(bytes(sendString,'utf-8'),(IP,int(Port)))
+
+            fogHornSocket.sendto(bytes(sendString,'utf-8'),(IP,int(Port)))
+
+            fogHornSocket.close()
+        except:
+            Log.getLogger().error("Unable to connect to {}:{}".format(IP,Port))
+
         return True
 
     # this routine (mostly a cut and paste of __ReadDownstreamTargets) will, if the config file has
@@ -426,7 +490,6 @@ class Configuration():
 
                 objTarget = Target.Target(IP,Port,ConnectionType.Unknown,True)# could be Marvin or another Oscar
                 
-                #Key = socket.gethostbyname(IP) + ":" +str(Port)
                 Key = IP + ":" +str(Port)
                 TargetManager.GetTargetManager().AddDownstreamTarget(objTarget,Key)
                 
@@ -438,7 +501,6 @@ class Configuration():
         return retList 
 
     def __ReadAutoConnectInfo(self,domDoc):
-        retList = []
         nodeList = domDoc.getElementsByTagName("MarvinAutoConnect")
         if None != nodeList and len(nodeList) > 0:
             for node in nodeList:
@@ -490,7 +552,6 @@ class Configuration():
                         else:
                             Log.getLogger().error("Invalid BITW <Mode>: " + modeStr)
                             return False
-
 
                     if False == input.hasAttribute("Namespace"):
                         Log.getLogger().error("BITW <Input> requires Namespace attribute.")
@@ -588,7 +649,7 @@ class Configuration():
                     if True == Historical:
                         Log.getLogger().warn("Sending Historical data from more than 1 data source to the same file: " + ShuntFile)
                 else:
-                    self.__ShuntingFiles[ShuntFile.lower()] = ShuntFile;
+                    self.__ShuntingFiles[ShuntFile.lower()] = ShuntFile
 
                 dataTuple = (Namespace,ID,ShuntFile,ID_Comp,Historical)
 
@@ -610,7 +671,7 @@ class Configuration():
                 ## Initialize the file ##
                 try:
                     with open(ShuntFile,"w") as sf:
-                        sf.write("##### Generated by Oscar Shunt #####\n");
+                        sf.write("##### Generated by Oscar Shunt #####\n")
                 except Exception as Ex:
                     Log.getLogger().error("Invalid Shunt filename specified: " + ShuntFile)
                     return False                    
@@ -618,7 +679,6 @@ class Configuration():
                 Log.getLogger().info("Creating Shunt [" + Namespace + ":" + ID +"] --> " + ShuntFile)
 
         return True
-
 
     def GetMarvinAutoConnectKeyFromHash(self,keyHash):
         if keyHash in self.__DynamicConnectMarvinMap.keys():
@@ -648,9 +708,7 @@ class Configuration():
         end = '</Namespace>'
         reg = "(?<=%s).*?(?=%s)" % (start,end)
         try:
-
-            result = re.search(reg, buffer)
-            r= re.compile(reg)
+            r = re.compile(reg)
             NamespaceList = r.findall(buffer)
 
             if None == NamespaceList:

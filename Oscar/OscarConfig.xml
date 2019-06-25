@@ -21,7 +21,10 @@
 ##############################################################################
 -->
 <Oscar ID="DaGrouch">
-  <IncomingMinionConnection PORT ="5100"/>
+  <IncomingMinionConnection PORT ="5100">
+       <!-- <Oscar IP="OtherOscar.MyNet.com" Port="6200" Key="MarvinAutoConnectKey"/> -->
+  </IncomingMinionConnection>
+
   <TargetConnection IP="localhost" PORT="5200"/>
   <MarvinAutoConnect Key="Identifying Key"/> <!-- Marvin can attach to <IncomingMnionConnection>, with this key and be added as a TargetConnection -->
     <!--
