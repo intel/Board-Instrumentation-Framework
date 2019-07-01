@@ -20,7 +20,7 @@
 ##############################################################################
 -->
 
-<Widget Type = "SteelGauge">
+<Widget Type="SteelGauge">
     <Style>Gauge40GbE.Bx.css</Style>
     <MinValue>0</MinValue>
     <MaxValue>80</MaxValue>
