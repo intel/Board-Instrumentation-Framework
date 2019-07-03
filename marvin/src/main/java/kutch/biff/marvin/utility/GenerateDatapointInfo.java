@@ -226,12 +226,30 @@ public class GenerateDatapointInfo
 	__dirtyMap.putAll(newDirtyMap);
     }
     
+    private void HandleProxyUpdates()
+    {
+	String dataStr = null;
+	String proxyID=null,proxyNS=null;
+	synchronized (__dirtyMap)
+	{
+	    for (String key : __dirtyMap.keySet())
+	    {
+	    
+	}
+	
+	
+    }
     private void CheckForUpdate()
     {
 	float Total = 0;
 	boolean forceUpdate = false;
-	String dataStr = null;
-	String proxyID=null,proxyNS=null;
+	
+	if (_Method == GenerateMethod.PROXY)
+	{
+	    HandleProxyUpdates();
+	    return;
+	}
+
 	synchronized (__dirtyMap)
 	{
 	    if (__minFrequency > 0)
@@ -262,6 +280,7 @@ public class GenerateDatapointInfo
 		    try
 		    {
 			Total += Float.parseFloat(__dirtyMap.get(key).getKey());
+			Total *= __Scale;
 		    }
 		    
 		    catch(NumberFormatException ex)
