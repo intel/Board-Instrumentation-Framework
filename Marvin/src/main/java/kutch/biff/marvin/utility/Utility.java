@@ -97,6 +97,15 @@ public class Utility
 	String parts[] = key.split(Utility.__KeyConjunction);
 	return parts;
     }
+    
+    public static String combineWildcards(String s1, String s2)
+    {
+	if (s1.contains("*"))
+	{
+	    s1 = s1.replace("*", s2);
+	}
+	return s1;
+    }
 
     
 }

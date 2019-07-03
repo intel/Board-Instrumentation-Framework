@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2018 Intel Corporation
+ * #  Copyright (c) 2019 Intel Corporation
  * # 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * ##############################################################################
  * #    File Abstract: 
  * #    Does 'DOS' or unix style file system matching for strings.  Since
- * #    Java does not have a glob library, use the file sysem code to do the 
+ * #    Java does not have a glob library, use the file system code to do the 
  * #    dirty work.
  * #
  * ##############################################################################
@@ -26,13 +26,18 @@ package kutch.biff.marvin.utility;
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
+
+import kutch.biff.marvin.logger.MarvinLogger;
 
 /**
  *
- * @author Patrick
+ * @author Patrick.Kutch@gmail.com
  */
 public class Glob
 {
+    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+
     public static boolean check(String globPattern, String stringToCheck)
     {
         if (null == globPattern || null == stringToCheck)
@@ -49,9 +54,9 @@ public class Glob
             return "*".equals(globPattern) || matcher.matches(Paths.get(stringToCheck));
         }
         catch(Exception ex)
-        {
+        {	
+            LOGGER.severe("Check function had exception on [" + globPattern + "] and [" + stringToCheck +"]");
             return false;
         }
-       
     }
 }

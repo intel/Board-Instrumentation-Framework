@@ -982,7 +982,7 @@ public class ConfigurationReader
     {
         ArrayList<Pair<String, String>> maskList = new ArrayList<>();
         ArrayList<Pair<String, String>> excludeList = new ArrayList<>();
-        int precision = 2;
+        int precision = -1;
         boolean hasListEntry = false;
         int listEntry = 0;
 

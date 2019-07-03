@@ -115,6 +115,10 @@ public class GenerateDatapointInfo
     public void setMethod(GenerateMethod method)
     {
 	_Method = method;
+	if (GenerateMethod.PROXY == _Method)
+	{
+	    setPrecision(-1);
+	}
     }
     
     public double getScale()
@@ -226,30 +230,58 @@ public class GenerateDatapointInfo
 	__dirtyMap.putAll(newDirtyMap);
     }
     
-    private void HandleProxyUpdates()
+    private void HandleProxiedValue(String proxyNS, String proxyID, String strValue)
     {
-	String dataStr = null;
-	String proxyID=null,proxyNS=null;
-	synchronized (__dirtyMap)
+	MarvinTask mt = new MarvinTask();
+	String dataStr;
+	try
 	{
-	    for (String key : __dirtyMap.keySet())
-	    {
+	    float value;
+	    value = Float.parseFloat(strValue);
+	    value *= __Scale;
+	    int precision = __precision;
 	    
+	    if (-1 == precision)
+	    { // use precision of value received
+		int integerPlaces = strValue.indexOf('.');
+		if (integerPlaces > 0)
+		{
+		    precision = strValue.length() - integerPlaces - 1;
+		}
+		else
+		{
+		    precision = 0;
+		}
+		
+	    }
+	    DecimalFormat df = new DecimalFormat();
+	    df.setGroupingUsed(false);
+	    df.setMaximumFractionDigits(precision);
+	    df.setMinimumFractionDigits(precision);
+	    
+	    dataStr = df.format(value);
 	}
 	
-	
+	catch(NumberFormatException ex)
+	{
+	    dataStr = strValue;
+	}
+	// Can use wildcard for target names, only for Proxy at moment
+	mt.AddDataset(Utility.combineWildcards(__ID, proxyID), Utility.combineWildcards(__Namespace,proxyNS), dataStr);
+	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
     }
+    
     private void CheckForUpdate()
     {
-	float Total = 0;
-	boolean forceUpdate = false;
-	
 	if (_Method == GenerateMethod.PROXY)
 	{
-	    HandleProxyUpdates();
+	    LOGGER.severe("Entered CheckForUpdate() for proxied value - should NEVER occur.  Notify Patrick");
 	    return;
 	}
-
+	
+	float Total = 0;
+	boolean forceUpdate = false;
+	int sourcPrecision = 0;
 	synchronized (__dirtyMap)
 	{
 	    if (__minFrequency > 0)
@@ -272,57 +304,40 @@ public class GenerateDatapointInfo
 	    }
 	    for (String key : __dirtyMap.keySet())
 	    {
-		if (_Method == GenerateMethod.PROXY)
-		{
-		    String parts[] = Utility.splitKey(key);
-		    proxyNS = parts[0];
-		    proxyID = parts[1];
-		    try
-		    {
-			Total += Float.parseFloat(__dirtyMap.get(key).getKey());
-			Total *= __Scale;
-		    }
-		    
-		    catch(NumberFormatException ex)
-		    {
-			dataStr = __dirtyMap.get(key).getKey();
-		    }
-		    int l = __dirtyMap.size();
-		    LOGGER.info(Integer.toString(l));
-		    //break; // for proxy, only 1 value will be there
-		}
 		// Value contains boolean, if false, then it isn't ready to be processed
 		// so don't worry about it, and return.
 		if (__dirtyMap.get(key).getValue() || forceUpdate)
 		{
-		    Total += Float.parseFloat(__dirtyMap.get(key).getKey());
+		    String strValue = __dirtyMap.get(key).getKey();
+		    Total += Float.parseFloat(strValue);
+		    int integerPlaces = strValue.indexOf('.');
+		    int precision = strValue.length() - integerPlaces - 1;
+		    if (precision > sourcPrecision)
+		    {
+			sourcPrecision = precision; // use source precision, in case not specified
+		    }
 		}
 		else
 		{
 		    return; // not all of them had been updated
 		}
 	    }
-	    
-	    if (_Method == GenerateMethod.AVERAGE && Total != 0.0)
+	    if (_Method == GenerateMethod.ADD || Total == 0.0)
+	    {
+	    }
+	    else
 	    {
 		Total /= __dirtyMap.size();
 	    }
-	    // this likely needs to be a postponed task - otherwise can have endless loop of
-	    // a mobius strip (maybe a marvindata task...
+	    Total *= __Scale;
+	    // this likely needs to be a postponted task - otherwise can have endless loop
+	    // of a mobius strip (maybe a marvindata task...
 	    // DataManager.getDataManager().ChangeValue(__ID, __Namespace,
 	    // Float.toString(Total));
 	    
-	    try
-	    {
-		Total *= __Scale;
-	    }
-	    catch(NumberFormatException ex)
-	    {
-		
-	    }
-	    
 	    for (String key : __dirtyMap.keySet())
-	    { // go flip the dirty bit
+	    { // go flip the dirty bit - can't do this in main loop because not all could have
+	      // been dirty
 		Pair<String, Boolean> entry = new Pair<>(__dirtyMap.get(key).getKey(), false);
 		__dirtyMap.put(key, entry);
 	    }
@@ -331,31 +346,16 @@ public class GenerateDatapointInfo
 	MarvinTask mt = new MarvinTask();
 	DecimalFormat df = new DecimalFormat();
 	df.setGroupingUsed(false);
-	df.setMaximumFractionDigits(__precision);
-	df.setMinimumFractionDigits(__precision);
-
-	try
-	{
-	    dataStr = df.format(Total);
-	}
-	    catch(NumberFormatException ex)
-	    {
-		if (null == dataStr)
-		    {
-		    	dataStr= "oops"; 
-		    }
-	    }
+	int precision = __precision;
 	
-	if (_Method == GenerateMethod.PROXY)
-	{
-
-	    mt.AddDataset(proxyID , __Namespace, dataStr );
-	    LOGGER.info(proxyID);
+	if (-1 == precision)
+	{ // use precision of value received
+	    precision = sourcPrecision;
 	}
-	else
-	{
-	    mt.AddDataset(__ID, __Namespace, dataStr );
-	}
+	
+	df.setMaximumFractionDigits(precision);
+	df.setMinimumFractionDigits(precision);
+	mt.AddDataset(__ID, __Namespace, df.format(Total));
 	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
 	__lastUpdate = System.currentTimeMillis();
     }
@@ -383,13 +383,17 @@ public class GenerateDatapointInfo
 		}
 		try
 		{
-		    if (_Method != GenerateMethod.PROXY)
+		    if (GenerateMethod.PROXY == _Method)
+		    {
+			HandleProxiedValue(inputNamespace, inputID, newVal.toString());
+		    }
+		    else
 		    {
 			Float.parseFloat(newVal.toString()); // only allow numeric values for non proxy
+			Pair<String, Boolean> entry = new Pair<>(newVal.toString(), true);
+			__dirtyMap.put(Utility.generateKey(inputNamespace, inputID), entry);
+			CheckForUpdate();
 		    }
-		    Pair<String, Boolean> entry = new Pair<>(newVal.toString(), true);
-		    __dirtyMap.put(Utility.generateKey(inputNamespace, inputID), entry);
-		    CheckForUpdate();
 		}
 		catch(NumberFormatException ex)
 		{
