@@ -983,6 +983,8 @@ public class ConfigurationReader
         ArrayList<Pair<String, String>> maskList = new ArrayList<>();
         ArrayList<Pair<String, String>> excludeList = new ArrayList<>();
         int precision = 2;
+        boolean hasListEntry = false;
+        int listEntry = 0;
 
         Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode);
         if (null == genDPInfo)
@@ -1013,6 +1015,20 @@ public class ConfigurationReader
                 }
                 excludeList.add(exclude);
             }
+            else if (node.getNodeName().equalsIgnoreCase("ListEntry"))
+            {
+                try
+                {
+            		listEntry = node.getIntegerContent();
+            		hasListEntry = true;
+                }
+                catch (NumberFormatException ex)
+                {
+                    LOGGER.severe("Invalid ListEntry specified for <GenerateDatapoint>: " + node.getTextContent());
+                    return null;
+                }
+            }
+            	
             else if (node.getNodeName().equalsIgnoreCase("Decimals"))
             {
                 try
@@ -1040,6 +1056,16 @@ public class ConfigurationReader
             return null;
         }
         GenerateDatapointInfo info = new GenerateDatapointInfo(genDPInfo.getKey(), genDPInfo.getValue(), maskList, excludeList);
+        
+        if (hasListEntry)
+        {
+            if (!info.setListEntry(listEntry))
+            {
+                LOGGER.severe("Invalid ListEntry specified for <GenerateDatapoint>: " + Integer.toString(listEntry));
+                return null;
+            }
+        }
+        
         if (inputNode.getAttribute("Method").equalsIgnoreCase("Add"))
         {
             info.setMethod(GenerateDatapointInfo.GenerateMethod.ADD);
@@ -1048,6 +1074,21 @@ public class ConfigurationReader
         {
             info.setMethod(GenerateDatapointInfo.GenerateMethod.AVERAGE);
         }
+        else if (inputNode.getAttribute("Method").equalsIgnoreCase("Proxy"))
+        {
+            info.setMethod(GenerateDatapointInfo.GenerateMethod.PROXY);
+            if (inputNode.hasAttribute("ProxyID"))
+            {
+        	String proxyID = inputNode.getAttribute("ProxyID");
+        	info.setProxyID(proxyID);
+            }
+            else
+            {
+                LOGGER.severe("GenerateDatapoint [Proxy] requires ProxyID");
+                return null;
+            }
+        }
+        
         else
         {
             LOGGER.severe("Invalid Method specified for GenerateDatapoint: " + inputNode.getAttribute("Method"));
@@ -1111,7 +1152,6 @@ public class ConfigurationReader
                 LOGGER.severe("<GenerateDatapoint> specified <Refresh> without a Policy.");
                 return null;
             }
-
         }
 
         info.setPrecision(precision);
@@ -1799,8 +1839,7 @@ public class ConfigurationReader
         {
             return false;
         }
-        DataManager.getDataManager().AddGenerateDatapointInfo(info);;
-        return true;
+        return DataManager.getDataManager().AddGenerateDatapointInfo(info);
     }
 
     public static boolean ReadTaskList(FrameworkNode taskNode)

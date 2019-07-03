@@ -22,6 +22,7 @@
 package kutch.biff.marvin.datamanager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -38,6 +39,7 @@ import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.utility.GenerateDatapointInfo;
 import kutch.biff.marvin.utility.Glob;
+import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandTabBuilder;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 
@@ -52,13 +54,14 @@ public class DataManager
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     private ConcurrentHashMap<String, DataSet> _DataMap;
+    private Map<String, GenerateDatapointInfo> _ProxyIDMap;
     private ConcurrentHashMap<String, List<WildcardListItem>> _WildcardDataMap;
     private final Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> _OnDemandQueue; // a queue solves some of my concurency issues
     private final Queue<GenerateDatapointInfo> __GenerateDatapointList;
     private long _UpdateCount;
     private long _UnassignedDataPoints;
     private boolean __DynamicTabRegistered = false;
-    private static String __KeyConjunction="MarvinKeyJoinerString";
+    
 
     public DataManager()
     {
@@ -69,6 +72,7 @@ public class DataManager
         _UnassignedDataPoints = 0;
         _OnDemandQueue = new ConcurrentLinkedQueue<>();
         __GenerateDatapointList = new ConcurrentLinkedQueue<>();
+        _ProxyIDMap = new HashMap<>();
     }
 
     public boolean DynamicTabRegistered()
@@ -76,9 +80,20 @@ public class DataManager
         return __DynamicTabRegistered;
     }
 
-    public void AddGenerateDatapointInfo(GenerateDatapointInfo genInfo)
+    public boolean AddGenerateDatapointInfo(GenerateDatapointInfo genInfo)
     {
+	if (genInfo.getProxyID() != null)
+	{
+	    if (_ProxyIDMap.containsKey(genInfo.getProxyID().toUpperCase()))
+	    {
+		LOGGER.severe("GenerateDataPoint: Proxy must have unique proxyID.  Duplicate ID:" + genInfo.getProxyID());
+		return false;
+	    }
+
+	    _ProxyIDMap.put(genInfo.getProxyID().toUpperCase(),genInfo);
+	}
         __GenerateDatapointList.add(genInfo);
+        return true;
     }
     
     public Queue<GenerateDatapointInfo> getGenerateDatapointList()
@@ -131,11 +146,6 @@ public class DataManager
         return _UnassignedDataPoints;
     }
     
-    private String createKey(String Namespace, String ID)
-    {
-        return Namespace.toUpperCase() + __KeyConjunction + ID.toUpperCase();
-    }
-
     public void RemoveListener(String ID, String Namespace, ChangeListener<?> listener)
     {
         if (null == ID || null == Namespace)
@@ -143,13 +153,14 @@ public class DataManager
             return;
         }
 
-        String Key = createKey(Namespace,ID);
+        String Key = Utility.generateKey(Namespace,ID);
 
         if (_DataMap.containsKey(Key))
         {
             _DataMap.get(Key).removeListener(listener);
         }
     }
+    
     public void RemoveListener(ChangeListener<?> listener)
     {
         // super inefficient.....
@@ -166,7 +177,7 @@ public class DataManager
             return;
         }
 
-        String Key = createKey(Namespace,ID);
+        String Key = Utility.generateKey(Namespace,ID);
 
         if (false == _DataMap.containsKey(Key))
         {
@@ -263,7 +274,7 @@ public class DataManager
         
         synchronized (this)
         {
-            String Key = createKey(Namespace,ID);
+            String Key = Utility.generateKey(Namespace,ID);
 
             _UpdateCount++;
 
@@ -308,7 +319,7 @@ public class DataManager
                 return null;
             }
 
-            String Key = createKey(Namespace,ID);
+            String Key = Utility.generateKey(Namespace,ID);
 
             if (_DataMap.containsKey(Key))
             {
@@ -328,7 +339,7 @@ public class DataManager
                 return null;
             }
 
-            String Key = createKey(Namespace,ID);
+            String Key = Utility.generateKey(Namespace,ID);
 
             if (_DataMap.containsKey(Key))
             {
@@ -366,13 +377,13 @@ public class DataManager
             return count;
         }
         
-        String strCompare = createKey(namespaceCriterea,idCriterea);
+        String strCompare = Utility.generateKey(namespaceCriterea,idCriterea);
         
         for (String Key : _DataMap.keySet())
         {
             if (Glob.check(strCompare, Key))
             {
-                String parts[] = Key.split(__KeyConjunction);
+                String parts[] = Utility.splitKey(Key);
                 if (parts.length != 2)
                 {
                     LOGGER.severe("Unknown problem trying to perform PulseDataPoint. Key=" + Key);

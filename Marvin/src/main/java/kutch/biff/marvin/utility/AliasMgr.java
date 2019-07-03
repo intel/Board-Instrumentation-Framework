@@ -170,7 +170,7 @@ public class AliasMgr
         {
             return;
         }
-        Map map = _AliasList.get(0);
+        Map<String, String> map = _AliasList.get(0);
         if (map.containsKey(Alias.toUpperCase()))
         {
             return;
@@ -203,7 +203,7 @@ public class AliasMgr
             LOGGER.severe("Attempted to set an ALIAS ID to NULL");
             return;
         }
-        Map map = _AliasList.get(0);
+        Map<String, String> map = _AliasList.get(0);
         if (map.containsKey(Alias.toUpperCase()))
         {
             LOGGER.config("Duplicate Alias detected for : " + Alias + ". Ignoring.");
@@ -228,7 +228,7 @@ public class AliasMgr
             LOGGER.severe("Attempted to set an ALIAS ID to NULL");
             return;
         }
-        Map map = _AliasList.get(0);
+        Map<String, String> map = _AliasList.get(0);
         if (map.containsKey(Alias.toUpperCase()))
         {
             UpdateAlias(Alias, Value);
@@ -252,7 +252,7 @@ public class AliasMgr
             LOGGER.severe("Attempted to set a Root ALIAS ID to NULL");
             return;
         }
-        Map map = _AliasList.get(_AliasList.size() - 1);
+        Map<String, String> map = _AliasList.get(_AliasList.size() - 1);
         if (map.containsKey(Alias.toUpperCase()))
         {
             return;

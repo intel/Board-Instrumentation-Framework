@@ -51,7 +51,7 @@ public class AreaChartWidget extends LineChartWidget
 
         for (SeriesDataSet ds : getSeries())
         {
-            ((AreaChart) (getChart())).getData().add(ds.getSeries());
+            ((AreaChart<?, ?>) (getChart())).getData().add(ds.getSeries());
         }
     }
 

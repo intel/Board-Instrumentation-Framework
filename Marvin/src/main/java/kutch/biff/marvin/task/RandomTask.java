@@ -22,8 +22,6 @@
 package kutch.biff.marvin.task;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
-import kutch.biff.marvin.logger.MarvinLogger;
 
 /**
  *
@@ -31,8 +29,6 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 public class RandomTask extends BaseTask
 {
-
-    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
 
     class RandomSet

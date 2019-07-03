@@ -329,7 +329,7 @@ class Configuration():
 
         OscarNode = nodeList[0].getElementsByTagName("Oscar")
 
-        if None != OscarNode:
+        if None != OscarNode and len(OscarNode) > 0:
             Log.getLogger().info("Auto Connect Info found.")
             
             oscarAttributes = OscarNode[0].attributes

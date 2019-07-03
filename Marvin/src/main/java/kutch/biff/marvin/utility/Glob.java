@@ -44,6 +44,14 @@ public class Glob
         PathMatcher matcher = ("*".equals(globPattern)) ? null
                               : FileSystems.getDefault().getPathMatcher("glob:" + globPattern);
 
-        return "*".equals(globPattern) || matcher.matches(Paths.get(stringToCheck));
+        try
+        {
+            return "*".equals(globPattern) || matcher.matches(Paths.get(stringToCheck));
+        }
+        catch(Exception ex)
+        {
+            return false;
+        }
+       
     }
 }
