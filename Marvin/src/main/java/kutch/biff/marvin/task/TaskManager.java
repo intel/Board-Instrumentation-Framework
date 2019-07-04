@@ -502,6 +502,11 @@ public class TaskManager
 		    objTaskItem = BuildDesktopTaskItem(ID, node);
 		}
 		
+		else if (taskType.equalsIgnoreCase("UpdateProxy"))
+		{
+		    objTaskItem = BuildUpdateProxyTask(ID, node);
+		}
+		
 		else if (taskType.equalsIgnoreCase("DataSetFile"))
 		{
 		    objTaskItem = BuildDataSetFileTaskItem(ID, node);
@@ -1700,6 +1705,44 @@ public class TaskManager
 	}
 	
 	return pbT;
+    }
+    
+    private UpdateProxyTask BuildUpdateProxyTask(String taskID, FrameworkNode taskNode)
+    {
+	UpdateProxyTask task = null;
+	for (FrameworkNode node : taskNode.getChildNodes())
+	{
+	    if (node.getNodeName().equalsIgnoreCase("Proxy"))
+	    {
+		Utility.ValidateAttributes(new String[] { "Namespace", "ID", "ProxyID" }, node);
+		if (!node.hasAttribute("ProxyID"))
+		{
+		    LOGGER.severe("ProxyTask requires ProxyID");
+		    return null;
+		}
+		if (!(node.hasAttribute("Namespace") || node.hasAttribute("ID")))
+		{
+		    LOGGER.severe("ProxyTask requires Namespace or ID or both");
+		    return null;
+		}
+		
+		task = new UpdateProxyTask(node.getAttribute("ProxyID"));
+		if (node.hasAttribute("Namespace"))
+		{
+		    task.setNamespaceMask(node.getAttribute("Namespace"));
+		}
+		if (node.hasAttribute("ID"))
+		{
+		    task.setIDMask(node.getAttribute("ID"));
+		}
+	    }
+	    else
+	    {
+		LOGGER.severe("Unknown tag in ProxyTask:" + node.getNodeName());
+		return null;
+	    }
+	}
+	return task;
     }
     
 }

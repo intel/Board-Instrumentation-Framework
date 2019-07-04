@@ -21,8 +21,6 @@
  */
 package kutch.biff.marvin.task;
 
-import java.util.logging.Logger;
-import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.widget.DynamicTabWidget;
 
 /**
@@ -31,7 +29,6 @@ import kutch.biff.marvin.widget.DynamicTabWidget;
  */
 public class DynamicDebugWidgetTask extends BaseTask
 {
-    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private String Namespace;
     private String ID;

@@ -182,6 +182,28 @@ public class GenerateDatapointInfo
 	return false;
     }
     
+    public void ProxyReset(String newNamespaceFilter, String newIDFilter)
+    {
+	synchronized (__dirtyMap)
+	{
+	    removeAllListeners();
+	    __dirtyMap.clear();
+	    
+
+	    Pair<String, String> current = __includeCriterea.get(0);
+	    if (null == newNamespaceFilter)
+	    {
+		newNamespaceFilter = current.getKey();
+	    }
+	    if (null == newIDFilter)
+	    {
+		newIDFilter = current.getValue();
+	    }
+	    __includeCriterea.clear(); // only 1 criteria for proxy
+	    __includeCriterea.add(new Pair<String, String>(newNamespaceFilter, newIDFilter));
+	}
+    }
+    
     private boolean Matches(String checkNamespace, String checkID, ArrayList<Pair<String, String>> criterea)
     {
 	for (Pair<String, String> matchPattern : criterea)
@@ -218,7 +240,7 @@ public class GenerateDatapointInfo
 	    }
 	    else
 	    {
-		ChangeListener objListener = _listenerMap.get(key);
+		ChangeListener<?> objListener = _listenerMap.get(key);
 		_listenerMap.remove(key);
 		LOGGER.info("Removing Stale GenerateDataPoing Input: " + key);
 		// very inefficeint - this should be re-woredk.
@@ -228,6 +250,23 @@ public class GenerateDatapointInfo
 	}
 	__dirtyMap.clear();
 	__dirtyMap.putAll(newDirtyMap);
+    }
+    
+    private void removeAllListeners()
+    {
+	synchronized (this)
+	{
+	    
+	    for (String key : _listenerMap.keySet())
+	    {
+		// go through all listeners for this data and nuke it.
+		ChangeListener<?> objListener = _listenerMap.get(key);
+		// very inefficient - this should be re-worked.
+		DataManager.getDataManager().RemoveListener(objListener);
+	    }
+	    _listenerMap.clear();
+	    __PreviouslyChecked.clear();
+	}
     }
     
     private void HandleProxiedValue(String proxyNS, String proxyID, String strValue)
@@ -267,7 +306,7 @@ public class GenerateDatapointInfo
 	    dataStr = strValue;
 	}
 	// Can use wildcard for target names, only for Proxy at moment
-	mt.AddDataset(Utility.combineWildcards(__ID, proxyID), Utility.combineWildcards(__Namespace,proxyNS), dataStr);
+	mt.AddDataset(Utility.combineWildcards(__ID, proxyID), Utility.combineWildcards(__Namespace, proxyNS), dataStr);
 	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
     }
     
@@ -364,10 +403,10 @@ public class GenerateDatapointInfo
     {
 	// LOGGER.info(String.format("Adding Input of %s:%s to Build Data point
 	// %s:%s",inputNamespace,inputID,__Namespace,__ID));
-	ChangeListener objListener = new ChangeListener()
+	ChangeListener<Object> objListener = new ChangeListener<Object>()
 	{
 	    @Override
-	    public void changed(ObservableValue o, Object oldVal, Object newVal)
+	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
 	    {
 		if (__csvEntry > -1)
 		{
@@ -404,6 +443,24 @@ public class GenerateDatapointInfo
 	    }
 	};
 	DataManager.getDataManager().AddListener(inputID, inputNamespace, objListener);
-	_listenerMap.put(inputNamespace.toUpperCase() + inputID.toLowerCase(), objListener);
+	synchronized (this)
+	{
+	    
+	    _listenerMap.put(inputNamespace.toUpperCase() + inputID.toLowerCase(), objListener);
+	}
+    }
+    
+    public void DumpPatterns()
+    {
+	for (Pair<String,String> entry : __includeCriterea)
+	{
+	    String ns = entry.getKey();
+	    String ID = entry.getKey();
+	    if (ns == ID)
+	    {
+		
+	    }
+	    ID = ns;
+	}
     }
 }

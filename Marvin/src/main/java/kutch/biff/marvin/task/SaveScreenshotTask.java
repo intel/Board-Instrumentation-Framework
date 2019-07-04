@@ -21,20 +21,20 @@
  */
 package kutch.biff.marvin.task;
 
+import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
-import javax.imageio.ImageIO;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import kutch.biff.marvin.configuration.Configuration;
-import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
 
 /**
  *

@@ -60,7 +60,7 @@ public class LaunchProgramTask extends BaseTask
         
         try
         {
-            Process proc = rt.exec(execString);
+            rt.exec(execString);
         }
         catch (Exception ex)
         {

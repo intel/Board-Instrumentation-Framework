@@ -21,6 +21,8 @@
  */
 package kutch.biff.marvin.task;
 
+import kutch.biff.marvin.datamanager.DataManager;
+
 /**
  *
  * @author Patrick.Kutch@gmail.com
@@ -29,20 +31,30 @@ package kutch.biff.marvin.task;
 public class UpdateProxyTask extends BaseTask
 {
     private String _ProxyID;
-    private String _NewNamespaceCriterea;
-    private String _NewIDCriterea;
+    private String _NewNamespaceCriterea = null;
+    private String _NewIDCriterea = null;
     
     
     public UpdateProxyTask(String proxyID)
     {
-	
+	_ProxyID = proxyID;
+    }
+    
+    public void setNamespaceMask(String newNS)
+    {
+	_NewNamespaceCriterea = newNS;
+    }
+    
+    
+    public void setIDMask(String newID)
+    {
+	_NewIDCriterea = newID;
     }
 
 
     @Override
     public void PerformTask()
     {
-	// TODO Auto-generated method stub
-	
+	DataManager.getDataManager().UpdateGenerateDatapointProxy(getDataValue(_ProxyID), getDataValue(_NewNamespaceCriterea), getDataValue(_NewIDCriterea));
     }
 }
