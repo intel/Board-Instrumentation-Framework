@@ -21,6 +21,9 @@
  */
 package kutch.biff.marvin.configuration;
 
+import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
+import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.OpenDefinitionFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +31,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
@@ -40,9 +53,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.util.Pair;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.PromptManager;
@@ -54,17 +64,11 @@ import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.GenerateDatapointInfo;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
-import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
 import kutch.biff.marvin.widget.DynamicTabWidget;
 import kutch.biff.marvin.widget.TabWidget;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandTabBuilder;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
-import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.OpenDefinitionFile;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -1076,6 +1080,10 @@ public class ConfigurationReader
         }
         else if (inputNode.getAttribute("Method").equalsIgnoreCase("Proxy"))
         {
+            if (maskList.size() > 1)
+            {
+        	LOGGER.severe("GenerateDatapoint: Proxy only supports a single input pattern.");
+            }
             info.setMethod(GenerateDatapointInfo.GenerateMethod.PROXY);
             if (inputNode.hasAttribute("ProxyID"))
             {
@@ -1368,7 +1376,8 @@ public class ConfigurationReader
                                                         "ID", "File", "Align", "hgap", "vgap", "Task"
             });
 
-            if (false == AliasMgr.getAliasMgr().ReadAliasFromExternalFile(node.getAttribute("File")))
+            AliasMgr.getAliasMgr();
+	    if (false == AliasMgr.ReadAliasFromExternalFile(node.getAttribute("File")))
             {
                 return null;
             }
@@ -1490,13 +1499,14 @@ public class ConfigurationReader
                                 found = true;
 
                                 tab = new TabWidget(id);
-                                FrameworkNode tabNode = null;
+                                //FrameworkNode tabNode = null;
 
                                 tab = ConfigurationReader.ReadTab(node, tab, id);
                                 if (null == tab)
                                 {
                                     return null;
                                 }
+                                /*
                                 if (false) // TODO - hmm, not sure about this.... why did I do this
                                 {
                                     if (node.hasAttribute("File")) // can externally define widgets within
@@ -1546,6 +1556,7 @@ public class ConfigurationReader
 
                                     break;
                                 }
+                                */
                             }
                         }
                         if (true == found)
@@ -1757,20 +1768,6 @@ public class ConfigurationReader
 
     private static boolean ReadConditionals(Document doc)
     {
-        /*
-         <Conditional type='IF_EQ' CaseSensitive="True">
-         <MinionSrc ID="myID" Namespace="myNS"/>
-         <Value>
-         <MinionSrc ID="myID" Namespace="myNS"/>
-         </Value>
-         or
-         <Value>44</Value>
-        
-         <Then>Task12</Then>
-         <Else>Task3</Else>
-         </Conditional>
-         */
-        TaskManager TASKMAN = TaskManager.getTaskManager();
         boolean retVal = true;
 
         NodeList conditionals = doc.getElementsByTagName("Conditional");
@@ -1805,7 +1802,6 @@ public class ConfigurationReader
 
     private static boolean ReadTaskAndConditionals(Document doc)
     {
-        TaskManager TASKMAN = TaskManager.getTaskManager();
         boolean retVal = true;
 
         List<FrameworkNode> taskListNodes = FrameworkNode.GetChildNodes(doc, "TaskList");
