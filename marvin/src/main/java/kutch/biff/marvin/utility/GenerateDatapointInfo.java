@@ -450,7 +450,7 @@ public class GenerateDatapointInfo
 	    _listenerMap.put(inputNamespace.toUpperCase() + inputID.toLowerCase(), objListener);
 	}
     }
-    
+/*     
     public void DumpPatterns()
     {
 	for (Pair<String,String> entry : __includeCriterea)
@@ -464,4 +464,5 @@ public class GenerateDatapointInfo
 	    ID = ns;
 	}
     }
+*/    
 }

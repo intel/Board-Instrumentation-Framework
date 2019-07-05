@@ -110,8 +110,10 @@ public class Marvin extends Application
     private String ConfigFilename = "Application.xml";
     private String LogFileName = "MarvinLog.html";
     private boolean ShowHelp = false;
+    @SuppressWarnings("unused")
     private boolean ShowVersion = false;
     private boolean ShowSplash = true;
+    @SuppressWarnings("unused")
     private boolean RunInDebugger = false;
     private boolean enforceMediaSupport = false;
     private boolean dumpAlias = false;
@@ -120,9 +122,11 @@ public class Marvin extends Application
     private MarvinLocalData objLocalMarvinData = null;
     private MySplash _Splash;
     private boolean _CheckForSizeProblems = true;
+    @SuppressWarnings("unused")
     private boolean _SizeCheckWindowShowing = false;
 
     // returns the base tab pane - used for dynamic tabs in debug mode
+    @SuppressWarnings("exports")
     public static TabPane GetBaseTabPane()
     {
         return _objTabPane;
@@ -541,6 +545,7 @@ public class Marvin extends Application
         return true;
     }
 
+    @SuppressWarnings("unused")
     private void checkSize(Stage stage, Scene scene, GridPane objGridPane)
     {
         stage.centerOnScreen();
@@ -787,6 +792,7 @@ public class Marvin extends Application
         return true;
     }
 
+    @SuppressWarnings("exports")
     @Override
     public void start(Stage stage) throws Exception
     {
@@ -802,6 +808,7 @@ public class Marvin extends Application
 
     }
 
+    @SuppressWarnings("exports")
     public void FinishLoad(Stage stage)
     {
         stage.setIconified(true);

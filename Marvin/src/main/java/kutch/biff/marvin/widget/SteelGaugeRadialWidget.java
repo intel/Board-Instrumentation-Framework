@@ -38,7 +38,6 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class SteelGaugeRadialWidget extends BaseWidget
 {
-
     private String UnitText;
     private double MinValue;
     private double MaxValue;
