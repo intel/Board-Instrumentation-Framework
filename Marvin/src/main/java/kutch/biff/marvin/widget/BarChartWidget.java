@@ -82,20 +82,21 @@ public class BarChartWidget extends LineChartWidget
         SetupSeriesSets(dataMgr);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void setupListenersForSingleSource(DataManager dataMgr)
     {
         XYChart.Series<String, Number> objSeries = new XYChart.Series<>();
         for (int iLoop = 0; iLoop < getxAxisMaxCount(); iLoop++)
         {
-            XYChart.Data objData = new XYChart.Data<>(Integer.toString(iLoop), 0);
+            @SuppressWarnings("rawtypes")
+	    XYChart.Data objData = new XYChart.Data<>(Integer.toString(iLoop), 0);
             objSeries.getData().add(objData);
         }
         ((BarChart) getChart()).getData().add(objSeries);
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {
@@ -132,18 +133,21 @@ public class BarChartWidget extends LineChartWidget
 
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public javafx.scene.Node getStylableObject()
     {
         return ((BarChart) (getChart()));
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public ObservableList<String> getStylesheets()
     {
         return ((BarChart) (getChart())).getStylesheets();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Chart CreateChartObject()
     {

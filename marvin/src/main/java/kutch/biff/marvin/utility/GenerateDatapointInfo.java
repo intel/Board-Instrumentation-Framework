@@ -46,6 +46,7 @@ public class GenerateDatapointInfo
     private final String __Namespace, __ID;
     private final Map<String, Boolean> __PreviouslyChecked;
     private final Map<String, Pair<String, Boolean>> __dirtyMap;
+    @SuppressWarnings("rawtypes")
     private final Map<String, ChangeListener> _listenerMap;
     private int __precision;
     private int __minFrequency;

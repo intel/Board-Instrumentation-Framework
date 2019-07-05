@@ -30,7 +30,6 @@ import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.task.MarvinTask;
 import kutch.biff.marvin.utility.FrameworkNode;
-import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
 
 /**
  *
@@ -40,10 +39,12 @@ public class PDF_ReaderWidget extends BaseWidget
 {
 //    private final org.jpedal.PdfDecoderFX _pdf = new org.jpedal.PdfDecoderFX();
     private Node _pdf = null;
+    @SuppressWarnings("unused")
     private String _SrcFile;
     private Group _objGroup;
     private int _CurrPage = 1;
     private int _AutoAdvanceInterval;
+    @SuppressWarnings("unused")
     private boolean _AutoAdvance, _AutoLoopWithAdvance;
     private static int _AutoAdvancePageNumber = 0;
 
@@ -91,10 +92,10 @@ public class PDF_ReaderWidget extends BaseWidget
                 TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
             }
 
-            dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+            dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
             {
                 @Override
-                public void changed(ObservableValue o, Object oldVal, Object newVal)
+                public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                 {
                     MyHandler(newVal);
                 }

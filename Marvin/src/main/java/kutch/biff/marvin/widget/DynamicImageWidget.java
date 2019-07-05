@@ -23,6 +23,7 @@ package kutch.biff.marvin.widget;
 
 import java.io.File;
 import java.util.HashMap;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -36,8 +37,6 @@ import kutch.biff.marvin.task.MarvinTask;
 import kutch.biff.marvin.utility.CircularList;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.Utility;
-import static kutch.biff.marvin.widget.BaseWidget.CONFIG;
-import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
 import kutch.biff.marvin.widget.dynamicgrid.DynamicTransition;
 
 /**
@@ -135,10 +134,10 @@ public class DynamicImageWidget extends StaticImageWidget
 
             DynamicImageWidget objDynaImg = this;
 
-            dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+            dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
                         {
                             @Override
-                            public void changed(ObservableValue o, Object oldVal, Object newVal)
+                            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                             {
                                 boolean ChangeOcurred = false;
                                 if (IsPaused())

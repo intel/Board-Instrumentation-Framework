@@ -22,6 +22,7 @@
 package kutch.biff.marvin.widget;
 
 import java.util.ArrayList;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -47,7 +48,7 @@ public class StackedBarChartWidget extends BarChartWidget
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void setupListeners(DataManager dataMgr)
     {
         for (String key : _SeriesOrder)
@@ -81,11 +82,11 @@ public class StackedBarChartWidget extends BarChartWidget
 
                 objSeries.getData().add(objData);
 
-                dataMgr.AddListener(objDs.getID(), objDs.getNamespace(), new ChangeListener()
+                dataMgr.AddListener(objDs.getID(), objDs.getNamespace(), new ChangeListener<Object>()
                 {
 
                     @Override
-                    public void changed(ObservableValue o, Object oldVal, Object newVal)
+                    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                     {
                         if (IsPaused())
                         {

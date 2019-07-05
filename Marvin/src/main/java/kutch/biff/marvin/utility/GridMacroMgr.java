@@ -34,6 +34,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
 public class GridMacroMgr
 {
     private final static GridMacroMgr _Mgr = new GridMacroMgr();
+    @SuppressWarnings("rawtypes")
     private final ArrayList<Map> _GridMacroList;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     
@@ -70,7 +71,8 @@ public class GridMacroMgr
             LOGGER.severe("Tried to add GridMacro that is null.");
             return false;
         }
-        Map map = _GridMacroList.get(0);
+        @SuppressWarnings("unchecked")
+	Map<String, FrameworkNode> map = _GridMacroList.get(0);
         map.put(nameMacro.toUpperCase(), macroNode);
             
         return true;
@@ -79,7 +81,7 @@ public class GridMacroMgr
     public boolean macroExists(String strMacro)
     {
         String strName = strMacro.toUpperCase();
-        for (Map map : _GridMacroList)
+        for (Map<?, ?> map : _GridMacroList)
         {
             if (map.containsKey(strName))
             {
@@ -92,7 +94,7 @@ public class GridMacroMgr
     public FrameworkNode getGridMacro(String strMacro)
     {
         String strName = strMacro.toUpperCase();
-        for (Map map : _GridMacroList)
+        for (Map<?, ?> map : _GridMacroList)
         {
             if (map.containsKey(strName))
             {

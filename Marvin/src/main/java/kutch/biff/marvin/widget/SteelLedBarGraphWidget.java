@@ -139,10 +139,10 @@ public class SteelLedBarGraphWidget extends BaseWidget
         pane.add(_BarGraph, getColumn(), getRow(), getColumnSpan(), getRowSpan());
         //pane.add(_Pane,  getColumn(), getRow(),getRowSpan(),getColumnSpan());
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {

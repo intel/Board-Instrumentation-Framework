@@ -60,7 +60,7 @@ public class SteelGaugeWidget extends BaseWidget
     private List<Section> Sections;
     private List<Pair<Double, Double>> SectionPercentages;
     private Gauge _Gauge;  // remember that you need to disable mouse action in gaugeskin knob.setOnMousePressed(event -> ~ line 324
-    private GridPane _ParentGridPane;
+    //private GridPane _ParentGridPane;
     private double _InitialValue;
 
     public SteelGaugeWidget()
@@ -91,7 +91,7 @@ public class SteelGaugeWidget extends BaseWidget
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
-        _ParentGridPane = pane;
+        //_ParentGridPane = pane;
         if (false == SetupGauge())
         {
             return false;
@@ -102,10 +102,10 @@ public class SteelGaugeWidget extends BaseWidget
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
         SetupPeekaboo(DataManager.getDataManager());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
                     {
                         @Override
-                        public void changed(ObservableValue o, Object oldVal, Object newVal)
+                        public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                         {
                             if (IsPaused())
                             {

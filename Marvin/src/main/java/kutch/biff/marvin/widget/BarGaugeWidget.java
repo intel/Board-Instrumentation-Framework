@@ -80,10 +80,10 @@ public class BarGaugeWidget extends BaseWidget
 
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {

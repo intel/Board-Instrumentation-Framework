@@ -32,11 +32,12 @@ import kutch.biff.marvin.utility.SeriesDataSet;
  */
 public class AreaChartWidget extends LineChartWidget
 {
-    public void AreaChartWidget()
+    public AreaChartWidget()
     {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Chart CreateChartObject()
     {
@@ -55,12 +56,14 @@ public class AreaChartWidget extends LineChartWidget
         }
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public javafx.scene.Node getStylableObject()
     {
         return ((AreaChart) (getChart()));
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public ObservableList<String> getStylesheets()
     {

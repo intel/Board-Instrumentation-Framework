@@ -23,6 +23,7 @@ package kutch.biff.marvin.widget;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -71,10 +72,10 @@ public class PieChartWidget extends BaseWidget
         SetupPeekaboo(dataMgr);
 
         pane.add(_Chart, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())  
                 {

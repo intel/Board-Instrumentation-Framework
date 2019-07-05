@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -102,10 +103,10 @@ public abstract class MediaPlayerWidget extends BaseWidget
             ConfigurePlayback(dataMgr);
         }
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 String strVal = newVal.toString().replaceAll("(\\r|\\n)", "");
                 String key;
@@ -143,10 +144,10 @@ public abstract class MediaPlayerWidget extends BaseWidget
 
     private void ConfigurePlayback(DataManager dataMgr)
     {
-        dataMgr.AddListener(_PlaybackControlID, _PlaybackControl_Namespace, new ChangeListener()
+        dataMgr.AddListener(_PlaybackControlID, _PlaybackControl_Namespace, new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 String strPlaybackCmd = newVal.toString();
                 if (strPlaybackCmd.equalsIgnoreCase("Play"))
@@ -710,7 +711,8 @@ public abstract class MediaPlayerWidget extends BaseWidget
             Media objMedia; // just a test
             objMedia = getMedia(_MediaURI.get(strFileID));
 
-            MediaPlayer mediaPlayer = new MediaPlayer(objMedia); // will throw exception if not valid
+            @SuppressWarnings("unused")
+	    MediaPlayer mediaPlayer = new MediaPlayer(objMedia); // will throw exception if not valid
             //LOGGER.info("Verified that the OS has support for " + _WidgetType);
             return true;
         }

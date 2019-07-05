@@ -65,11 +65,10 @@ public class LineChartWidget extends LineChartWidget_MS
         pane.add(getChart(), getColumn(), getRow(), getColumnSpan(), getRowSpan());
         //hmm, only get called if different, that could be a problem for a chart
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            @SuppressWarnings("unchecked")
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {

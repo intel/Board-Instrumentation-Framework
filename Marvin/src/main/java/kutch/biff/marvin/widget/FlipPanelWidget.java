@@ -21,8 +21,9 @@
  */
 package kutch.biff.marvin.widget;
 
-import eu.hansolo.enzo.flippanel.FlipPanel;
 import java.io.File;
+
+import eu.hansolo.enzo.flippanel.FlipPanel;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -35,8 +36,6 @@ import javafx.scene.layout.VBox;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.PanelSideInfo;
-import static kutch.biff.marvin.widget.BaseWidget.CONFIG;
-import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 
 /**
@@ -104,7 +103,7 @@ public class FlipPanelWidget extends BaseWidget
         dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
                     {
                         @Override
-                        public void changed(ObservableValue o, Object oldVal, Object newVal)
+                        public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                         {
                             String strVal = newVal.toString();
                             Orientation orientation = getRequestedOrientation(strVal);

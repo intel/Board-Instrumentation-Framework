@@ -21,7 +21,10 @@
  */
 package kutch.biff.marvin.widget;
 
+import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
+
 import java.util.HashMap;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Tooltip;
@@ -34,12 +37,9 @@ import kutch.biff.marvin.utility.CircularList;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.GridMacroMgr;
 import kutch.biff.marvin.utility.Utility;
-import static kutch.biff.marvin.widget.BaseWidget.CONFIG;
-import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
 import kutch.biff.marvin.widget.dynamicgrid.DynamicGrid;
 import kutch.biff.marvin.widget.dynamicgrid.DynamicTransition;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
-import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
 
 /**
  *
@@ -132,10 +132,10 @@ public class DynamicGridWidget extends GridWidget
                 TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
             }
 
-            dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+            dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
                         {
                             @Override
-                            public void changed(ObservableValue o, Object oldVal, Object newVal)
+                            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                             {
                                 if (IsPaused())
                                 {
@@ -290,7 +290,7 @@ public class DynamicGridWidget extends GridWidget
     public boolean HandleWidgetSpecificSettings(FrameworkNode node)
     {
         String Id = "";
-        String FileName;
+        //String FileName;
 
         if (super.HandleWidgetSpecificSettings(node)) // padding override etc.
         {
@@ -338,7 +338,7 @@ public class DynamicGridWidget extends GridWidget
         {
             if (node.hasAttribute("Source"))
             {
-                FileName = node.getAttribute("Source");
+                //FileName = node.getAttribute("Source");
             }
             else if (node.hasAttribute("Macro"))
             {

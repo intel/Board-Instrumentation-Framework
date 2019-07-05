@@ -50,10 +50,10 @@ public class ProgressIndicatorWidget extends BaseWidget
         ConfigureAlignment();
         SetupPeekaboo(dataMgr);
         pane.add(_Indicator, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {

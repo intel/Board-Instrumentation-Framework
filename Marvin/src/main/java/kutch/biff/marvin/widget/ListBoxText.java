@@ -56,10 +56,10 @@ public class ListBoxText extends BaseWidget
         SetupPeekaboo(dataMgr);
 
         pane.add(_listView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
                     {
                         @Override
-                        public void changed(ObservableValue o, Object oldVal, Object newVal)
+                        public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                         {
                             if (IsPaused())
                             {

@@ -59,7 +59,6 @@ public class LineChartWidget_MS extends BaseChartWidget
      * @param dataMgr
      * @return
      */
-    @SuppressWarnings("unchecked")
     protected boolean _CreateMSChart(GridPane pane, DataManager dataMgr)
     {
         _CreateChart();
@@ -73,10 +72,10 @@ public class LineChartWidget_MS extends BaseChartWidget
         {
             for (SeriesDataSet ds : getSeries())
             {
-                dataMgr.AddListener(ds.getID(), ds.getNamespace(), new ChangeListener()
+                dataMgr.AddListener(ds.getID(), ds.getNamespace(), new ChangeListener<Object>()
                             {
                                 @Override
-                                public void changed(ObservableValue o, Object oldVal, Object newVal)
+                                public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                                 {
                                     if (IsPaused())
                                     {
@@ -128,22 +127,23 @@ public class LineChartWidget_MS extends BaseChartWidget
 
         for (SeriesDataSet ds : getSeries())
         {
-            ((LineChart) (getChart())).getData().add(ds.getSeries());
+            ((LineChart<?, ?>) (getChart())).getData().add(ds.getSeries());
         }
     }
 
     @Override
     public javafx.scene.Node getStylableObject()
     {
-        return ((LineChart) (getChart()));
+        return ((LineChart<?, ?>) (getChart()));
     }
 
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return ((LineChart) (getChart())).getStylesheets();
+        return ((LineChart<?, ?>) (getChart())).getStylesheets();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Chart CreateChartObject()
     {

@@ -46,6 +46,7 @@ public class SteelGaugeRadialSteelWidget extends BaseWidget
     private double MinorTick;
     private double MajorTickCount, MinorTickCount;
     private RadialGauge.TickLabelOrientation eOrientation;
+    @SuppressWarnings("unused")
     private boolean EnhancedRateText;
     private boolean Shadowed;
     private RadialGauge _Gauge;
@@ -86,10 +87,10 @@ public class SteelGaugeRadialSteelWidget extends BaseWidget
         getParentPane().add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
         SetupPeekaboo(DataManager.getDataManager());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
                     {
                         @Override
-                        public void changed(ObservableValue o, Object oldVal, Object newVal)
+                        public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                         {
                             if (IsPaused())
                             {

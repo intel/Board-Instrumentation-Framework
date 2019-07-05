@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2016 Intel Corporation
+ * #  Copyright (c) 2019 Intel Corporation
  * # 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import javafx.beans.value.ChangeListener;
 
 /**
  *
- * @author Patrick Kutch
+ * @author Patrick.Kutch@gmail.com
  */
 public class DataSet
 {
@@ -74,7 +74,7 @@ public class DataSet
         }
     }
 
-    @SuppressWarnings("unchecked")    
+    @SuppressWarnings({ "unchecked", "rawtypes" })    
     public void addListener(ChangeListener listener)
     {
         if (null != listener && null != _ObjectProperty)
@@ -83,6 +83,7 @@ public class DataSet
         }
     }
     
+    @SuppressWarnings({ "unchecked", "rawtypes" })    
     public void removeListener(ChangeListener listener)
     {
         if (null != listener && null != _ObjectProperty)
