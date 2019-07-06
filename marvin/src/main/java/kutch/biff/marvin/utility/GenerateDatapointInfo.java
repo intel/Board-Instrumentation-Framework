@@ -54,10 +54,11 @@ public class GenerateDatapointInfo
     private double __Scale;
     private String __ProxyID;
     private int __csvEntry;
+    private String __splitToken;
     
     public enum GenerateMethod
     {
-	ADD, AVERAGE, PROXY, INVALID
+	ADD, AVERAGE, PROXY, SPLIT_LIST, INVALID
     };
     
     public enum RefreshPolicy
@@ -86,6 +87,7 @@ public class GenerateDatapointInfo
 	__Scale = 1.0;
 	__ProxyID = null;
 	__csvEntry = -1;
+	__splitToken = null;
     }
     
     public int getListEntry()
@@ -101,6 +103,11 @@ public class GenerateDatapointInfo
 	}
 	__csvEntry = newVal;
 	return true;
+    }
+    
+    public void setSplitToken(String newToken)
+    {
+	__splitToken = newToken;
     }
     
     public String getProxyID()
@@ -190,7 +197,6 @@ public class GenerateDatapointInfo
 	    removeAllListeners();
 	    __dirtyMap.clear();
 	    
-
 	    Pair<String, String> current = __includeCriterea.get(0);
 	    if (null == newNamespaceFilter)
 	    {
@@ -274,6 +280,7 @@ public class GenerateDatapointInfo
     {
 	MarvinTask mt = new MarvinTask();
 	String dataStr;
+	
 	try
 	{
 	    float value;
@@ -311,7 +318,74 @@ public class GenerateDatapointInfo
 	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
     }
     
-    private void CheckForUpdate()
+    private void HandleSplitList(String NS, String ID, String strInpValue)
+    {
+	String parts[] = strInpValue.split(__splitToken);
+	
+	if (parts.length < 2)
+	{
+	    LOGGER.warning("GenerateDatapoint: SplitList received data that was not a list: " + strInpValue);
+	    return;
+	}
+	
+	int index = 0;
+	
+	for (String strValue : parts)
+	{
+	    MarvinTask mt = new MarvinTask();
+	    String dataStr;
+	    try
+	    {
+		float value;
+		value = Float.parseFloat(strValue);
+		value *= __Scale;
+		int precision = __precision;
+		
+		if (-1 == precision)
+		{ // use precision of value received
+		    int integerPlaces = strValue.indexOf('.');
+		    if (integerPlaces > 0)
+		    {
+			precision = strValue.length() - integerPlaces - 1;
+		    }
+		    else
+		    {
+			precision = 0;
+		    }
+		    
+		}
+		DecimalFormat df = new DecimalFormat();
+		df.setGroupingUsed(false);
+		df.setMaximumFractionDigits(precision);
+		df.setMinimumFractionDigits(precision);
+		
+		dataStr = df.format(value);
+		
+		index++;
+	    }
+	    
+	    catch(NumberFormatException ex)
+	    {
+		dataStr = strValue;
+	    }
+	    // Can use wildcard for target names, only for Proxy at moment
+	    // mt.AddDataset(Utility.combineWildcards(__ID, proxyID),
+	    // Utility.combineWildcards(__Namespace, proxyNS), dataStr);
+	    
+	    String newID = Utility.combineWildcards(__ID, ID) + "." + Integer.toString(index);
+	    String newNS = Utility.combineWildcards(__Namespace, NS);
+	    mt.AddDataset(newID, newNS, dataStr);
+	    TaskManager.getTaskManager().AddDeferredTaskObject(mt);
+	}
+	MarvinTask mt = new MarvinTask();
+	
+	String newID = Utility.combineWildcards(__ID, ID) + ".count";
+	String newNS = Utility.combineWildcards(__Namespace, NS);
+	mt.AddDataset(newID, newNS, Integer.toString(parts.length));
+	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
+    }
+    
+    private void CheckForUpdate(String NS, String ID)
     {
 	if (_Method == GenerateMethod.PROXY)
 	{
@@ -351,7 +425,16 @@ public class GenerateDatapointInfo
 		    String strValue = __dirtyMap.get(key).getKey();
 		    Total += Float.parseFloat(strValue);
 		    int integerPlaces = strValue.indexOf('.');
-		    int precision = strValue.length() - integerPlaces - 1;
+		    int precision;
+		    if (integerPlaces < 0)
+		    {
+			precision = 0;
+		    }
+			
+		    else
+		    {
+			precision= strValue.length() - integerPlaces - 1;
+		    }
 		    if (precision > sourcPrecision)
 		    {
 			sourcPrecision = precision; // use source precision, in case not specified
@@ -395,7 +478,11 @@ public class GenerateDatapointInfo
 	
 	df.setMaximumFractionDigits(precision);
 	df.setMinimumFractionDigits(precision);
-	mt.AddDataset(__ID, __Namespace, df.format(Total));
+	String newID = Utility.combineWildcards(__ID, ID);
+	String newNS = Utility.combineWildcards(__Namespace, NS);
+	mt.AddDataset(newID, newNS, df.format(Total));
+
+//	mt.AddDataset(__ID, __Namespace, df.format(Total));
 	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
 	__lastUpdate = System.currentTimeMillis();
     }
@@ -411,7 +498,7 @@ public class GenerateDatapointInfo
 	    {
 		if (__csvEntry > -1)
 		{
-		    String parts[] = newVal.toString().split(",");
+		    String parts[] = newVal.toString().split(__splitToken);
 		    if (parts.length < __csvEntry)
 		    {
 			LOGGER.severe(String.format(
@@ -427,12 +514,16 @@ public class GenerateDatapointInfo
 		    {
 			HandleProxiedValue(inputNamespace, inputID, newVal.toString());
 		    }
+		    else if (GenerateMethod.SPLIT_LIST == _Method)
+		    {
+			HandleSplitList(inputNamespace, inputID, newVal.toString());
+		    }
 		    else
 		    {
 			Float.parseFloat(newVal.toString()); // only allow numeric values for non proxy
 			Pair<String, Boolean> entry = new Pair<>(newVal.toString(), true);
 			__dirtyMap.put(Utility.generateKey(inputNamespace, inputID), entry);
-			CheckForUpdate();
+			CheckForUpdate(inputNamespace, inputID);
 		    }
 		}
 		catch(NumberFormatException ex)
@@ -450,19 +541,11 @@ public class GenerateDatapointInfo
 	    _listenerMap.put(inputNamespace.toUpperCase() + inputID.toLowerCase(), objListener);
 	}
     }
-/*     
-    public void DumpPatterns()
-    {
-	for (Pair<String,String> entry : __includeCriterea)
-	{
-	    String ns = entry.getKey();
-	    String ID = entry.getKey();
-	    if (ns == ID)
-	    {
-		
-	    }
-	    ID = ns;
-	}
-    }
-*/    
+    /*
+     * public void DumpPatterns() { for (Pair<String,String> entry :
+     * __includeCriterea) { String ns = entry.getKey(); String ID = entry.getKey();
+     * if (ns == ID) {
+     * 
+     * } ID = ns; } }
+     */
 }
