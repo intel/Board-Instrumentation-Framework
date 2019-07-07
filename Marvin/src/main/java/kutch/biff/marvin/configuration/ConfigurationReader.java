@@ -1388,7 +1388,7 @@ public class ConfigurationReader
 	    AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node,
 		    new String[] { "ID", "File", "Align", "hgap", "vgap", "Task" });
 	    
-	    if (false == AliasMgr.getAliasMgr().ReadAliasFromExternalFile(node.getAttribute("File")))
+	    if (false == AliasMgr.ReadAliasFromExternalFile(node.getAttribute("File")))
 	    {
 		return null;
 	    }
@@ -1508,13 +1508,13 @@ public class ConfigurationReader
 				found = true;
 				
 				tab = new TabWidget(id);
-				FrameworkNode tabNode = null;
 				
 				tab = ConfigurationReader.ReadTab(node, tab, id);
 				if (null == tab)
 				{
 				    return null;
 				}
+/*				
 				if (false) // TODO - hmm, not sure about this.... why did I do this
 				{
 				    if (node.hasAttribute("File")) // can externally define widgets within
@@ -1561,6 +1561,7 @@ public class ConfigurationReader
 				    
 				    break;
 				}
+*/				
 			    }
 			}
 			if (true == found)
@@ -1778,7 +1779,6 @@ public class ConfigurationReader
 	 * 
 	 * <Then>Task12</Then> <Else>Task3</Else> </Conditional>
 	 */
-	TaskManager TASKMAN = TaskManager.getTaskManager();
 	boolean retVal = true;
 	
 	NodeList conditionals = doc.getElementsByTagName("Conditional");
@@ -1815,7 +1815,6 @@ public class ConfigurationReader
     
     private static boolean ReadTaskAndConditionals(Document doc)
     {
-	TaskManager TASKMAN = TaskManager.getTaskManager();
 	boolean retVal = true;
 	
 	List<FrameworkNode> taskListNodes = FrameworkNode.GetChildNodes(doc, "TaskList");
