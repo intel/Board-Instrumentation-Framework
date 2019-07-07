@@ -40,6 +40,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.util.Pair;
+import java.util.Random;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -1090,8 +1091,9 @@ public class ConfigurationReader
 	    }
 	    else
 	    {
-		LOGGER.severe("GenerateDatapoint [Proxy] requires ProxyID");
-		return null;
+		LOGGER.warning("GenerateDatapoint [Proxy] did not have a ProxyID, you will be unable to change it with a task.");
+		String proxyID = Long.toString(new Random().nextLong());
+		info.setProxyID(proxyID);
 	    }
 	}
 	else if (inputNode.getAttribute("Method").equalsIgnoreCase("SplitList"))
