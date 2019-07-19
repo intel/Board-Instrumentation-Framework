@@ -317,7 +317,7 @@ class Configuration():
                 try:
                    self.__FromUpstreamConnection.Port = int(Alias.Alias(attributes["PORT"].nodeValue))
                 except Exception as Ex:
-                    Log.getLogger().error(str(ex))
+                    Log.getLogger().error(str(Ex))
                     Log.getLogger().error("Invalid Port set for IncomingMinionConnection ")
                     return  False
             else:
@@ -329,7 +329,7 @@ class Configuration():
 
         OscarNode = nodeList[0].getElementsByTagName("Oscar")
 
-        if None != OscarNode:
+        if None != OscarNode and len(OscarNode) > 0:
             Log.getLogger().info("Auto Connect Info found.")
             
             oscarAttributes = OscarNode[0].attributes
