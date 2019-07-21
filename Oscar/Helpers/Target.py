@@ -58,7 +58,7 @@ class Target(ConnectionPoint.ConnectionPoint):
             self.m_socket.settimeout(0.001)
 
         except Exception as ex:
-                Log.getLogger().error("Error setting up Target Socket -->" + str(self.m_Connection))
+                Log.getLogger().error("Error setting up Target Socket -->" + str(super.m_Connection))
 
         self.threadName = "Target:" + self.getIP() + "[" + str(self.getPort()) +"]"
         ThreadManager.GetThreadManager().CreateThread(self.threadName,self.WorkerProc)
@@ -192,10 +192,13 @@ class Target(ConnectionPoint.ConnectionPoint):
         if self.m_LastDNSResolution + self.m_DNSResolutionPeriod < Time.GetCurrMS() and self.m_hasTimedOut == True:
             self.m_IP_InUse = None  # Force a DNS resolution, may help when move laptop and gets new address -
                                     # eventually
-        if self.m_hasTimedOut and self.Type == ConnectionType.DynamicMarvin:
-            self.MarkedForRemoval = True
-            self.Type = ConnectionType.DynamicMarvin_To_Remove
 
+#        if self.m_hasTimedOut:
+#            Log.getLogger().error("Timed out" + str(ConnectionType.DynamicMarvin))
+
+        if self.m_hasTimedOut and (self.Type == ConnectionType.DynamicMarvin or self.Type == ConnectionType.DynamicOscar):
+            self.MarkedForRemoval = True
+            self.Type +=1 
 
         return dataToProcess
 

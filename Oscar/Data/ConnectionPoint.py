@@ -27,9 +27,11 @@ class ConnectionType(object):
     DownstreamOscar = 5
     DynamicMarvin = 6
     DynamicMarvin_To_Remove = 7
+    DynamicOscar = 8
+    DynamicOscar_To_Remove = 9
 
     Unknown = 20
-
+    @staticmethod
     def toString(val):
         if val == ConnectionType.DownstreamServer:
             return "Downstream Server"
@@ -55,6 +57,11 @@ class ConnectionType(object):
         if val == ConnectionType.DynamicMarvin_To_Remove:
             return "#Marvin#"
 
+        if val == ConnectionType.DynamicOscar:
+            return "^Oscar^"
+            
+        if val == ConnectionType.DynamicOscar_To_Remove:
+            return "#Oscar#"
         return "Unknown"
 
 

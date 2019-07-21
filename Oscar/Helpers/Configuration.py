@@ -381,7 +381,7 @@ class Configuration():
         uID = str(random.randint(0,500000))
 
         sendString = ('<Marvin Type=\"Bullhorn\">'
-            '<Version>1.0</Version>')
+            '<Version>1.1</Version>')
 
         sendString += '<UniqueID>{}</UniqueID>'.format(uID)
 

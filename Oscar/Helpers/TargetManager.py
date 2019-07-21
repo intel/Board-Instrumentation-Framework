@@ -390,8 +390,13 @@ class TargetManager():
     def CheckForRemovalOfDynamicMarvins(self):
         for TargetKey in self._DownstreamTargets.keys():
             objTarget = self.GetDownstreamTarget(TargetKey)
-            if True == objTarget.MarkedForRemoval and objTarget.Type == ConnectionPoint.ConnectionType.DynamicMarvin_To_Remove :
-                Log.getLogger().info("Removing Dynamic Marvin connection with Key: " + objTarget._UserKey)
+            if True == objTarget.MarkedForRemoval and \
+                    (objTarget.Type == ConnectionPoint.ConnectionType.DynamicMarvin_To_Remove or  objTarget.Type == ConnectionPoint.ConnectionType.DynamicOscar_To_Remove):
+                if objTarget.Type == ConnectionPoint.ConnectionType.DynamicMarvin_To_Remove:
+                    Log.getLogger().info("Removing Dynamic Marvin connection with Key: " + objTarget._UserKey)
+                else:
+                    Log.getLogger().info("Removing Dynamic Oscar connection with Key: " + objTarget._UserKey)
+                    
                 objTarget.StopProcessing()
                 self.RemoveDynamicDownstreamTarget(TargetKey)
                 self.CheckForRemovalOfDynamicMarvins() # call myself repeatedly in case more than 1 in list

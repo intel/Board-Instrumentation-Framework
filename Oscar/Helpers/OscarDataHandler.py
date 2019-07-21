@@ -46,8 +46,8 @@ class OscarDataHandler(object):
 
     def __StartWatchdogTimer(self):
         if None == self.__WatchdogTimer:
-            self.__WatchdogTimer = WatchDog.WatchdogTimer()
-            self.__WatchdogTimer.Start()
+            self.__WatchdogTimer = Watchdog.WatchdogTimer()
+           # self.__WatchdogTimer.Start()
             
     def HandleIncomingPacket(self,node,rawData,fromAddress):
         if node.nodeName == "OscarGroup":
@@ -206,7 +206,7 @@ class OscarDataHandler(object):
             Log.getLogger().warning("Received Oscar Watchdog for unknown downstream Target: ",IP+":"+Port)
             return
         
-        if objTarget.getType() != ConnectionType.DownstreamOscar: # would not know what this is until you hear back
+        if objTarget.getType() != ConnectionType.DownstreamOscar and objTarget.getType() != ConnectionType.DynamicOscar : # would not know what this is until you hear back
             objTarget.Type = ConnectionType.DownstreamOscar
         objTarget.StrokeWatchdogTimer()
 

@@ -68,7 +68,7 @@ class ServerUDP(ConnectionPoint.ConnectionPoint):
         self.m_ConnPoint.Port = self.Port # ungly kludge
         self.m_ConnPoint.IP = self.IP # ungly kludge
 
-        Log.getLogger().info(self.getTypeStr()+" listening on -->" + str(self))
+        Log.getLogger().info(self.getTypeStr() +" listening on -->" + str(self))
         
         ThreadManager.GetThreadManager().CreateThread(self.m_Name,self.workerProc)
         ThreadManager.GetThreadManager().StartThread(self.m_Name)

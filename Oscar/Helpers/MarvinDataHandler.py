@@ -499,12 +499,16 @@ class MarvinDataHandler(object):
             return
 
         # doesn't already exist, so let's to add!
-        objTarget = Target.Target(IP,Port,ConnectionType.DynamicMarvin,True)
+        if "1.0" == version:
+            objTarget = Target.Target(IP,Port,ConnectionType.DynamicMarvin,True)
+        else:
+            objTarget = Target.Target(IP,Port,ConnectionType.DynamicOscar,True)
+
         objTarget._ReceivedOnUniqueID = UniqueID # so we can filter out dups due to UDP
         objTarget._UserKey = RemoteKey
         TargetManager.GetTargetManager().AddDownstreamTarget(objTarget,HashMapKey)
 
-        Log.getLogger().info("Creating Marvin Dynamic Connection:" + strID)
+        Log.getLogger().info("Creating Dynamic Connection:" + strID)
 
         return
 
@@ -512,4 +516,4 @@ class MarvinDataHandler(object):
 def GetDataHandler():
     if MarvinDataHandler._instance == None:
         return MarvinDataHandler()
-    return MarvinDataHandler._ingstance
+    return MarvinDataHandler._instance
