@@ -22,6 +22,7 @@
 package kutch.biff.marvin.widget;
 
 import java.io.File;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -33,7 +34,6 @@ import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.Utility;
-import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
 
 /**
  *
@@ -75,10 +75,10 @@ public class ButtonWidget extends BaseWidget
             return false;
         }
         pane.add(getButton(), getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 String strVal = newVal.toString();
                 getButton().setText(strVal);

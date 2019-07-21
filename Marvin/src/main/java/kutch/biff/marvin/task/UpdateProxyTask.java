@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2016 Intel Corporation
+ * #  Copyright (c) 2019 Intel Corporation
  * # 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -21,35 +21,40 @@
  */
 package kutch.biff.marvin.task;
 
-import kutch.biff.marvin.widget.DynamicTabWidget;
+import kutch.biff.marvin.datamanager.DataManager;
 
 /**
  *
- * @author Patrick Kutch
+ * @author Patrick.Kutch@gmail.com
  */
-public class DynamicDebugWidgetTask extends BaseTask
+
+public class UpdateProxyTask extends BaseTask
 {
-    private final TaskManager TASKMAN = TaskManager.getTaskManager();
-    private String Namespace;
-    private String ID;
-    private String Value;
+    private String _ProxyID;
+    private String _NewNamespaceCriterea = null;
+    private String _NewIDCriterea = null;
     
-    public DynamicDebugWidgetTask(String Namespace, String ID, String Value)
+    
+    public UpdateProxyTask(String proxyID)
     {
-        this.Namespace = Namespace;
-        this.ID = ID;
-        this.Value = Value;
+	_ProxyID = proxyID;
     }
     
-    @Override
-    public boolean getMustBeInGUIThread()
+    public void setNamespaceMask(String newNS)
     {
-        return true;
-    }    
+	_NewNamespaceCriterea = newNS;
+    }
+    
+    
+    public void setIDMask(String newID)
+    {
+	_NewIDCriterea = newID;
+    }
+
+
     @Override
     public void PerformTask()
     {
-        DynamicTabWidget objWidget = DynamicTabWidget.getTab(Namespace,TASKMAN.getDataMgr());
-        objWidget.AddWidget(TASKMAN.getDataMgr(), ID, Value);
+	DataManager.getDataManager().UpdateGenerateDatapointProxy(getDataValue(_ProxyID), getDataValue(_NewNamespaceCriterea), getDataValue(_NewIDCriterea));
     }
 }

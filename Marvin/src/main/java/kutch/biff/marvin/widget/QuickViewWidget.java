@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.GridPane;
@@ -62,7 +63,7 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort
     private String _OddDataStyle = "fx-font-size: 1.5em";
     private boolean _ShowTitle = true;
     private AtomicInteger _SortCount;
-    private int _hGap, _vGap;
+//    private int _hGap, _vGap;
 
 //    private GridWidget _GridWidget;
     private List<Pair<String, List<Object>>> _DataPoint;  // Minion ID, [objGrid,objID,objValue]
@@ -77,8 +78,8 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort
         _DataPoint = new ArrayList<>();
         _DataPointMap = new HashMap<>(); // for quick lookup as new data comes in
         _ExclusionList = new HashMap<>(); // For those we do not want to show
-        _hGap = -1;
-        _vGap = -1;
+//        _hGap = -1;
+//        _vGap = -1;
         _SortCount = new AtomicInteger();
     }
 
@@ -100,10 +101,10 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort
             getGridPane().setVgap(getvGap());
         }
 
-        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {

@@ -81,10 +81,10 @@ public class DoubleBarGaugeWidget extends BaseWidget
 
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {
@@ -111,10 +111,10 @@ public class DoubleBarGaugeWidget extends BaseWidget
             LOGGER.severe("No Outter Data source defined for BarGauge");
             return false;
         }
-        dataMgr.AddListener(_OuterID, _OuterNamespace, new ChangeListener()
+        dataMgr.AddListener(_OuterID, _OuterNamespace, new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {

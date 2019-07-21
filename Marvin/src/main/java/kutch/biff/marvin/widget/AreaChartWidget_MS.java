@@ -35,45 +35,48 @@ import kutch.biff.marvin.utility.SeriesDataSet;
  */
 public class AreaChartWidget_MS extends LineChartWidget_MS
 {
-    public void AreaChartWidget_MS()
+    public AreaChartWidget_MS()
     {
-        
+	
     }
     
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
-        return _CreateMSChart(pane, dataMgr);
-    }
-  @Override
-    protected Chart CreateChartObject()
-    {
-        return new AreaChart<>(getxAxis(), getyAxis());
+	return _CreateMSChart(pane, dataMgr);
     }
     
-
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
+    protected Chart CreateChartObject()
+    {
+	return new AreaChart<>(getxAxis(), getyAxis());
+    }
+    
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void _CreateChart()
     {
-        CreateChart();
-
-        for (SeriesDataSet ds : getSeries())
-        {
-            ((AreaChart) (getChart())).getData().add(ds.getSeries());
-        }
-        
+	CreateChart();
+	
+	for (SeriesDataSet ds : getSeries())
+	{
+	    ((AreaChart) (getChart())).getData().add(ds.getSeries());
+	}
+	
     }
-
+    
+    @SuppressWarnings("rawtypes")
     @Override
     public javafx.scene.Node getStylableObject()
     {
-        return ((AreaChart) (getChart()));
+	return ((AreaChart) (getChart()));
     }
-
+    
+    @SuppressWarnings("rawtypes")
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return ((AreaChart) (getChart())).getStylesheets();
-    }    
+	return ((AreaChart) (getChart())).getStylesheets();
+    }
 }

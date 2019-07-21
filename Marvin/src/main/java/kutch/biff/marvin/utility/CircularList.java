@@ -30,6 +30,10 @@ import java.util.ArrayList;
  */
 public class CircularList<T> extends ArrayList<T>
 {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6542607529993640355L;
     private int _LastUsedIndex=0;
     
     @Override

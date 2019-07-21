@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
 
 /**
- * /**
  *
  * @author Patrick.Kutch@gmail.com
  */
@@ -66,7 +65,8 @@ public class DataSetFileTask extends BaseTask
     {
         String fname = getDataValue(_strFileName);
         fname = convertToFileOSSpecific(_strFileName);
-        int count = HandleDataFile(fname);
+        @SuppressWarnings("unused")
+	int count = HandleDataFile(fname);
     }
 
     private int HandleDataFile(String inpFile)

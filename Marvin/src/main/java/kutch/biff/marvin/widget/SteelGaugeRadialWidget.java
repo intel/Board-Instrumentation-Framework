@@ -21,9 +21,10 @@
  */
 package kutch.biff.marvin.widget;
 
+import static java.lang.Math.abs;
+
 import eu.hansolo.enzo.gauge.Radial;
 import eu.hansolo.enzo.gauge.Radial.TickLabelOrientation;
-import static java.lang.Math.abs;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -37,17 +38,20 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class SteelGaugeRadialWidget extends BaseWidget
 {
-
     private String UnitText;
     private double MinValue;
     private double MaxValue;
+    @SuppressWarnings("unused")
     private int DialStartAngle;
+    @SuppressWarnings("unused")
     private int DialRangeAngle;
     private double MajorTick;
     private double MinorTick;
     private TickLabelOrientation eOrientation;
+    @SuppressWarnings("unused")
     private boolean EnhancedRateText;
     private Radial _Gauge;
+    @SuppressWarnings("unused")
     private GridPane _ParentGridPane;
     private double _InitialValue = 0;
     private double MajorTickCount = 0;
@@ -87,10 +91,10 @@ public class SteelGaugeRadialWidget extends BaseWidget
 
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
                     {
                         @Override
-                        public void changed(ObservableValue o, Object oldVal, Object newVal)
+                        public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                         {
                             if (IsPaused())
                             {

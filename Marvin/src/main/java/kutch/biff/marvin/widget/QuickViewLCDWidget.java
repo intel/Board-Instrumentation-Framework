@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.GridPane;
@@ -37,7 +38,6 @@ import kutch.biff.marvin.task.QuickViewWidgetSortTask;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.NaturalComparator;
-import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
 
 /**
  *
@@ -64,7 +64,7 @@ public class QuickViewLCDWidget extends GridWidget implements IQuickViewSort
 //    private GridWidget _GridWidget;
     private List<Pair<String, SteelLCDWidget>> _DataPoint;  // Minion ID, LCDWidget
     private DataManager _dataMgr;
-    private int _hGap, _vGap;
+    //private int _hGap, _vGap;
     private HashMap<String, String> _ExclusionList;
     private HashMap<String, String> _DataPointMap;
     private AtomicInteger _SortCount;
@@ -72,8 +72,8 @@ public class QuickViewLCDWidget extends GridWidget implements IQuickViewSort
     public QuickViewLCDWidget()
     {
         _DataPoint = new ArrayList<>();
-        _hGap = -1;
-        _vGap = -1;
+//        _hGap = -1;
+//        _vGap = -1;
         _ExclusionList = new HashMap<>(); // For those we do not want to show
         _DataPointMap = new HashMap<>(); // for quick lookup as new data comes in
         _SortCount = new AtomicInteger();
@@ -97,10 +97,10 @@ public class QuickViewLCDWidget extends GridWidget implements IQuickViewSort
             getGridPane().setVgap(getvGap());
         }
 
-        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {

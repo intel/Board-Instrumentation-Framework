@@ -87,6 +87,7 @@ public class NaturalComparator implements Comparator<String>
         {
             tokenList.add(strString.substring(index));
         }
+        scanner.close();
         return tokenList;
     }
 }

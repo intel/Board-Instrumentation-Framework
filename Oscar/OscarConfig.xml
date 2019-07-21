@@ -26,6 +26,7 @@
   </IncomingMinionConnection>
 
   <TargetConnection IP="localhost" PORT="5200"/>
+  <TargetConnection IP="localhost" PORT="5333"/>
   <MarvinAutoConnect Key="Identifying Key"/> <!-- Marvin can attach to <IncomingMnionConnection>, with this key and be added as a TargetConnection -->
     <!--
     <BITW>

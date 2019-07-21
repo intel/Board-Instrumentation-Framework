@@ -22,8 +22,10 @@
 package kutch.biff.marvin.widget;
 
 import static java.lang.Math.abs;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.chart.Axis;
@@ -35,7 +37,6 @@ import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.SeriesDataSet;
 import kutch.biff.marvin.utility.SeriesSet;
 import kutch.biff.marvin.utility.Utility;
-import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
 
 /**
  *
@@ -47,7 +48,9 @@ abstract public class BaseChartWidget extends BaseWidget
     private Chart _chart;
     //private AreaChart<Number,Number> _chart;    
     private final ArrayList<SeriesDataSet> _Series;
+    @SuppressWarnings("rawtypes")
     protected Axis _xAxis;
+    @SuppressWarnings("rawtypes")
     protected Axis _yAxis;
     protected String xAxisLabel, yAxisLabel;
     protected double xAxisMaxCount, yAxisMaxCount;
@@ -60,7 +63,6 @@ abstract public class BaseChartWidget extends BaseWidget
     protected boolean SynchronizeMulitSourceData;
     protected int MaxSynchronizeMulitSoureDataWait;
     protected long MaxSynchronizeMultiSourceLastUpdate;
-    @SuppressWarnings("unchecked")
     protected HashMap<String, SeriesSet> _SeriesMap;
     protected ArrayList<String> _SeriesOrder;
     protected boolean _HorizontalChart;
@@ -108,7 +110,7 @@ abstract public class BaseChartWidget extends BaseWidget
      * @param series
      * @param Max
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void ShiftSeries(XYChart.Series series, int Max)
     {
         if (series.getData().size() < Max)
@@ -189,11 +191,13 @@ abstract public class BaseChartWidget extends BaseWidget
         ((NumberAxis) (_xAxis)).setMinorTickCount((int) xAxisMinorTick + 1);
     }
 
+    @SuppressWarnings("rawtypes")
     protected Axis getxAxis()
     {
         return _xAxis;
     }
 
+    @SuppressWarnings("rawtypes")
     protected Axis getyAxis()
     {
         return _yAxis;
@@ -578,6 +582,7 @@ abstract public class BaseChartWidget extends BaseWidget
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void AddNewData(SeriesDataSet ds, String strNewValue)
     {
         double newValue = 0;
@@ -727,6 +732,7 @@ abstract public class BaseChartWidget extends BaseWidget
         return _HorizontalChart;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void SetupSeriesSets(DataManager dataMgr)
     {
         for (String key : _SeriesOrder)
@@ -758,10 +764,10 @@ abstract public class BaseChartWidget extends BaseWidget
 
                 objSeries.getData().add(objChartDataSet);
 
-                dataMgr.AddListener(objDs.getID(), objDs.getNamespace(), new ChangeListener()
+                dataMgr.AddListener(objDs.getID(), objDs.getNamespace(), new ChangeListener<Object>()
                             {
-                                @Override
-                                public void changed(ObservableValue o, Object oldVal, Object newVal)
+				@Override
+                                public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                                 {
                                     if (IsPaused())
                                     {
@@ -792,7 +798,8 @@ abstract public class BaseChartWidget extends BaseWidget
                             });
 
             }
-            boolean fReturn = ((XYChart) getChart()).getData().add(objSeries);
+            @SuppressWarnings({ "unused" })
+	    boolean fReturn = ((XYChart) getChart()).getData().add(objSeries);
         }
     }
 

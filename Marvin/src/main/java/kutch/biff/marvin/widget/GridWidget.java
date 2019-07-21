@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -40,7 +41,6 @@ import javafx.scene.paint.Color;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.Utility;
-import static kutch.biff.marvin.widget.BaseWidget.LOGGER;
 
 /**
  *
@@ -59,6 +59,7 @@ public class GridWidget extends BaseWidget
     protected double _vGapPercentOfParentGrid;
     private String _OnDemandTask;
     private boolean _UseListView;
+    @SuppressWarnings("rawtypes")
     private ListView _ListView;
     private String _ListViewFileCSS;
     private String _ListStyleID;
@@ -152,6 +153,7 @@ public class GridWidget extends BaseWidget
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean Create(GridPane parentPane, DataManager dataMgr)
     {
@@ -504,7 +506,6 @@ public class GridWidget extends BaseWidget
     {
         Bounds local = this.getGridPane().getBoundsInLocal();
         Dimension configD = this.getConfiguredDimensions();
-        Dimension viewD = this.getRealDimensions();
 
         if (configD.getWidth() > 0)
         {

@@ -30,6 +30,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 public class ChainedTask extends BaseTask
 {
+    @SuppressWarnings("unused")
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private TaskManager TASKMAN = TaskManager.getTaskManager();
     

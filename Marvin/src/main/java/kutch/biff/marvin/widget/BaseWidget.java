@@ -706,10 +706,6 @@ abstract public class BaseWidget implements Widget
         {
             Width = getStylableObject().getBoundsInParent().getWidth();
             Height = getStylableObject().getBoundsInParent().getHeight();
-            //getStylableObject().b
-            double pWidth = getStylableObject().getParent().getBoundsInLocal().getWidth();
-            double pHeight = getStylableObject().getParent().getBoundsInLocal().getHeight();
-            pWidth *= 1;
         }
         objDimension.setSize(Width, Height);
         return objDimension;
@@ -1193,10 +1189,10 @@ abstract public class BaseWidget implements Widget
         getStylableObject().setVisible(_PeekabooShowDefault);
         for (Pair<String, String> peekaboo : _Peekaboos)
         {
-            dataMgr.AddListener(peekaboo.getValue(), peekaboo.getKey(), new ChangeListener()
+            dataMgr.AddListener(peekaboo.getValue(), peekaboo.getKey(), new ChangeListener<Object>()
                         {
                             @Override
-                            public void changed(ObservableValue o, Object oldVal, Object newVal)
+                            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
                             {
                                 String strPeek = newVal.toString();
                                 HandlePeekabooMessage(strPeek);

@@ -27,13 +27,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import kutch.biff.marvin.configuration.Configuration;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
-import kutch.biff.marvin.splash.MySplash;
 import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.utility.FrameworkNode;
@@ -44,10 +49,6 @@ import kutch.biff.marvin.widget.DynamicGridWidget;
 import kutch.biff.marvin.widget.GridWidget;
 import kutch.biff.marvin.widget.OnDemandGridWidget;
 import kutch.biff.marvin.widget.Widget;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -55,10 +56,9 @@ import org.xml.sax.SAXException;
  */
 public class WidgetBuilder
 {
-
-    private final static Configuration CONFIG = Configuration.getConfig();
+    //private final static Configuration CONFIG = Configuration.getConfig();
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    private final static MySplash SPLASH = MySplash.getSplash();
+    //private final static MySplash SPLASH = MySplash.getSplash();
     private static int FileDepth = 1;
     private static String FileTree = "";
 
@@ -145,11 +145,6 @@ public class WidgetBuilder
         String fileNameWPath;
         File fCheck = new File(fileName);
 
-        if (null == fCheck)
-        {
-            return null;
-        }
-
         if (fCheck.exists())
         {
             fileNameWPath = fileName;  //fully qualified path provided (likely custom widget)
@@ -216,7 +211,6 @@ public class WidgetBuilder
         }
         if (true == widgetNode.hasAttribute("Width"))
         {
-            String str = widgetNode.getAttribute("Width");
             if (false == retWidget.parseWidth(widgetNode))
             {
                 return null;
@@ -578,7 +572,7 @@ public class WidgetBuilder
 //
 //        return true;
     }
-
+/*
     private static int GetIntAttribute(FrameworkNode node, String Attribute, boolean fRequired)
     {
         if (node.hasAttribute(Attribute))
@@ -600,7 +594,7 @@ public class WidgetBuilder
         }
         return -2;
     }
-
+*/
     private static BaseWidget ParseWidgetDefinitionFile(String Filename)
     {
         BaseWidget retWidget = null;
@@ -829,11 +823,7 @@ public class WidgetBuilder
 
     public static boolean ReadGridAttributes(GridWidget objGridWidget, FrameworkNode gridNode, boolean isFlipPanelGrid)
     {
-        String WhatIsIt = "Grid";
-        if (true == isFlipPanelGrid)
-        {
-            WhatIsIt = "FlipPanel";
-        }
+
         if (gridNode.hasAttribute("rowSpan"))
         {
             objGridWidget.setRowSpan(gridNode.getIntegerAttribute("rowspan", 1));

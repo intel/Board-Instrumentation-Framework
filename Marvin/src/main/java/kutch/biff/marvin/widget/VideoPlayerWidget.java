@@ -68,11 +68,6 @@ public class VideoPlayerWidget extends MediaPlayerWidget
         _IsValid = flag;
     }
     
-    public static void VideoPlayerWidget(boolean flag)
-    {
-        _IsValid = flag;
-    }
-    
     /**
      *
      */

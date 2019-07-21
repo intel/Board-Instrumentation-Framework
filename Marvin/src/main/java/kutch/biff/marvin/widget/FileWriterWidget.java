@@ -133,10 +133,10 @@ public class FileWriterWidget extends BaseWidget
             return false;
         }
 
-        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {

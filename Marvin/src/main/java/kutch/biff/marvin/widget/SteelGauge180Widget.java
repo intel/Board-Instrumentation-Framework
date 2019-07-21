@@ -21,8 +21,9 @@
  */
 package kutch.biff.marvin.widget;
 
-import eu.hansolo.enzo.gauge.OneEightyGauge;
 import java.util.logging.Logger;
+
+import eu.hansolo.enzo.gauge.OneEightyGauge;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -79,10 +80,10 @@ public class SteelGauge180Widget extends BaseWidget
 
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
-            public void changed(ObservableValue o, Object oldVal, Object newVal)
+            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
             {
                 if (IsPaused())
                 {

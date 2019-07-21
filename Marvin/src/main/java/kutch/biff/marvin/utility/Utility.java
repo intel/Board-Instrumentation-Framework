@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2016 Intel Corporation
+ * #  Copyright (c) 2019 Intel Corporation
  * # 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -30,11 +30,13 @@ import org.w3c.dom.NamedNodeMap;
 
 /**
  *
- * @author Patrick Kutch
+ * @author Patrick.Kutch@gmail.com
  */
 public class Utility
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    private static String __KeyConjunction="MarvinKeyJoinerString";
+
     
     public static boolean ValidateAttributes(String ValidAttributes[],FrameworkNode node)
     {
@@ -84,5 +86,26 @@ public class Utility
         
         return ValidateAttributes(Attributes.toArray(new String[Attributes.size()]),node);
     }
+    
+    public static String generateKey(String s1, String s2)
+    {
+	return s1.toUpperCase() + Utility.__KeyConjunction + s2.toUpperCase();
+    }
+    
+    public static String[] splitKey(String key)
+    {
+	String parts[] = key.split(Utility.__KeyConjunction);
+	return parts;
+    }
+    
+    public static String combineWildcards(String s1, String s2)
+    {
+	if (s1.contains("*"))
+	{
+	    s1 = s1.replace("*", s2);
+	}
+	return s1;
+    }
+
     
 }
