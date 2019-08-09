@@ -206,6 +206,7 @@ class Measurement:
 
     def __getCategories(self,client):
         categories=[]
+            
         for category in client.get_list_measurements():
             categories.append(category['name'])
 
@@ -345,7 +346,7 @@ class Measurement:
             if None != self._namespace and len(keyMap) > 0:
                 NS = self._namespace.evaluate(keyMap)
             else:
-                NS = None
+                NS = "None"
 
             ListID += self._separator + "list"
 
@@ -418,11 +419,6 @@ class Measurement:
         retMap={}
 
 
-        if None != self._namespace and len(resultList) > 0:
-            NS = self._namespace.evaluate(resultList[0])
-        else:
-            NS = None
-
         # if making lists, create a map of them for updating
         # Need to do this in case the select statement grabs more than
         # one instance of a data point!
@@ -430,6 +426,17 @@ class Measurement:
             mapsUpdatedThisLoop=[]
         
         for entry in resultList:
+            # Map has 1 entry for each Namespace, and each entry is a map of data
+            if None != self._namespace:
+                NS = self._namespace.evaluate(resultList[0])
+            else:
+                NS = 'None'
+
+            if not NS in retMap:
+                retMap[NS]={}
+
+            currMap = retMap[NS]
+    
             instanceName = measurement
             
             ID = measurement
@@ -482,15 +489,15 @@ class Measurement:
                 mapsUpdatedThisLoop.append(instanceName) #keep track of what was updated in this query, and only send those
             
             if (isInstance and not self._makeListOnly) or not isInstance:
-                retMap[ID] = self._value.evaluate(entry)
+                currMap[ID] = self._value.evaluate(entry)
 
         if self._makeList: # Made lists, now let's add to the returning data map
             for listName in mapsUpdatedThisLoop:  # But only the ones changed in this loop
-                retMap[listName + self._separator + "size"] = str(len(self._listMap[listName]))
-                retMap[listName] = ",".join(self._listMap[listName])
+                currMap[listName + self._separator + "size"] = str(len(self._listMap[listName]))
+                currMap[listName] = ",".join(self._listMap[listName])
 
-        for key in retMap: # in case they specified a Namespace override
-            retMap[key] = (retMap[key],NS)
+#        for key in currMap: # in case they specified a Namespace override
+#            currMap[key] = (currMap[key],NS)
 
         return retMap
 
@@ -575,13 +582,15 @@ def PointCollectFunction(frameworkInterface,target,username,password,database,**
 
             client.close()
             
-            for ID in dataMap:
-                Data, Namespace = dataMap[ID]
+            for NS in dataMap:
+                nsMap = dataMap[NS]
+                for ID in nsMap:
+                    Data, Namespace = nsMap[ID]
 
-                if not frameworkInterface.DoesCollectorExist(ID,Namespace): # Do we already have this ID?
-                    frameworkInterface.AddCollector(ID,Namespace)    # Nope, so go add it, and maybe Custom NS!
+                    if not frameworkInterface.DoesCollectorExist(ID,Namespace): # Do we already have this ID?
+                        frameworkInterface.AddCollector(ID,Namespace)    # Nope, so go add it, and maybe Custom NS!
 
-                frameworkInterface.SetCollectorValue(ID,Data,None,Namespace)
+                    frameworkInterface.SetCollectorValue(ID,Data,None,Namespace)
 
     except Exception as Ex:
         logger.error("Unrecoverable error in InfluxDB Collector plugin: " + str(Ex))
