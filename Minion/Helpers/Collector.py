@@ -263,7 +263,12 @@ class Collector:
     #try to normalize a comma separated array.  if it doesn't work, just send
     #back the orginial string
     def __NormalizeArray(self,newValue,timeDelta):
-        splitData = newValue.split(",")
+        try:
+            splitData = newValue.split(",")
+        except Exception :
+            Log.getLogger().error("Tried to normalize an array that wasn't an array: " + newValue)
+            return newValue
+
         oldData = self._LastValue.split(",")
         index = 0
         retString = None
@@ -388,6 +393,10 @@ class Collector:
 
         returnVal = None
         collectedValue = self.Collect()
+
+        if None == collectedValue:
+            Log.getLogger().error("No Data for {}".format(self.GetID()))
+            return
 
         #Get collected time after collection, can't be sure each collection
         #take same amount of time

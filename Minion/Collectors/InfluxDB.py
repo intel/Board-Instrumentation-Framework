@@ -60,6 +60,7 @@ import logging
 import ast
 import time
 from operator import itemgetter
+#from Util import Time
 from pprint import pprint as pprint
 
 
@@ -77,6 +78,10 @@ def Sleep(seconds):
 
 def SleepMs(milliseconds):
     Sleep(float(milliseconds)/1000.0)    
+
+#gets current MS since epoch
+def GetCurrMS():
+    return  int(round(time.time() *1000)) # Gives you float secs since epoch, so make it ms and chop
 
 class Entry:
     def __init__(self,key,value):
@@ -97,11 +102,11 @@ class Entry:
         return (self._key,self._value,self._fixed)
 
     def evaluate(self,dataMap):
-        if self.fixed():
-            return str(self.value())
+        if self._fixed:
+            return str(self._value)
 
-        if self.key() in dataMap:
-            return str(dataMap[self.key()])
+        if self._key in dataMap:
+            return str(dataMap[self._key])
 
         else:
             return None 
@@ -117,10 +122,9 @@ class Entry:
         return entry
 
 class Measurement:
-    def __init__(self,configMap,name):
+    def __init__(self,configMap,name,usingLast):
         self._MeasurementList = None
         self._listMap={}  # Keep it around, as member in case I get partial data
-
         self._Name = name
 
         if 'separator' in configMap:
@@ -145,12 +149,18 @@ class Measurement:
             self._id_keys.append(Entry('',keyEntry))
 
         if not 'value' in configMap:
-            raise ValueError("Measurement {} did not specify value".format(self._Name))
+            if usingLast:
+                configMap['value'] = "{last_value}"
+            else:
+                raise ValueError("Measurement {} did not specify value".format(self._Name))
 
         self._value = Entry('value',configMap['value'])
 
         if not 'select' in configMap:
-            raise ValueError("Measurement {} did not select value".format(self._Name))
+            if usingLast:
+                configMap['select'] = "last(*)"
+            else:
+                raise ValueError("Measurement {} did not select value".format(self._Name))
 
         self._select = configMap['select']
 
@@ -162,9 +172,13 @@ class Measurement:
 
         if 'other' in configMap:
             self._other = configMap['other']
-        
+
+        elif usingLast:
+            configMap['other'] = "group by *"
+            self._other = "group by *"
+
         else:
-            self._other = None
+            self._other = ""
 
         if 'instance' in configMap:
             self._instance = configMap['instance']
@@ -199,7 +213,7 @@ class Measurement:
             self._where = ""
         
         else:
-            self._where = "WHERE " + configMap['where']
+            self._where = configMap['where']
 
     def getMeasurementList(self):
         return self._MeasurementList
@@ -262,7 +276,14 @@ class Measurement:
             self._seriesSizes = self.getMeasurmentListSize(dbClient)
 
     def createColumnStr(self, keyStr):
+        if None == keyStr:
+            return ""
+
+        if not ',' in keyStr:
+            return keyStr
+        
         keys = keyStr.split(",")
+
         retStr = keys[0]
         for colInfo in keys[1:]:
             colName, valueStr = colInfo.split("=")
@@ -371,7 +392,7 @@ class Measurement:
 
                 dataList=[]
                 for counter,dp in enumerate(resultList):
-                    dataPoint = str(self._value.evaluate(dp))
+                    dataPoint = self._value.evaluate(dp)
                     if None == dataPoint:
                         logger.error("Specified value of {} for historical collector not found".format(self._value.key()))
                         return
@@ -407,14 +428,18 @@ class Measurement:
 
         return retMap
 
-    def queryMeasurement(self,measurement,dbClient):
-        query = "select {} from {} {}".format(self._select,measurement, self._where)
+    def queryMeasurement(self,measurement,dbClient,queryLast):
+        query = "select {0} from {1} {2} {3}".format(self._select,measurement, self._where, self._other)
 
         logger.info("Querying with: " + query)
         resultList = []
 
-        resultSet = dbClient.query(query)    
+        #start = GetCurrMS()
+        resultSet = dbClient.query(query)    #result set has the tags in it
         resultList = list(resultSet.get_points())
+        keyList = list(resultSet.keys())
+
+        #print("Read Took {}ms for {} items and {} keys".format(GetCurrMS()-start,len(resultList),len(keyList)))
 
         retMap={}
 
@@ -423,14 +448,22 @@ class Measurement:
         # Need to do this in case the select statement grabs more than
         # one instance of a data point!
         if self._makeList:
-            mapsUpdatedThisLoop=[]
+            mapsUpdatedThisLoop={}
+
+        #start = GetCurrMS()
+        for index in range(len(resultList)):
+            entry = resultList[index]
+            # if getting last, the keys are in a different place then if getting another way
+            if True == queryLast:
+                keys = keyList[index][1]
+            else:
+                keys = entry
         
-        for entry in resultList:
             # Map has 1 entry for each Namespace, and each entry is a map of data
             if None != self._namespace:
-                NS = self._namespace.evaluate(resultList[0])
+                NS = self._namespace.evaluate(keys)
             else:
-                NS = 'None'
+                NS = self._namespace
 
             if not NS in retMap:
                 retMap[NS]={}
@@ -443,73 +476,81 @@ class Measurement:
             isInstance = False
             isInstanceKey = None
 
-            # if measurement == 'ipmi_value' and entry['type_instance'] == 'Agg Therm Mgn 1 system_board (7.1)':
-            #     pprint("-------start-----------")
-            #     pprint(entry['time'])
-            #     pprint("-------end-------------")
-            #     pass
-
             for id_part in self._id_keys:
-                idTag = id_part.evaluate(entry)
-                if None == idTag:
+                idTag = id_part.evaluate(keys)
+
+                if None == idTag or 'None' == idTag:
                     continue
 
-                if self._makeList:
-                    try:
-                        float(idTag) # if a number, and making a list, then this will not fail
-                        isInstance = True
-                        isInstanceKey = idTag
-                    except:                        
-                        instanceName += self._separator + idTag
-                        #csvListLenKey += 
+                else:
+                    if self._makeList:
+                        try:
+                            float(idTag) # if a number, and making a list, then this will not fail
+                            isInstance = True
+                            isInstanceKey = idTag
+                        except:                        
+                            instanceName += self._separator + idTag
                     
-                ID += self._separator + idTag
+                    ID += self._separator + idTag
 
+            currVal = self._value.evaluate(entry)
             if self._makeList and isInstance: # generate a list if a bunch of instances
                 instanceName += self._separator + "list"
                 isInstanceKey = int(isInstanceKey)
 
-                if not instanceName in self._listMap: # 1st time this list ahs been created
+                if not NS in self._listMap: # 1st map for this namespace
+                    self._listMap[NS] = {}
+
+                currListMap = self._listMap[NS]
+                if not instanceName in currListMap: # 1st time this list ahs been created
                     if isInstanceKey != 0:
-                        self._listMap[instanceName] = [0] * (isInstanceKey +1)
+                        currListMap[instanceName] = [0] * (isInstanceKey +1)
                         continue  # got data from middle of a set (say started getting at CPU #20 out of 88)
-                                  # during 1st loop, not likely to occur, but it can
+                                # during 1st loop, not likely to occur, but it can
 
                     else:
-                        self._listMap[instanceName] = []
-
+                        currListMap[instanceName] = []
 
                 # if grabbed multiple instances of same data (over a timespan), need to append the list
-                if int(isInstanceKey) >= len(self._listMap[instanceName]):
-                    self._listMap[instanceName].append(self._value.evaluate(entry))
+                if int(isInstanceKey) >= len(self._listMap[NS][instanceName]):
+                    self._listMap[NS][instanceName].append(currVal)
 
                 else: # otherwise just get latest value
-                    self._listMap[instanceName][int(isInstanceKey)] = self._value.evaluate(entry)
+                    self._listMap[NS][instanceName][int(isInstanceKey)] = currVal
 
-                mapsUpdatedThisLoop.append(instanceName) #keep track of what was updated in this query, and only send those
-            
+                if NS not in mapsUpdatedThisLoop:
+                    mapsUpdatedThisLoop[NS] = {}
+
+                if instanceName not in  mapsUpdatedThisLoop[NS]:
+                    mapsUpdatedThisLoop[NS][instanceName] = instanceName
+
             if (isInstance and not self._makeListOnly) or not isInstance:
-                currMap[ID] = self._value.evaluate(entry)
+                currMap[ID] = currVal
 
         if self._makeList: # Made lists, now let's add to the returning data map
-            for listName in mapsUpdatedThisLoop:  # But only the ones changed in this loop
-                currMap[listName + self._separator + "size"] = str(len(self._listMap[listName]))
-                currMap[listName] = ",".join(self._listMap[listName])
+            for Namespace in mapsUpdatedThisLoop:  # But only the ones changed in this loop
+                for listName in mapsUpdatedThisLoop[Namespace]:
+                    retMap[Namespace][listName + self._separator + "size"] = str(len(self._listMap[Namespace][listName]))
+                    retMap[Namespace][listName] = ",".join(self._listMap[Namespace][listName])
 
-#        for key in currMap: # in case they specified a Namespace override
-#            currMap[key] = (currMap[key],NS)
+        #print("Process Took {}ms".format(GetCurrMS()-start))
 
         return retMap
 
-    def performQuery(self,dbClient):
-        retMap={}
+    def performQuery(self,dbClient,getLast):
+        dataMap={}
         if None == self._MeasurementList or 0 == len(self._MeasurementList):
             self.determineMeasurementList(dbClient)
 
         for measurement in self._MeasurementList:
-            retMap.update(self.queryMeasurement(measurement,dbClient))
+            newDataMap = self.queryMeasurement(measurement,dbClient,getLast)
+            for namespace in newDataMap:
+                if not namespace in dataMap:
+                    dataMap[namespace] = {}
+
+                dataMap[namespace].update(newDataMap[namespace])
         
-        return retMap
+        return dataMap        
 
 def _ValidateInputFilter(inputStr):
     filter = inputStr.replace('\n', '').replace('\r', '').strip()
@@ -532,9 +573,7 @@ def GetMeasurementInfo(target,username,password,database,measurement):
             pprint("  " + item)
     pass
 
-
-## Dynamic Collector interface
-def PointCollectFunction(frameworkInterface,target,username,password,database,**filterList):
+def _CollectFunction(useLastMethod,frameworkInterface,target,username,password,database,**filterList):    
     global logger
     logger = frameworkInterface.Logger
     logger.info("Starting InfluxDB Collector {0}".format(VersionStr))
@@ -546,24 +585,44 @@ def PointCollectFunction(frameworkInterface,target,username,password,database,**
     for key in filterList:
         filter = filterList[key]
         dbFilter = _ValidateInputFilter(filter)
-        FilterSet.append(Measurement(dbFilter,key))
+        FilterSet.append(Measurement(dbFilter,key,useLastMethod))
 
     if not ':' in target:
         raise ValueError("InfluxDB requires 1st Parameter to be IP:Port")
 
     hostname,port = target.split(":")
 
-#    GetMeasurementInfo(target,username,password,database,"cpufreq_value")
-
+    sleepInterval = frameworkInterface.Interval
+    loopStart = GetCurrMS()
     try:
+        warningOcurredCount = 0
         while not frameworkInterface.KillThreadSignalled():
-            SleepMs(frameworkInterface.Interval)
+            loopTime = GetCurrMS() - loopStart
+            if loopTime > frameworkInterface.Interval:
+                warningOcurredCount += 1
+                if warningOcurredCount == 5:
+                    logger.error("InfluxDB Collector takes {} ms for one loop, but interval set for {}".format(loopTime,frameworkInterface.Interval))
+                
+                if warningOcurredCount > 20:
+                    warningOcurredCount = 0
+
+                sleepInterval = 0
+            else:
+                sleepInterval = frameworkInterface.Interval - loopTime
+            SleepMs(sleepInterval)
+            loopStart = GetCurrMS()
             client = InfluxDBClient(hostname, port, username, password, database)
             dataMap={}
 
             try:
                 for entry in FilterSet:
-                    dataMap.update(entry.performQuery(client))
+                    newDataMap = entry.performQuery(client,useLastMethod)
+                    for namespace in newDataMap:
+                        if not namespace in dataMap:
+                            dataMap[namespace] = {}
+
+                        dataMap[namespace].update(newDataMap[namespace])
+                    
 
             except exceptions.InfluxDBClientError as Ex:
                 logger.error("InfluxDB Collector: {}".format(Ex))
@@ -582,10 +641,10 @@ def PointCollectFunction(frameworkInterface,target,username,password,database,**
 
             client.close()
             
-            for NS in dataMap:
-                nsMap = dataMap[NS]
+            for Namespace in dataMap:
+                nsMap = dataMap[Namespace]
                 for ID in nsMap:
-                    Data, Namespace = nsMap[ID]
+                    Data = nsMap[ID]
 
                     if not frameworkInterface.DoesCollectorExist(ID,Namespace): # Do we already have this ID?
                         frameworkInterface.AddCollector(ID,Namespace)    # Nope, so go add it, and maybe Custom NS!
@@ -593,7 +652,15 @@ def PointCollectFunction(frameworkInterface,target,username,password,database,**
                     frameworkInterface.SetCollectorValue(ID,Data,None,Namespace)
 
     except Exception as Ex:
-        logger.error("Unrecoverable error in InfluxDB Collector plugin: " + str(Ex))
+        logger.error("Unrecoverable error in InfluxDB Collector plugin: " + str(Ex))    
+
+def LastPointCollectFunction(frameworkInterface,target,username,password,database,**filterList):    
+    _CollectFunction(True,frameworkInterface,target,username,password,database,**filterList)
+
+## Dynamic Collector interface
+def PointCollectFunction(frameworkInterface,target,username,password,database,**filterList):
+    _CollectFunction(False,frameworkInterface,target,username,password,database,**filterList)
+
 
 
 # def generateSortedFetchList(keyList):
@@ -681,7 +748,7 @@ def HistoryCollectFunction(frameworkInterface,target,username,password,database,
     for key in filterList:
         filter = filterList[key]
         dbFilter = _ValidateInputFilter(filter)
-        FilterSet.append(Measurement(dbFilter,key))
+        FilterSet.append(Measurement(dbFilter,key,False))
 
     if not ':' in target:
         raise ValueError("InfluxDB requires 1st Parameter to be IP:Port")
