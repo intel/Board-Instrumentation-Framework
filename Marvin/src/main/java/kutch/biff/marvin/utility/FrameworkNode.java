@@ -46,13 +46,20 @@ public class FrameworkNode
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private static final AliasMgr ALIASMANAGER = AliasMgr.getAliasMgr();
-    private Node _node;
+    protected Node _node;
     private NamedNodeMap _attributes;
 
     public FrameworkNode(Node baseNode)
     {
         _node = baseNode;
         _attributes = baseNode.getAttributes();
+    }
+    
+    public FrameworkNode(FrameworkNode otherNode)
+    {
+	Node copy = otherNode._node.cloneNode(true);
+        _node = copy;
+        _attributes = copy.getAttributes();
     }
 
     public String getAttributeList()
@@ -599,7 +606,7 @@ public class FrameworkNode
 
     public String getTextContent()
     {
-        return HandleAlias(_node.getTextContent());
+        return HandleAlias(_node.getTextContent().strip());
     }
 
     /**

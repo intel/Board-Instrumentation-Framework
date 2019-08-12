@@ -31,6 +31,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
 */
 public class MarvinPlaybackManager
 {
+    @SuppressWarnings("unused")
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static MarvinPlaybackManager _inst = new MarvinPlaybackManager();
     

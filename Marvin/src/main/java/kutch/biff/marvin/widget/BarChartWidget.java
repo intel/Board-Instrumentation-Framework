@@ -71,7 +71,6 @@ public class BarChartWidget extends LineChartWidget
         _xAxis.setAnimated(false);  // for some reason for this chart, it defaults to true!
     }
 
-    @SuppressWarnings("unchecked")
     protected void setupListeners(DataManager dataMgr)
     {
         if (0 == _SeriesOrder.size())
@@ -88,7 +87,6 @@ public class BarChartWidget extends LineChartWidget
         XYChart.Series<String, Number> objSeries = new XYChart.Series<>();
         for (int iLoop = 0; iLoop < getxAxisMaxCount(); iLoop++)
         {
-            @SuppressWarnings("rawtypes")
 	    XYChart.Data objData = new XYChart.Data<>(Integer.toString(iLoop), 0);
             objSeries.getData().add(objData);
         }

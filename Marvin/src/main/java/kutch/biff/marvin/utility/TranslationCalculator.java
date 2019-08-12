@@ -27,7 +27,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 import kutch.biff.marvin.configuration.Configuration;
@@ -46,7 +45,7 @@ public class TranslationCalculator
     private final DoubleProperty _Scale;
 //    private final Pane _ReferencePane;
     private final Pane _WorkingPane;
-    private final Rectangle clip = new Rectangle();
+    //private final Rectangle clip = new Rectangle();
     private final Pos _Position;
     private final Translate _Translate;
 

@@ -43,6 +43,7 @@ import kutch.biff.marvin.widget.BaseWidget;
 public class MarvinLocalData
 {
     private final ConfigurationReader CONFIG = ConfigurationReader.GetConfigReader();
+    @SuppressWarnings("unused")
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private final String Namespace = "MarvinLocalNamespace";

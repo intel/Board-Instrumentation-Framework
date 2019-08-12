@@ -963,18 +963,11 @@ public class ConfigurationReader
 	return dynaInfo;
     }
     
-    private static Pair<String, String> getNamespaceAndIdPattern(FrameworkNode node, String method)
+    private static Pair<String, String> getNamespaceAndIdPattern(FrameworkNode node)
     {
-	if (node.hasAttribute("Namespace"))
+	if (node.hasAttribute("Namespace") && node.hasAttribute("ID"))
 	{
-	    if (node.hasAttribute("ID"))
-	    {
 		return new Pair<String, String>(node.getAttribute("Namespace"), node.getAttribute("ID"));
-	    }
-	    if (method.equalsIgnoreCase("MakeList"))
-	    {
-		return new Pair<String, String>(node.getAttribute("Namespace"), "");
-	    }
 	}
 	return null;
     }
@@ -994,7 +987,7 @@ public class ConfigurationReader
 	}
 	
 	String strMethod = inputNode.getAttribute("Method");
-	Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode,strMethod);
+	Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode);
 	if (null == genDPInfo)
 	{
 	    LOGGER.severe("Invalid GenerateDatapoint.");
@@ -1006,7 +999,7 @@ public class ConfigurationReader
 	{
 	    if (node.getNodeName().equalsIgnoreCase("InputPattern"))
 	    {
-		Pair<String, String> input = getNamespaceAndIdPattern(node,strMethod);
+		Pair<String, String> input = getNamespaceAndIdPattern(node);
 		if (null == input)
 		{
 		    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(),
@@ -1017,7 +1010,7 @@ public class ConfigurationReader
 	    }
 	    else if (node.getNodeName().equalsIgnoreCase("ExcludePattern"))
 	    {
-		Pair<String, String> exclude = getNamespaceAndIdPattern(node,strMethod);
+		Pair<String, String> exclude = getNamespaceAndIdPattern(node);
 		if (null == exclude)
 		{
 		    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(),
@@ -1091,7 +1084,7 @@ public class ConfigurationReader
 	{
 	    info.setMethod(GenerateDatapointInfo.GenerateMethod.AVERAGE);
 	}
-	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeList"))
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("Make_List"))
 	{
 	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_LIST);
 	}

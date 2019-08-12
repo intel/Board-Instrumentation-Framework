@@ -32,6 +32,7 @@ public class SeriesDataSet
     private String ID;
     private String Title;
     private String Namespace;
+    @SuppressWarnings("rawtypes")
     private XYChart.Series _Series;
     private double _ScaleValue;
     
@@ -70,6 +71,7 @@ public class SeriesDataSet
         return Namespace;
     }
 
+    @SuppressWarnings("rawtypes")
     public XYChart.Series getSeries()
     {
         return _Series;

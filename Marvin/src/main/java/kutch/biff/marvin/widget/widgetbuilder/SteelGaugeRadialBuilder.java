@@ -35,10 +35,7 @@ import kutch.biff.marvin.widget.SteelGaugeRadialWidget;
 public class SteelGaugeRadialBuilder
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    @SuppressWarnings(
-    {
-        "BroadCatchBlock", "TooBroadCatch"
-    })
+
     public static SteelGaugeRadialWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
         SteelGaugeRadialWidget objWidget = new SteelGaugeRadialWidget();
