@@ -59,7 +59,7 @@ public class GenerateDatapointInfo
     
     public enum GenerateMethod
     {
-	ADD, AVERAGE, PROXY, SPLIT_LIST, INVALID
+	ADD, AVERAGE, PROXY, SPLIT_LIST, MAKE_LIST,INVALID
     };
     
     public enum RefreshPolicy
@@ -396,7 +396,7 @@ public class GenerateDatapointInfo
 	
 	float Total = 0;
 	boolean forceUpdate = false;
-	int sourcPrecision = 0;
+	int sourcePrecision = 0;
 	synchronized (__dirtyMap)
 	{
 	    if (__minFrequency > 0)
@@ -436,9 +436,9 @@ public class GenerateDatapointInfo
 		    {
 			precision= strValue.length() - integerPlaces - 1;
 		    }
-		    if (precision > sourcPrecision)
+		    if (precision > sourcePrecision)
 		    {
-			sourcPrecision = precision; // use source precision, in case not specified
+			sourcePrecision = precision; // use source precision, in case not specified
 		    }
 		}
 		else
@@ -474,7 +474,7 @@ public class GenerateDatapointInfo
 	
 	if (-1 == precision)
 	{ // use precision of value received
-	    precision = sourcPrecision;
+	    precision = sourcePrecision;
 	}
 	
 	df.setMaximumFractionDigits(precision);

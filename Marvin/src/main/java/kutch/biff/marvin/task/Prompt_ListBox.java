@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2016 Intel Corporation
+ * #  Copyright (c) 2019 Intel Corporation
  * # 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 package kutch.biff.marvin.task;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -36,17 +37,31 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import kutch.biff.marvin.configuration.Configuration;
+import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
+import kutch.biff.marvin.utility.DataPointGenerator;
 import kutch.biff.marvin.utility.FrameworkNode;
 
 /**
- *
+ *<Prompt ID="Volume Selection" Type="ListBox">
+	<Title>Volume Level</Title>
+	<Message>Select the Volume for this media player</Message>
+	<List>
+		<Item Text="Mute">Volume:0</Item>
+		<Item Text="100%">Volume:100</Item>
+		<Item Text="25%">Volume:25</Item>215 Revision 19.07 Board Instrumentation Framework
+		<Item Text="50%">Volume:50</Item>
+		<Item Text="75%">Volume:75</Item>
+	</List>
+	</Prompt>
+
  * @author Patrick Kutch
  */
 public class Prompt_ListBox extends BasePrompt
 {
-    private final  ArrayList<String> _DisplayTextList;
-    private final  ArrayList<String> _ParamList;
+    private final List<String> _DisplayTextList;
+    private final List<String> _ParamList;
+    private final List<List<DataPointGenerator>> _DataPoints;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private int _PrevSelection = 0;
     public Prompt_ListBox(String ID)
@@ -54,13 +69,16 @@ public class Prompt_ListBox extends BasePrompt
         super(ID);
         _DisplayTextList = new ArrayList<>();
         _ParamList = new ArrayList<>();
+        _DataPoints = new ArrayList<>();
     }
     
-    public void AddListItem(String strDisplayText, String strParam)
+    public void AddListItem(String strDisplayText, String strParam, List<DataPointGenerator> dps)
     {
         _DisplayTextList.add(strDisplayText);
         _ParamList.add(strParam);
+        _DataPoints.add(dps);
     }
+    
     @Override
     protected Pane SetupDialog(Stage dialog)
     {
@@ -134,6 +152,14 @@ public class Prompt_ListBox extends BasePrompt
         btn.setOnAction((ActionEvent event) -> 
         {
             int Selection = listBox.getSelectionModel().getSelectedIndex();
+            List<DataPointGenerator> dataPoints = _DataPoints.get(Selection);
+            if (null != dataPoints)
+            {
+        	for (DataPointGenerator dp : dataPoints)
+        	{
+        	    dp.generate();
+        	}
+            }
             SetPromptedValue(_ParamList.get(Selection));
             _PrevSelection = Selection;
             dialog.close();
@@ -169,7 +195,12 @@ public class Prompt_ListBox extends BasePrompt
                     {
                         strDisplayText = node.getTextContent();
                     }
-                    AddListItem(strDisplayText,node.getTextContent());
+                    List<DataPointGenerator> dataPoints = null;
+                    if (node.hasAttribute("CreateDataPoint"))
+                    {
+                	dataPoints = ConfigurationReader.ReadDataPointsForTask(node.getAttribute("CreateDataPoint"),node.getAttribute("Text"),node.getAttribute("Task"));
+                    }
+                    AddListItem(strDisplayText,node.getTextContent(),dataPoints);
                 }        
                 else
                 {

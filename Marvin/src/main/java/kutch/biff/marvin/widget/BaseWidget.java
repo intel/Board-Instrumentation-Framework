@@ -121,7 +121,9 @@ abstract public class BaseWidget implements Widget
     protected String _SelectedStyleID = null;
     private List<Double> _SteppedMaxRanges = null;
     private List<Double> _SteppedMinRanges = null;
+    @SuppressWarnings("unused")
     private boolean _widthEqualsHeight = false;
+    @SuppressWarnings("unused")
     private boolean _heightEqualsWidth = false;
     
     protected static CircularList<String> DebugStyles = null;
@@ -1535,9 +1537,16 @@ abstract public class BaseWidget implements Widget
         }
     }
 
-    public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode)
+    // handles unknown tags within widget app settings
+    public boolean HandleWidgetSpecificSettings(FrameworkNode widgetTag)
     {
         return false;
+    }
+    
+    // handles any specific 'sub tags' in a widget
+    public boolean HandleWidgetSpecificConfiguration(FrameworkNode widgetNode)
+    {
+	return true;
     }
 
     public void HandleWidgetSpecificAttributes(FrameworkNode widgetNode)
@@ -1694,7 +1703,6 @@ abstract public class BaseWidget implements Widget
     {
         if (false == _MouseHasBeenSetup) // quick hack, as I call this from MOST widgets, but now want it from all.  Will eventually remove from individual widgets.
         {
-            BaseWidget objWidget = this;
             if (null != getTaskID() || CONFIG.isDebugMode()) // only do if a task to setup, or if debug mode
             {
                 EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>()

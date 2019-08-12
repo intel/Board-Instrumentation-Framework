@@ -32,11 +32,14 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 public class SeriesSet
 {
+    @SuppressWarnings("unused")
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private ArrayList<SeriesDataSet> _MinionSrcList;
+    @SuppressWarnings("rawtypes")
     private XYChart.Series _Series;
     private String _Title;
     
+    @SuppressWarnings("rawtypes")
     public SeriesSet(String strTitle)
     {
         _MinionSrcList = new ArrayList<>();
@@ -68,6 +71,7 @@ public class SeriesSet
         return _Title;
     }
 
+    @SuppressWarnings("rawtypes")
     public XYChart.Series getSeries()
     {
         return _Series;

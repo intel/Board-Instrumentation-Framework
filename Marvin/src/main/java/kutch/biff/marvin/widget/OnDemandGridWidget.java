@@ -42,6 +42,7 @@ public class OnDemandGridWidget extends GridWidget
     private String __strPrimaryGrowth = "HZ";
     private String __strSecondaryGrowth = "VT";
     private int __NewLineCount = 1;
+    @SuppressWarnings("unused")
     private int __currentLineCount = 0;
     private int __nextPositionX = 0;
     private int __nextPositionY = 0;

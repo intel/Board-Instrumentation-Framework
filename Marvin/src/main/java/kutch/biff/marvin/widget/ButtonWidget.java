@@ -44,160 +44,162 @@ public class ButtonWidget extends BaseWidget
     private Button _Button;
     protected String _ImageFileName;
     protected double _ImageWidthConstraint, _ImageHeightConstraint;
-
+    
     public ButtonWidget()
     {
-        _Button = new Button();
-        _ImageFileName = null;
-        _ImageWidthConstraint = 0;
-        _ImageHeightConstraint = 0;
+	_Button = new Button();
+	_ImageFileName = null;
+	_ImageWidthConstraint = 0;
+	_ImageHeightConstraint = 0;
     }
     
     protected ButtonBase getButton()
     {
-        return _Button;
+	return _Button;
     }
-
+    
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
-        SetParent(pane);
-        getButton().disableProperty().set(!_InitiallyEnabled);
-
-        ConfigureDimentions();
-
-        ConfigureAlignment();
-        SetupPeekaboo(dataMgr);
-        
-        getButton().setText(getTitle());
-        if (false == SetupImage())
-        {
-            return false;
-        }
-        pane.add(getButton(), getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
-        {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
-            {
-                String strVal = newVal.toString();
-                getButton().setText(strVal);
-            }
-        });
-
-        SetupTaskAction();
-        return ApplyCSS();
+	SetParent(pane);
+	getButton().disableProperty().set(!_InitiallyEnabled);
+	
+	ConfigureDimentions();
+	
+	ConfigureAlignment();
+	SetupPeekaboo(dataMgr);
+	
+	getButton().setText(getTitle());
+	if (false == SetupImage())
+	{
+	    return false;
+	}
+	pane.add(getButton(), getColumn(), getRow(), getColumnSpan(), getRowSpan());
+	dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
+	{
+	    @Override
+	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
+	    {
+		onChange(o, oldVal, newVal);
+	    }
+	});
+	
+	SetupTaskAction();
+	return ApplyCSS();
     }
-
+    
+    protected void onChange(ObservableValue<?> o, Object oldVal, Object newVal)
+    {
+	String strVal = newVal.toString();
+	getButton().setText(strVal);
+    }
+    
     @Override
     public javafx.scene.Node getStylableObject()
     {
-        return getButton();
+	return getButton();
     }
-
+    
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return getButton().getStylesheets();
+	return getButton().getStylesheets();
     }
-
+    
     @Override
     public boolean SupportsEnableDisable()
     {
-        return true;
+	return true;
     }
-
+    
     @Override
     public void SetEnabled(boolean enabled)
     {
-        getButton().disableProperty().set(!enabled);
+	getButton().disableProperty().set(!enabled);
     }
-
+    
     public void setImageFileName(String _ImageFileName)
     {
-        this._ImageFileName = _ImageFileName;
+	this._ImageFileName = _ImageFileName;
     }
-
+    
     private boolean SetupImage()
     {
-        if (null != _ImageFileName)
-        {
-            String fname = convertToFileOSSpecific(_ImageFileName);
-            File file = new File(fname);
-            if (file.exists())
-            {
-                String fn = "file:" + fname;
-                Image img = new Image(fn);
-                ImageView view = new ImageView(img);
-
-                if (_ImageHeightConstraint > 0)
-                {
-                    view.setFitHeight(_ImageHeightConstraint);
-                }
-                if (_ImageWidthConstraint > 0)
-                {
-                    view.setFitWidth(_ImageWidthConstraint);
-                }
-
-                getButton().setGraphic(view);
-
-                LOGGER.config("Adding Image to Button - " + _ImageFileName);
-                return true;
-            }
-            else
-            {
-                LOGGER.severe("Invalid Image File specified for Button: " + _ImageFileName);
-                return false;
-            }
-        }
-        return true;
+	if (null != _ImageFileName)
+	{
+	    String fname = convertToFileOSSpecific(_ImageFileName);
+	    File file = new File(fname);
+	    if (file.exists())
+	    {
+		String fn = "file:" + fname;
+		Image img = new Image(fn);
+		ImageView view = new ImageView(img);
+		
+		if (_ImageHeightConstraint > 0)
+		{
+		    view.setFitHeight(_ImageHeightConstraint);
+		}
+		if (_ImageWidthConstraint > 0)
+		{
+		    view.setFitWidth(_ImageWidthConstraint);
+		}
+		
+		getButton().setGraphic(view);
+		
+		LOGGER.config("Adding Image to Button - " + _ImageFileName);
+		return true;
+	    }
+	    else
+	    {
+		LOGGER.severe("Invalid Image File specified for Button: " + _ImageFileName);
+		return false;
+	    }
+	}
+	return true;
     }
-
+    
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode)
     {
-        if (widgetNode.getNodeName().equalsIgnoreCase("Image"))
-        {
-            setImageFileName(widgetNode.getTextContent());
-
-            Utility.ValidateAttributes(new String[]
-            {
-                "Height", "Width"
-            }, widgetNode);
-            if (widgetNode.hasAttribute("Width"))
-            {
-                try
-                {
-                    _ImageWidthConstraint = Double.parseDouble(widgetNode.getAttribute("Width"));
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Button Image has invalid Width specified: " + widgetNode.getAttribute("Width"));
-                    return false;
-                }
-            }
-            if (widgetNode.hasAttribute("Height"))
-            {
-                try
-                {
-                    _ImageHeightConstraint = Double.parseDouble(widgetNode.getAttribute("Height"));
-                }
-                catch (NumberFormatException ex)
-                {
-                    LOGGER.severe("Button Image has invalid Height specified: " + widgetNode.getAttribute("Height"));
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        return false;
+	if (widgetNode.getNodeName().equalsIgnoreCase("Image"))
+	{
+	    setImageFileName(widgetNode.getTextContent());
+	    
+	    Utility.ValidateAttributes(new String[] { "Height", "Width" }, widgetNode);
+	    if (widgetNode.hasAttribute("Width"))
+	    {
+		try
+		{
+		    _ImageWidthConstraint = Double.parseDouble(widgetNode.getAttribute("Width"));
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Button Image has invalid Width specified: " + widgetNode.getAttribute("Width"));
+		    return false;
+		}
+	    }
+	    if (widgetNode.hasAttribute("Height"))
+	    {
+		try
+		{
+		    _ImageHeightConstraint = Double.parseDouble(widgetNode.getAttribute("Height"));
+		}
+		catch(NumberFormatException ex)
+		{
+		    LOGGER.severe("Button Image has invalid Height specified: " + widgetNode.getAttribute("Height"));
+		    return false;
+		}
+	    }
+	    
+	    return true;
+	}
+	return false;
     }
-
+    
     @Override
     public void UpdateTitle(String strTitle)
     {
-        getButton().setText(strTitle);
+	getButton().setText(strTitle);
     }
-
+    
 }

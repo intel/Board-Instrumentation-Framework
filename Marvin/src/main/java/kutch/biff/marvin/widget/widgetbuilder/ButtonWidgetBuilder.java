@@ -35,6 +35,7 @@ import kutch.biff.marvin.widget.ToggleButtonWidget;
  */
 public class ButtonWidgetBuilder
 {
+    @SuppressWarnings("unused")
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     public static ButtonWidget Build(FrameworkNode masterNode, String widgetDefFilename)

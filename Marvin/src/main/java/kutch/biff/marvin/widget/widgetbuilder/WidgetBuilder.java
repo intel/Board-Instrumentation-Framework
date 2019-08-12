@@ -330,7 +330,7 @@ public class WidgetBuilder
                 {
                     Utility.ValidateAttributes(new String[]
                     {
-                        "Namespace", "ID","Scale"
+                        "Namespace", "ID","Scale",
                     }, node);
                     if (node.hasAttribute("Scale"))
                     {
@@ -398,8 +398,14 @@ public class WidgetBuilder
                 return null;
             }
         }
-
-        return retWidget;
+        if (null != retWidget)
+        {
+            if (retWidget.HandleWidgetSpecificConfiguration(widgetNode))
+            {
+        	return retWidget;
+            }
+        }
+        return null;
     }
 
     public static boolean HandlePeekaboo(BaseWidget widget, FrameworkNode widgetNode)
