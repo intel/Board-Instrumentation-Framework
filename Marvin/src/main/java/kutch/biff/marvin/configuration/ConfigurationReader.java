@@ -963,11 +963,18 @@ public class ConfigurationReader
 	return dynaInfo;
     }
     
-    private static Pair<String, String> getNamespaceAndIdPattern(FrameworkNode node)
+    private static Pair<String, String> getNamespaceAndIdPattern(FrameworkNode node, String method)
     {
-	if (node.hasAttribute("Namespace") && node.hasAttribute("ID"))
+	if (node.hasAttribute("Namespace"))
 	{
-	    return new Pair<String, String>(node.getAttribute("Namespace"), node.getAttribute("ID"));
+	    if (node.hasAttribute("ID"))
+	    {
+		return new Pair<String, String>(node.getAttribute("Namespace"), node.getAttribute("ID"));
+	    }
+	    if (method.equalsIgnoreCase("MakeList"))
+	    {
+		return new Pair<String, String>(node.getAttribute("Namespace"), "");
+	    }
 	}
 	return null;
     }
@@ -980,21 +987,29 @@ public class ConfigurationReader
 	boolean hasListEntry = false;
 	int listEntry = 0;
 	
-	Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode);
+	if (!inputNode.hasAttribute("Method"))
+	{
+	    LOGGER.severe("GenerateDatapoint did not specify the Method of generate. ");
+	    return null;
+	}
+	
+	String strMethod = inputNode.getAttribute("Method");
+	Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode,strMethod);
 	if (null == genDPInfo)
 	{
 	    LOGGER.severe("Invalid GenerateDatapoint.");
 	    return null;
 	}
 	
+	
 	for (FrameworkNode node : inputNode.getChildNodes(true))
 	{
 	    if (node.getNodeName().equalsIgnoreCase("InputPattern"))
 	    {
-		Pair<String, String> input = getNamespaceAndIdPattern(node);
+		Pair<String, String> input = getNamespaceAndIdPattern(node,strMethod);
 		if (null == input)
 		{
-		    LOGGER.severe(String.format("Invalid GenerateDatapoing %s:%s -->%s", genDPInfo.getKey(),
+		    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(),
 			    genDPInfo.getValue(), node.getAttributeList()));
 		    return null;
 		}
@@ -1002,7 +1017,7 @@ public class ConfigurationReader
 	    }
 	    else if (node.getNodeName().equalsIgnoreCase("ExcludePattern"))
 	    {
-		Pair<String, String> exclude = getNamespaceAndIdPattern(node);
+		Pair<String, String> exclude = getNamespaceAndIdPattern(node,strMethod);
 		if (null == exclude)
 		{
 		    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(),
@@ -1046,11 +1061,6 @@ public class ConfigurationReader
 		return null;
 	    }
 	}
-	if (!inputNode.hasAttribute("Method"))
-	{
-	    LOGGER.severe("GenerateDatapoint did not specify the Method of generate. ");
-	    return null;
-	}
 	GenerateDatapointInfo info = new GenerateDatapointInfo(genDPInfo.getKey(), genDPInfo.getValue(), maskList,
 		excludeList);
 	
@@ -1080,6 +1090,10 @@ public class ConfigurationReader
 	else if (inputNode.getAttribute("Method").equalsIgnoreCase("Average"))
 	{
 	    info.setMethod(GenerateDatapointInfo.GenerateMethod.AVERAGE);
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeList"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_LIST);
 	}
 	else if (inputNode.getAttribute("Method").equalsIgnoreCase("Proxy"))
 	{

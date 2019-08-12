@@ -63,6 +63,7 @@ public class GridWidget extends BaseWidget
     private ListView _ListView;
     private String _ListViewFileCSS;
     private String _ListStyleID;
+    @SuppressWarnings("unused")
     private List<String> _ListStyleOverride;
 
     public GridWidget()
@@ -777,6 +778,7 @@ public class GridWidget extends BaseWidget
         return _OnDemandTask;
     }
 
+    @SuppressWarnings("unused")
     @Override
     protected boolean ApplyCSS()
     {

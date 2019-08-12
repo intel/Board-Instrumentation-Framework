@@ -59,7 +59,7 @@ public class GenerateDatapointInfo
     
     public enum GenerateMethod
     {
-	ADD, AVERAGE, PROXY, SPLIT_LIST, INVALID
+	ADD, AVERAGE, PROXY, SPLIT_LIST, MAKE_LIST, INVALID
     };
     
     public enum RefreshPolicy
@@ -319,6 +319,12 @@ public class GenerateDatapointInfo
 	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
     }
     
+    private void HandleMakeList(String NS, String ID, String strInpValue)
+    {
+	String parts[] = strInpValue.split(__splitToken);
+	
+    }
+    
     private void HandleSplitList(String NS, String ID, String strInpValue)
     {
 	String parts[] = strInpValue.split(__splitToken);
@@ -449,9 +455,14 @@ public class GenerateDatapointInfo
 	    if (_Method == GenerateMethod.ADD || Total == 0.0)
 	    {
 	    }
-	    else
+	    else if (_Method == GenerateMethod.AVERAGE)
 	    {
 		Total /= __dirtyMap.size();
+	    }
+	    else
+	    {
+		LOGGER.severe("Unknown GenerateDataPoint method: "+ _Method);
+		return;
 	    }
 	    Total *= __Scale;
 	    // this likely needs to be a postponted task - otherwise can have endless loop
@@ -518,6 +529,10 @@ public class GenerateDatapointInfo
 		    else if (GenerateMethod.SPLIT_LIST == _Method)
 		    {
 			HandleSplitList(inputNamespace, inputID, newVal.toString());
+		    }
+		    else if (GenerateMethod.MAKE_LIST == _Method)
+		    {
+			HandleMakeList(inputNamespace, inputID, newVal.toString());
 		    }
 		    else
 		    {
