@@ -21,8 +21,6 @@
  */
 package kutch.biff.marvin.widget;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.control.ButtonBase;
@@ -60,11 +58,6 @@ public class MenuButtonWidget extends ButtonWidget
 	__CommonTaskNode = null;
     }
     
-    
-//    protected boolean ApplyCSS()
-//    {
-//	return true;
-//    }
 
     public void setCommonTaskNode(FrameworkNode commonTask)
     {
@@ -76,6 +69,8 @@ public class MenuButtonWidget extends ButtonWidget
     {
 	return _Button;
     }
+    
+    
     
     @Override
     public EventHandler<MouseEvent> SetupTaskAction()
