@@ -23,6 +23,8 @@ package kutch.biff.marvin.utility;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,13 +59,18 @@ public class GenerateDatapointInfo
     private String __ProxyID;
     private int __csvEntry;
     private String __splitToken;
-    private String __ListContents;
-    private Map<String, String> __NamespaceMap;
+    private Map<String, String> __mapOfListData;
+    private ListSortMethod _sortMethod;
     
     public enum GenerateMethod
     {
-	ADD, AVERAGE, PROXY, SPLIT_LIST, MAKE_LIST, MAKE_NAMESPACE_LIST, INVALID
+	ADD, AVERAGE, PROXY, SPLIT_LIST, MAKE_LIST, MAKE_NAMESPACE_LIST, MAKE_ID_LIST, INVALID
     };
+    
+    public enum ListSortMethod
+    {
+	ASCENDING, DESCENDING, NONE;
+    }
     
     public enum RefreshPolicy
     {
@@ -78,6 +85,7 @@ public class GenerateDatapointInfo
     {
 	_Method = GenerateMethod.INVALID;
 	_Policy = RefreshPolicy.INVALD;
+	_sortMethod = ListSortMethod.ASCENDING;
 	__includeCriterea = includeList;
 	__excludeCriterea = excludeList;
 	__dirtyMap = new HashMap<>();
@@ -92,8 +100,7 @@ public class GenerateDatapointInfo
 	__ProxyID = null;
 	__csvEntry = -1;
 	__splitToken = null;
-	__ListContents = null;
-	__NamespaceMap = new HashMap<>();
+	__mapOfListData = new HashMap<>();
     }
     
     public int getListEntry()
@@ -109,6 +116,11 @@ public class GenerateDatapointInfo
 	}
 	__csvEntry = newVal;
 	return true;
+    }
+    
+    public void SetSortMethod(ListSortMethod newMethod)
+    {
+	_sortMethod = newMethod;
     }
     
     public void setSplitToken(String newToken)
@@ -224,7 +236,7 @@ public class GenerateDatapointInfo
 	{
 	    Pair<String, String> matchPattern = criterea.get(index);
 	    // ID is null when only checking NS
-	    if (Glob.check(matchPattern.getKey(), checkNamespace)
+	    if ((null == matchPattern.getKey() || Glob.check(matchPattern.getKey(), checkNamespace))
 		    && (null == matchPattern.getValue() || Glob.check(matchPattern.getValue(), checkID)))
 	    {
 		return true;
@@ -330,26 +342,80 @@ public class GenerateDatapointInfo
     
     private void HandleMakeList(String NS, String ID, String strInpValue)
     {
-	String parts[] = strInpValue.split(__splitToken);
-	
+	String[] parts = strInpValue.split(",");
     }
-    
-    private void HandleMakeNamespaceList(String NS)
+
+    private void HandleIDList(String NS, String ID)
     {
-	if (!__NamespaceMap.containsKey(NS.toUpperCase()))
+	String Key = NS + ID;
+	Key = Key.toUpperCase();
+	if (!__mapOfListData.containsKey(Key))
 	{
-	    __NamespaceMap.put(NS.toUpperCase(), NS);
-	    if (null == __ListContents)
+	    __mapOfListData.put(Key,ID);
+	    String strData = null;
+	    String[] entries = new String[__mapOfListData.size()];
+	    int index = 0;
+	    for (String key : __mapOfListData.keySet())
 	    {
-		__ListContents = NS;
+		entries[index++] = __mapOfListData.get(key);
 	    }
-	    else
+	    
+	    if (ListSortMethod.ASCENDING == _sortMethod)
 	    {
-		__ListContents += "," + NS;
+		java.util.Arrays.sort(entries);
+		
+	    }
+	    else if (ListSortMethod.DESCENDING == _sortMethod)
+	    {
+		java.util.Arrays.sort(entries, Collections.reverseOrder());
+	    }
+	    for (String item : entries)
+	    {
+		if (null == strData)
+		{
+		    strData = item;
+		}
+		else
+		{
+		    strData += "," + item;
+		}
 	    }
 	    MarvinTask mt = new MarvinTask();
 	    
-	    mt.AddDataset(__ID, __Namespace, __ListContents);
+	    mt.AddDataset(__ID, __Namespace, strData);
+	    TaskManager.getTaskManager().AddDeferredTaskObject(mt);
+	}	
+    }
+    private void HandleNamespaceList(String strListItem)
+    {
+	if (!__mapOfListData.containsKey(strListItem.toUpperCase()))
+	{
+	    __mapOfListData.put(strListItem.toUpperCase(), strListItem);
+	    String strData = null;
+	    String[] entries = __mapOfListData.keySet().toArray(new String[__mapOfListData.size()]);
+	    if (ListSortMethod.DESCENDING == _sortMethod)
+	    {
+		java.util.Arrays.sort(entries);
+		
+	    }
+	    else if (ListSortMethod.ASCENDING == _sortMethod)
+	    {
+		java.util.Arrays.sort(entries, Collections.reverseOrder());
+	    }
+	    for (String item : entries)
+	    {
+		if (null == strData)
+		{
+		    strData = item;
+		}
+		else
+		{
+		    strData += "," + item;
+		}
+	    }
+	    MarvinTask mt = new MarvinTask();
+	    
+	    mt.AddDataset(__ID, __Namespace, strData);
 	    TaskManager.getTaskManager().AddDeferredTaskObject(mt);
 	}
     }
@@ -566,7 +632,11 @@ public class GenerateDatapointInfo
 		    
 		    else if (GenerateMethod.MAKE_NAMESPACE_LIST == _Method)
 		    {
-			HandleMakeNamespaceList(inputNamespace);
+			HandleNamespaceList(inputNamespace);
+		    }
+		    else if (GenerateMethod.MAKE_ID_LIST == _Method)
+		    {
+			HandleIDList(inputNamespace,inputID);
 		    }
 		    else
 		    {

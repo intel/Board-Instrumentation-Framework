@@ -50,9 +50,11 @@ import kutch.biff.marvin.task.PromptManager;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.AliasMgr;
 import kutch.biff.marvin.utility.Conditional;
+import kutch.biff.marvin.utility.DataPointGenerator;
 import kutch.biff.marvin.utility.DynamicItemInfoContainer;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.GenerateDatapointInfo;
+import kutch.biff.marvin.utility.GenerateDatapointInfo.ListSortMethod;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
 import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
@@ -967,14 +969,21 @@ public class ConfigurationReader
     {
 	if (node.hasAttribute("Namespace"))
 	{
-	     if (node.hasAttribute("ID") && !noID)
-	     {
+	    if (node.hasAttribute("ID") && !noID)
+	    {
 		return new Pair<String, String>(node.getAttribute("Namespace"), node.getAttribute("ID"));
-	     }
-	     if (noID)
-	     {
-		 return new Pair<String,String>(node.getAttribute("Namespace"),null);
-	     }
+	    }
+	    if (noID)
+	    {
+		return new Pair<String, String>(node.getAttribute("Namespace"), null);
+	    }
+	}
+	else if (noID) // is ID List
+	{
+	    if (node.hasAttribute("ID"))
+	    {
+		return new Pair<String, String>(null, node.getAttribute("ID"));
+	    }
 	}
 	return null;
     }
@@ -983,6 +992,7 @@ public class ConfigurationReader
     {
 	ArrayList<Pair<String, String>> maskList = new ArrayList<>();
 	ArrayList<Pair<String, String>> excludeList = new ArrayList<>();
+	ListSortMethod sortPolicy = ListSortMethod.ASCENDING;
 	int precision = -1;
 	boolean hasListEntry = false;
 	int listEntry = 0;
@@ -993,21 +1003,21 @@ public class ConfigurationReader
 	    return null;
 	}
 	
-	boolean IsGenerateNamespaceList= inputNode.getAttribute("Method").equalsIgnoreCase("MakeNamespaceList"); 
+	boolean IsGenerateNamespaceList = inputNode.getAttribute("Method").equalsIgnoreCase("MakeNamespaceList") || inputNode.getAttribute("Method").equalsIgnoreCase("MakeIDList");
+	String strMethod = inputNode.getAttribute("Method");
 	
-	Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode,false);
+	Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode, false);
 	if (null == genDPInfo)
 	{
 	    LOGGER.severe("Invalid GenerateDatapoint.");
 	    return null;
 	}
 	
-	
 	for (FrameworkNode node : inputNode.getChildNodes(true))
 	{
 	    if (node.getNodeName().equalsIgnoreCase("InputPattern"))
 	    {
-		Pair<String, String> input = getNamespaceAndIdPattern(node,IsGenerateNamespaceList);
+		Pair<String, String> input = getNamespaceAndIdPattern(node, IsGenerateNamespaceList);
 		if (null == input)
 		{
 		    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(),
@@ -1018,7 +1028,7 @@ public class ConfigurationReader
 	    }
 	    else if (node.getNodeName().equalsIgnoreCase("ExcludePattern"))
 	    {
-		Pair<String, String> exclude = getNamespaceAndIdPattern(node,IsGenerateNamespaceList);
+		Pair<String, String> exclude = getNamespaceAndIdPattern(node, IsGenerateNamespaceList);
 		if (null == exclude)
 		{
 		    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(),
@@ -1056,13 +1066,42 @@ public class ConfigurationReader
 	    else if (node.getNodeName().equalsIgnoreCase("Refresh"))
 	    { // handle below
 	    }
+	    else if (node.getNodeName().equalsIgnoreCase("Sort"))
+	    {
+		if (strMethod.equalsIgnoreCase("MakeList") || strMethod.equalsIgnoreCase("MakeNamespaceList") || 
+			strMethod.equalsIgnoreCase("MakeIDList") )
+		{
+		    String strSort = node.getTextContent();
+		    if (strSort.equalsIgnoreCase("Ascending"))
+		    {
+			sortPolicy = ListSortMethod.ASCENDING;
+		    }
+		    else if (strSort.equalsIgnoreCase("Descending"))
+		    {
+			sortPolicy = ListSortMethod.DESCENDING;
+		    }
+		    else if (strSort.equalsIgnoreCase("None"))
+		    {
+			sortPolicy = ListSortMethod.NONE;
+		    }
+		    else
+		    {
+			LOGGER.severe("Invalid Sort Method for Generate Datapoint: " + strSort);
+			return null;
+		    }
+		}
+		else
+		{
+			LOGGER.warning("Specified Sort Method for Generate Datapoint, however " + strMethod + " does not support sorting.  Ignoring.");
+		}
+	    }
 	    else
 	    {
 		LOGGER.severe("Unknown entry in <GenerateDatapoint>: " + node.getNodeName());
 		return null;
 	    }
 	}
-	GenerateDatapointInfo info = new GenerateDatapointInfo(genDPInfo.getKey(), genDPInfo.getValue(), maskList, 
+	GenerateDatapointInfo info = new GenerateDatapointInfo(genDPInfo.getKey(), genDPInfo.getValue(), maskList,
 		excludeList);
 	
 	if (hasListEntry)
@@ -1081,7 +1120,6 @@ public class ConfigurationReader
 	    {
 		info.setSplitToken(",");
 	    }
-	    
 	}
 	
 	if (inputNode.getAttribute("Method").equalsIgnoreCase("Add"))
@@ -1098,7 +1136,11 @@ public class ConfigurationReader
 	}
 	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeNamespaceList"))
 	{
-	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_NAMESPACE_LIST); 
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_NAMESPACE_LIST);
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeIDList"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_ID_LIST);
 	}
 	else if (inputNode.getAttribute("Method").equalsIgnoreCase("Proxy"))
 	{
@@ -1110,7 +1152,8 @@ public class ConfigurationReader
 	    }
 	    else
 	    {
-		LOGGER.warning("GenerateDatapoint [Proxy] did not have a ProxyID, you will be unable to change it with a task.");
+		LOGGER.warning(
+			"GenerateDatapoint [Proxy] did not have a ProxyID, you will be unable to change it with a task.");
 		String proxyID = Long.toString(new Random().nextLong());
 		info.setProxyID(proxyID);
 	    }
@@ -1533,54 +1576,28 @@ public class ConfigurationReader
 				{
 				    return null;
 				}
-/*				
-				if (false) // TODO - hmm, not sure about this.... why did I do this
-				{
-				    if (node.hasAttribute("File")) // can externally define widgets within
-				    {
-					WidgetBuilder.StartReadingExternalFile(node);
-					tabNode = OpenTabDefinitionFile(node.getAttribute("File"));
-					if (null == tabNode)
-					{
-					    LOGGER.severe("Invalid tab definition file: " + node.getAttribute("File"));
-					    return null;
-					}
-					
-					AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node,
-						new String[] { "ID", "File", "Align", "hgap", "vgap", "Task" });
-					
-					if (false == AliasMgr.getAliasMgr()
-						.ReadAliasFromExternalFile(node.getAttribute("File")))
-					{
-					    return null;
-					}
-					if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("File")))
-					{
-					    return null;
-					}
-				    }
-				    else
-				    {
-					Utility.ValidateAttributes(
-						new String[] { "ID", "File", "Align", "hgap", "vgap", "Task" }, node);
-					tabNode = node;
-				    }
-				    if (null == tabNode)
-				    {
-					return null;
-				    }
-				    if (false == tab.LoadConfiguration(tabNode))
-				    {
-					return null;
-				    }
-				    if (node.hasAttribute("File"))
-				    {
-					WidgetBuilder.DoneReadingExternalFile();
-				    }
-				    
-				    break;
-				}
-*/				
+				/*
+				 * if (false) // TODO - hmm, not sure about this.... why did I do this { if
+				 * (node.hasAttribute("File")) // can externally define widgets within {
+				 * WidgetBuilder.StartReadingExternalFile(node); tabNode =
+				 * OpenTabDefinitionFile(node.getAttribute("File")); if (null == tabNode) {
+				 * LOGGER.severe("Invalid tab definition file: " + node.getAttribute("File"));
+				 * return null; }
+				 * 
+				 * AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[] { "ID",
+				 * "File", "Align", "hgap", "vgap", "Task" });
+				 * 
+				 * if (false == AliasMgr.getAliasMgr()
+				 * .ReadAliasFromExternalFile(node.getAttribute("File"))) { return null; } if
+				 * (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("File"))) {
+				 * return null; } } else { Utility.ValidateAttributes( new String[] { "ID",
+				 * "File", "Align", "hgap", "vgap", "Task" }, node); tabNode = node; } if (null
+				 * == tabNode) { return null; } if (false == tab.LoadConfiguration(tabNode)) {
+				 * return null; } if (node.hasAttribute("File")) {
+				 * WidgetBuilder.DoneReadingExternalFile(); }
+				 * 
+				 * break; }
+				 */
 			    }
 			}
 			if (true == found)
@@ -2146,7 +2163,7 @@ public class ConfigurationReader
     {
 	if (menuNode.getNodeName().equalsIgnoreCase("MenuItem"))
 	{
-	    Utility.ValidateAttributes(new String[] { "Text", "Task" }, menuNode);
+	    Utility.ValidateAttributes(new String[] { "Text", "Task", "CreateDataPoint" }, menuNode);
 	    if (menuNode.hasAttribute("Text") && menuNode.hasAttribute("Task"))
 	    {
 		MenuItem objItem = new MenuItem(menuNode.getAttribute("Text"));
@@ -2163,12 +2180,27 @@ public class ConfigurationReader
 		
 		if (true == Configuration.getConfig().getAllowTasks())
 		{
+		    List<DataPointGenerator> dataPoints = new ArrayList<>();
+		    
 		    String strTask = menuNode.getAttribute("Task");
+		    if (menuNode.hasAttribute("CreateDataPoint"))
+		    {
+			dataPoints.addAll(ReadDataPointsForTask(menuNode.getAttribute("CreateDataPoint"),
+				menuNode.getAttribute("Text"), menuNode.getAttribute("Task")));
+			if (dataPoints.size() == 0)
+			{
+			    return null;
+			}
+		    }
 		    objItem.setOnAction(new EventHandler<ActionEvent>()
 		    {
 			@Override
 			public void handle(ActionEvent t)
 			{
+			    for (DataPointGenerator dpGen : dataPoints)
+			    {
+				dpGen.generate();
+			    }
 			    TASKMAN.PerformTask(strTask);
 			}
 		    });
@@ -2214,4 +2246,54 @@ public class ConfigurationReader
 	objMenu.getItems().addAll(items);
 	return objMenu;
     }
+    
+    public static List<DataPointGenerator> ReadDataPointsForTask(String strInput, String strTaskText, String strTask)
+    {
+	List<DataPointGenerator> retList = new ArrayList<>();
+	if (strInput.contains("^")) // might be replacement of ^Text or ^Task
+	{
+	    if (strInput.contains("^Text"))
+	    {
+		strInput = strInput.replace("^Text", strTaskText);
+	    }
+	    if (strInput.contains("^Task"))
+	    {
+		strInput = strInput.replace("^Task", strTask);
+	    }
+	}
+	String[] points = strInput.split("\\]");
+	for (String point : points)
+	{
+	    if (point.length() == 0)
+	    {
+		continue;
+	    }
+	    if (point.charAt(0) == ',' && point.charAt(1) == '[')
+	    {
+		point = point.substring(1);
+	    }
+	    if (point.charAt(0) == '[')
+	    {
+		point = point.substring(1);
+		String[] parts = point.split(",",3);
+		if (parts.length != 3)
+		{
+		    retList.clear();
+		    return retList;
+		}
+		String Namespace = parts[0];
+		String ID = parts[1];
+		String val = parts[2];
+		retList.add(new DataPointGenerator(Namespace,ID,val));
+	    }
+	    else
+	    {
+		    retList.clear();
+		    return retList;
+	    }
+	}
+	
+	
+	return retList;
+    }    
 }
