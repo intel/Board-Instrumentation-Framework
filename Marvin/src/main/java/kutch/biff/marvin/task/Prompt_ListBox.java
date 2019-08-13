@@ -195,12 +195,14 @@ public class Prompt_ListBox extends BasePrompt
                     {
                         strDisplayText = node.getTextContent();
                     }
+                    /* Beginning of work, but not yet done
                     List<DataPointGenerator> dataPoints = null;
                     if (node.hasAttribute("CreateDataPoint"))
                     {
                 	dataPoints = ConfigurationReader.ReadDataPointsForTask(node.getAttribute("CreateDataPoint"),node.getAttribute("Text"),node.getAttribute("Task"));
                     }
                     AddListItem(strDisplayText,node.getTextContent(),dataPoints);
+                   */
                 }        
                 else
                 {

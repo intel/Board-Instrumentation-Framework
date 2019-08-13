@@ -24,6 +24,7 @@ package kutch.biff.marvin.utility;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -42,8 +43,8 @@ import kutch.biff.marvin.task.TaskManager;
 public class GenerateDatapointInfo
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    private final ArrayList<Pair<String, String>> __includeCriterea;
-    private final ArrayList<Pair<String, String>> __excludeCriterea;
+    private final List<Pair<String, String>> __includeCriterea;
+    private final List<Pair<String, String>> __excludeCriterea;
     private final String __Namespace, __ID;
     private final Map<String, Boolean> __PreviouslyChecked;
     private final Map<String, Pair<String, Boolean>> __dirtyMap;
@@ -56,10 +57,12 @@ public class GenerateDatapointInfo
     private String __ProxyID;
     private int __csvEntry;
     private String __splitToken;
+    private String __ListContents;
+    private Map<String, String> __NamespaceMap;
     
     public enum GenerateMethod
     {
-	ADD, AVERAGE, PROXY, SPLIT_LIST, MAKE_LIST, INVALID
+	ADD, AVERAGE, PROXY, SPLIT_LIST, MAKE_LIST, MAKE_NAMESPACE_LIST, INVALID
     };
     
     public enum RefreshPolicy
@@ -70,8 +73,8 @@ public class GenerateDatapointInfo
     private GenerateMethod _Method;
     private RefreshPolicy _Policy;
     
-    public GenerateDatapointInfo(String namespace, String id, ArrayList<Pair<String, String>> includeList,
-	    ArrayList<Pair<String, String>> excludeList)
+    public GenerateDatapointInfo(String namespace, String id, List<Pair<String, String>> includeList,
+	    List<Pair<String, String>> excludeList)
     {
 	_Method = GenerateMethod.INVALID;
 	_Policy = RefreshPolicy.INVALD;
@@ -89,6 +92,8 @@ public class GenerateDatapointInfo
 	__ProxyID = null;
 	__csvEntry = -1;
 	__splitToken = null;
+	__ListContents = null;
+	__NamespaceMap = new HashMap<>();
     }
     
     public int getListEntry()
@@ -212,11 +217,15 @@ public class GenerateDatapointInfo
 	}
     }
     
-    private boolean Matches(String checkNamespace, String checkID, ArrayList<Pair<String, String>> criterea)
+    private boolean Matches(String checkNamespace, String checkID, List<Pair<String, String>> criterea)
     {
-	for (Pair<String, String> matchPattern : criterea)
+	// for (Pair<String, String> matchPattern : criterea)
+	for (int index = 0; index < criterea.size(); index++)
 	{
-	    if (Glob.check(matchPattern.getKey(), checkNamespace) && Glob.check(matchPattern.getValue(), checkID))
+	    Pair<String, String> matchPattern = criterea.get(index);
+	    // ID is null when only checking NS
+	    if (Glob.check(matchPattern.getKey(), checkNamespace)
+		    && (null == matchPattern.getValue() || Glob.check(matchPattern.getValue(), checkID)))
 	    {
 		return true;
 	    }
@@ -323,6 +332,26 @@ public class GenerateDatapointInfo
     {
 	String parts[] = strInpValue.split(__splitToken);
 	
+    }
+    
+    private void HandleMakeNamespaceList(String NS)
+    {
+	if (!__NamespaceMap.containsKey(NS.toUpperCase()))
+	{
+	    __NamespaceMap.put(NS.toUpperCase(), NS);
+	    if (null == __ListContents)
+	    {
+		__ListContents = NS;
+	    }
+	    else
+	    {
+		__ListContents += "," + NS;
+	    }
+	    MarvinTask mt = new MarvinTask();
+	    
+	    mt.AddDataset(__ID, __Namespace, __ListContents);
+	    TaskManager.getTaskManager().AddDeferredTaskObject(mt);
+	}
     }
     
     private void HandleSplitList(String NS, String ID, String strInpValue)
@@ -437,10 +466,10 @@ public class GenerateDatapointInfo
 		    {
 			precision = 0;
 		    }
-			
+		    
 		    else
 		    {
-			precision= strValue.length() - integerPlaces - 1;
+			precision = strValue.length() - integerPlaces - 1;
 		    }
 		    if (precision > sourcePrecision)
 		    {
@@ -461,7 +490,7 @@ public class GenerateDatapointInfo
 	    }
 	    else
 	    {
-		LOGGER.severe("Unknown GenerateDataPoint method: "+ _Method);
+		LOGGER.severe("Unknown GenerateDataPoint method: " + _Method);
 		return;
 	    }
 	    Total *= __Scale;
@@ -493,7 +522,7 @@ public class GenerateDatapointInfo
 	String newID = Utility.combineWildcards(__ID, ID);
 	String newNS = Utility.combineWildcards(__Namespace, NS);
 	mt.AddDataset(newID, newNS, df.format(Total));
-
+	
 //	mt.AddDataset(__ID, __Namespace, df.format(Total));
 	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
 	__lastUpdate = System.currentTimeMillis();
@@ -533,6 +562,11 @@ public class GenerateDatapointInfo
 		    else if (GenerateMethod.MAKE_LIST == _Method)
 		    {
 			HandleMakeList(inputNamespace, inputID, newVal.toString());
+		    }
+		    
+		    else if (GenerateMethod.MAKE_NAMESPACE_LIST == _Method)
+		    {
+			HandleMakeNamespaceList(inputNamespace);
 		    }
 		    else
 		    {
