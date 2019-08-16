@@ -23,6 +23,7 @@ package kutch.biff.marvin.widget.widgetbuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -37,6 +38,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javafx.util.Pair;
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.AliasMgr;
@@ -330,7 +332,7 @@ public class WidgetBuilder
                 {
                     Utility.ValidateAttributes(new String[]
                     {
-                        "Namespace", "ID","Scale",
+                        "Namespace", "ID","Scale", "DataIndex","Separator"
                     }, node);
                     if (node.hasAttribute("Scale"))
                     {
@@ -341,6 +343,13 @@ public class WidgetBuilder
                             return null;
                         }
                         retWidget.setValueScale(scaleVal);
+                    }
+                    Pair<ValueRange,Character> indexInfo = WidgetBuilder.ReadMinionSrcIndexInfo(node);
+                    
+                    if (indexInfo.getKey().getMinimum() > -1)
+                    {
+                	retWidget.set__dataIndex(indexInfo.getKey());
+                	retWidget.set__dataIndexToken(indexInfo.getValue());
                     }
                     
                     if (node.hasAttribute("ID"))
@@ -406,6 +415,61 @@ public class WidgetBuilder
             }
         }
         return null;
+    }
+    
+    public static Pair<ValueRange,Character> ReadMinionSrcIndexInfo(FrameworkNode node)
+    {
+	char cRet='.';
+	int iStart=-1,iEnd=-1;
+	
+        if (node.hasAttribute("DataIndex"))
+        {
+            	String strIndex = node.getAttribute("DataIndex");
+            	if (strIndex.contains("-"))
+            	{
+            	    String []parts = strIndex.split("-");
+            	    if (parts.length !=2)
+            	    {
+            		LOGGER.severe("Invalid DataIndex range specified for MinionSrc: " + strIndex);
+            	    }
+            	    try
+            	    {
+            		int val1 = Integer.parseInt(parts[0]);
+            		iEnd = Integer.parseInt(parts[1]);
+            		iStart = val1;
+            	    }
+                    catch (NumberFormatException ex1)
+                    {
+                	LOGGER.severe("Invalid DataIndex range specified for MinionSrc: " + strIndex);
+                    }
+            	    
+            	}
+            	else
+            	{
+                	iStart = node.getIntegerAttribute("DataIndex", -1);
+                	iEnd = iStart;
+            	}
+
+        }
+        if (node.hasAttribute("Separator"))
+        {
+        	if (!node.hasAttribute("DataIndex"))
+        	{
+        	    LOGGER.severe("Specified Separator for MinionSrc, but no DataIndex");
+        	    iStart = -1;
+        	    iEnd = iStart;        	    
+        	}
+        	String strVal = node.getAttribute("DataIndex");
+        	if (strVal.length() !=1)
+        	{
+        	    LOGGER.severe("Specified invalid Separator for MinionSrc: " + strVal);
+        	    iStart = -1;
+        	    iEnd = iStart;
+        	}
+        }
+	ValueRange retRange = ValueRange.of(iStart,iEnd);
+
+        return new Pair<ValueRange,Character>(retRange,cRet);
     }
 
     public static boolean HandlePeekaboo(BaseWidget widget, FrameworkNode widgetNode)

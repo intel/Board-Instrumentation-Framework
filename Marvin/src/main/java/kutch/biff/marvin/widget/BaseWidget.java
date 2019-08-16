@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -130,6 +131,9 @@ abstract public class BaseWidget implements Widget
     
     protected static CircularList<String> DebugStyles = null;
     
+    private ValueRange 	__dataIndexRange;
+    private char 	__dataIndexToken;
+    
     public BaseWidget()
     {
 	_WidgetParentPane = null;
@@ -180,6 +184,9 @@ abstract public class BaseWidget implements Widget
 	_SteppedMaxRangeIndex = 0;
 	_SteppedMinRangeIndex = 0;
 	
+	__dataIndexRange = ValueRange.of(-1, -1);
+	__dataIndexToken = '.';	
+	
 	if (CONFIG.isDebugMode())
 	{
 	    AddAdditionalStyleOverride(AliasMgr.getAliasMgr().GetAlias("DEBUG_STYLE"));
@@ -194,6 +201,26 @@ abstract public class BaseWidget implements Widget
 	}
     }
     
+    public ValueRange get__dataIndex()
+    {
+        return __dataIndexRange;
+    }
+
+    public void set__dataIndex(ValueRange __dataIndex)
+    {
+        this.__dataIndexRange = __dataIndex;
+    }
+
+    public char get__dataIndexToken()
+    {
+        return __dataIndexToken;
+    }
+
+    public void set__dataIndexToken(char __dataIndexToken)
+    {
+        this.__dataIndexToken = __dataIndexToken;
+    }
+
     public void initialSteppedRangeSetup(double min, double max)
     {
 	if (!SupportsSteppedRanges())
