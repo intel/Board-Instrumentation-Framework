@@ -19,6 +19,12 @@
  * #
  * ##############################################################################
  */
+
+/**
+ *
+ * @author Patrick.Kutch@gmail.com
+ */
+
 package kutch.biff.marvin.utility;
 
 import java.text.DecimalFormat;
@@ -33,7 +39,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
-import kutch.biff.marvin.datamanager.MarvinChangeListener;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.MarvinTask;
 import kutch.biff.marvin.task.TaskManager;

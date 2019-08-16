@@ -72,7 +72,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author Patrick Kutch
+ * @author Patrick.Kutch@gmail.com
  */
 public class ConfigurationReader
 {
