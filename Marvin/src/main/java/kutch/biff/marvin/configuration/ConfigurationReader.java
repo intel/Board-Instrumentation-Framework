@@ -75,7 +75,6 @@ import org.xml.sax.SAXException;
  */
 public class ConfigurationReader
 {
-    
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private Configuration _Configuration = null;
     private final TaskManager TASKMAN = TaskManager.getTaskManager();

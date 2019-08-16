@@ -320,9 +320,9 @@ public class GenerateDatapointInfo
 		else
 		{
 		    precision = 0;
-		}
-		
+		}		
 	    }
+	    
 	    DecimalFormat df = new DecimalFormat();
 	    df.setGroupingUsed(false);
 	    df.setMaximumFractionDigits(precision);
@@ -342,7 +342,44 @@ public class GenerateDatapointInfo
     
     private void HandleMakeList(String NS, String ID, String strInpValue)
     {
-	String[] parts = strInpValue.split(",");
+	String Key = NS + ID;
+	Key = Key.toUpperCase();
+	if (!__mapOfListData.containsKey(Key))
+	{
+	    __mapOfListData.put(Key,strInpValue);
+	    String strData = null;
+	    String[] entries = new String[__mapOfListData.size()];
+	    int index = 0;
+	    for (String key : __mapOfListData.keySet())
+	    {
+		entries[index++] = __mapOfListData.get(key);
+	    }
+	    
+	    if (ListSortMethod.ASCENDING == _sortMethod)
+	    {
+		java.util.Arrays.sort(entries);
+		
+	    }
+	    else if (ListSortMethod.DESCENDING == _sortMethod)
+	    {
+		java.util.Arrays.sort(entries, Collections.reverseOrder());
+	    }
+	    for (String item : entries)
+	    {
+		if (null == strData)
+		{
+		    strData = item;
+		}
+		else
+		{
+		    strData += "," + item;
+		}
+	    }
+	    MarvinTask mt = new MarvinTask();
+	    
+	    mt.AddDataset(__ID, __Namespace, strData);
+	    TaskManager.getTaskManager().AddDeferredTaskObject(mt);
+	}	
     }
 
     private void HandleIDList(String NS, String ID)

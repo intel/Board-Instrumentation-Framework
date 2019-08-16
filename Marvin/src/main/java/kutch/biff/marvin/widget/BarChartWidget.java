@@ -40,11 +40,13 @@ import kutch.biff.marvin.utility.FrameworkNode;
 public class BarChartWidget extends LineChartWidget
 {
     private final CategoryAxis _xAxis;
+    private XYChart.Series<String, Number> _objSeries;
 
     public BarChartWidget(boolean Horizontal)
     {
         _xAxis = new CategoryAxis();
         _HorizontalChart = Horizontal;
+        _objSeries = new XYChart.Series<>();
     }
 
     @Override
@@ -80,17 +82,42 @@ public class BarChartWidget extends LineChartWidget
         }
         SetupSeriesSets(dataMgr);
     }
+    
+    protected void setupAxis()
+    {
+	_objSeries.getData().clear();	
+
+
+        for (int iLoop = 0; iLoop < getxAxisMaxCount(); iLoop++)
+        {
+	    XYChart.Data objData = new XYChart.Data<>(Integer.toString(iLoop), 0);
+	    _objSeries.getData().add(objData);
+        }
+    }
+    
+    protected void resizeAxis(int newSize)
+    {
+	int currSize = _objSeries.getData().size();
+	if (currSize < newSize)
+	{
+	    while (currSize < newSize)
+	    {
+		XYChart.Data objData = new XYChart.Data<>(Integer.toString(currSize), 0);
+		_objSeries.getData().add(objData);
+		currSize++;
+	    }
+	}
+	else while (currSize > newSize)
+	{
+	    _objSeries.getData().remove(--currSize);
+	}
+    }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private void setupListenersForSingleSource(DataManager dataMgr)
     {
-        XYChart.Series<String, Number> objSeries = new XYChart.Series<>();
-        for (int iLoop = 0; iLoop < getxAxisMaxCount(); iLoop++)
-        {
-	    XYChart.Data objData = new XYChart.Data<>(Integer.toString(iLoop), 0);
-            objSeries.getData().add(objData);
-        }
-        ((BarChart) getChart()).getData().add(objSeries);
+	setupAxis();
+        ((BarChart) getChart()).getData().add(_objSeries);	
         dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
         {
             @Override
@@ -104,10 +131,14 @@ public class BarChartWidget extends LineChartWidget
                 String[] strList = newVal.toString().split(",");
                 if (strList.length != getxAxisMaxCount())
                 {
-                    LOGGER.severe("Received " + Integer.toString(strList.length) + " items for a Bar Chart , however Widget only defined for " + Integer.toString(getxAxisMaxCount()));
-                    return;
+                    LOGGER.info("Received " + Integer.toString(strList.length) + " items for a Bar Chart, so changing chart.");
+                    setxAxisMaxCount(strList.length);
+                    //setupAxis();
+                    resizeAxis(getxAxisMaxCount());
                 }
+                
                 int index = 0;
+                
                 for (String strValue : strList)
                 {
                     double newValue;
@@ -123,7 +154,7 @@ public class BarChartWidget extends LineChartWidget
                         return;
                     }
 
-                    XYChart.Data objData = objSeries.getData().get(index++);
+                    XYChart.Data objData = _objSeries.getData().get(index++);
                     objData.setYValue(newValue);
                 }
             }

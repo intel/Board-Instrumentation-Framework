@@ -54,7 +54,7 @@ abstract public class BaseChartWidget extends BaseWidget
     protected Axis _yAxis;
     protected String xAxisLabel, yAxisLabel;
     protected double xAxisMaxCount, yAxisMaxCount;
-    protected double yAxisMaxValue, yAxisMinValue;
+    protected double yAxisMaxValue, yAxisMinValue, yAxisMaxValue_Initial, yAxisMinValue_Initial;
     private boolean _Animated;
     protected int xAxisMinorTick, yAxisMinorTick;
     protected double xAxisMajorTick, yAxisMajorTick;
@@ -155,6 +155,8 @@ abstract public class BaseChartWidget extends BaseWidget
         _xAxis.setLabel(xAxisLabel);
         _yAxis.setLabel(yAxisLabel);
         _chart.setAnimated(_Animated);
+        yAxisMaxValue_Initial = yAxisMaxValue;
+        yAxisMinValue_Initial = yAxisMinValue;
         initialSteppedRangeSetup(yAxisMinValue, yAxisMaxValue);
     }
 
@@ -809,4 +811,15 @@ abstract public class BaseChartWidget extends BaseWidget
         return true;
     }
 
+    
+    public void resetState()
+    {
+        yAxisMaxValue = yAxisMaxValue_Initial;
+        yAxisMinValue = yAxisMinValue_Initial;
+        resetSteppedRange();
+        setyAxisMaxValue(yAxisMaxValue_Initial);
+        //setyAxisMinValue(yAxisMinValue_Initial);
+        initialSteppedRangeSetup(yAxisMinValue, yAxisMaxValue);
+        UpdateValueRange();
+    }
 }
