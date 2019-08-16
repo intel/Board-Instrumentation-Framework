@@ -22,8 +22,7 @@
 package kutch.biff.marvin.utility;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.time.temporal.ValueRange;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +33,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
+import kutch.biff.marvin.datamanager.MarvinChangeListener;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.MarvinTask;
 import kutch.biff.marvin.task.TaskManager;
+import kutch.biff.marvin.widget.BaseWidget;
 
 /**
  *
@@ -79,9 +80,14 @@ public class GenerateDatapointInfo
     
     private GenerateMethod _Method;
     private RefreshPolicy _Policy;
+    private ValueRange 	__dataIndexRange;
+    private String 	__dataIndexToken;
+    private boolean 	__ProcessRanges;
+
+    
     
     public GenerateDatapointInfo(String namespace, String id, List<Pair<String, String>> includeList,
-	    List<Pair<String, String>> excludeList)
+	    List<Pair<String, String>> excludeList,ValueRange valRange, String tokenCharForValue)
     {
 	_Method = GenerateMethod.INVALID;
 	_Policy = RefreshPolicy.INVALD;
@@ -101,6 +107,21 @@ public class GenerateDatapointInfo
 	__csvEntry = -1;
 	__splitToken = null;
 	__mapOfListData = new HashMap<>();
+	__dataIndexRange = valRange;
+	__dataIndexToken = tokenCharForValue;
+	if (__dataIndexRange.getMinimum() > -1)
+	{
+	    __ProcessRanges = true;
+	}
+	else
+	{
+	    __ProcessRanges = false;	    
+	}
+	if (__ID.equalsIgnoreCase("PMU_IDList"))
+	{
+	    id = __ID.toUpperCase();
+	}
+	
     }
     
     public int getListEntry()
@@ -196,6 +217,10 @@ public class GenerateDatapointInfo
 	{
 	    return false;
 	}
+	if (__ID.equalsIgnoreCase("PMU_IDList"))
+	{
+	    id = checkID.toUpperCase();
+	}
 	if (Matches(namespace, id, __includeCriterea) && !Matches(namespace, id, __excludeCriterea))
 	{
 	    __PreviouslyChecked.put(namespace + id, true);
@@ -272,7 +297,7 @@ public class GenerateDatapointInfo
 		ChangeListener<?> objListener = _listenerMap.get(key);
 		_listenerMap.remove(key);
 		LOGGER.info("Removing Stale GenerateDataPoing Input: " + key);
-		// very inefficeint - this should be re-woredk.
+		// very inefficient - this should be re-woredk.
 		DataManager.getDataManager().RemoveListener(objListener);
 		__PreviouslyChecked.remove(key); // in case it comes back
 	    }
@@ -388,6 +413,14 @@ public class GenerateDatapointInfo
 	Key = Key.toUpperCase();
 	if (!__mapOfListData.containsKey(Key))
 	{
+	    if (__ProcessRanges)
+	    {
+		ID = BaseWidget.ProcessIndexDataRequest(__dataIndexRange, __dataIndexToken, ID);
+		if (null == ID)
+		{
+		    return;
+		}
+	    }
 	    __mapOfListData.put(Key,ID);
 	    String strData = null;
 	    String[] entries = new String[__mapOfListData.size()];
@@ -636,9 +669,11 @@ public class GenerateDatapointInfo
 	// LOGGER.info(String.format("Adding Input of %s:%s to Build Data point
 	// %s:%s",inputNamespace,inputID,__Namespace,__ID));
 	ChangeListener<Object> objListener = new ChangeListener<Object>()
+	//MarvinChangeListener objListener = new MarvinChangeListener(__dataIndexRange,__dataIndexToken)
 	{
 	    @Override
 	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
+	    //public void onChanged(String newVal)
 	    {
 		if (__csvEntry > -1)
 		{

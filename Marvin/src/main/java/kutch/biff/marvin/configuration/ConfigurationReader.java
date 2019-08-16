@@ -23,6 +23,7 @@ package kutch.biff.marvin.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -968,7 +969,7 @@ public class ConfigurationReader
     {
 	if (node.hasAttribute("Namespace"))
 	{
-	    if (node.hasAttribute("ID") && !noID)
+	    if (node.hasAttribute("ID") || !noID)
 	    {
 		return new Pair<String, String>(node.getAttribute("Namespace"), node.getAttribute("ID"));
 	    }
@@ -1006,6 +1007,7 @@ public class ConfigurationReader
 	String strMethod = inputNode.getAttribute("Method");
 	
 	Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode, false);
+	Pair<ValueRange,String> rangeInfo = WidgetBuilder.ReadMinionSrcIndexInfo(inputNode);
 	if (null == genDPInfo)
 	{
 	    LOGGER.severe("Invalid GenerateDatapoint.");
@@ -1101,7 +1103,7 @@ public class ConfigurationReader
 	    }
 	}
 	GenerateDatapointInfo info = new GenerateDatapointInfo(genDPInfo.getKey(), genDPInfo.getValue(), maskList,
-		excludeList);
+		excludeList,rangeInfo.getKey(),rangeInfo.getValue());
 	
 	if (hasListEntry)
 	{

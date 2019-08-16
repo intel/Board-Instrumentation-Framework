@@ -21,14 +21,18 @@
  */
 package kutch.biff.marvin.utility;
 
+import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.TaskManager;
+import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 
 /**
  *
@@ -63,6 +67,8 @@ public class Conditional
     private String _Else_Task;
     private boolean _CaseSensitive;
     protected boolean _UsesThen;
+    private ValueRange 	__dataIndexRange;
+    private String 	__dataIndexToken;
     
     /*
      * public Conditional(Conditional.Type type) { _type = type; _Value1_ID = null;
@@ -80,6 +86,9 @@ public class Conditional
 	_If_Task = null;
 	_Else_Task = null;
 	_UsesThen = usesThen;
+	__dataIndexRange = ValueRange.of(-1, -1);
+	__dataIndexToken = ",";	
+	
     }
     
     protected String getThenTask()
@@ -415,6 +424,7 @@ public class Conditional
     protected boolean ReadMinionSrc(FrameworkNode condNode)
     {
 	String ID = null, Namespace = null;
+
 	
 	for (FrameworkNode node : condNode.getChildNodes())
 	{
@@ -442,6 +452,9 @@ public class Conditional
 		    LOGGER.severe("Conditional defined with invalid MinionSrc, no Namespace");
 		    return false;
 		}
+		Pair<ValueRange,String> indexInfo = WidgetBuilder.ReadMinionSrcIndexInfo(node);
+		__dataIndexRange = indexInfo.getKey();
+		__dataIndexToken = indexInfo.getValue();
 	    }
 	}
 	SetNamespaceAndID(Namespace, ID);

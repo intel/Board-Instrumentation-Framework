@@ -344,7 +344,7 @@ public class WidgetBuilder
                         }
                         retWidget.setValueScale(scaleVal);
                     }
-                    Pair<ValueRange,Character> indexInfo = WidgetBuilder.ReadMinionSrcIndexInfo(node);
+                    Pair<ValueRange,String> indexInfo = WidgetBuilder.ReadMinionSrcIndexInfo(node);
                     
                     if (indexInfo.getKey().getMinimum() > -1)
                     {
@@ -417,9 +417,9 @@ public class WidgetBuilder
         return null;
     }
     
-    public static Pair<ValueRange,Character> ReadMinionSrcIndexInfo(FrameworkNode node)
+    public static Pair<ValueRange,String> ReadMinionSrcIndexInfo(FrameworkNode node)
     {
-	char cRet='.';
+	String cRet=",";
 	int iStart=-1,iEnd=-1;
 	
         if (node.hasAttribute("DataIndex"))
@@ -459,17 +459,26 @@ public class WidgetBuilder
         	    iStart = -1;
         	    iEnd = iStart;        	    
         	}
-        	String strVal = node.getAttribute("DataIndex");
+        	String strVal = node.getAttribute("Separator");
         	if (strVal.length() !=1)
         	{
         	    LOGGER.severe("Specified invalid Separator for MinionSrc: " + strVal);
         	    iStart = -1;
         	    iEnd = iStart;
         	}
+        	else
+        	{
+        	    if (strVal.equalsIgnoreCase("."))
+        	    {
+        		strVal="\\.";
+        	    }
+        	    cRet = strVal;
+        	}
+        	
         }
 	ValueRange retRange = ValueRange.of(iStart,iEnd);
 
-        return new Pair<ValueRange,Character>(retRange,cRet);
+        return new Pair<ValueRange,String>(retRange,cRet);
     }
 
     public static boolean HandlePeekaboo(BaseWidget widget, FrameworkNode widgetNode)

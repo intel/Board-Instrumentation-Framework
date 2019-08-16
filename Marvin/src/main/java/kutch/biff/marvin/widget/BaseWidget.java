@@ -131,8 +131,8 @@ abstract public class BaseWidget implements Widget
     
     protected static CircularList<String> DebugStyles = null;
     
-    private ValueRange 	__dataIndexRange;
-    private char 	__dataIndexToken;
+    private ValueRange __dataIndexRange;
+    private String __dataIndexToken;
     
     public BaseWidget()
     {
@@ -185,7 +185,7 @@ abstract public class BaseWidget implements Widget
 	_SteppedMinRangeIndex = 0;
 	
 	__dataIndexRange = ValueRange.of(-1, -1);
-	__dataIndexToken = '.';	
+	__dataIndexToken = ",";
 	
 	if (CONFIG.isDebugMode())
 	{
@@ -203,24 +203,24 @@ abstract public class BaseWidget implements Widget
     
     public ValueRange get__dataIndex()
     {
-        return __dataIndexRange;
+	return __dataIndexRange;
     }
-
+    
     public void set__dataIndex(ValueRange __dataIndex)
     {
-        this.__dataIndexRange = __dataIndex;
+	this.__dataIndexRange = __dataIndex;
     }
-
-    public char get__dataIndexToken()
+    
+    public String get__dataIndexToken()
     {
-        return __dataIndexToken;
+	return __dataIndexToken;
     }
-
-    public void set__dataIndexToken(char __dataIndexToken)
+    
+    public void set__dataIndexToken(String __dataIndexToken)
     {
-        this.__dataIndexToken = __dataIndexToken;
+	this.__dataIndexToken = __dataIndexToken;
     }
-
+    
     public void initialSteppedRangeSetup(double min, double max)
     {
 	if (!SupportsSteppedRanges())
@@ -2159,4 +2159,36 @@ abstract public class BaseWidget implements Widget
 	LOGGER.warning(
 		"Tried to perform resetState for widget [" + this.getName() + "] that does not support this feature");
     }
+    
+    public static String ProcessIndexDataRequest(ValueRange valueRange, String splitToken, String strValue)
+    {
+	String[] parts = strValue.split(splitToken);
+	if (parts.length == 1)
+	{
+	    return null;	// wasn't split
+	}
+	if (valueRange.getMinimum() < parts.length && valueRange.getMaximum() < parts.length)
+	{
+	    String retStr = null;
+	    
+	    for (long index = valueRange.getMinimum(); index <= valueRange.getMaximum(); index++)
+	    {
+		if (null == retStr)
+		{
+		    retStr = parts[(int) index];
+		}
+		else
+		{
+		    retStr += "," + parts[(int) index];
+		}
+	    }
+	    return retStr;
+	}
+	else
+	{
+	    LOGGER.warning("DataIndex looking for index that is not in data: " + strValue);
+	}
+	return null;
+    }
+    
 }

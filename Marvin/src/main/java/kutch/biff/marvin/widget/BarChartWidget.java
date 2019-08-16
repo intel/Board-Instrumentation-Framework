@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2016 Intel Corporation
+ * #  Copyright (c) 2019 Intel Corporation
  * # 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@
  */
 package kutch.biff.marvin.widget;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -31,6 +29,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.datamanager.DataManager;
+import kutch.biff.marvin.datamanager.MarvinChangeListener;
 import kutch.biff.marvin.utility.FrameworkNode;
 
 /**
@@ -118,17 +117,17 @@ public class BarChartWidget extends LineChartWidget
     {
 	setupAxis();
         ((BarChart) getChart()).getData().add(_objSeries);	
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
+        dataMgr.AddListener(getMinionID(), getNamespace(), new MarvinChangeListener(get__dataIndex(),get__dataIndexToken())
         {
             @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
+            public void onChanged(String newVal)
             {
                 if (IsPaused())
                 {
                     return;
                 }
 
-                String[] strList = newVal.toString().split(",");
+                String[] strList = newVal.split(",");
                 if (strList.length != getxAxisMaxCount())
                 {
                     LOGGER.info("Received " + Integer.toString(strList.length) + " items for a Bar Chart, so changing chart.");

@@ -144,7 +144,6 @@ public class MenuButtonWidget extends ButtonWidget
 	    }
 	    catch(Exception ex)
 	    {
-		LOGGER.severe("one");
 		LOGGER.severe(ex.toString());
 	    }
 	    if (null != objItem)
@@ -155,12 +154,10 @@ public class MenuButtonWidget extends ButtonWidget
 		}
 		catch(Exception ex)
 		{
-			LOGGER.severe("two");
 		    LOGGER.severe(ex.toString());
 		}
 	    }
 	}
 	ApplyCSS();
     }
-    
 }
