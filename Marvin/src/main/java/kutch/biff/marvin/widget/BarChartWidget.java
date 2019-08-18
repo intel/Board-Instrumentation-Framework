@@ -27,6 +27,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.Chart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.datamanager.MarvinChangeListener;
@@ -89,7 +90,7 @@ public class BarChartWidget extends LineChartWidget
 
         for (int iLoop = 0; iLoop < getxAxisMaxCount(); iLoop++)
         {
-	    XYChart.Data objData = new XYChart.Data<>(Integer.toString(iLoop), 0);
+	    Data<String, Number> objData = new XYChart.Data<>(Integer.toString(iLoop), 0);
 	    _objSeries.getData().add(objData);
         }
     }
@@ -101,7 +102,7 @@ public class BarChartWidget extends LineChartWidget
 	{
 	    while (currSize < newSize)
 	    {
-		XYChart.Data objData = new XYChart.Data<>(Integer.toString(currSize), 0);
+		Data<String, Number> objData = new XYChart.Data<>(Integer.toString(currSize), 0);
 		_objSeries.getData().add(objData);
 		currSize++;
 	    }

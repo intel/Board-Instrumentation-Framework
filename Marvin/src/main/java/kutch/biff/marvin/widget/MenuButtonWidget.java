@@ -22,6 +22,7 @@
 package kutch.biff.marvin.widget;
 
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuButton;
@@ -49,6 +50,7 @@ public class MenuButtonWidget extends ButtonWidget
 {
     private MenuButton _Button;
     private FrameworkNode __CommonTaskNode;
+    private boolean __UpdateTitleFromSelection;
     
     public MenuButtonWidget()
     {
@@ -56,9 +58,9 @@ public class MenuButtonWidget extends ButtonWidget
 	// to get around styling bug in Java 8
 	_Button.getStyleClass().add("kutch");
 	__CommonTaskNode = null;
+	__UpdateTitleFromSelection = false;
     }
     
-
     public void setCommonTaskNode(FrameworkNode commonTask)
     {
 	__CommonTaskNode = commonTask;
@@ -69,8 +71,6 @@ public class MenuButtonWidget extends ButtonWidget
     {
 	return _Button;
     }
-    
-    
     
     @Override
     public EventHandler<MouseEvent> SetupTaskAction()
@@ -95,11 +95,28 @@ public class MenuButtonWidget extends ButtonWidget
 	    if (null != objItem)
 	    {
 		_Button.getItems().add(objItem);
+		setupChangeTitleListener(objItem);
 		return true;
 	    }
 	}
 	
 	return false;
+    }
+    
+    private void setupChangeTitleListener(MenuItem objItem)
+    {
+	if (__UpdateTitleFromSelection)
+	{
+	    EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>()
+	    {
+		@Override
+		public void handle(ActionEvent event)
+		{
+		    _Button.setText(objItem.getText());
+		}
+	    };
+	    objItem.addEventHandler(ActionEvent.ACTION, eventHandler);
+	}
     }
     
     @Override
@@ -119,6 +136,11 @@ public class MenuButtonWidget extends ButtonWidget
 		return false;
 	    }
 	}
+	if (widgetNode.hasChild("Title") && widgetNode.getChild("Title").hasAttribute("UpdateTitleFromSelection"))
+	{
+	    __UpdateTitleFromSelection= widgetNode.getChild("Title").getBooleanAttribute("UpdateTitleFromSelection");
+	}
+	
 	return true;
     }
     
@@ -141,6 +163,7 @@ public class MenuButtonWidget extends ButtonWidget
 	    try
 	    {
 		objItem = rdr.ReadMenuItem(menuNode);
+		setupChangeTitleListener(objItem);
 	    }
 	    catch(Exception ex)
 	    {

@@ -33,6 +33,7 @@ public class UpdateProxyTask extends BaseTask
     private String _ProxyID;
     private String _NewNamespaceCriterea = null;
     private String _NewIDCriterea = null;
+    private String _newListEntry=null;
     
     
     public UpdateProxyTask(String proxyID)
@@ -51,10 +52,14 @@ public class UpdateProxyTask extends BaseTask
 	_NewIDCriterea = newID;
     }
 
+    public void setListEntry(String newEntry)
+    {
+	_newListEntry = newEntry;
+    }
 
     @Override
     public void PerformTask()
     {
-	DataManager.getDataManager().UpdateGenerateDatapointProxy(getDataValue(_ProxyID), getDataValue(_NewNamespaceCriterea), getDataValue(_NewIDCriterea));
+	DataManager.getDataManager().UpdateGenerateDatapointProxy(getDataValue(_ProxyID), getDataValue(_NewNamespaceCriterea), getDataValue(_NewIDCriterea),getDataValue(_newListEntry));
     }
 }

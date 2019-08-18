@@ -53,7 +53,7 @@ public class DataManager
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     
     private ConcurrentHashMap<String, DataSet> _DataMap;
-    private Map<String, GenerateDatapointInfo> _ProxyIDMap;
+    private Map<String, List<GenerateDatapointInfo>> _ProxyIDMap;
     private ConcurrentHashMap<String, List<WildcardListItem>> _WildcardDataMap;
     private final Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> _OnDemandQueue; // a queue solves some of
 											       // my concurency issues
@@ -81,22 +81,27 @@ public class DataManager
     
     public boolean AddGenerateDatapointInfo(GenerateDatapointInfo genInfo)
     {
-	if (genInfo.getProxyID() != null)
+	String key;
+	if (null == genInfo.getProxyID())
 	{
-	    if (_ProxyIDMap.containsKey(genInfo.getProxyID().toUpperCase()))
-	    {
-		LOGGER.severe(
-			"GenerateDataPoint: Proxy must have unique proxyID.  Duplicate ID:" + genInfo.getProxyID());
-		return false;
-	    }
-	    
-	    _ProxyIDMap.put(genInfo.getProxyID().toUpperCase(), genInfo);
+	    key = this.toString();
 	}
+	else
+	{
+	    key = genInfo.getProxyID().toUpperCase();
+	    
+	}
+	if (!_ProxyIDMap.containsKey(key))
+	{
+	    _ProxyIDMap.put(key, new ArrayList<GenerateDatapointInfo>());
+	}
+	
+	_ProxyIDMap.get(key).add(genInfo); // add to list
 	__GenerateDatapointList.add(genInfo);
 	return true;
     }
     
-    public void UpdateGenerateDatapointProxy(String proxyID, String newNamespaceCriteria, String newIDCriterea)
+    public void UpdateGenerateDatapointProxy(String proxyID, String newNamespaceCriteria, String newIDCriterea, String newListEntry)
     {
 	if (!_ProxyIDMap.containsKey(proxyID.toUpperCase()))
 	{
@@ -105,10 +110,10 @@ public class DataManager
 	}
 	
 	LOGGER.info("Updating proxy [" + proxyID + "] to [" + newNamespaceCriteria + ":" + newIDCriterea + "]");
-	GenerateDatapointInfo genInfo = _ProxyIDMap.get(proxyID.toUpperCase());
-	
-	genInfo.ProxyReset(newNamespaceCriteria, newIDCriterea);
-	genInfo = _ProxyIDMap.get(proxyID.toUpperCase());
+	for (GenerateDatapointInfo genInfo : _ProxyIDMap.get(proxyID.toUpperCase()))
+	{
+	    genInfo.ProxyReset(newNamespaceCriteria, newIDCriterea,newListEntry);
+	}
     }
     
     public Queue<GenerateDatapointInfo> getGenerateDatapointList()
@@ -173,10 +178,10 @@ public class DataManager
 	
 	if (_DataMap.containsKey(Key))
 	{
-		synchronized (this)
-		{
-		    _DataMap.get(Key).removeListener(listener);
-		}
+	    synchronized (this)
+	    {
+		_DataMap.get(Key).removeListener(listener);
+	    }
 	}
     }
     

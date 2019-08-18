@@ -1172,6 +1172,14 @@ public class ConfigurationReader
 		info.setSplitToken(",");
 	    }
 	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("GetListSize"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.GET_LIST_SIZE);
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeIndexList"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_INDEX_LIST);
+	}
 	
 	else
 	{

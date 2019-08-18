@@ -1714,7 +1714,7 @@ public class TaskManager
 	{
 	    if (node.getNodeName().equalsIgnoreCase("Proxy"))
 	    {
-		Utility.ValidateAttributes(new String[] { "Namespace", "ID", "ProxyID" }, node);
+		Utility.ValidateAttributes(new String[] { "Namespace", "ID", "ProxyID","ListEntry" }, node);
 		if (!node.hasAttribute("ProxyID"))
 		{
 		    LOGGER.severe("ProxyTask requires ProxyID");
@@ -1734,6 +1734,10 @@ public class TaskManager
 		if (node.hasAttribute("ID"))
 		{
 		    task.setIDMask(node.getAttribute("ID"));
+		}
+		if (node.hasAttribute("ListEntry"))
+		{
+		    task.setListEntry(node.getAttribute("ListEntry"));
 		}
 	    }
 	    else

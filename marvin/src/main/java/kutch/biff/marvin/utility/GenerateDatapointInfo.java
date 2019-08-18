@@ -70,7 +70,8 @@ public class GenerateDatapointInfo
     
     public enum GenerateMethod
     {
-	ADD, AVERAGE, PROXY, SPLIT_LIST, MAKE_LIST, MAKE_NAMESPACE_LIST, MAKE_ID_LIST, INVALID
+	ADD, AVERAGE, PROXY, SPLIT_LIST, MAKE_LIST, MAKE_NAMESPACE_LIST, MAKE_ID_LIST, GET_LIST_SIZE, MAKE_INDEX_LIST,
+	INVALID
     };
     
     public enum ListSortMethod
@@ -85,14 +86,12 @@ public class GenerateDatapointInfo
     
     private GenerateMethod _Method;
     private RefreshPolicy _Policy;
-    private ValueRange 	__dataIndexRange;
-    private String 	__dataIndexToken;
-    private boolean 	__ProcessRanges;
-
-    
+    private ValueRange __dataIndexRange;
+    private String __dataIndexToken;
+    private boolean __ProcessRanges;
     
     public GenerateDatapointInfo(String namespace, String id, List<Pair<String, String>> includeList,
-	    List<Pair<String, String>> excludeList,ValueRange valRange, String tokenCharForValue)
+	    List<Pair<String, String>> excludeList, ValueRange valRange, String tokenCharForValue)
     {
 	_Method = GenerateMethod.INVALID;
 	_Policy = RefreshPolicy.INVALD;
@@ -110,7 +109,7 @@ public class GenerateDatapointInfo
 	__Scale = 1.0;
 	__ProxyID = null;
 	__csvEntry = -1;
-	__splitToken = null;
+	__splitToken = ",";
 	__mapOfListData = new HashMap<>();
 	__dataIndexRange = valRange;
 	__dataIndexToken = tokenCharForValue;
@@ -120,13 +119,8 @@ public class GenerateDatapointInfo
 	}
 	else
 	{
-	    __ProcessRanges = false;	    
+	    __ProcessRanges = false;
 	}
-	if (__ID.equalsIgnoreCase("PMU_IDList"))
-	{
-	    id = __ID.toUpperCase();
-	}
-	
     }
     
     public int getListEntry()
@@ -217,17 +211,15 @@ public class GenerateDatapointInfo
     {
 	String namespace = checkNamespace.toUpperCase();
 	String id = checkID.toUpperCase();
+	
 	// if already checked, no need to do it again
 	if (__PreviouslyChecked.containsKey(namespace + id))
 	{
 	    return false;
 	}
-	if (__ID.equalsIgnoreCase("PMU_IDList"))
-	{
-	    id = checkID.toUpperCase();
-	}
 	if (Matches(namespace, id, __includeCriterea) && !Matches(namespace, id, __excludeCriterea))
 	{
+	    
 	    __PreviouslyChecked.put(namespace + id, true);
 	    return true;
 	}
@@ -238,7 +230,7 @@ public class GenerateDatapointInfo
 	return false;
     }
     
-    public void ProxyReset(String newNamespaceFilter, String newIDFilter)
+    public void ProxyReset(String newNamespaceFilter, String newIDFilter, String newListEntry)
     {
 	synchronized (__dirtyMap)
 	{
@@ -254,8 +246,22 @@ public class GenerateDatapointInfo
 	    {
 		newIDFilter = current.getValue();
 	    }
-	    __includeCriterea.clear(); // only 1 criteria for proxy
-	    __includeCriterea.add(new Pair<String, String>(newNamespaceFilter, newIDFilter));
+	    if (null != newNamespaceFilter && null != newIDFilter)
+	    {
+		__includeCriterea.clear(); // only 1 criteria for proxy
+		__includeCriterea.add(new Pair<String, String>(newNamespaceFilter, newIDFilter));
+	    }
+	    if (null != newListEntry)
+	    {
+		try
+		{
+		    __csvEntry = Integer.parseInt(newListEntry);
+		}
+		catch(NumberFormatException ex)
+		{
+		    LOGGER.severe("Attempt to set proxy ListEntry failed:" + newListEntry);
+		}
+	    }
 	}
     }
     
@@ -350,7 +356,7 @@ public class GenerateDatapointInfo
 		else
 		{
 		    precision = 0;
-		}		
+		}
 	    }
 	    
 	    DecimalFormat df = new DecimalFormat();
@@ -365,6 +371,12 @@ public class GenerateDatapointInfo
 	{
 	    dataStr = strValue;
 	}
+	if (__ID.equalsIgnoreCase("iTLB-loads"))
+	{
+	    String foo = dataStr;
+	    foo = foo = "d";
+	}
+	
 	// Can use wildcard for target names, only for Proxy at moment
 	mt.AddDataset(Utility.combineWildcards(__ID, proxyID), Utility.combineWildcards(__Namespace, proxyNS), dataStr);
 	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
@@ -376,7 +388,7 @@ public class GenerateDatapointInfo
 	Key = Key.toUpperCase();
 	if (!__mapOfListData.containsKey(Key))
 	{
-	    __mapOfListData.put(Key,strInpValue);
+	    __mapOfListData.put(Key, strInpValue);
 	    String strData = null;
 	    String[] entries = new String[__mapOfListData.size()];
 	    int index = 0;
@@ -409,9 +421,50 @@ public class GenerateDatapointInfo
 	    
 	    mt.AddDataset(__ID, __Namespace, strData);
 	    TaskManager.getTaskManager().AddDeferredTaskObject(mt);
-	}	
+	}
     }
+    
+    private void HandleMakeListIndexList(String strInpValue)
+    {
+	if (null == strInpValue)
+	{
+	    return;
+	}
+	String strData = null;
+	
+	int len = strInpValue.split(__splitToken).length;
+	
+	for (int iIndex = 0; iIndex < len; iIndex++)
+	{
 
+	    if (null == strData)
+	    {
+		strData = Integer.toString(iIndex); 
+	    }
+	    else
+	    {
+		strData += __splitToken + Integer.toString(iIndex);
+	    }
+	}
+	MarvinTask mt = new MarvinTask();
+	mt.AddDataset(__ID, __Namespace, strData);
+	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
+    }
+    
+    private void HandleGetListSize(String strInpValue)
+    {
+	if (null == strInpValue)
+	{
+	    return;
+	}
+	String strData;
+	strData = Integer.toString(strInpValue.split(__splitToken).length);
+	
+	MarvinTask mt = new MarvinTask();
+	mt.AddDataset(__ID, __Namespace, strData);
+	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
+    }
+    
     private void HandleIDList(String NS, String ID)
     {
 	String Key = NS + ID;
@@ -426,7 +479,7 @@ public class GenerateDatapointInfo
 		    return;
 		}
 	    }
-	    __mapOfListData.put(Key,ID);
+	    __mapOfListData.put(Key, ID);
 	    String strData = null;
 	    String[] entries = new String[__mapOfListData.size()];
 	    int index = 0;
@@ -459,13 +512,28 @@ public class GenerateDatapointInfo
 	    
 	    mt.AddDataset(__ID, __Namespace, strData);
 	    TaskManager.getTaskManager().AddDeferredTaskObject(mt);
-	}	
+	}
     }
+    
     private void HandleNamespaceList(String strListItem)
     {
 	if (!__mapOfListData.containsKey(strListItem.toUpperCase()))
 	{
-	    __mapOfListData.put(strListItem.toUpperCase(), strListItem);
+	    String strNamespace;
+	    if (__ProcessRanges)
+	    {
+		strNamespace = BaseWidget.ProcessIndexDataRequest(__dataIndexRange, __dataIndexToken, strListItem);
+		if (null == strNamespace)
+		{
+		    return;
+		}
+	    }
+	    else
+	    {
+		strNamespace = strListItem;
+	    }
+	    __mapOfListData.put(strListItem.toUpperCase(), strNamespace);
+	    
 	    String strData = null;
 	    String[] entries = __mapOfListData.keySet().toArray(new String[__mapOfListData.size()]);
 	    if (ListSortMethod.DESCENDING == _sortMethod)
@@ -674,11 +742,12 @@ public class GenerateDatapointInfo
 	// LOGGER.info(String.format("Adding Input of %s:%s to Build Data point
 	// %s:%s",inputNamespace,inputID,__Namespace,__ID));
 	ChangeListener<Object> objListener = new ChangeListener<Object>()
-	//MarvinChangeListener objListener = new MarvinChangeListener(__dataIndexRange,__dataIndexToken)
+	// MarvinChangeListener objListener = new
+	// MarvinChangeListener(__dataIndexRange,__dataIndexToken)
 	{
 	    @Override
 	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
-	    //public void onChanged(String newVal)
+	    // public void onChanged(String newVal)
 	    {
 		if (__csvEntry > -1)
 		{
@@ -713,7 +782,15 @@ public class GenerateDatapointInfo
 		    }
 		    else if (GenerateMethod.MAKE_ID_LIST == _Method)
 		    {
-			HandleIDList(inputNamespace,inputID);
+			HandleIDList(inputNamespace, inputID);
+		    }
+		    else if (GenerateMethod.GET_LIST_SIZE == _Method)
+		    {
+			HandleGetListSize(newVal.toString());
+		    }
+		    else if (GenerateMethod.MAKE_INDEX_LIST == _Method)
+		    {
+			HandleMakeListIndexList(newVal.toString());
 		    }
 		    else
 		    {

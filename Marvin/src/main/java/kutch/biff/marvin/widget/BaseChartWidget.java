@@ -692,7 +692,7 @@ abstract public class BaseChartWidget extends BaseWidget
                 }
                 else
                 {
-                    LOGGER.severe("hart SeriesSedefined with invalid MinionSrc - no Namespace");
+                    LOGGER.severe("Chart SeriesSet defined with invalid MinionSrc - no Namespace");
                     return false;
                 }
                 if (node.hasAttribute("SeriesID"))
