@@ -489,11 +489,13 @@ class Measurement:
                             isInstance = True
                             isInstanceKey = idTag
                         except:                        
-                            instanceName += self._separator + idTag
+                            if len(idTag) > 0:
+                                instanceName += self._separator + idTag
                     
                     ID += self._separator + idTag
 
             currVal = self._value.evaluate(entry)
+            
             if self._makeList and isInstance: # generate a list if a bunch of instances
                 instanceName += self._separator + "list"
                 isInstanceKey = int(isInstanceKey)
@@ -530,6 +532,7 @@ class Measurement:
         if self._makeList: # Made lists, now let's add to the returning data map
             for Namespace in mapsUpdatedThisLoop:  # But only the ones changed in this loop
                 for listName in mapsUpdatedThisLoop[Namespace]:
+                    sz = str(len(self._listMap[Namespace][listName]))
                     retMap[Namespace][listName + self._separator + "size"] = str(len(self._listMap[Namespace][listName]))
                     retMap[Namespace][listName] = ",".join(self._listMap[Namespace][listName])
 
@@ -543,6 +546,7 @@ class Measurement:
             self.determineMeasurementList(dbClient)
 
         for measurement in self._MeasurementList:
+            #self.getKeysForCategory(self,dbClient,measurement) 
             newDataMap = self.queryMeasurement(measurement,dbClient,getLast)
             for namespace in newDataMap:
                 if not namespace in dataMap:
