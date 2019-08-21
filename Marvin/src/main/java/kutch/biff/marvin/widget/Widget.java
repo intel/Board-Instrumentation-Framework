@@ -48,7 +48,7 @@ public interface Widget
     public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent);
     public void OnPaused();
     public void OnResumed();
-    public void resetState();
+    public void resetState(String strParam);
 }
 
 

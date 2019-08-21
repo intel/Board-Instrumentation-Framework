@@ -1195,9 +1195,15 @@ abstract public class BaseWidget implements Widget
 	{
 	    HandleMarvinPeekaboo(strPeek);
 	}
-	else if (strPeek.equalsIgnoreCase("Reset"))
+	else if (strPeek.length() >= "Reset".length()
+		&& strPeek.substring(0, "Reset".length()).equalsIgnoreCase("Reset"))
 	{
-	    resetState();
+	    String strParam = null;
+	    if (strPeek.length() > "Reset:".length() && strPeek.substring(0,"Reset:".length()).equalsIgnoreCase("Reset:"))
+	    {
+		strParam = strPeek.substring("Reset:".length());
+	    }
+	    resetState(strParam);
 	}
 	
 	else
@@ -2173,7 +2179,7 @@ abstract public class BaseWidget implements Widget
 	_SteppedMaxRangeIndex = 0;
     }
     
-    public void resetState()
+    public void resetState(String param)
     {
 	LOGGER.warning(
 		"Tried to perform resetState for widget [" + this.getName() + "] that does not support this feature");
