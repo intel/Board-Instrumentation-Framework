@@ -67,6 +67,7 @@ public class GenerateDatapointInfo
     private String __splitToken;
     private Map<String, String> __mapOfListData;
     private ListSortMethod _sortMethod;
+    private String __cachedValue;
     
     public enum GenerateMethod
     {
@@ -121,6 +122,7 @@ public class GenerateDatapointInfo
 	{
 	    __ProcessRanges = false;
 	}
+	__cachedValue="";
     }
     
     public int getListEntry()
@@ -338,7 +340,7 @@ public class GenerateDatapointInfo
     {
 	MarvinTask mt = new MarvinTask();
 	String dataStr;
-	
+
 	try
 	{
 	    float value;
@@ -370,11 +372,6 @@ public class GenerateDatapointInfo
 	catch(NumberFormatException ex)
 	{
 	    dataStr = strValue;
-	}
-	if (__ID.equalsIgnoreCase("iTLB-loads"))
-	{
-	    String foo = dataStr;
-	    foo = foo = "d";
 	}
 	
 	// Can use wildcard for target names, only for Proxy at moment
@@ -508,11 +505,11 @@ public class GenerateDatapointInfo
 		    strData += "," + item;
 		}
 	    }
-	    MarvinTask mt = new MarvinTask();
-	    
-	    mt.AddDataset(__ID, __Namespace, strData);
-	    TaskManager.getTaskManager().AddDeferredTaskObject(mt);
+	    __cachedValue = strData;
 	}
+	    MarvinTask mt = new MarvinTask();
+	    mt.AddDataset(__ID, __Namespace, __cachedValue);
+	    TaskManager.getTaskManager().AddDeferredTaskObject(mt);
     }
     
     private void HandleNamespaceList(String strListItem)

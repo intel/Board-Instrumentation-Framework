@@ -7,6 +7,8 @@ module kutch.biff.marvin {
     requires java.logging;
     
     requires eu.hansolo.enzo;
+    requires javafx.graphics;
+    requires java.xml;
 
     exports kutch.biff.marvin;
 }

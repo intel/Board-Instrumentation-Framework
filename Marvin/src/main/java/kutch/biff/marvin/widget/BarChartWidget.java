@@ -21,7 +21,13 @@
  */
 package kutch.biff.marvin.widget;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.Chart;
@@ -29,6 +35,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.datamanager.MarvinChangeListener;
 import kutch.biff.marvin.utility.FrameworkNode;
@@ -92,6 +99,7 @@ public class BarChartWidget extends LineChartWidget
         {
 	    Data<String, Number> objData = new XYChart.Data<>(Integer.toString(iLoop), 0);
 	    _objSeries.getData().add(objData);
+	    //displayLabelForData(objData);
         }
     }
     
@@ -103,7 +111,9 @@ public class BarChartWidget extends LineChartWidget
 	    while (currSize < newSize)
 	    {
 		Data<String, Number> objData = new XYChart.Data<>(Integer.toString(currSize), 0);
+
 		_objSeries.getData().add(objData);
+		      // displayLabelForData(objData);
 		currSize++;
 	    }
 	}
@@ -112,7 +122,8 @@ public class BarChartWidget extends LineChartWidget
 	    _objSeries.getData().remove(--currSize);
 	}
     }
-
+    
+ 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private void setupListenersForSingleSource(DataManager dataMgr)
     {
@@ -210,5 +221,29 @@ public class BarChartWidget extends LineChartWidget
         ((NumberAxis) (_yAxis)).setMinorTickCount((int)yAxisMinorTick+1);
         // xAxis is not a number axis
     }
-    
+    private void displayLabelForData(XYChart.Data<String, Number> data) {
+	  final Node node = data.getNode();
+	  final Text dataText = new Text(data.getYValue() + "");
+	  node.parentProperty().addListener(new ChangeListener<Parent>() {
+	    @Override public void changed(ObservableValue<? extends Parent> ov, Parent oldParent, Parent parent) {
+	      Group parentGroup = (Group) parent;
+	      parentGroup.getChildren().add(dataText);
+	    }
+	  });
+	 
+	  node.boundsInParentProperty().addListener((ChangeListener<? super Bounds>) new ChangeListener<Bounds>() {
+	    public void changed(ObservableValue<? extends Bounds> ov, Bounds oldBounds, Bounds bounds) {
+	      dataText.setLayoutX(
+	        Math.round(
+	          bounds.getMinX() + bounds.getWidth() / 2 - dataText.prefWidth(-1) / 2
+	        )
+	      );
+	      dataText.setLayoutY(
+	        Math.round(
+	          bounds.getMinY() - dataText.prefHeight(-1) * 0.5
+	        )
+	      );
+	    }
+	  });
+	}    
 }

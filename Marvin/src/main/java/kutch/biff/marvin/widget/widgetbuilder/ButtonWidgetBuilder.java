@@ -37,42 +37,43 @@ public class ButtonWidgetBuilder
 {
     @SuppressWarnings("unused")
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     public static ButtonWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        ButtonWidget btnWidget = new ButtonWidget();
-        for (FrameworkNode node : masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(btnWidget, node))
-            {
-                continue;
-            }
-        }
-        return btnWidget;
+	ButtonWidget btnWidget = new ButtonWidget();
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(btnWidget, node))
+	    {
+		continue;
+	    }
+	}
+	return btnWidget;
     }
+    
     public static MenuButtonWidget BuildMenuButton(FrameworkNode masterNode, String widgetDefFilename)
     {
-        MenuButtonWidget btnWidget = new MenuButtonWidget();
-        for (FrameworkNode node : masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(btnWidget, node))
-            {
-                continue;
-            }
-        }
-        return btnWidget;
+	MenuButtonWidget btnWidget = new MenuButtonWidget();
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(btnWidget, node))
+	    {
+		continue;
+	    }
+	}
+	return btnWidget;
     }
     
     public static ToggleButtonWidget BuildToggleButton(FrameworkNode masterNode, String widgetDefFilename)
     {
-        ToggleButtonWidget btnWidget = new ToggleButtonWidget();
-        for (FrameworkNode node : masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(btnWidget, node))
-            {
-                continue;
-            }
-        }
-        return btnWidget;
+	ToggleButtonWidget btnWidget = new ToggleButtonWidget();
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(btnWidget, node))
+	    {
+		continue;
+	    }
+	}
+	return btnWidget;
     }
 }

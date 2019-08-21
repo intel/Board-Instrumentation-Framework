@@ -288,6 +288,25 @@ abstract public class BaseWidget implements Widget
 	}
     }
     
+    public double getCurrentMaxSteppedRange()
+    {
+	if (null == _SteppedMaxRanges)
+	{
+	    return -1;
+	}
+	return _SteppedMaxRanges.get(_SteppedMaxRangeIndex);
+	
+    }
+    
+    public double getCurrentMinSteppedRange()
+    {
+	if (null == _SteppedMinRanges)
+	{
+	    return -1;
+	}
+	return _SteppedMinRanges.get(_SteppedMinRangeIndex);
+	
+    }
     public boolean getExceededMaxSteppedRange(double compareVal)
     {
 	if (null == _SteppedMaxRanges)

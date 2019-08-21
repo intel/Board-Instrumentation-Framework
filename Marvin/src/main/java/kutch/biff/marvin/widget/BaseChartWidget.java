@@ -138,6 +138,14 @@ abstract public class BaseChartWidget extends BaseWidget
 
     protected void CreateChart()
     {
+        if (-1 != getCurrentMaxSteppedRange())
+        {
+            yAxisMaxValue = getCurrentMaxSteppedRange();
+        }
+        if (-1 != getCurrentMinSteppedRange())
+        {
+            yAxisMinValue = getCurrentMinSteppedRange();
+        }
         CreateAxisObjects();
         //_xAxis = new NumberAxis(0d,xAxisMaxCount-1,xAxisMajorTick);
         //_yAxis = new NumberAxis(yAxisMinValue,yAxisMaxValue,yAxisMajorTick);

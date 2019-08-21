@@ -51,6 +51,7 @@ public class MenuButtonWidget extends ButtonWidget
     private MenuButton _Button;
     private FrameworkNode __CommonTaskNode;
     private boolean __UpdateTitleFromSelection;
+    private String __LastValue;
     
     public MenuButtonWidget()
     {
@@ -58,12 +59,14 @@ public class MenuButtonWidget extends ButtonWidget
 	// to get around styling bug in Java 8
 	_Button.getStyleClass().add("kutch");
 	__CommonTaskNode = null;
-	__UpdateTitleFromSelection = false;
+	__UpdateTitleFromSelection = true; // can turn off laster
+	__LastValue="";
     }
     
     public void setCommonTaskNode(FrameworkNode commonTask)
     {
-	__CommonTaskNode = commonTask;
+	__CommonTaskNode = new FrameworkNode(commonTask);  // make new instance, to get alias resolved now
+	//__CommonTaskNode.ResolveAlias();
     }
     
     @Override
@@ -82,7 +85,6 @@ public class MenuButtonWidget extends ButtonWidget
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode)
     {
-	
 	if (super.HandleWidgetSpecificSettings(widgetNode))
 	{
 	    return true;
@@ -91,6 +93,7 @@ public class MenuButtonWidget extends ButtonWidget
 	if (widgetNode.getNodeName().equalsIgnoreCase("MenuItem"))
 	{
 	    ConfigurationReader rdr = ConfigurationReader.GetConfigReader();
+	    
 	    MenuItem objItem = rdr.ReadMenuItem(widgetNode);
 	    if (null != objItem)
 	    {
@@ -112,7 +115,10 @@ public class MenuButtonWidget extends ButtonWidget
 		@Override
 		public void handle(ActionEvent event)
 		{
-		    _Button.setText(objItem.getText());
+		    if (__UpdateTitleFromSelection) // sometimes flag is read AFTER handler setup
+		    {
+			_Button.setText(objItem.getText());
+		    }
 		}
 	    };
 	    objItem.addEventHandler(ActionEvent.ACTION, eventHandler);
@@ -136,9 +142,14 @@ public class MenuButtonWidget extends ButtonWidget
 		return false;
 	    }
 	}
+	
 	if (widgetNode.hasChild("Title") && widgetNode.getChild("Title").hasAttribute("UpdateTitleFromSelection"))
 	{
 	    __UpdateTitleFromSelection= widgetNode.getChild("Title").getBooleanAttribute("UpdateTitleFromSelection");
+	}
+	else
+	{
+	    __UpdateTitleFromSelection = false;
 	}
 	
 	return true;
@@ -148,16 +159,18 @@ public class MenuButtonWidget extends ButtonWidget
     protected void onChange(ObservableValue<?> o, Object oldVal, Object newVal)
     {
 	String entriesList = newVal.toString();
-	if (entriesList.length() < 1)
+	if (entriesList.length() < 1 || __LastValue.equals(entriesList))
 	{
 	    return;
 	}
+	__LastValue = entriesList;
 	_Button.getItems().clear();
 	String[] newEntries = newVal.toString().split(",");
 	ConfigurationReader rdr = ConfigurationReader.GetConfigReader();
 	for (String entry : newEntries)
 	{
 	    FrameworkNode menuNode = new FrameworkNode(__CommonTaskNode);
+	    
 	    menuNode.AddAttibute("Text", entry);
 	    MenuItem objItem = null;
 	    try
