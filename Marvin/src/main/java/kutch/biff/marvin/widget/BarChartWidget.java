@@ -80,26 +80,72 @@ public class BarChartWidget extends LineChartWidget
 	_xAxis.setAnimated(false); // for some reason for this chart, it defaults to true!
     }
     
-    protected void setupListeners(DataManager dataMgr)
+    @SuppressWarnings("unchecked")
+    @Override
+    protected Chart CreateChartObject()
     {
-	if (0 == _SeriesOrder.size())
+	if (isHorizontal())
 	{
-	    setupListenersForSingleSource(dataMgr);
-	    return;
+	    getyAxis().setTickLabelRotation(90);
+	    return new BarChart<Number, String>(getyAxis(), _xAxis);
 	}
-	SetupSeriesSets(dataMgr);
+	
+	return new BarChart<String, Number>(_xAxis, getyAxis());
     }
     
-    protected void setupAxis()
+    @SuppressWarnings("unused")
+    private void displayLabelForData(XYChart.Data<String, Number> data)
     {
-	_objSeries.getData().clear();
-	
-	for (int iLoop = 0; iLoop < getxAxisMaxCount(); iLoop++)
+	final Node node = data.getNode();
+	final Text dataText = new Text(data.getYValue() + "");
+	node.parentProperty().addListener(new ChangeListener<Parent>()
 	{
-	    Data<String, Number> objData = new XYChart.Data<>(Integer.toString(iLoop), 0);
-	    _objSeries.getData().add(objData);
-	    // displayLabelForData(objData);
+	    @Override
+	    public void changed(ObservableValue<? extends Parent> ov, Parent oldParent, Parent parent)
+	    {
+		Group parentGroup = (Group) parent;
+		parentGroup.getChildren().add(dataText);
+	    }
+	});
+	
+	node.boundsInParentProperty().addListener(new ChangeListener<Bounds>()
+	{
+	    @Override
+	    public void changed(ObservableValue<? extends Bounds> ov, Bounds oldBounds, Bounds bounds)
+	    {
+		dataText.setLayoutX(Math.round(bounds.getMinX() + bounds.getWidth() / 2 - dataText.prefWidth(-1) / 2));
+		dataText.setLayoutY(Math.round(bounds.getMinY() - dataText.prefHeight(-1) * 0.5));
+	    }
+	});
+    }
+    
+    protected CategoryAxis getAxis_X()
+    {
+	return this._xAxis;
+    }
+    
+    @Override
+    public javafx.scene.Node getStylableObject()
+    {
+	return ((getChart()));
+    }
+    
+    @SuppressWarnings("rawtypes")
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+	return ((BarChart) (getChart())).getStylesheets();
+    }
+    
+    @Override
+    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
+    {
+	if (true == HandleChartSpecificAppSettings(node))
+	{
+	    return true;
 	}
+	
+	return false;
     }
     
     protected void resizeAxis(int newSize)
@@ -121,6 +167,28 @@ public class BarChartWidget extends LineChartWidget
 	    {
 		_objSeries.getData().remove(--currSize);
 	    }
+    }
+    
+    protected void setupAxis()
+    {
+	_objSeries.getData().clear();
+	
+	for (int iLoop = 0; iLoop < getxAxisMaxCount(); iLoop++)
+	{
+	    Data<String, Number> objData = new XYChart.Data<>(Integer.toString(iLoop), 0);
+	    _objSeries.getData().add(objData);
+	    // displayLabelForData(objData);
+	}
+    }
+    
+    protected void setupListeners(DataManager dataMgr)
+    {
+	if (0 == _SeriesOrder.size())
+	{
+	    setupListenersForSingleSource(dataMgr);
+	    return;
+	}
+	SetupSeriesSets(dataMgr);
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -174,76 +242,10 @@ public class BarChartWidget extends LineChartWidget
 	
     }
     
-    @SuppressWarnings("rawtypes")
     @Override
-    public javafx.scene.Node getStylableObject()
-    {
-	return ((BarChart) (getChart()));
-    }
-    
-    @SuppressWarnings("rawtypes")
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-	return ((BarChart) (getChart())).getStylesheets();
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    protected Chart CreateChartObject()
-    {
-	if (isHorizontal())
-	{
-	    getyAxis().setTickLabelRotation(90);
-	    return new BarChart<Number, String>(getyAxis(), _xAxis);
-	}
-	
-	return new BarChart<String, Number>(_xAxis, getyAxis());
-    }
-    
-    @Override
-    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
-    {
-	if (true == HandleChartSpecificAppSettings(node))
-	{
-	    return true;
-	}
-	
-	return false;
-    }
-    
-    protected CategoryAxis getAxis_X()
-    {
-	return this._xAxis;
-    }
-    
     protected void setupMinorTicks()
     {
-	((NumberAxis) (_yAxis)).setMinorTickCount((int) yAxisMinorTick + 1);
+	((NumberAxis) (_yAxis)).setMinorTickCount(yAxisMinorTick + 1);
 	// xAxis is not a number axis
-    }
-    
-    private void displayLabelForData(XYChart.Data<String, Number> data)
-    {
-	final Node node = data.getNode();
-	final Text dataText = new Text(data.getYValue() + "");
-	node.parentProperty().addListener(new ChangeListener<Parent>()
-	{
-	    @Override
-	    public void changed(ObservableValue<? extends Parent> ov, Parent oldParent, Parent parent)
-	    {
-		Group parentGroup = (Group) parent;
-		parentGroup.getChildren().add(dataText);
-	    }
-	});
-	
-	node.boundsInParentProperty().addListener((ChangeListener<? super Bounds>) new ChangeListener<Bounds>()
-	{
-	    public void changed(ObservableValue<? extends Bounds> ov, Bounds oldBounds, Bounds bounds)
-	    {
-		dataText.setLayoutX(Math.round(bounds.getMinX() + bounds.getWidth() / 2 - dataText.prefWidth(-1) / 2));
-		dataText.setLayoutY(Math.round(bounds.getMinY() - dataText.prefHeight(-1) * 0.5));
-	    }
-	});
     }
 }

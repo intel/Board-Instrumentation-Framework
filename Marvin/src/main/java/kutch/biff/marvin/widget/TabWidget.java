@@ -48,6 +48,80 @@ import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
  */
 public class TabWidget extends GridWidget
 {
+    public static void ReIndexTabs(TabPane tabPane)
+    {
+        TabWidget.sortTabs(tabPane);
+
+        int tabIndex = 0;
+        for (Tab tab : tabPane.getTabs())
+        {
+            for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs())
+            {
+                if (tabWidget.Reindex(tab, tabIndex))
+                {
+                    break;
+                }
+            }
+            tabIndex++;
+        }
+    }
+    private static void sortTabs(TabPane tabPane)
+    {
+        List<TabWidget> tabs = ConfigurationReader.GetConfigReader().getTabs();
+        Collections.sort(tabs, new Comparator<TabWidget>()
+                 {
+                     @Override
+                     public int compare(TabWidget o1, TabWidget o2)
+                     {
+                         if (!o1.getCreatedOnDemand() && o2.getCreatedOnDemand())
+                         {
+                             return -1;
+                         }
+                         if (o1.getCreatedOnDemand() && !o2.getCreatedOnDemand())
+                         {
+
+                             return 0;
+                         }
+                         if (!o1.getCreatedOnDemand() && !o2.getCreatedOnDemand())
+                         {
+                             return 0;
+                         }
+                         if (null == o1.getOnDemandSortBy() && null == o2.getOnDemandSortBy())
+                         {
+                             return 0;
+                         }
+                         if (null == o1.getOnDemandSortBy() && null != o2.getOnDemandSortBy())
+                         {
+                             return 1;
+                         }
+                         if (null != o1.getOnDemandSortBy() && null == o2.getOnDemandSortBy())
+                         {
+                             return -1;
+                         }
+                         return o1.getOnDemandSortBy().compareToIgnoreCase(o2.getOnDemandSortBy());
+                         //return nc.compare(o1.getTitle(),o2.getTitle());
+                     }
+                 }
+        );
+        int index = 0;
+        for (TabWidget tabWidget : tabs)
+        {
+            boolean selected = false;
+            Tab objTab = tabWidget.getTabControl();
+            if (objTab.isSelected())
+            {
+                selected = true;
+            }
+            tabPane.getTabs().remove(objTab);
+            tabPane.getTabs().add(index, objTab);
+            if (selected)
+            {
+                SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+                selectionModel.select(index);
+            }
+            index++;
+        }
+    }
     private Tab _tab;
     private GridPane _BaseGridPane; // throw one down in tab to put all the goodies in
     private boolean _IsVisible;
@@ -58,7 +132,9 @@ public class TabWidget extends GridWidget
     private StackPane _stackReference;
     private String _TaskOnActivate;
     private boolean _IgnoreFirstSelect;
+
     private boolean _CreatedOnDemand;
+
     private String _OnDemandSortStr;
 
     public TabWidget(String tabID)
@@ -153,101 +229,20 @@ public class TabWidget extends GridWidget
         return false;
     }
 
-    public void setOnDemandSortBy(String sortStr)
+    public boolean getCreatedOnDemand()
     {
-        _OnDemandSortStr = sortStr;
+        return _CreatedOnDemand;
+    }
+
+    @Override
+    protected GridPane getGridPane()
+    {
+        return _BaseGridPane;
     }
 
     public String getOnDemandSortBy()
     {
         return _OnDemandSortStr;
-    }
-
-    public boolean Reindex(Tab compare, int newIndex)
-    {
-        if (compare == _tab)
-        {
-            _TabIndex = newIndex;
-            return true;
-        }
-        return false;
-    }
-
-    private static void sortTabs(TabPane tabPane)
-    {
-        List<TabWidget> tabs = ConfigurationReader.GetConfigReader().getTabs();
-        Collections.sort(tabs, new Comparator<TabWidget>()
-                 {
-                     @Override
-                     public int compare(TabWidget o1, TabWidget o2)
-                     {
-                         if (!o1.getCreatedOnDemand() && o2.getCreatedOnDemand())
-                         {
-                             return -1;
-                         }
-                         if (o1.getCreatedOnDemand() && !o2.getCreatedOnDemand())
-                         {
-
-                             return 0;
-                         }
-                         if (!o1.getCreatedOnDemand() && !o2.getCreatedOnDemand())
-                         {
-                             return 0;
-                         }
-                         if (null == o1.getOnDemandSortBy() && null == o2.getOnDemandSortBy())
-                         {
-                             return 0;
-                         }
-                         if (null == o1.getOnDemandSortBy() && null != o2.getOnDemandSortBy())
-                         {
-                             return 1;
-                         }
-                         if (null != o1.getOnDemandSortBy() && null == o2.getOnDemandSortBy())
-                         {
-                             return -1;
-                         }
-                         return o1.getOnDemandSortBy().compareToIgnoreCase(o2.getOnDemandSortBy());
-                         //return nc.compare(o1.getTitle(),o2.getTitle());
-                     }
-                 }
-        );
-        int index = 0;
-        for (TabWidget tabWidget : tabs)
-        {
-            boolean selected = false;
-            Tab objTab = tabWidget.getTabControl();
-            if (objTab.isSelected())
-            {
-                selected = true;
-            }
-            tabPane.getTabs().remove(objTab);
-            tabPane.getTabs().add(index, objTab);
-            if (selected)
-            {
-                SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
-                selectionModel.select(index);
-            }
-            index++;
-        }
-    }
-
-    public static void ReIndexTabs(TabPane tabPane)
-    {
-        TabWidget.sortTabs(tabPane);
-
-        String Titles = "";
-        int tabIndex = 0;
-        for (Tab tab : tabPane.getTabs())
-        {
-            for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs())
-            {
-                if (tabWidget.Reindex(tab, tabIndex))
-                {
-                    break;
-                }
-            }
-            tabIndex++;
-        }
     }
 
     @Override
@@ -262,9 +257,19 @@ public class TabWidget extends GridWidget
         return basePane.getStylesheets();
     }
 
-    public void setOnActivateTask(String taskID)
+    public Tab getTabControl()
     {
-        _TaskOnActivate = taskID;
+        return _tab;
+    }
+
+    public int getTabIndex()
+    {
+        return _TabIndex;
+    }
+
+    public boolean isVisible()
+    {
+        return _IsVisible;
     }
 
     public boolean LoadConfiguration(FrameworkNode doc)
@@ -370,32 +375,6 @@ public class TabWidget extends GridWidget
         return true;
     }
 
-    public boolean isVisible()
-    {
-        return _IsVisible;
-    }
-
-    public void setVisible(boolean _IsVisible)
-    {
-        this._IsVisible = _IsVisible;
-    }
-
-    public int getTabIndex()
-    {
-        return _TabIndex;
-    }
-
-    public Tab getTabControl()
-    {
-        return _tab;
-    }
-
-    @Override
-    protected GridPane getGridPane()
-    {
-        return _BaseGridPane;
-    }
-
     @Override
     public boolean PerformPostCreateActions(GridWidget parentGrid, boolean updateToolTipOnly)
     {
@@ -427,14 +406,34 @@ public class TabWidget extends GridWidget
         return super.PerformPostCreateActions(parentGrid, updateToolTipOnly);
     }
 
+    public boolean Reindex(Tab compare, int newIndex)
+    {
+        if (compare == _tab)
+        {
+            _TabIndex = newIndex;
+            return true;
+        }
+        return false;
+    }
+
     public void setCreatedOnDemand()
     {
         _CreatedOnDemand = true;
     }
 
-    public boolean getCreatedOnDemand()
+    public void setOnActivateTask(String taskID)
     {
-        return _CreatedOnDemand;
+        _TaskOnActivate = taskID;
+    }
+
+    public void setOnDemandSortBy(String sortStr)
+    {
+        _OnDemandSortStr = sortStr;
+    }
+
+    public void setVisible(boolean _IsVisible)
+    {
+        this._IsVisible = _IsVisible;
     }
    
 }

@@ -53,6 +53,25 @@ public class WebWidget extends BaseWidget
 	_HackedFile = null;
     }
     
+    private void BadContent(String strContent)
+    {
+	LOGGER.warning("Received bad WebWidget content: " + strContent);
+    }
+    
+    @Override
+    protected void ConfigureDimentions()
+    {
+	if (getHeight() > 0)
+	{
+	    _Browser.setPrefHeight(getHeight());
+	}
+	
+	if (getWidth() > 0)
+	{
+	    _Browser.setPrefWidth(getWidth());
+	}
+    }
+    
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
@@ -118,9 +137,17 @@ public class WebWidget extends BaseWidget
 	return ApplyCSS();
     }
     
-    private void BadContent(String strContent)
+    @Override
+    public Node getStylableObject()
     {
-	LOGGER.warning("Received bad WebWidget content: " + strContent);
+	return _Browser;
+    }
+    
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+	
+	return _Browser.getStylesheets();
     }
     
     private void SetContent(String strContent)
@@ -147,41 +174,14 @@ public class WebWidget extends BaseWidget
     }
     
     @Override
-    public ObservableList<String> getStylesheets()
-    {
-	
-	return _Browser.getStylesheets();
-    }
-    
-    @Override
-    public Node getStylableObject()
-    {
-	return _Browser;
-    }
-    
-    public void SetReverseContent(boolean newVal)
-    {
-	_ReverseContent = newVal;
-    }
-    
-    @Override
     public void SetInitialValue(String value)
     {
 	_CurrentContent = value;
     }
     
-    @Override
-    protected void ConfigureDimentions()
+    public void SetReverseContent(boolean newVal)
     {
-	if (getHeight() > 0)
-	{
-	    _Browser.setPrefHeight(getHeight());
-	}
-	
-	if (getWidth() > 0)
-	{
-	    _Browser.setPrefWidth(getWidth());
-	}
+	_ReverseContent = newVal;
     }
     
     @Override

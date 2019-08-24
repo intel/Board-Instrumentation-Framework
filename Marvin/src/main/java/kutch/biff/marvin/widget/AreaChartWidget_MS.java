@@ -41,19 +41,6 @@ public class AreaChartWidget_MS extends LineChartWidget_MS
     }
     
     @Override
-    public boolean Create(GridPane pane, DataManager dataMgr)
-    {
-	return _CreateMSChart(pane, dataMgr);
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    protected Chart CreateChartObject()
-    {
-	return new AreaChart<>(getxAxis(), getyAxis());
-    }
-    
-    @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void _CreateChart()
     {
@@ -64,6 +51,19 @@ public class AreaChartWidget_MS extends LineChartWidget_MS
 	    ((AreaChart) (getChart())).getData().add(ds.getSeries());
 	}
 	
+    }
+    
+    @Override
+    public boolean Create(GridPane pane, DataManager dataMgr)
+    {
+	return _CreateMSChart(pane, dataMgr);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    protected Chart CreateChartObject()
+    {
+	return new AreaChart<>(getxAxis(), getyAxis());
     }
     
     @SuppressWarnings("rawtypes")

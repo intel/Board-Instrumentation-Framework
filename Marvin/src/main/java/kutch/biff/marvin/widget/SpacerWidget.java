@@ -46,12 +46,6 @@ public class SpacerWidget extends BaseWidget
         }
     }
     
-    protected Label GetPanel()
-    {
-        return _panel;
-    }
-    
-    
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
@@ -67,22 +61,28 @@ public class SpacerWidget extends BaseWidget
         SetupTaskAction();   
         return ApplyCSS();
     }
-@Override
-    public javafx.scene.Node getStylableObject()
+    
+    
+    protected Label GetPanel()
     {
         return _panel;
     }
-    
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-        return _panel.getStylesheets();
-    }        
 @Override
     public Region getRegionObject()
     {
        return _panel;
-    }    
+    }
+    
+    @Override
+        public javafx.scene.Node getStylableObject()
+        {
+            return _panel;
+        }        
+@Override
+public ObservableList<String> getStylesheets()
+{
+    return _panel.getStylesheets();
+}    
     @Override
     public void UpdateTitle(String strTitle)
     {

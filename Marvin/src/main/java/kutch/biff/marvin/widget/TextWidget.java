@@ -39,10 +39,8 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class TextWidget extends BaseWidget
 {
-    
     private String _TextString;
     private Label _TextControl;
-    private static Label testLabel = null;
     protected Group _Group;
     private boolean _ScaleToFitBounderies;
     private boolean _NumericFormat = false;
@@ -58,6 +56,15 @@ public class TextWidget extends BaseWidget
 	_TextControl.setAlignment(Pos.CENTER);
 	_ScaleToFitBounderies = false;
 	setDefaultIsSquare(false);
+    }
+    
+    @Override
+    public void ConfigureAlignment()
+    {
+	super.ConfigureAlignment();
+	_TextControl.setAlignment(getPosition());
+	GridPane.setValignment(_Group, getVerticalPosition());
+	GridPane.setHalignment(_Group, getHorizontalPosition());
     }
     
     @Override
@@ -162,31 +169,14 @@ public class TextWidget extends BaseWidget
     }
     
     @Override
-    public void setDecimalPlaces(int _DecimalPlaces)
-    {
-	super.setDecimalPlaces(_DecimalPlaces);
-	this.DecimalsSet = true;
-    }
-    
-    @Override
-    public void SetInitialValue(String value)
-    {
-	_TextString = value;
-    }
-    
-    @Override
-    public void ConfigureAlignment()
-    {
-	super.ConfigureAlignment();
-	_TextControl.setAlignment(getPosition());
-	GridPane.setValignment(_Group, getVerticalPosition());
-	GridPane.setHalignment(_Group, getHorizontalPosition());
-    }
-    
-    @Override
     public javafx.scene.Node getRemovableNode()
     {
 	return _Group;
+    }
+    
+    public boolean getScaleToFitBounderies()
+    {
+	return _ScaleToFitBounderies;
     }
     
     @Override
@@ -199,16 +189,6 @@ public class TextWidget extends BaseWidget
     public ObservableList<String> getStylesheets()
     {
 	return _TextControl.getStylesheets();
-    }
-    
-    public boolean getScaleToFitBounderies()
-    {
-	return _ScaleToFitBounderies;
-    }
-    
-    public void setScaleToFitBounderies(boolean _ScaleToFitBounderies)
-    {
-	this._ScaleToFitBounderies = _ScaleToFitBounderies;
     }
     
     @Override
@@ -272,6 +252,24 @@ public class TextWidget extends BaseWidget
 	    return true;
 	}
 	return false;
+    }
+    
+    @Override
+    public void setDecimalPlaces(int _DecimalPlaces)
+    {
+	super.setDecimalPlaces(_DecimalPlaces);
+	this.DecimalsSet = true;
+    }
+    
+    @Override
+    public void SetInitialValue(String value)
+    {
+	_TextString = value;
+    }
+    
+    public void setScaleToFitBounderies(boolean _ScaleToFitBounderies)
+    {
+	this._ScaleToFitBounderies = _ScaleToFitBounderies;
     }
     
     @Override

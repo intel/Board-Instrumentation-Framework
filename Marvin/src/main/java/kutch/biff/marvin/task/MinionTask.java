@@ -45,30 +45,21 @@ public class MinionTask extends BaseTask
         _ID = null;
     }
 
+    public String getID()
+    {
+        return _ID;
+    }
     @Override
     public boolean getMustBeInGUIThread()
     {
         return false;
     }
+
     public String getNamespace()
     {
         return _Namespace;
     }
 
-    public void setNamespace(String _Namespace)
-    {
-        this._Namespace = _Namespace;
-    }
-
-    public String getID()
-    {
-        return _ID;
-    }
-
-    public void setID(String _ID)
-    {
-        this._ID = _ID;
-    }
     @Override
     public  void PerformTask()
     {
@@ -111,5 +102,14 @@ public class MinionTask extends BaseTask
         
         TASKMAN.SendToAllOscars(sendBuffer.getBytes());
         LOGGER.info("Sending Minion Task [" + getNamespace() + ":"+getID()+"] Params: " + strParamList);
+    }
+
+    public void setID(String _ID)
+    {
+        this._ID = _ID;
+    }
+    public void setNamespace(String _Namespace)
+    {
+        this._Namespace = _Namespace;
     }
 }

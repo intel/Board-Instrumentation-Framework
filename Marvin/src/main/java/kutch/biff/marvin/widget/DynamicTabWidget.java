@@ -53,15 +53,39 @@ public class DynamicTabWidget extends TabWidget
     private static String Odd_Background = "-fx-background-color:grey";
     private static String Odd_ID = "-fx-font-size: 2.5em;-fx-text-fill:black";
     private static String Odd_Value = "-fx-font-size: 1.5em;";
-    private List<Pair<String, List<Object>>> _DataPoint;  // Minion ID, [objGrid,objID,objValue]
-    private AtomicInteger _SortCount;
-    
-    public DynamicTabWidget(String tabID)
+    public static String getEven_Background()
     {
-        super(tabID);
-        _DataPoint = new ArrayList<>();
-        _SortCount = new AtomicInteger();        
-        _SortCount.set(0);
+        return DynamicTabWidget.Even_Background;
+    }
+    public static String getEven_ID()
+    {
+        return DynamicTabWidget.Even_ID;
+    }
+    
+    public static String getEven_Value()
+    {
+        return DynamicTabWidget.Even_Value;
+    }
+
+    public static int getMaxWidth()
+    {
+        return DynamicTabWidget.MaxWidth;
+    }
+
+    public static String getOdd_Background()
+    {
+        return DynamicTabWidget.Odd_Background;
+    }
+
+    public static String getOdd_ID()
+    {
+        return DynamicTabWidget.Odd_ID;
+    }
+
+    
+    public static String getOdd_Value()
+    {
+        return DynamicTabWidget.Odd_Value;
     }
 
     public static DynamicTabWidget getTab(String tabID, DataManager dataMgr)
@@ -93,23 +117,81 @@ public class DynamicTabWidget extends TabWidget
         return objTabWidget;
     }
 
-    private void SetStyle(boolean Odd, GridWidget objGrid, TextWidget objIDWidget, TextWidget objValueWidget)
+    public static String getTitleStr()
     {
-        if (Odd)
-        {
-            objGrid.setStyleOverride(Arrays.asList(DynamicTabWidget.getOdd_Background()));
-            objIDWidget.setStyleOverride(Arrays.asList(DynamicTabWidget.getOdd_ID()));
-            objValueWidget.setStyleOverride(Arrays.asList(DynamicTabWidget.getOdd_Value()));
-        }
-        else
-        {
-            objGrid.setStyleOverride(Arrays.asList(DynamicTabWidget.getEven_Background()));
-            objIDWidget.setStyleOverride(Arrays.asList(DynamicTabWidget.getEven_ID()));
-            objValueWidget.setStyleOverride(Arrays.asList(DynamicTabWidget.getEven_Value()));
-        }
-        objGrid.ApplyOverrides();
-        objIDWidget.ApplyOverrides();
-        objValueWidget.ApplyOverrides();
+        return DynamicTabWidget.TitleStr;
+    }
+
+    public static String getTitleStyle()
+    {
+        return DynamicTabWidget.TitleStyle;
+    }
+
+    public static boolean isEnabled()
+    {
+        return DynamicTabWidget.Enabled;
+    }
+
+    public static void setEnabled(boolean Enabled)
+    {
+        DynamicTabWidget.Enabled = Enabled;
+    }
+
+    public static void setEven_Background(String Even_Background)
+    {
+        DynamicTabWidget.Even_Background = Even_Background;
+    }
+
+    public static void setEven_ID(String Even_ID)
+    {
+        DynamicTabWidget.Even_ID = Even_ID;
+    }
+
+    public static void setEven_Value(String Even_Value)
+    {
+        DynamicTabWidget.Even_Value = Even_Value;
+    }
+
+    public static void setMaxWidth(int MaxWidth)
+    {
+        DynamicTabWidget.MaxWidth = MaxWidth;
+    }
+
+    public static void setOdd_Background(String Odd_Background)
+    {
+        DynamicTabWidget.Odd_Background = Odd_Background;
+    }
+
+    public static void setOdd_ID(String Odd_ID)
+    {
+        DynamicTabWidget.Odd_ID = Odd_ID;
+    }
+
+    public static void setOdd_Value(String Odd_Value)
+    {
+        DynamicTabWidget.Odd_Value = Odd_Value;
+    }
+
+    public static void setTitleStr(String newTitle)
+    {
+        DynamicTabWidget.TitleStr = newTitle;
+    }
+
+    public static void setTitleStyle(String TitleStyle)
+    {
+        DynamicTabWidget.TitleStyle = TitleStyle;
+    }
+
+    private List<Pair<String, List<Object>>> _DataPoint;  // Minion ID, [objGrid,objID,objValue]
+
+    private AtomicInteger _SortCount;
+
+    public DynamicTabWidget(String tabID)
+    {
+        super(tabID);
+        _DataPoint = new ArrayList<>();
+        _SortCount = new AtomicInteger();        
+        _SortCount.set(0);
     }
 
     public void AddWidget(DataManager dataMgr, String ID, String initialVal)
@@ -146,6 +228,64 @@ public class DynamicTabWidget extends TabWidget
         SetupSort();
     }
 
+    public int getSortCount()
+    {
+        synchronized(this)
+        {
+            return _SortCount.get();
+        }
+    }
+
+    private int incrementSortCount()
+    {
+        synchronized(this)
+        {
+            return _SortCount.incrementAndGet();
+        }
+    }
+    
+    public void PerformSort()
+    {
+        if (getSortCount()>0)
+        {
+            setIncrementSortCount(0); 
+            Sort();
+        }
+    }
+
+    private void setIncrementSortCount(int newVal)
+    {
+        synchronized(this)
+        {
+            _SortCount.set(newVal);
+        }
+    }
+    private void SetStyle(boolean Odd, GridWidget objGrid, TextWidget objIDWidget, TextWidget objValueWidget)
+    {
+        if (Odd)
+        {
+            objGrid.setStyleOverride(Arrays.asList(DynamicTabWidget.getOdd_Background()));
+            objIDWidget.setStyleOverride(Arrays.asList(DynamicTabWidget.getOdd_ID()));
+            objValueWidget.setStyleOverride(Arrays.asList(DynamicTabWidget.getOdd_Value()));
+        }
+        else
+        {
+            objGrid.setStyleOverride(Arrays.asList(DynamicTabWidget.getEven_Background()));
+            objIDWidget.setStyleOverride(Arrays.asList(DynamicTabWidget.getEven_ID()));
+            objValueWidget.setStyleOverride(Arrays.asList(DynamicTabWidget.getEven_Value()));
+        }
+        objGrid.ApplyOverrides();
+        objIDWidget.ApplyOverrides();
+        objValueWidget.ApplyOverrides();
+    }
+    private void SetupSort() // create a deferred task to do the actual sorting, otherwise when you have 5000 datapoints it overlaods the gui
+    {
+        if (incrementSortCount() < 5) // don't need to stack them on if already in the queue
+        {
+            DynamicTabWidgetSortTask objTask = new DynamicTabWidgetSortTask(this);
+            TaskManager.getTaskManager().AddPostponedTaskThreaded(objTask, 500); // just every 1.5 secs do a sort
+        }
+    }
     
     /**
      * Go through and sort the goodies alphabetically
@@ -188,146 +328,6 @@ public class DynamicTabWidget extends TabWidget
                 column = 0;
             }
             objGrid.getStylableObject().setVisible(true);
-        }
-    }
-
-    public static String getTitleStyle()
-    {
-        return DynamicTabWidget.TitleStyle;
-    }
-
-    public static void setTitleStyle(String TitleStyle)
-    {
-        DynamicTabWidget.TitleStyle = TitleStyle;
-    }
-
-    public static boolean isEnabled()
-    {
-        return DynamicTabWidget.Enabled;
-    }
-
-    public static void setEnabled(boolean Enabled)
-    {
-        DynamicTabWidget.Enabled = Enabled;
-    }
-
-    public static int getMaxWidth()
-    {
-        return DynamicTabWidget.MaxWidth;
-    }
-
-    public static void setMaxWidth(int MaxWidth)
-    {
-        DynamicTabWidget.MaxWidth = MaxWidth;
-    }
-
-    public static void setTitleStr(String newTitle)
-    {
-        DynamicTabWidget.TitleStr = newTitle;
-    }
-
-    public static String getTitleStr()
-    {
-        return DynamicTabWidget.TitleStr;
-    }
-
-    public static String getEven_Background()
-    {
-        return DynamicTabWidget.Even_Background;
-    }
-
-    public static void setEven_Background(String Even_Background)
-    {
-        DynamicTabWidget.Even_Background = Even_Background;
-    }
-
-    public static String getEven_ID()
-    {
-        return DynamicTabWidget.Even_ID;
-    }
-
-    public static void setEven_ID(String Even_ID)
-    {
-        DynamicTabWidget.Even_ID = Even_ID;
-    }
-
-    public static String getEven_Value()
-    {
-        return DynamicTabWidget.Even_Value;
-    }
-
-    public static void setEven_Value(String Even_Value)
-    {
-        DynamicTabWidget.Even_Value = Even_Value;
-    }
-
-    public static String getOdd_Background()
-    {
-        return DynamicTabWidget.Odd_Background;
-    }
-
-    public static void setOdd_Background(String Odd_Background)
-    {
-        DynamicTabWidget.Odd_Background = Odd_Background;
-    }
-
-    public static String getOdd_ID()
-    {
-        return DynamicTabWidget.Odd_ID;
-    }
-
-    public static void setOdd_ID(String Odd_ID)
-    {
-        DynamicTabWidget.Odd_ID = Odd_ID;
-    }
-
-    public static String getOdd_Value()
-    {
-        return DynamicTabWidget.Odd_Value;
-    }
-
-    public static void setOdd_Value(String Odd_Value)
-    {
-        DynamicTabWidget.Odd_Value = Odd_Value;
-    }
-    
-    public int getSortCount()
-    {
-        synchronized(this)
-        {
-            return _SortCount.get();
-        }
-    }
-
-    private int incrementSortCount()
-    {
-        synchronized(this)
-        {
-            return _SortCount.incrementAndGet();
-        }
-    }
-    private void setIncrementSortCount(int newVal)
-    {
-        synchronized(this)
-        {
-            _SortCount.set(newVal);
-        }
-    }
-    private void SetupSort() // create a deferred task to do the actual sorting, otherwise when you have 5000 datapoints it overlaods the gui
-    {
-        if (incrementSortCount() < 5) // don't need to stack them on if already in the queue
-        {
-            DynamicTabWidgetSortTask objTask = new DynamicTabWidgetSortTask(this);
-            TaskManager.getTaskManager().AddPostponedTaskThreaded(objTask, 500); // just every 1.5 secs do a sort
-        }
-    }
-    
-    public void PerformSort()
-    {
-        if (getSortCount()>0)
-        {
-            setIncrementSortCount(0); 
-            Sort();
         }
     }
     

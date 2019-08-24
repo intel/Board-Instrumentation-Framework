@@ -37,7 +37,8 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class PDF_ReaderWidget extends BaseWidget
 {
-//    private final org.jpedal.PdfDecoderFX _pdf = new org.jpedal.PdfDecoderFX();
+private static int _AutoAdvancePageNumber = 0;
+    //    private final org.jpedal.PdfDecoderFX _pdf = new org.jpedal.PdfDecoderFX();
     private Node _pdf = null;
     @SuppressWarnings("unused")
     private String _SrcFile;
@@ -46,12 +47,20 @@ public class PDF_ReaderWidget extends BaseWidget
     private int _AutoAdvanceInterval;
     @SuppressWarnings("unused")
     private boolean _AutoAdvance, _AutoLoopWithAdvance;
-    private static int _AutoAdvancePageNumber = 0;
 
     public PDF_ReaderWidget()
     {
         _AutoAdvance = false;
         _AutoLoopWithAdvance = false;
+    }
+
+    @Override
+    public void ConfigureAlignment()
+    {
+        super.ConfigureAlignment();
+
+        GridPane.setValignment(_objGroup, getVerticalPosition());
+        GridPane.setHalignment(_objGroup, getHorizontalPosition());
     }
 
     @Override
@@ -103,6 +112,122 @@ public class PDF_ReaderWidget extends BaseWidget
             });
             return ApplyCSS();
         }
+        return false;
+    }
+
+    @Override
+    public Node getStylableObject()
+    {
+        return _pdf;
+    }
+
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+        return null;
+        //return _pdf.getStylesheets();
+    }
+
+    private void gotoPage(int pageNum)
+    {
+        /*
+        if (pageNum > _pdf.getPageCount())
+        {
+            LOGGER.warning("Tried to go to PDF page " + Integer.toString(pageNum) + " but it only has " + Integer.toBinaryString(_pdf.getPageCount())+ " pages.");
+            return;
+        }
+        try
+        {
+            final PdfPageData pageData = _pdf.getPdfPageData();
+            final int rotation = pageData.getRotation(pageNum); //rotation angle of current page
+            float scaleVal = 1;
+            if (getWidth() != 0 || getHeight() != 0)
+            {
+                float xScale = 0;
+                float yScale = 0;
+                // figure out which is the smaller scale value and use it
+                if (getWidth() > 0)
+                {
+                    xScale = (float) getWidth() / pageData.getCropBoxWidth2D(pageNum);
+                }
+                if (getHeight() > 0)
+                {
+                    yScale = (float) getHeight() / pageData.getCropBoxHeight2D(pageNum);
+                }
+
+                if (xScale > yScale)
+                {
+                    scaleVal = yScale;
+                }
+                else
+                {
+                    scaleVal = xScale;
+                }
+            }
+            // The sample App does this, and if I don't, it looks wrong
+            if (rotation == 0 || rotation == 180)
+            {
+                _pdf.setPageParameters(scaleVal, pageNum);
+            }
+            
+            _pdf.decodePage(pageNum);
+            _CurrPage = pageNum;
+            _pdf.waitForDecodingToFinish();
+        }
+
+        catch (final Exception e)
+        {
+            LOGGER.severe(e.toString());
+        }
+        */
+    }
+
+    @Override
+    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
+    {
+        if (node.getNodeName().equalsIgnoreCase("Source"))
+        {
+            setSrcFile(node.getTextContent());
+            return true;
+        }
+        if (node.getNodeName().equalsIgnoreCase("AutoAdvance"))
+        {
+            /*        
+             <AutoAdvance Frequency='1000' Loop='False'/>
+             */
+            if (node.hasAttribute("Frequency"))
+            {
+                _AutoAdvanceInterval = node.getIntegerAttribute("Frequency", -1);
+                if (_AutoAdvanceInterval < 100)
+                {
+                    LOGGER.severe("Frequency specified for PDF_ReaderWidget is invalid: " + node.getAttribute("Frequency"));
+                    return false;
+                }
+
+                if (node.hasAttribute("Loop"))
+                {
+                    _AutoLoopWithAdvance = node.getBooleanAttribute("Loop");
+                }
+                _AutoAdvance = true;
+                return true;
+            }
+
+            return false;
+        }
+        if (node.getNodeName().equalsIgnoreCase("InitialPage"))
+        {
+            try
+            {
+                _CurrPage = Integer.parseInt(node.getTextContent());
+            }
+            catch (NumberFormatException ex)
+            {
+                LOGGER.severe("Initial Page for PDF_ReaderWidget: " + node.getTextContent());
+                return false;
+            }
+            return true;
+        }
+
         return false;
     }
 
@@ -171,23 +296,9 @@ public class PDF_ReaderWidget extends BaseWidget
         */
     }
 
-    @Override
-    public ObservableList<String> getStylesheets()
+    public void setSrcFile(String strFile)
     {
-        return null;
-        //return _pdf.getStylesheets();
-    }
-
-    @Override
-    public Node getStylableObject()
-    {
-        return _pdf;
-    }
-
-    @Override
-    public void UpdateTitle(String newTitle)
-    {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        _SrcFile = strFile;
     }
 
     private boolean setupPDF()
@@ -223,121 +334,10 @@ public class PDF_ReaderWidget extends BaseWidget
         return true;
     }
 
-    public void setSrcFile(String strFile)
-    {
-        _SrcFile = strFile;
-    }
-
     @Override
-    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
+    public void UpdateTitle(String newTitle)
     {
-        if (node.getNodeName().equalsIgnoreCase("Source"))
-        {
-            setSrcFile(node.getTextContent());
-            return true;
-        }
-        if (node.getNodeName().equalsIgnoreCase("AutoAdvance"))
-        {
-            /*        
-             <AutoAdvance Frequency='1000' Loop='False'/>
-             */
-            if (node.hasAttribute("Frequency"))
-            {
-                _AutoAdvanceInterval = node.getIntegerAttribute("Frequency", -1);
-                if (_AutoAdvanceInterval < 100)
-                {
-                    LOGGER.severe("Frequency specified for PDF_ReaderWidget is invalid: " + node.getAttribute("Frequency"));
-                    return false;
-                }
-
-                if (node.hasAttribute("Loop"))
-                {
-                    _AutoLoopWithAdvance = node.getBooleanAttribute("Loop");
-                }
-                _AutoAdvance = true;
-                return true;
-            }
-
-            return false;
-        }
-        if (node.getNodeName().equalsIgnoreCase("InitialPage"))
-        {
-            try
-            {
-                _CurrPage = Integer.parseInt(node.getTextContent());
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.severe("Initial Page for PDF_ReaderWidget: " + node.getTextContent());
-                return false;
-            }
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public void ConfigureAlignment()
-    {
-        super.ConfigureAlignment();
-
-        GridPane.setValignment(_objGroup, getVerticalPosition());
-        GridPane.setHalignment(_objGroup, getHorizontalPosition());
-    }
-
-    private void gotoPage(int pageNum)
-    {
-        /*
-        if (pageNum > _pdf.getPageCount())
-        {
-            LOGGER.warning("Tried to go to PDF page " + Integer.toString(pageNum) + " but it only has " + Integer.toBinaryString(_pdf.getPageCount())+ " pages.");
-            return;
-        }
-        try
-        {
-            final PdfPageData pageData = _pdf.getPdfPageData();
-            final int rotation = pageData.getRotation(pageNum); //rotation angle of current page
-            float scaleVal = 1;
-            if (getWidth() != 0 || getHeight() != 0)
-            {
-                float xScale = 0;
-                float yScale = 0;
-                // figure out which is the smaller scale value and use it
-                if (getWidth() > 0)
-                {
-                    xScale = (float) getWidth() / pageData.getCropBoxWidth2D(pageNum);
-                }
-                if (getHeight() > 0)
-                {
-                    yScale = (float) getHeight() / pageData.getCropBoxHeight2D(pageNum);
-                }
-
-                if (xScale > yScale)
-                {
-                    scaleVal = yScale;
-                }
-                else
-                {
-                    scaleVal = xScale;
-                }
-            }
-            // The sample App does this, and if I don't, it looks wrong
-            if (rotation == 0 || rotation == 180)
-            {
-                _pdf.setPageParameters(scaleVal, pageNum);
-            }
-            
-            _pdf.decodePage(pageNum);
-            _CurrPage = pageNum;
-            _pdf.waitForDecodingToFinish();
-        }
-
-        catch (final Exception e)
-        {
-            LOGGER.severe(e.toString());
-        }
-        */
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

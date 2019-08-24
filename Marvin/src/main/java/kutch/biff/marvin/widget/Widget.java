@@ -35,20 +35,20 @@ import kutch.biff.marvin.utility.FrameworkNode;
 public interface Widget
 {
     public boolean Create(GridPane pane,DataManager dataMgr);
-    public ObservableList<String> getStylesheets();
-    public javafx.scene.Node getStylableObject();
-    public boolean SupportsEnableDisable();
-    public boolean SupportsSteppedRanges();
-    public void HandleCustomStyleOverride(FrameworkNode styleNode);
     public Region getRegionObject();
-    public void UpdateTitle(String newTitle);
-    public void UpdateValueRange();
-    public boolean PerformPostCreateActions(GridWidget objParentGrid,boolean flag);
-    public void PrepareForAppShutdown();
-    public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent);
+    public javafx.scene.Node getStylableObject();
+    public ObservableList<String> getStylesheets();
+    public void HandleCustomStyleOverride(FrameworkNode styleNode);
     public void OnPaused();
     public void OnResumed();
+    public boolean PerformPostCreateActions(GridWidget objParentGrid,boolean flag);
+    public void PrepareForAppShutdown();
     public void resetState(String strParam);
+    public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent);
+    public boolean SupportsEnableDisable();
+    public boolean SupportsSteppedRanges();
+    public void UpdateTitle(String newTitle);
+    public void UpdateValueRange();
 }
 
 

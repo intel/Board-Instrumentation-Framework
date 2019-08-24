@@ -36,13 +36,6 @@ public class PromptManager
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private static PromptManager _PromptManager = null;
-    private ArrayList<BasePrompt> _Prompts = null;
-    
-    public PromptManager()
-    {
-        _Prompts = new ArrayList<>();
-    }
-
     public static PromptManager getPromptManager()
     {
         if (null == _PromptManager)
@@ -51,19 +44,14 @@ public class PromptManager
         }
         return _PromptManager;
     }
-
-    public BasePrompt getPrompt(String ID)
-    {
-        for (BasePrompt prompt : _Prompts)
-        {
-            if (ID.equalsIgnoreCase(prompt.toString()))
-            {
-                return prompt;
-            }
-        }
-        return null;
-    }
     
+    private ArrayList<BasePrompt> _Prompts = null;
+
+    public PromptManager()
+    {
+        _Prompts = new ArrayList<>();
+    }
+
     public boolean addPrompt(String ID, BasePrompt prompt)
     {
         if (null == getPrompt(ID))
@@ -182,6 +170,18 @@ public class PromptManager
         objPrompt.setDlgTitle(strTitle);
         objPrompt.setMessage(strMessage);
         return addPrompt(ID, objPrompt);
+    }
+    
+    public BasePrompt getPrompt(String ID)
+    {
+        for (BasePrompt prompt : _Prompts)
+        {
+            if (ID.equalsIgnoreCase(prompt.toString()))
+            {
+                return prompt;
+            }
+        }
+        return null;
     }
     
 }

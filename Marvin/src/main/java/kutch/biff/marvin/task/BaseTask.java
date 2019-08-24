@@ -34,64 +34,31 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 abstract public class BaseTask implements ITask
 {
-    private ArrayList<Parameter> _Params;
-    private long _PostponePeriod;
     private static int _TaskCount = 0;
+    protected final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    public static int getTaskCount()
+    {
+        return _TaskCount;
+    }
+    private ArrayList<Parameter> _Params;
+    
+    private long _PostponePeriod;
     protected String _ID;
     
-    protected final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    
     protected final TaskManager TASKMAN = TaskManager.getTaskManager();
-    
-    
     public BaseTask()
     {
         _ID = null;
         _TaskCount++;
     }
+    
     public BaseTask(String taskID)
     {
         _Params = null;
         _PostponePeriod = 0;
         _TaskCount++;
         _ID=taskID;
-    }
-    
-    public String getTaskID_ForVerification()
-    {
-        return _ID;
-    }
-    
-    public String getTaskID()
-    {
-        if (null == _ID)
-        {
-            return this.toString();
-        }
-        return _ID;
-    }
-    
-    public void setTaskID(String taskID)
-    {
-        _ID = taskID;
-    }
-    @Override
-    public boolean getMustBeInGUIThread()
-    {
-        return true;
-    }
-    public static int getTaskCount()
-    {
-        return _TaskCount;
-    }
-
-    public ArrayList<Parameter> getParams()
-    {
-        return _Params;
-    }
-
-    public void setParams(ArrayList<Parameter> _Params)
-    {
-        this._Params = _Params;
     }
     
     /**
@@ -124,17 +91,50 @@ abstract public class BaseTask implements ITask
         
         return CheckForDataSrcParameter(strData);
     }
-
+    
+    @Override
+    public boolean getMustBeInGUIThread()
+    {
+        return true;
+    }
+    public ArrayList<Parameter> getParams()
+    {
+        return _Params;
+    }
     @Override
     public long getPostponePeriod()
     {
         return _PostponePeriod;
     }
 
+    public String getTaskID()
+    {
+        if (null == _ID)
+        {
+            return this.toString();
+        }
+        return _ID;
+    }
+
+    public String getTaskID_ForVerification()
+    {
+        return _ID;
+    }
+    
+    public void setParams(ArrayList<Parameter> _Params)
+    {
+        this._Params = _Params;
+    }
+
     @Override
     public void setPostponePeriod(long _PostponePeriod)
     {
         this._PostponePeriod = _PostponePeriod;
+    }
+
+    public void setTaskID(String taskID)
+    {
+        _ID = taskID;
     }
     
 }

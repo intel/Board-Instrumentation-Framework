@@ -42,22 +42,12 @@ public class OscarTask extends BaseTask
         return _OscarID;
     }
 
-    public void setOscarID(String _OscarID)
-    {
-        this._OscarID = _OscarID;
-    }
-
     @Override
     public String getTaskID()
     {
         return _TaskID;
     }
 
-    @Override
-    public void setTaskID(String _TaskID)
-    {
-        this._TaskID = _TaskID;
-    }
     @Override
     public  void PerformTask()
     {
@@ -102,5 +92,15 @@ public class OscarTask extends BaseTask
             TASKMAN.SendToOscar(getDataValue(strOscarID),sendBuffer.getBytes());
             LOGGER.info("Sending Oscar Task to Oscar[" + _OscarID+ ":"+getTaskID()+"] " + logParams);
         }
+    }
+
+    public void setOscarID(String _OscarID)
+    {
+        this._OscarID = _OscarID;
+    }
+    @Override
+    public void setTaskID(String _TaskID)
+    {
+        this._TaskID = _TaskID;
     }
 }

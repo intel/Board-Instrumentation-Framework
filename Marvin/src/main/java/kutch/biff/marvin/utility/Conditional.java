@@ -41,22 +41,163 @@ import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 public class Conditional
 {
     
-    @Override
-    public String toString()
-    {
-	return "Conditional{" + "_Value1_ID=" + _Value1_ID + ", _Value1_Namespace=" + _Value1_Namespace
-		+ ", _Value2_ID=" + _Value2_ID + ", _Value2_Namespace=" + _Value2_Namespace + ", _Value2=" + _Value2
-		+ ", _type=" + _type + ", _If_Task=" + _If_Task + ", _Else_Task=" + _Else_Task + '}';
-    }
-    
-    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    private final TaskManager TASKMAN = TaskManager.getTaskManager();
-    
     public enum Type
     {
 	EQ, NE, GT, GE, LT, LE, CASE, Invalid
+    }
+    
+    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    public static Conditional BuildConditional(Type type, FrameworkNode condNode, boolean usesThen)
+    {
+	Conditional objCond = null;
+	if (type == Type.CASE)
+	{
+	    objCond = ConditionalCase.BuildConditionalCase(condNode);
+	}
+	else if (type != Type.Invalid)
+	{
+	    ArrayList<FrameworkNode> OrChildren = condNode.getChildNodes("OR");
+	    ArrayList<FrameworkNode> AndChildren = condNode.getChildNodes("And");
+	    
+	    if (OrChildren.isEmpty() && AndChildren.isEmpty())
+	    {
+		
+		objCond = new Conditional(type, usesThen);
+	    }
+	    else
+	    {
+		objCond = new CompoundConditional(type);
+	    }
+	    if (!objCond.readCondition(condNode))
+	    {
+		objCond = null;
+	    }
+	}
+	
+	return objCond;
+    }
+    
+    public static boolean EvaluateConditional(String strValue1, String strValue2, Type Conditional,
+	    boolean isCaseSensitive)
+    {
+	boolean result;
+	
+	try
+	{
+	    result = PerformValue(Double.parseDouble(strValue1), Double.parseDouble(strValue2), Conditional);
+	}
+	catch(NumberFormatException ex)
+	{
+	    result = PerformString(strValue1, strValue2, Conditional, isCaseSensitive);
+	}
+	return result;
     };
     
+    public static Type GetType(String strType)
+    {
+	if (null == strType)
+	{
+	    return Type.Invalid;
+	}
+	
+	if (strType.equalsIgnoreCase("IF_EQ"))
+	{
+	    return Type.EQ;
+	}
+	if (strType.equalsIgnoreCase("IF_NE"))
+	{
+	    return Type.NE;
+	}
+	if (strType.equalsIgnoreCase("IF_GE"))
+	{
+	    return Type.GE;
+	}
+	if (strType.equalsIgnoreCase("IF_GT"))
+	{
+	    return Type.GT;
+	}
+	if (strType.equalsIgnoreCase("IF_LE"))
+	{
+	    return Type.LE;
+	}
+	if (strType.equalsIgnoreCase("IF_LT"))
+	{
+	    return Type.LT;
+	}
+	if (strType.equalsIgnoreCase("IF_EQ"))
+	{
+	    return Type.EQ;
+	}
+	if (strType.equalsIgnoreCase("CASE"))
+	{
+	    return Type.CASE;
+	}
+	return Type.Invalid;
+    }
+    protected static boolean PerformString(String Val1, String Val2, Type testType, boolean isCaseSensitive)
+    {
+	if (!isCaseSensitive)
+	{
+	    Val1 = Val1.toLowerCase();
+	    Val2 = Val2.toLowerCase();
+	}
+	
+	Val1 = Val1.trim();
+	Val2 = Val2.trim();
+	switch (testType)
+	{
+	    case EQ:
+		return Val1.equals(Val2);
+	    case NE:
+		return !Val1.equals(Val2);
+	    
+	    case GT:
+		return Val1.compareTo(Val2) > 0;
+	    
+	    case GE:
+		return Val1.compareTo(Val2) >= 0;
+	    
+	    case LT:
+		return Val1.compareTo(Val2) < 0;
+	    
+	    case LE:
+		return Val1.compareTo(Val2) <= 0;
+	    case CASE:
+		break;
+	    case Invalid:
+		break;
+	    default:
+		break;
+	}
+	return false;
+    }
+    protected static boolean PerformValue(double Val1, double Val2, Type testType)
+    {
+	switch (testType)
+	{
+	    case EQ:
+		return Val1 == Val2;
+	    
+	    case NE:
+		return Val1 != Val2;
+	    
+	    case GT:
+		return Val1 > Val2;
+	    
+	    case GE:
+		return Val1 >= Val2;
+	    
+	    case LT:
+		return Val1 < Val2;
+	    
+	    case LE:
+		return Val1 <= Val2;
+	    default:
+		break;
+	}
+	return false;
+    }
+    private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private String _Value1_ID;
     private String _Value1_Namespace;
     private String _Value2_ID;
@@ -65,9 +206,14 @@ public class Conditional
     private final Type _type;
     private String _If_Task;
     private String _Else_Task;
+    
     private boolean _CaseSensitive;
+    
     protected boolean _UsesThen;
+    
+    @SuppressWarnings("unused")
     private ValueRange 	__dataIndexRange;
+    @SuppressWarnings("unused")
     private String 	__dataIndexToken;
     
     /*
@@ -91,35 +237,16 @@ public class Conditional
 	
     }
     
-    protected String getThenTask()
+    public void Enable()
     {
-	return _If_Task;
-    }
-    
-    protected String getElseTask()
-    {
-	return _Else_Task;
-    }
-    
-    public void SetNamespaceAndID(String namespace, String id)
-    {
-	_Value1_ID = id;
-	_Value1_Namespace = namespace;
-    }
-    
-    @Override
-    public int hashCode()
-    {
-	int hash = 7;
-	hash = 59 * hash + Objects.hashCode(this._Value1_ID);
-	hash = 59 * hash + Objects.hashCode(this._Value1_Namespace);
-	hash = 59 * hash + Objects.hashCode(this._Value2_ID);
-	hash = 59 * hash + Objects.hashCode(this._Value2_Namespace);
-	hash = 59 * hash + Objects.hashCode(this._Value2);
-	hash = 59 * hash + Objects.hashCode(this._type);
-	hash = 59 * hash + Objects.hashCode(this._Else_Task);
-	hash = 59 * hash + (this._CaseSensitive ? 1 : 0);
-	return hash;
+	DataManager.getDataManager().AddListener(_Value1_ID, _Value1_Namespace, new ChangeListener<Object>()
+	{
+	    @Override
+	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
+	    {
+		Perform(newVal.toString());
+	    }
+	});
     }
     
     @Override
@@ -177,69 +304,45 @@ public class Conditional
 	return true;
     }
     
+    public String getElse_Task()
+    {
+	return _Else_Task;
+    }
+    
+    protected String getElseTask()
+    {
+	return _Else_Task;
+    }
+    
+    public String getIf_Task()
+    {
+	return _If_Task;
+    }
+    
+    protected String getThenTask()
+    {
+	return _If_Task;
+    }
+    
     protected Type getType()
     {
 	return _type;
-    }
-    
-    public static Type GetType(String strType)
-    {
-	if (null == strType)
-	{
-	    return Type.Invalid;
-	}
-	
-	if (strType.equalsIgnoreCase("IF_EQ"))
-	{
-	    return Type.EQ;
-	}
-	if (strType.equalsIgnoreCase("IF_NE"))
-	{
-	    return Type.NE;
-	}
-	if (strType.equalsIgnoreCase("IF_GE"))
-	{
-	    return Type.GE;
-	}
-	if (strType.equalsIgnoreCase("IF_GT"))
-	{
-	    return Type.GT;
-	}
-	if (strType.equalsIgnoreCase("IF_LE"))
-	{
-	    return Type.LE;
-	}
-	if (strType.equalsIgnoreCase("IF_LT"))
-	{
-	    return Type.LT;
-	}
-	if (strType.equalsIgnoreCase("IF_EQ"))
-	{
-	    return Type.EQ;
-	}
-	if (strType.equalsIgnoreCase("CASE"))
-	{
-	    return Type.CASE;
-	}
-	return Type.Invalid;
-    }
-    
-    public void Enable()
-    {
-	DataManager.getDataManager().AddListener(_Value1_ID, _Value1_Namespace, new ChangeListener<Object>()
-	{
-	    @Override
-	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
-	    {
-		Perform(newVal.toString());
-	    }
-	});
     }
     
     // used for compound conditionals only
     protected String GetValue1()
     {
 	return DataManager.getDataManager().GetValue(_Value1_ID, _Value1_Namespace);
+    }
+    
+    public String getValue1_Namespace()
+    {
+	return _Value1_Namespace;
+    }
+    
+    public String getValue2()
+    {
+	return _Value2;
     }
     
     protected String GetValue2()
@@ -251,20 +354,34 @@ public class Conditional
 	return _Value2;
     }
     
-    public static boolean EvaluateConditional(String strValue1, String strValue2, Type Conditional,
-	    boolean isCaseSensitive)
+    public String getValue2_ID()
     {
-	boolean result;
-	
-	try
-	{
-	    result = PerformValue(Double.parseDouble(strValue1), Double.parseDouble(strValue2), Conditional);
-	}
-	catch(NumberFormatException ex)
-	{
-	    result = PerformString(strValue1, strValue2, Conditional, isCaseSensitive);
-	}
-	return result;
+	return _Value2_ID;
+    }
+    
+    public String getValue2_Namespace()
+    {
+	return _Value2_Namespace;
+    }
+    
+    @Override
+    public int hashCode()
+    {
+	int hash = 7;
+	hash = 59 * hash + Objects.hashCode(this._Value1_ID);
+	hash = 59 * hash + Objects.hashCode(this._Value1_Namespace);
+	hash = 59 * hash + Objects.hashCode(this._Value2_ID);
+	hash = 59 * hash + Objects.hashCode(this._Value2_Namespace);
+	hash = 59 * hash + Objects.hashCode(this._Value2);
+	hash = 59 * hash + Objects.hashCode(this._type);
+	hash = 59 * hash + Objects.hashCode(this._Else_Task);
+	hash = 59 * hash + (this._CaseSensitive ? 1 : 0);
+	return hash;
+    }
+    
+    public boolean isCaseSensitive()
+    {
+	return _CaseSensitive;
     }
     
     protected void Perform(String Val1)
@@ -284,181 +401,6 @@ public class Conditional
 	{
 	    TASKMAN.AddDeferredTask(_Else_Task);
 	}
-    }
-    
-    protected static boolean PerformString(String Val1, String Val2, Type testType, boolean isCaseSensitive)
-    {
-	if (!isCaseSensitive)
-	{
-	    Val1 = Val1.toLowerCase();
-	    Val2 = Val2.toLowerCase();
-	}
-	
-	Val1 = Val1.trim();
-	Val2 = Val2.trim();
-	switch (testType)
-	{
-	    case EQ:
-		return Val1.equals(Val2);
-	    case NE:
-		return !Val1.equals(Val2);
-	    
-	    case GT:
-		return Val1.compareTo(Val2) > 0;
-	    
-	    case GE:
-		return Val1.compareTo(Val2) >= 0;
-	    
-	    case LT:
-		return Val1.compareTo(Val2) < 0;
-	    
-	    case LE:
-		return Val1.compareTo(Val2) <= 0;
-	    case CASE:
-		break;
-	    case Invalid:
-		break;
-	    default:
-		break;
-	}
-	return false;
-    }
-    
-    protected static boolean PerformValue(double Val1, double Val2, Type testType)
-    {
-	switch (testType)
-	{
-	    case EQ:
-		return Val1 == Val2;
-	    
-	    case NE:
-		return Val1 != Val2;
-	    
-	    case GT:
-		return Val1 > Val2;
-	    
-	    case GE:
-		return Val1 >= Val2;
-	    
-	    case LT:
-		return Val1 < Val2;
-	    
-	    case LE:
-		return Val1 <= Val2;
-	    default:
-		break;
-	}
-	return false;
-    }
-    
-    public String getValue1_Namespace()
-    {
-	return _Value1_Namespace;
-    }
-    
-    public void setValue1_Namespace(String _Value1_Namespace)
-    {
-	this._Value1_Namespace = _Value1_Namespace;
-    }
-    
-    public String getValue2_ID()
-    {
-	return _Value2_ID;
-    }
-    
-    public void setValue2_ID(String _Value2_ID)
-    {
-	this._Value2_ID = _Value2_ID;
-    }
-    
-    public String getValue2_Namespace()
-    {
-	return _Value2_Namespace;
-    }
-    
-    public void setValue2_Namespace(String _Value2_Namespace)
-    {
-	this._Value2_Namespace = _Value2_Namespace;
-    }
-    
-    public String getValue2()
-    {
-	return _Value2;
-    }
-    
-    public void setValue2(String _Value2)
-    {
-	this._Value2 = _Value2;
-    }
-    
-    public String getIf_Task()
-    {
-	return _If_Task;
-    }
-    
-    public void setIf_Task(String _If_Task)
-    {
-	this._If_Task = _If_Task;
-    }
-    
-    public String getElse_Task()
-    {
-	return _Else_Task;
-    }
-    
-    public void setElse_Task(String _Else_Task)
-    {
-	this._Else_Task = _Else_Task;
-    }
-    
-    public boolean isCaseSensitive()
-    {
-	return _CaseSensitive;
-    }
-    
-    public void setCaseSensitive(boolean _CaseSensitive)
-    {
-	this._CaseSensitive = _CaseSensitive;
-    }
-    
-    protected boolean ReadMinionSrc(FrameworkNode condNode)
-    {
-	String ID = null, Namespace = null;
-
-	
-	for (FrameworkNode node : condNode.getChildNodes())
-	{
-	    if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
-	    {
-		continue;
-	    }
-	    if (node.getNodeName().equalsIgnoreCase("MinionSrc"))
-	    {
-		if (node.hasAttribute("ID"))
-		{
-		    ID = node.getAttribute("ID");
-		}
-		else
-		{
-		    LOGGER.severe("Conditional defined with invalid MinionSrc, no ID");
-		    return false;
-		}
-		if (node.hasAttribute("Namespace"))
-		{
-		    Namespace = node.getAttribute("Namespace");
-		}
-		else
-		{
-		    LOGGER.severe("Conditional defined with invalid MinionSrc, no Namespace");
-		    return false;
-		}
-		Pair<ValueRange,String> indexInfo = WidgetBuilder.ReadMinionSrcIndexInfo(node);
-		__dataIndexRange = indexInfo.getKey();
-		__dataIndexToken = indexInfo.getValue();
-	    }
-	}
-	SetNamespaceAndID(Namespace, ID);
-	return true;
     }
     
     protected boolean readCondition(FrameworkNode condNode)
@@ -555,33 +497,92 @@ public class Conditional
 	return retVal;
     }
     
-    public static Conditional BuildConditional(Type type, FrameworkNode condNode, boolean usesThen)
+    protected boolean ReadMinionSrc(FrameworkNode condNode)
     {
-	Conditional objCond = null;
-	if (type == Type.CASE)
-	{
-	    objCond = ConditionalCase.BuildConditionalCase(condNode);
-	}
-	else if (type != Type.Invalid)
-	{
-	    ArrayList<FrameworkNode> OrChildren = condNode.getChildNodes("OR");
-	    ArrayList<FrameworkNode> AndChildren = condNode.getChildNodes("And");
-	    
-	    if (OrChildren.isEmpty() && AndChildren.isEmpty())
-	    {
-		
-		objCond = new Conditional(type, usesThen);
-	    }
-	    else
-	    {
-		objCond = new CompoundConditional(type);
-	    }
-	    if (!objCond.readCondition(condNode))
-	    {
-		objCond = null;
-	    }
-	}
+	String ID = null, Namespace = null;
+
 	
-	return objCond;
+	for (FrameworkNode node : condNode.getChildNodes())
+	{
+	    if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
+	    {
+		continue;
+	    }
+	    if (node.getNodeName().equalsIgnoreCase("MinionSrc"))
+	    {
+		if (node.hasAttribute("ID"))
+		{
+		    ID = node.getAttribute("ID");
+		}
+		else
+		{
+		    LOGGER.severe("Conditional defined with invalid MinionSrc, no ID");
+		    return false;
+		}
+		if (node.hasAttribute("Namespace"))
+		{
+		    Namespace = node.getAttribute("Namespace");
+		}
+		else
+		{
+		    LOGGER.severe("Conditional defined with invalid MinionSrc, no Namespace");
+		    return false;
+		}
+		Pair<ValueRange,String> indexInfo = WidgetBuilder.ReadMinionSrcIndexInfo(node);
+		__dataIndexRange = indexInfo.getKey();
+		__dataIndexToken = indexInfo.getValue();
+	    }
+	}
+	SetNamespaceAndID(Namespace, ID);
+	return true;
+    }
+    
+    public void setCaseSensitive(boolean _CaseSensitive)
+    {
+	this._CaseSensitive = _CaseSensitive;
+    }
+    
+    public void setElse_Task(String _Else_Task)
+    {
+	this._Else_Task = _Else_Task;
+    }
+    
+    public void setIf_Task(String _If_Task)
+    {
+	this._If_Task = _If_Task;
+    }
+    
+    public void SetNamespaceAndID(String namespace, String id)
+    {
+	_Value1_ID = id;
+	_Value1_Namespace = namespace;
+    }
+    
+    public void setValue1_Namespace(String _Value1_Namespace)
+    {
+	this._Value1_Namespace = _Value1_Namespace;
+    }
+    
+    public void setValue2(String _Value2)
+    {
+	this._Value2 = _Value2;
+    }
+    
+    public void setValue2_ID(String _Value2_ID)
+    {
+	this._Value2_ID = _Value2_ID;
+    }
+    
+    public void setValue2_Namespace(String _Value2_Namespace)
+    {
+	this._Value2_Namespace = _Value2_Namespace;
+    }
+    
+    @Override
+    public String toString()
+    {
+	return "Conditional{" + "_Value1_ID=" + _Value1_ID + ", _Value1_Namespace=" + _Value1_Namespace
+		+ ", _Value2_ID=" + _Value2_ID + ", _Value2_Namespace=" + _Value2_Namespace + ", _Value2=" + _Value2
+		+ ", _type=" + _type + ", _If_Task=" + _If_Task + ", _Else_Task=" + _Else_Task + '}';
     }
 }

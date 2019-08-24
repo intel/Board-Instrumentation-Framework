@@ -54,18 +54,6 @@ public class BarGaugeWidget extends BaseWidget
     }
 
     @Override
-    public javafx.scene.Node getStylableObject()
-    {
-        return _Gauge;
-    }
-
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-        return _Gauge.getStylesheets();
-    }
-
-    @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
@@ -111,53 +99,15 @@ public class BarGaugeWidget extends BaseWidget
     }
 
     @Override
-    public void SetInitialValue(String value)
+    public javafx.scene.Node getStylableObject()
     {
-        try
-        {
-            _InitialValue = Double.parseDouble(value);
-        }
-        catch (NumberFormatException ex)
-        {
-            LOGGER.severe("Invalid Default Value data for BarGauge: " + value);
-        }
+        return _Gauge;
     }
 
-    public void setMinValue(double MinValue)
+    @Override
+    public ObservableList<String> getStylesheets()
     {
-        _InitialValue = MinValue;
-        this.MinValue = MinValue;
-    }
-
-    public void setMaxValue(double MaxValue)
-    {
-        this.MaxValue = MaxValue;
-    }
-
-    private boolean SetupGauge()
-    {
-        _Gauge.setMinValue(MinValue);
-        _Gauge.setMaxValue(MaxValue);
-
-        if (getTitle().length() > 0)
-        {
-            _Gauge.setTitle(getTitle());
-        }
-        if (null != getUnitsOverride())
-        {
-            _Gauge.setUnit(getUnitsOverride());
-            LOGGER.config("Overriding Widget Units Text to " + getUnitsOverride());
-        }
-        else if (UnitText.length() > 0)
-        {
-            _Gauge.setUnit(UnitText);
-        }
-
-        _Gauge.setDecimals(getDecimalPlaces());
-
-        SetupTaskAction();
-
-        return false != ApplyCSS();
+        return _Gauge.getStylesheets();
     }
 
     /**
@@ -194,12 +144,62 @@ public class BarGaugeWidget extends BaseWidget
     }
 
     @Override
-    public void UpdateTitle(String strTitle)
+    public void SetInitialValue(String value)
     {
-        _Gauge.setTitle(getTitle());
+        try
+        {
+            _InitialValue = Double.parseDouble(value);
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe("Invalid Default Value data for BarGauge: " + value);
+        }
     }
+
+    public void setMaxValue(double MaxValue)
+    {
+        this.MaxValue = MaxValue;
+    }
+
+    public void setMinValue(double MinValue)
+    {
+        _InitialValue = MinValue;
+        this.MinValue = MinValue;
+    }
+
     public void setUnitText(String UnitText)
     {
         this.UnitText = UnitText;
+    }
+
+    private boolean SetupGauge()
+    {
+        _Gauge.setMinValue(MinValue);
+        _Gauge.setMaxValue(MaxValue);
+
+        if (getTitle().length() > 0)
+        {
+            _Gauge.setTitle(getTitle());
+        }
+        if (null != getUnitsOverride())
+        {
+            _Gauge.setUnit(getUnitsOverride());
+            LOGGER.config("Overriding Widget Units Text to " + getUnitsOverride());
+        }
+        else if (UnitText.length() > 0)
+        {
+            _Gauge.setUnit(UnitText);
+        }
+
+        _Gauge.setDecimals(getDecimalPlaces());
+
+        SetupTaskAction();
+
+        return false != ApplyCSS();
+    }
+    @Override
+    public void UpdateTitle(String strTitle)
+    {
+        _Gauge.setTitle(getTitle());
     }
 }

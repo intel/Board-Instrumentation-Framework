@@ -35,36 +35,10 @@ public class MathematicTask extends PulseTask
 
     }
 
-    public boolean setValue(String strValue)
-    {
-        try
-        {
-            _Value = Double.parseDouble(strValue);
-            validVal = true;
-        }
-        catch (NumberFormatException ex)
-        {
-
-        }
-        return validVal;
-    }
-
     @Override
     public boolean isValid()
     {
         return (super.isValid() && validVal && _Operation != null);
-    }
-
-    public boolean SetOperation(String strOper)
-    {
-        if (strOper.equalsIgnoreCase("Add")
-            || strOper.equalsIgnoreCase("Subtract")
-            || strOper.equalsIgnoreCase("Multipley"))
-        {
-            _Operation = strOper;
-        }
-
-        return (null != _Operation);
     }
 
     @Override
@@ -113,5 +87,31 @@ public class MathematicTask extends PulseTask
             int intVal = (int) newVal;
             TASKMAN.getDataMgr().ChangeValue(_ID, _Namespace, Integer.toString(intVal));
         }
+    }
+
+    public boolean SetOperation(String strOper)
+    {
+        if (strOper.equalsIgnoreCase("Add")
+            || strOper.equalsIgnoreCase("Subtract")
+            || strOper.equalsIgnoreCase("Multipley"))
+        {
+            _Operation = strOper;
+        }
+
+        return (null != _Operation);
+    }
+
+    public boolean setValue(String strValue)
+    {
+        try
+        {
+            _Value = Double.parseDouble(strValue);
+            validVal = true;
+        }
+        catch (NumberFormatException ex)
+        {
+
+        }
+        return validVal;
     }
 }

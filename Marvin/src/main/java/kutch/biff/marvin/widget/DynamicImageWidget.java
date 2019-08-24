@@ -48,6 +48,7 @@ import kutch.biff.marvin.widget.dynamicgrid.DynamicTransition;
 public class DynamicImageWidget extends StaticImageWidget
 {
 
+    private static int _AutoAdvanceImageNumber = 0;
     private HashMap<String, String> _ImageFilenames;
     private HashMap<String, DynamicTransition> _TransitionMap;
     private HashMap<String, ImageView> _ImageViewMap;
@@ -58,7 +59,6 @@ public class DynamicImageWidget extends StaticImageWidget
     private boolean _AutoAdvance;
     private boolean _AutoLoopWithAdvance;
     private int _AutoAdvanceInterval;
-    private static int _AutoAdvanceImageNumber = 0;
     private ImageView _ActiveView;
     private GridPane basePane;
     private int _MonitorInterval = 500;
@@ -82,6 +82,68 @@ public class DynamicImageWidget extends StaticImageWidget
         _ImageView = null;
         basePane = new GridPane();
 
+    }
+
+    @Override
+    protected boolean ApplyCSS()
+    {
+        boolean fRet = true;
+        if (null != GetCSS_File())
+        {
+            //getStylesheets().clear();
+
+            LOGGER.config("Applying Stylesheet: " + GetCSS_File() + " to Widget [" + _DefinitionFile + "]");
+            // This was a .add(), but changed to Sett all as there was kind of
+            // memory leak when I changed style via Minion or MarvinTasks...
+            fRet = getStylesheets().setAll(GetCSS_File());
+            if (false == fRet)
+            {
+                LOGGER.severe("Failed to apply Stylesheet " + GetCSS_File());
+                return false;
+            }
+        }
+        if (null != getStyleID())
+        {
+            getStylableObject().setId(getStyleID());
+        }
+
+        for (String key : _ImageFilenames.keySet())
+        {
+            Node objStylable = _ImageViewMap.get(key);
+            fRet = ApplyStyleOverrides(objStylable, getStyleOverride());
+        }
+        return fRet;
+    }
+
+    @Override
+    public void ConfigureAlignment()
+    {
+        for (String key : _ImageFilenames.keySet())
+        {
+            Node objStylable = _ImageViewMap.get(key);
+            if (objStylable != null)
+            {
+                GridPane.setValignment(objStylable, getVerticalPosition());
+                GridPane.setHalignment(objStylable, getHorizontalPosition());
+            }
+        }
+    }
+
+    @Override
+    protected void ConfigureDimentions()
+    {
+        for (String key : _ImageFilenames.keySet())
+        {
+            if (getHeight() > 0)
+            {
+                _ImageViewMap.get(key).setFitHeight(getHeight());
+            }
+            if (getWidth() > 0)
+            {
+                _ImageViewMap.get(key).setFitWidth(getWidth());
+
+            }
+        }
     }
 
     /**
@@ -250,139 +312,10 @@ public class DynamicImageWidget extends StaticImageWidget
     }
 
     @Override
-    public EventHandler<MouseEvent> SetupTaskAction()
+    public javafx.scene.Node getStylableObject()
     {
-        BaseWidget objWidget = this;
-        if (null != getTaskID() || CONFIG.isDebugMode()) // only do if a task to setup, or if debug mode
-        {
-            EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>()
-            {
-                @Override
-                public void handle(MouseEvent event)
-                {
-                    if (event.isShiftDown() && CONFIG.isDebugMode())
-                    {
-                        LOGGER.info(objWidget.toString(true));
-                    }
-                    else if (_TaskMap.containsKey(_CurrentKey) && true == CONFIG.getAllowTasks())
-                    {
-                        TASKMAN.PerformTask(_TaskMap.get(_CurrentKey));
-                    }
-
-                    else if (null != getTaskID() && true == CONFIG.getAllowTasks())
-                    {
-                        TASKMAN.PerformTask(getTaskID());
-                    }
-                }
-            };
-            for (String key : _ImageFilenames.keySet())
-            {
-                _ImageViewMap.get(key).setOnMouseClicked(eh);
-            }
-
-            return eh;
-        }
+//        return _Pane;
         return null;
-    }
-
-    @Override
-    public boolean PerformPostCreateActions(GridWidget objParentGrid, boolean updateToolTipOnly)
-    {
-        if (true == updateToolTipOnly)
-        {
-            if (CONFIG.isDebugMode())
-            {
-                _ToolTip = this.toString();
-            }
-            if (_ToolTip != null && null != getStylableObject())
-            {
-                HandleToolTipInit();
-                for (String key : _ImageFilenames.keySet())
-                {
-                    ImageView objView = _ImageViewMap.get(key);
-                    Tooltip.install(objView, _objToolTip);
-                }
-            }
-            return true;
-        }
-
-        _WidgetParentGridWidget = objParentGrid;
-        if (CONFIG.isDebugMode())
-        {
-            _ToolTip = this.toString();
-        }
-        if (_ToolTip != null)
-        {
-            HandleToolTipInit();
-            for (String key : _ImageFilenames.keySet())
-            {
-                ImageView objView = _ImageViewMap.get(key);
-                Tooltip.install(objView, _objToolTip);
-            }
-        }
-        FireDefaultPeekaboo();
-
-        return handlePercentageDimentions();
-        //return true;
-    }
-
-    private boolean MonitorForFilechange()
-    {
-        boolean retVal = false;
-        for (String Id : _MontorMap.keySet())
-        {
-            File fp = new File(_ImageFilenames.get(Id).substring("file:".length())); // is stored as url, so skip the 1st part
-            if (fp.lastModified() != _MontorMap.get(Id))
-            {
-                _MontorMap.put(Id, fp.lastModified());
-                LOGGER.info("Monitoring " + _ImageFilenames.get(Id) + " updated");
-                ImageView objImageView = new ImageView(_ImageFilenames.get(Id));
-                objImageView.setPreserveRatio(getPreserveRatio());
-                objImageView.setSmooth(true);
-                objImageView.setPickOnBounds(!GetClickThroughTransparentRegion());
-                objImageView.setVisible(_ImageViewMap.get(Id).isVisible());
-                objImageView.setFitWidth(_ImageViewMap.get(Id).getFitWidth());
-                objImageView.setFitHeight(_ImageViewMap.get(Id).getFitHeight());
-                basePane.getChildren().remove(_ImageViewMap.get(Id));
-
-                _ImageViewMap.put(Id, objImageView);
-                basePane.add(objImageView, 0, 0);
-
-                retVal = true;
-            }
-        }
-        return retVal;
-    }
-
-    private boolean setupImages()
-    {
-        for (String key : _ImageFilenames.keySet())
-        {
-            ImageView objImageView = new ImageView(_ImageFilenames.get(key));
-            objImageView.setPreserveRatio(getPreserveRatio());
-            objImageView.setSmooth(true);
-            objImageView.setPickOnBounds(!GetClickThroughTransparentRegion());
-            objImageView.setVisible(false);
-            _ImageViewMap.put(key, objImageView);
-        }
-
-        if (_CurrentKey == null)
-        {
-            LOGGER.severe("No Initial Image setup for Dynamic Image Widget.");
-            return false;
-        }
-        else if (_ImageFilenames.containsKey(_CurrentKey))
-        {
-            _ActiveView = _ImageViewMap.get(_CurrentKey);
-            _ActiveView.setVisible(true);
-        }
-        else
-        {
-            LOGGER.severe("Initial key not valid for dynamic image widget: " + _CurrentKey);
-            return false;
-        }
-        ConfigureDimentions();
-        return true;
     }
 
     @Override
@@ -508,73 +441,32 @@ public class DynamicImageWidget extends StaticImageWidget
         return true;
     }
 
-    @Override
-    protected void ConfigureDimentions()
+    private boolean MonitorForFilechange()
     {
-        for (String key : _ImageFilenames.keySet())
+        boolean retVal = false;
+        for (String Id : _MontorMap.keySet())
         {
-            if (getHeight() > 0)
+            File fp = new File(_ImageFilenames.get(Id).substring("file:".length())); // is stored as url, so skip the 1st part
+            if (fp.lastModified() != _MontorMap.get(Id))
             {
-                _ImageViewMap.get(key).setFitHeight(getHeight());
-            }
-            if (getWidth() > 0)
-            {
-                _ImageViewMap.get(key).setFitWidth(getWidth());
+                _MontorMap.put(Id, fp.lastModified());
+                LOGGER.info("Monitoring " + _ImageFilenames.get(Id) + " updated");
+                ImageView objImageView = new ImageView(_ImageFilenames.get(Id));
+                objImageView.setPreserveRatio(getPreserveRatio());
+                objImageView.setSmooth(true);
+                objImageView.setPickOnBounds(!GetClickThroughTransparentRegion());
+                objImageView.setVisible(_ImageViewMap.get(Id).isVisible());
+                objImageView.setFitWidth(_ImageViewMap.get(Id).getFitWidth());
+                objImageView.setFitHeight(_ImageViewMap.get(Id).getFitHeight());
+                basePane.getChildren().remove(_ImageViewMap.get(Id));
 
-            }
-        }
-    }
+                _ImageViewMap.put(Id, objImageView);
+                basePane.add(objImageView, 0, 0);
 
-    @Override
-    public void ConfigureAlignment()
-    {
-        for (String key : _ImageFilenames.keySet())
-        {
-            Node objStylable = _ImageViewMap.get(key);
-            if (objStylable != null)
-            {
-                GridPane.setValignment(objStylable, getVerticalPosition());
-                GridPane.setHalignment(objStylable, getHorizontalPosition());
+                retVal = true;
             }
         }
-    }
-
-    @Override
-    public javafx.scene.Node getStylableObject()
-    {
-//        return _Pane;
-        return null;
-    }
-
-    @Override
-    protected boolean ApplyCSS()
-    {
-        boolean fRet = true;
-        if (null != GetCSS_File())
-        {
-            //getStylesheets().clear();
-
-            LOGGER.config("Applying Stylesheet: " + GetCSS_File() + " to Widget [" + _DefinitionFile + "]");
-            // This was a .add(), but changed to Sett all as there was kind of
-            // memory leak when I changed style via Minion or MarvinTasks...
-            fRet = getStylesheets().setAll(GetCSS_File());
-            if (false == fRet)
-            {
-                LOGGER.severe("Failed to apply Stylesheet " + GetCSS_File());
-                return false;
-            }
-        }
-        if (null != getStyleID())
-        {
-            getStylableObject().setId(getStyleID());
-        }
-
-        for (String key : _ImageFilenames.keySet())
-        {
-            Node objStylable = _ImageViewMap.get(key);
-            fRet = ApplyStyleOverrides(objStylable, getStyleOverride());
-        }
-        return fRet;
+        return retVal;
     }
 
     @Override
@@ -600,5 +492,113 @@ public class DynamicImageWidget extends StaticImageWidget
             mt.AddDataset(getMinionID(), getNamespace(), "Next");
             TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
         }
+    }
+
+    @Override
+    public boolean PerformPostCreateActions(GridWidget objParentGrid, boolean updateToolTipOnly)
+    {
+        if (true == updateToolTipOnly)
+        {
+            if (CONFIG.isDebugMode())
+            {
+                _ToolTip = this.toString();
+            }
+            if (_ToolTip != null && null != getStylableObject())
+            {
+                HandleToolTipInit();
+                for (String key : _ImageFilenames.keySet())
+                {
+                    ImageView objView = _ImageViewMap.get(key);
+                    Tooltip.install(objView, _objToolTip);
+                }
+            }
+            return true;
+        }
+
+        _WidgetParentGridWidget = objParentGrid;
+        if (CONFIG.isDebugMode())
+        {
+            _ToolTip = this.toString();
+        }
+        if (_ToolTip != null)
+        {
+            HandleToolTipInit();
+            for (String key : _ImageFilenames.keySet())
+            {
+                ImageView objView = _ImageViewMap.get(key);
+                Tooltip.install(objView, _objToolTip);
+            }
+        }
+        FireDefaultPeekaboo();
+
+        return handlePercentageDimentions();
+        //return true;
+    }
+
+    private boolean setupImages()
+    {
+        for (String key : _ImageFilenames.keySet())
+        {
+            ImageView objImageView = new ImageView(_ImageFilenames.get(key));
+            objImageView.setPreserveRatio(getPreserveRatio());
+            objImageView.setSmooth(true);
+            objImageView.setPickOnBounds(!GetClickThroughTransparentRegion());
+            objImageView.setVisible(false);
+            _ImageViewMap.put(key, objImageView);
+        }
+
+        if (_CurrentKey == null)
+        {
+            LOGGER.severe("No Initial Image setup for Dynamic Image Widget.");
+            return false;
+        }
+        else if (_ImageFilenames.containsKey(_CurrentKey))
+        {
+            _ActiveView = _ImageViewMap.get(_CurrentKey);
+            _ActiveView.setVisible(true);
+        }
+        else
+        {
+            LOGGER.severe("Initial key not valid for dynamic image widget: " + _CurrentKey);
+            return false;
+        }
+        ConfigureDimentions();
+        return true;
+    }
+
+    @Override
+    public EventHandler<MouseEvent> SetupTaskAction()
+    {
+        BaseWidget objWidget = this;
+        if (null != getTaskID() || CONFIG.isDebugMode()) // only do if a task to setup, or if debug mode
+        {
+            EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>()
+            {
+                @Override
+                public void handle(MouseEvent event)
+                {
+                    if (event.isShiftDown() && CONFIG.isDebugMode())
+                    {
+                        LOGGER.info(objWidget.toString(true));
+                    }
+                    else if (_TaskMap.containsKey(_CurrentKey) && true == CONFIG.getAllowTasks())
+                    {
+                        TASKMAN.PerformTask(_TaskMap.get(_CurrentKey));
+                    }
+
+                    else if (null != getTaskID() && true == CONFIG.getAllowTasks())
+                    {
+                        TASKMAN.PerformTask(getTaskID());
+                    }
+                }
+            };
+            for (String key : _ImageFilenames.keySet())
+            {
+                _ImageViewMap.get(key).setOnMouseClicked(eh);
+            }
+
+            return eh;
+        }
+        return null;
     }
 }

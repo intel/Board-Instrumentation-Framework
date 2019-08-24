@@ -54,6 +54,49 @@ public class SaveScreenshotTask extends BaseTask
         _strFileName = fName;
         _mode = mode;
     }
+    private String getFileExtension(String fileName) 
+    {
+        int lastIndexOf = fileName.lastIndexOf(".");
+        if (lastIndexOf == -1) 
+        {
+            return ""; 
+        }
+        return fileName.substring(lastIndexOf);
+    }
+    private String getFileWithoutExtension(String fileName) 
+    {
+        int lastIndexOf = fileName.lastIndexOf(".");
+        if (lastIndexOf == -1) 
+        {
+            return fileName;
+        }
+        return fileName.substring(0,lastIndexOf);
+    }
+    
+    private void HandlePrompt(String fName)
+    {
+        //FileNameExtensionFilter ft = new FileNameExtensionFilter(".jpg",".jpeg",".png",".gif");
+        
+    }
+    
+    private void HandleSequence(String fName)
+    {
+        int iNum = 1;
+        String fileName = fName;
+        String extension = getFileExtension(fName);
+        String base = getFileWithoutExtension(fName);
+        while (new File(fileName).exists())
+        {
+            fileName = base + String.format("%d", iNum);
+            if (extension.length()>0)
+            {
+                fileName = fileName + extension;
+            }
+            iNum++;
+        }
+        WriteToFile(fileName);
+    }
+
     @Override
     public void PerformTask()
     {
@@ -76,49 +119,6 @@ public class SaveScreenshotTask extends BaseTask
         {
             LOGGER.severe("Unknown mode in SaveScreenshotTask: " + _mode.toString());
         }
-    }
-    private void HandlePrompt(String fName)
-    {
-        //FileNameExtensionFilter ft = new FileNameExtensionFilter(".jpg",".jpeg",".png",".gif");
-        
-    }
-    
-    private String getFileExtension(String fileName) 
-    {
-        int lastIndexOf = fileName.lastIndexOf(".");
-        if (lastIndexOf == -1) 
-        {
-            return ""; 
-        }
-        return fileName.substring(lastIndexOf);
-    }
-    
-    private String getFileWithoutExtension(String fileName) 
-    {
-        int lastIndexOf = fileName.lastIndexOf(".");
-        if (lastIndexOf == -1) 
-        {
-            return fileName;
-        }
-        return fileName.substring(0,lastIndexOf);
-    }
-
-    private void HandleSequence(String fName)
-    {
-        int iNum = 1;
-        String fileName = fName;
-        String extension = getFileExtension(fName);
-        String base = getFileWithoutExtension(fName);
-        while (new File(fileName).exists())
-        {
-            fileName = base + String.format("%d", iNum);
-            if (extension.length()>0)
-            {
-                fileName = fileName + extension;
-            }
-            iNum++;
-        }
-        WriteToFile(fileName);
     }
     
     private void WriteToFile(String fName)

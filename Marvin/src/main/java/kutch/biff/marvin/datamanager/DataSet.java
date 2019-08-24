@@ -45,36 +45,6 @@ public class DataSet
         _LatestValueForMath = "";
     }
     
-    public int getSize()
-    {
-        return _DataUpdates.size();
-    }
-
-    public String getLatestValueForMath()
-    {
-        synchronized(this)
-        {
-            return _LatestValueForMath;
-        }
-    }
-            
-    public String getLatestValue()
-    {
-        synchronized(this)
-        {
-            return _LatestValue;
-        }
-    }
-    public void setLatestValue(String newValue)
-    {
-        DataObject newObj = new DataObject(newValue);
-        synchronized(this)
-        {
-            _DataUpdates.add(newObj);
-            _LatestValueForMath = newValue;
-        }
-    }
-
     @SuppressWarnings({ "unchecked", "rawtypes" })    
     public void addListener(ChangeListener listener)
     {
@@ -83,13 +53,43 @@ public class DataSet
             _ObjectProperty.addListener(listener);
         }
     }
-    
+
+    public String getLatestValue()
+    {
+        synchronized(this)
+        {
+            return _LatestValue;
+        }
+    }
+            
+    public String getLatestValueForMath()
+    {
+        synchronized(this)
+        {
+            return _LatestValueForMath;
+        }
+    }
+    public int getSize()
+    {
+        return _DataUpdates.size();
+    }
+
     @SuppressWarnings({ "unchecked", "rawtypes" })    
     public void removeListener(ChangeListener listener)
     {
         if (null != listener && null != _ObjectProperty)
         {
             _ObjectProperty.removeListener(listener);
+        }
+    }
+    
+    public void setLatestValue(String newValue)
+    {
+        DataObject newObj = new DataObject(newValue);
+        synchronized(this)
+        {
+            _DataUpdates.add(newObj);
+            _LatestValueForMath = newValue;
         }
     }
 

@@ -66,18 +66,18 @@ public class CircularList<T> extends ArrayList<T>
         return get(_LastUsedIndex);
     }
     
-    public boolean IsLast(String ID)
-    {
-        return ID.equalsIgnoreCase((String)super.get(super.size()-1));
-    }
     public T GetNext()
     {
         return get(_LastUsedIndex+1);
     }
-
     public T GetPrevious()
     {
         return get(_LastUsedIndex-1);
+    }
+
+    public boolean IsLast(String ID)
+    {
+        return ID.equalsIgnoreCase((String)super.get(super.size()-1));
     }
 }
 

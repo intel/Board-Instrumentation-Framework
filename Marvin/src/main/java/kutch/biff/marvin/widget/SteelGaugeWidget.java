@@ -134,113 +134,14 @@ public class SteelGaugeWidget extends BaseWidget
         return ApplyCSS();
     }
 
-    private void SetupTicksFromTickCount()
+    public double getMajorTickCount()
     {
-        double range = abs(this.MaxValue - this.MinValue);
-        if (range == 0)
-        {
-            return;
-        }
-        if (MajorTickCount > 0)
-        {
-            MajorTick = range / MajorTickCount;
-            if (MinorTickCount > 0)
-            {
-                MinorTick = MajorTick/MinorTickCount;
-            }
-        }
+        return MajorTickCount;
     }
 
-    private boolean SetupGauge()
+    public double getMinorTickCount()
     {
-        _Gauge.setMinValue(MinValue);
-        _Gauge.setMaxValue(MaxValue);
-        _Gauge.setStartAngle(DialStartAngle);
-        _Gauge.setAngleRange(DialRangeAngle);
-        _Gauge.setTickLabelOrientation(eOrientation);
-        _Gauge.setDropShadowEnabled(Shadowed);
-        _Gauge.setMinMeasuredValueVisible(ShowMeasuredMin);
-        _Gauge.setMaxMeasuredValueVisible(ShowMeasuredMax);
-        _Gauge.setPlainValue(!EnhancedRateText);
-
-        if (getTitle().length() > 0)
-        {
-            _Gauge.setTitle(getTitle());
-        }
-        SetupTicksFromTickCount();
-        if (MajorTick > 0)
-        {
-            _Gauge.setMajorTickSpace(MajorTick);
-        }
-        if (MinorTick > 0)
-        {
-            _Gauge.setMinorTickSpace(MinorTick);
-        }
-        if (null != getUnitsOverride())
-        {
-            _Gauge.setUnit(getUnitsOverride());
-            LOGGER.config("Overriding Widget Units Text to " + getUnitsOverride());
-        }
-        else if (UnitText.length() > 0)
-        {
-            _Gauge.setUnit(UnitText);
-        }
-        setSectionsFromPercentages();
-        if (null != Sections)
-        {
-            _Gauge.setSections(Sections);
-        }
-
-        _Gauge.setDecimals(getDecimalPlaces());
-        
-        ConfigureDimentions();
-
-        ConfigureAlignment();
-        EventHandler<MouseEvent> eh = SetupTaskAction(); // special because Gauge can be interactive
-        if (null == eh)
-        {
-            eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
-            {
-                @Override
-                public void handle(MouseEvent event)
-                {
-                }
-            };
-        }
-        _Gauge.customKnobClickHandlerProperty().set(eh);
-        
-        return true;
-    }
-
-    private void setSectionsFromPercentages()
-    {
-        if (null == SectionPercentages)
-        {
-            return;
-        }
-        List<Section> sections = new ArrayList<>();
-        double range = abs(MaxValue - MinValue);
-        for (Pair<Double, Double> sect : SectionPercentages)
-        {
-            double start, end;
-            start = MinValue + sect.getKey() / 100 * range;
-            end = MinValue + sect.getValue() / 100 * range;
-            sections.add(new Section(start, end));
-        }
-        setSections(sections);
-    }
-
-    @Override
-    public void SetInitialValue(String value)
-    {
-        try
-        {
-            _InitialValue = Double.parseDouble(value);
-        }
-        catch (NumberFormatException ex)
-        {
-            LOGGER.severe("Invalid Default Value data for SteelGauge: " + value);
-        }
+        return MinorTickCount;
     }
 
     @Override
@@ -249,85 +150,27 @@ public class SteelGaugeWidget extends BaseWidget
         return _Gauge;
     }
 
-    public void setUnitText(String UnitText)
-    {
-        this.UnitText = UnitText;
-    }
-
-    public void setDialRangeAngle(int DialRangeAngle)
-    {
-        this.DialRangeAngle = DialRangeAngle;
-    }
-
-    public void setMinValue(double MinValue)
-    {
-        this.MinValue = MinValue;
-    }
-
-    public void setMaxValue(double MaxValue)
-    {
-        this.MaxValue = MaxValue;
-    }
-
-    public void setDialStartAngle(int DialStartAngle)
-    {
-        this.DialStartAngle = DialStartAngle;
-    }
-
-    public void setRangeAngle(int DialEndAngle)
-    {
-        this.DialRangeAngle = DialEndAngle;
-    }
-
-    public void setMajorTick(double MajorTick)
-    {
-        this.MajorTick = MajorTick;
-    }
-
-    public void setMinorTick(double MinorTick)
-    {
-        this.MinorTick = MinorTick;
-    }
-
-    public void setOrientation(Gauge.TickLabelOrientation eOrientation)
-    {
-        this.eOrientation = eOrientation;
-    }
-
-    public void setEnhancedRateText(boolean EnhancedRateText)
-    {
-        this.EnhancedRateText = EnhancedRateText;
-    }
-
-    public void setShadowed(boolean Shadowed)
-    {
-        this.Shadowed = Shadowed;
-    }
-
-    public void setShowMeasuredMax(boolean ShowMeasuredMax)
-    {
-        this.ShowMeasuredMax = ShowMeasuredMax;
-    }
-
-    public void setShowMeasuredMin(boolean ShowMeasuredMin)
-    {
-        this.ShowMeasuredMin = ShowMeasuredMin;
-    }
-
-    public void setSections(List<Section> Sections)
-    {
-        this.Sections = Sections;
-    }
-
-    public void setPercentageSections(List<Pair<Double, Double>> Sections)
-    {
-        this.SectionPercentages = Sections;
-    }
-
     @Override
     public ObservableList<String> getStylesheets()
     {
         return _Gauge.getStylesheets();
+    }
+
+    protected void HandleSteppedRange(double newValue)
+    {
+        if (SupportsSteppedRanges())
+        {
+            if (getExceededMaxSteppedRange(newValue))
+            {
+                MaxValue = getNextMaxSteppedRange(newValue);
+                UpdateValueRange();
+            }
+            else if (getExceededMinSteppedRange(newValue))
+            {
+                MinValue = getNextMinSteppedRange(newValue);
+                UpdateValueRange();
+            }
+        }
     }
 
     /**
@@ -407,20 +250,6 @@ public class SteelGaugeWidget extends BaseWidget
         return true;
     }
 
-    @Override
-    public void UpdateTitle(String strTitle)
-    {
-        _Gauge.setTitle(getTitle());
-    }
-
-    @Override
-    public void UpdateValueRange()
-    {
-        _Gauge.setMinValue(MinValue);
-        _Gauge.setMaxValue(MaxValue);
-        makeNewGauge();
-    }
-
     private void makeNewGauge()
     {
         Gauge oldGauge = _Gauge;
@@ -441,9 +270,37 @@ public class SteelGaugeWidget extends BaseWidget
         ApplyCSS();
     }
 
-    public double getMajorTickCount()
+    public void setDialRangeAngle(int DialRangeAngle)
     {
-        return MajorTickCount;
+        this.DialRangeAngle = DialRangeAngle;
+    }
+
+    public void setDialStartAngle(int DialStartAngle)
+    {
+        this.DialStartAngle = DialStartAngle;
+    }
+
+    public void setEnhancedRateText(boolean EnhancedRateText)
+    {
+        this.EnhancedRateText = EnhancedRateText;
+    }
+
+    @Override
+    public void SetInitialValue(String value)
+    {
+        try
+        {
+            _InitialValue = Double.parseDouble(value);
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe("Invalid Default Value data for SteelGauge: " + value);
+        }
+    }
+
+    public void setMajorTick(double MajorTick)
+    {
+        this.MajorTick = MajorTick;
     }
 
     public void setMajorTickCount(double MajorTickCount)
@@ -451,9 +308,14 @@ public class SteelGaugeWidget extends BaseWidget
         this.MajorTickCount = MajorTickCount;
     }
 
-    public double getMinorTickCount()
+    public void setMaxValue(double MaxValue)
     {
-        return MinorTickCount;
+        this.MaxValue = MaxValue;
+    }
+
+    public void setMinorTick(double MinorTick)
+    {
+        this.MinorTick = MinorTick;
     }
 
     public void setMinorTickCount(double MinorTickCount)
@@ -461,19 +323,143 @@ public class SteelGaugeWidget extends BaseWidget
         this.MinorTickCount = MinorTickCount;
     }
 
-    protected void HandleSteppedRange(double newValue)
+    public void setMinValue(double MinValue)
     {
-        if (SupportsSteppedRanges())
+        this.MinValue = MinValue;
+    }
+
+    public void setOrientation(Gauge.TickLabelOrientation eOrientation)
+    {
+        this.eOrientation = eOrientation;
+    }
+
+    public void setPercentageSections(List<Pair<Double, Double>> Sections)
+    {
+        this.SectionPercentages = Sections;
+    }
+
+    public void setRangeAngle(int DialEndAngle)
+    {
+        this.DialRangeAngle = DialEndAngle;
+    }
+
+    public void setSections(List<Section> Sections)
+    {
+        this.Sections = Sections;
+    }
+
+    private void setSectionsFromPercentages()
+    {
+        if (null == SectionPercentages)
         {
-            if (getExceededMaxSteppedRange(newValue))
+            return;
+        }
+        List<Section> sections = new ArrayList<>();
+        double range = abs(MaxValue - MinValue);
+        for (Pair<Double, Double> sect : SectionPercentages)
+        {
+            double start, end;
+            start = MinValue + sect.getKey() / 100 * range;
+            end = MinValue + sect.getValue() / 100 * range;
+            sections.add(new Section(start, end));
+        }
+        setSections(sections);
+    }
+
+    public void setShadowed(boolean Shadowed)
+    {
+        this.Shadowed = Shadowed;
+    }
+
+    public void setShowMeasuredMax(boolean ShowMeasuredMax)
+    {
+        this.ShowMeasuredMax = ShowMeasuredMax;
+    }
+
+    public void setShowMeasuredMin(boolean ShowMeasuredMin)
+    {
+        this.ShowMeasuredMin = ShowMeasuredMin;
+    }
+
+    public void setUnitText(String UnitText)
+    {
+        this.UnitText = UnitText;
+    }
+
+    private boolean SetupGauge()
+    {
+        _Gauge.setMinValue(MinValue);
+        _Gauge.setMaxValue(MaxValue);
+        _Gauge.setStartAngle(DialStartAngle);
+        _Gauge.setAngleRange(DialRangeAngle);
+        _Gauge.setTickLabelOrientation(eOrientation);
+        _Gauge.setDropShadowEnabled(Shadowed);
+        _Gauge.setMinMeasuredValueVisible(ShowMeasuredMin);
+        _Gauge.setMaxMeasuredValueVisible(ShowMeasuredMax);
+        _Gauge.setPlainValue(!EnhancedRateText);
+
+        if (getTitle().length() > 0)
+        {
+            _Gauge.setTitle(getTitle());
+        }
+        SetupTicksFromTickCount();
+        if (MajorTick > 0)
+        {
+            _Gauge.setMajorTickSpace(MajorTick);
+        }
+        if (MinorTick > 0)
+        {
+            _Gauge.setMinorTickSpace(MinorTick);
+        }
+        if (null != getUnitsOverride())
+        {
+            _Gauge.setUnit(getUnitsOverride());
+            LOGGER.config("Overriding Widget Units Text to " + getUnitsOverride());
+        }
+        else if (UnitText.length() > 0)
+        {
+            _Gauge.setUnit(UnitText);
+        }
+        setSectionsFromPercentages();
+        if (null != Sections)
+        {
+            _Gauge.setSections(Sections);
+        }
+
+        _Gauge.setDecimals(getDecimalPlaces());
+        
+        ConfigureDimentions();
+
+        ConfigureAlignment();
+        EventHandler<MouseEvent> eh = SetupTaskAction(); // special because Gauge can be interactive
+        if (null == eh)
+        {
+            eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
             {
-                MaxValue = getNextMaxSteppedRange(newValue);
-                UpdateValueRange();
-            }
-            else if (getExceededMinSteppedRange(newValue))
+                @Override
+                public void handle(MouseEvent event)
+                {
+                }
+            };
+        }
+        _Gauge.customKnobClickHandlerProperty().set(eh);
+        
+        return true;
+    }
+
+    private void SetupTicksFromTickCount()
+    {
+        double range = abs(this.MaxValue - this.MinValue);
+        if (range == 0)
+        {
+            return;
+        }
+        if (MajorTickCount > 0)
+        {
+            MajorTick = range / MajorTickCount;
+            if (MinorTickCount > 0)
             {
-                MinValue = getNextMinSteppedRange(newValue);
-                UpdateValueRange();
+                MinorTick = MajorTick/MinorTickCount;
             }
         }
     }
@@ -482,6 +468,20 @@ public class SteelGaugeWidget extends BaseWidget
     public boolean SupportsSteppedRanges()
     {
         return true;
+    }
+
+    @Override
+    public void UpdateTitle(String strTitle)
+    {
+        _Gauge.setTitle(getTitle());
+    }
+
+    @Override
+    public void UpdateValueRange()
+    {
+        _Gauge.setMinValue(MinValue);
+        _Gauge.setMaxValue(MaxValue);
+        makeNewGauge();
     }
 
 }

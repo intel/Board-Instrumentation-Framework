@@ -35,10 +35,10 @@ import kutch.biff.marvin.logger.MarvinLogger;
 public class RemoteMarvinTask extends BaseTask
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    private static int _RequestNumber = 0;
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private String _TaskID;
     private String _MarvinID; // remote marvin id
-    private static int _RequestNumber = 0;
     
     public RemoteMarvinTask(String ID, String TaskID)
     {

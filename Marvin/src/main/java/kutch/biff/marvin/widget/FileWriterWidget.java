@@ -51,18 +51,17 @@ import kutch.biff.marvin.utility.FrameworkNode;
 public class FileWriterWidget extends BaseWidget
 {
 
-    public enum WriteMode
-    {
-        Append, Overwrite
-    };
-
     public enum WriteFormat
     {
         KeyPairIDValue, KeyPairNamespaceIDValue
     };
-    private static HashMap<String,HashMap<String,String>> _FileToDataMap= new HashMap();
+
+    public enum WriteMode
+    {
+        Append, Overwrite
+    };
+    private static HashMap<String,HashMap<String,String>> _FileToDataMap= new HashMap<String, HashMap<String, String>>();
     private HashMap<String, String> _DataPointMap;
-    private DataManager _dataMgr;
     private String _outFile;
     private WriteMode _writeMode;
     private WriteFormat _writeFormat;
@@ -75,37 +74,6 @@ public class FileWriterWidget extends BaseWidget
         _writeMode = WriteMode.Overwrite;
         _writeFormat = WriteFormat.KeyPairIDValue;
         _prefixStr = "";
-    }
-
-    private void writeMap(BufferedWriter writer) throws IOException
-    {
-        for (String key : _DataPointMap.keySet())
-        {
-            //writer.append(_prefixStr);
-            //if (_writeFormat == WriteFormat.KeyPairNamespaceIDValue)
-            //{
-//                writer.append(getNamespace());
-//            }
-            writer.append(key + "=");
-            writer.append(_DataPointMap.get(key));
-            writer.newLine();
-        }
-    }
-
-    private void Overwrite()
-    {
-        try
-        {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(_outFile));
-            writer.write("");
-            writeMap(writer);
-            writer.close();
-        }
-        
-        catch (IOException ex)
-        {
-            Logger.getLogger(FileWriterWidget.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     private void Append()
@@ -127,7 +95,7 @@ public class FileWriterWidget extends BaseWidget
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
-        _dataMgr = dataMgr;
+
         if (null == _outFile)
         {
             LOGGER.severe("Invalid FileWriterWidget, no <File> specified.");
@@ -175,6 +143,18 @@ public class FileWriterWidget extends BaseWidget
         return true;
     }
 
+    @Override
+    public Node getStylableObject()
+    {
+        return null;
+    }
+
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+        return null;
+    }
+
     /**
      *
      * @param node
@@ -188,7 +168,7 @@ public class FileWriterWidget extends BaseWidget
             _outFile = node.getTextContent();
             if (!_FileToDataMap.containsKey(_outFile))
             {
-                 _DataPointMap = new HashMap();
+                 _DataPointMap = new HashMap<String, String>();
                  _FileToDataMap.put(_outFile,_DataPointMap);
             }
             else
@@ -249,22 +229,41 @@ public class FileWriterWidget extends BaseWidget
         return false;
     }
 
-    @Override
-    public ObservableList<String> getStylesheets()
+    private void Overwrite()
     {
-        return null;
-    }
-
-    @Override
-    public Node getStylableObject()
-    {
-        return null;
+        try
+        {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(_outFile));
+            writer.write("");
+            writeMap(writer);
+            writer.close();
+        }
+        
+        catch (IOException ex)
+        {
+            Logger.getLogger(FileWriterWidget.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
     public void UpdateTitle(String newTitle)
     {
 
+    }
+
+    private void writeMap(BufferedWriter writer) throws IOException
+    {
+        for (String key : _DataPointMap.keySet())
+        {
+            //writer.append(_prefixStr);
+            //if (_writeFormat == WriteFormat.KeyPairNamespaceIDValue)
+            //{
+//                writer.append(getNamespace());
+//            }
+            writer.append(key + "=");
+            writer.append(_DataPointMap.get(key));
+            writer.newLine();
+        }
     }
 
 }

@@ -40,17 +40,6 @@ public class MarvinTask extends BaseTask
     {
         _Dataset = null;
     }
-    @Override
-    public boolean getMustBeInGUIThread()
-    {
-        return true;
-    }
-    
-    public boolean isValid()
-    {
-        return null != _Dataset;
-    }
-    
     public void AddDataset(String ID, String Namespace, String Data)
     {
         DataSet objSet = new DataSet();
@@ -62,6 +51,17 @@ public class MarvinTask extends BaseTask
             _Dataset = new ArrayList<>();
         }
         _Dataset.add(objSet);
+    }
+    
+    @Override
+    public boolean getMustBeInGUIThread()
+    {
+        return true;
+    }
+    
+    public boolean isValid()
+    {
+        return null != _Dataset;
     }
     @Override
     public  void PerformTask()

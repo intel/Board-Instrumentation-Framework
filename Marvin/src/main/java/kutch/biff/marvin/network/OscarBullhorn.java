@@ -40,8 +40,45 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 public class OscarBullhorn extends Client
 {
-    private String _Key;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    private static String convertByteArrayToHexString(byte[] arrayBytes)
+    {
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < arrayBytes.length; i++)
+        {
+            stringBuffer.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16)
+                    .substring(1));
+        }
+        return stringBuffer.toString();
+    }
+
+    private static String hashString(String message, String algorithm)
+    {
+        MessageDigest digest;
+        try
+        {
+            digest = MessageDigest.getInstance(algorithm);
+        }
+        catch (NoSuchAlgorithmException ex)
+        {
+            Logger.getLogger(OscarBullhorn.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+        byte[] hashedBytes;
+        try
+        {
+            hashedBytes = digest.digest(message.getBytes("UTF-8"));
+        }
+        catch (UnsupportedEncodingException ex)
+        {
+            Logger.getLogger(OscarBullhorn.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+
+        return convertByteArrayToHexString(hashedBytes);
+    }
+
+    private String _Key;
 
     public OscarBullhorn(String Address, int Port, String Key)
     {
@@ -102,42 +139,5 @@ public class OscarBullhorn extends Client
         
         Close();
         return retVal;
-    }
-
-    private static String hashString(String message, String algorithm)
-    {
-        MessageDigest digest;
-        try
-        {
-            digest = MessageDigest.getInstance(algorithm);
-        }
-        catch (NoSuchAlgorithmException ex)
-        {
-            Logger.getLogger(OscarBullhorn.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-        byte[] hashedBytes;
-        try
-        {
-            hashedBytes = digest.digest(message.getBytes("UTF-8"));
-        }
-        catch (UnsupportedEncodingException ex)
-        {
-            Logger.getLogger(OscarBullhorn.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-
-        return convertByteArrayToHexString(hashedBytes);
-    }
-
-    private static String convertByteArrayToHexString(byte[] arrayBytes)
-    {
-        StringBuffer stringBuffer = new StringBuffer();
-        for (int i = 0; i < arrayBytes.length; i++)
-        {
-            stringBuffer.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16)
-                    .substring(1));
-        }
-        return stringBuffer.toString();
     }
 }

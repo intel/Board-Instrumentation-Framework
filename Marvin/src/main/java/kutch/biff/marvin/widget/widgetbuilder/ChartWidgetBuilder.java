@@ -46,64 +46,9 @@ public class ChartWidgetBuilder
 
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
-    public static LineChartWidget_MS BuildMultiSourceLineChart(FrameworkNode masterNode, String widgetDefFilename)
-    {
-        LineChartWidget_MS objWidget = new LineChartWidget_MS();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
-        {
-            return null;
-        }
-
-        return objWidget;
-    }
-
-    public static LineChartWidget BuildLineChart(FrameworkNode masterNode, String widgetDefFilename)
-    {
-        LineChartWidget objWidget = new LineChartWidget();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
-        {
-            return null;
-        }
-
-        return objWidget;
-    }
-
     public static AreaChartWidget BuildAreaChart(FrameworkNode masterNode, String widgetDefFilename)
     {
         AreaChartWidget objWidget = new AreaChartWidget();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
-        {
-            return null;
-        }
-
-        return objWidget;
-    }
-
-    public static AreaChartWidget_MS BuildMultiSourceAreaChart(FrameworkNode masterNode, String widgetDefFilename)
-    {
-        AreaChartWidget_MS objWidget = new AreaChartWidget_MS();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
-        {
-            return null;
-        }
-
-        return objWidget;
-    }
-
-    public static StackedAreaChartWidget_MS BuildMultiSourceStackedAreaChart(FrameworkNode masterNode, String widgetDefFilename)
-    {
-        StackedAreaChartWidget_MS objWidget = new StackedAreaChartWidget_MS();
-        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
-        {
-            return null;
-        }
-
-        return objWidget;
-    }
-
-    public static StackedAreaChartWidget BuildStackedAreaChart(FrameworkNode masterNode, String widgetDefFilename)
-    {
-        StackedAreaChartWidget objWidget = new StackedAreaChartWidget();
         if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
         {
             return null;
@@ -126,6 +71,61 @@ public class ChartWidgetBuilder
     public static BarChartWidget BuildHorizontalBarChart(FrameworkNode masterNode, String widgetDefFilename)
     {
         BarChartWidget objWidget = new BarChartWidget(true);
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
+        {
+            return null;
+        }
+
+        return objWidget;
+    }
+
+    public static LineChartWidget BuildLineChart(FrameworkNode masterNode, String widgetDefFilename)
+    {
+        LineChartWidget objWidget = new LineChartWidget();
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
+        {
+            return null;
+        }
+
+        return objWidget;
+    }
+
+    public static AreaChartWidget_MS BuildMultiSourceAreaChart(FrameworkNode masterNode, String widgetDefFilename)
+    {
+        AreaChartWidget_MS objWidget = new AreaChartWidget_MS();
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
+        {
+            return null;
+        }
+
+        return objWidget;
+    }
+
+    public static LineChartWidget_MS BuildMultiSourceLineChart(FrameworkNode masterNode, String widgetDefFilename)
+    {
+        LineChartWidget_MS objWidget = new LineChartWidget_MS();
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
+        {
+            return null;
+        }
+
+        return objWidget;
+    }
+
+    public static StackedAreaChartWidget_MS BuildMultiSourceStackedAreaChart(FrameworkNode masterNode, String widgetDefFilename)
+    {
+        StackedAreaChartWidget_MS objWidget = new StackedAreaChartWidget_MS();
+        if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
+        {
+            return null;
+        }
+
+        return objWidget;
+    }
+
+    public static StackedAreaChartWidget BuildStackedAreaChart(FrameworkNode masterNode, String widgetDefFilename)
+    {
+        StackedAreaChartWidget objWidget = new StackedAreaChartWidget();
         if (false == ChartWidgetBuilder.HandleCommonChartWidgetDefinition(masterNode, objWidget, widgetDefFilename))
         {
             return null;

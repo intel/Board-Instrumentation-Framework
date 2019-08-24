@@ -37,13 +37,6 @@ public class AreaChartWidget extends LineChartWidget
 
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    protected Chart CreateChartObject()
-    {
-        return new AreaChart<>(getxAxis(), getyAxis());
-    }
-
     @Override
     @SuppressWarnings("unchecked")
     protected void _CreateChart()
@@ -54,6 +47,13 @@ public class AreaChartWidget extends LineChartWidget
         {
             ((AreaChart<?, ?>) (getChart())).getData().add(ds.getSeries());
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected Chart CreateChartObject()
+    {
+        return new AreaChart<>(getxAxis(), getyAxis());
     }
 
     @SuppressWarnings("rawtypes")

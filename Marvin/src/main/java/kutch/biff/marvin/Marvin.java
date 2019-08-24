@@ -87,24 +87,80 @@ import kutch.biff.marvin.widget.Widget;
 public class Marvin extends Application
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    private static TabPane _objTabPane = null;
+    public static void DumpThreads(boolean showStack)
+    {
+        showStack = false;
+        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+        Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+
+        LOGGER.info("******* Dumping " + Integer.toString(threadArray.length) + " Threads from thread: " + Thread.currentThread().getName() + " ****************");
+
+        String dumpString = "";
+        for (Thread entry : threadArray)
+        {
+            // info is name,priority,threadgroup
+            dumpString += "\t" + entry.toString() + " -- " + entry.getState().toString() + "\n";
+            if (true == showStack)
+            {
+                for (StackTraceElement element : entry.getStackTrace())
+                {
+                    dumpString += "\t\t" + element.toString() + "\n";
+                }
+            }
+        }
+        LOGGER.info(dumpString);
+    }
+    // returns the base tab pane - used for dynamic tabs in debug mode
+    @SuppressWarnings("exports")
+    public static TabPane GetBaseTabPane()
+    {
+        return _objTabPane;
+    }
+    public static void main(final String[] args)
+    {
+        if (!JVMversion.meetsMinimumVersion())
+        {
+            System.out.println("Not valid JVM version.  Requires 1." + JVMversion.MINIMUM_MAJOR_VERSION + " build " + JVMversion.MINIMUM_BUILD_VERSION + " or newer");
+            return;
+        }
+        try
+        {
+            Thread.currentThread().setName("Main Application Thread");
+            Application.launch(args);
+            System.exit(0);
+        }
+        catch (OutOfMemoryError ex)
+        {
+            JOptionPane.showMessageDialog(null, "Insufficient Memory.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (Exception ex)
+        {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            ex.printStackTrace(pw);
+            LOGGER.severe(sw.toString());
+            LOGGER.severe(ex.toString());
+        }
+        System.exit(1);
+    }
     private DataManager _DataMgr;
     private ConfigurationReader _Config;
-    private static TabPane _objTabPane = null;
     private Configuration appConfig = null;
     private Server _receiveServer;
     private AnimationTimer _animationTimer;
+
     private Heartbeat _Heartbeat;
     private long lastTimerCall;
     private TabPane _TestPane;
-
     private long TimerInterval = 2500; //nanoseconds 1ms = 1000000 ns
     private long MemoryUsageReportingInterval = 10000; // 10 secs
     private long LastMemoryUsageReportingTime = 0;
     private boolean ReportMemoryUsage = false;
+
     private String strOldSuffix = "dummy";
     private int SplashWait = 5000;
     private int NoSplashWait = 800;
-
     private Stage _stage;
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private String ConfigFilename = "Application.xml";
@@ -120,56 +176,56 @@ public class Marvin extends Application
     private boolean dumpWidgetInfo = false;
     private String altSplash = null;
     private MarvinLocalData objLocalMarvinData = null;
+
     private MySplash _Splash;
+
     private boolean _CheckForSizeProblems = true;
+
     @SuppressWarnings("unused")
     private boolean _SizeCheckWindowShowing = false;
 
-    // returns the base tab pane - used for dynamic tabs in debug mode
-    @SuppressWarnings("exports")
-    public static TabPane GetBaseTabPane()
+    private long BeginLoadProcess()
     {
-        return _objTabPane;
+        long start = System.currentTimeMillis();
+        if (null == _Config)
+        {
+            _Config = new ConfigurationReader();
+        }
+
+        if (null == _Config)
+        {
+            return 0;
+        }
+        
+        TASKMAN.setDataMgr(_DataMgr); // kludgy I know, I know.  I hang my head in shame
+        appConfig = _Config.ReadAppConfigFile(ConfigFilename);
+        
+        if (null != appConfig)
+        {
+            appConfig.setEnforceMediaSupport(enforceMediaSupport);
+            if (dumpAlias)
+            {
+                AliasMgr.getAliasMgr().DumpTop();
+            }
+
+            _receiveServer = new Server(_DataMgr);
+        }
+        return System.currentTimeMillis() - start;
     }
 
-    private void DisableWebCerts()
+    private void BeginServerEtc()
     {
-        LOGGER.info("Disabling Web Certificates.");
-        // Completely disable, by trusting everything!
-        TrustManager[] myTM = new TrustManager[]
+        LOGGER.info("Starting Server");
+        _receiveServer.Start();
+
+        TaskManager.getTaskManager().PerformOnStartupTasks(); // perform any tasks designated to be run on startup
+        _Heartbeat = new Heartbeat(_Config.getConfiguration().getHeartbeatInterval()); // every n seconds  TODO: make configurable
+        _Heartbeat.Start();
+        if (_Config.getConfiguration().getMarvinLocalDatafeed())
         {
-            new X509TrustManager()
-            {
-                @Override
-                public void checkServerTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType)
-                {
-                }
-
-                @Override
-                public java.security.cert.X509Certificate[] getAcceptedIssuers()
-                {
-                    return null;
-                }
-
-                @Override
-                public void checkClientTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType)
-                {
-                }
-            }
-        };
-
-        try
-        {
-            SSLContext context = SSLContext.getInstance("SSL");
-            context.init(null, myTM, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+            objLocalMarvinData = new MarvinLocalData(1);
         }
-        catch (Exception ex)
-        {
-            LOGGER.severe("Error Disabling Web Certificates: " + ex.toString());
-        }
+        _stage.setMaximized(true);
     }
 
     private void CheckForLogFileName()
@@ -193,6 +249,325 @@ public class Marvin extends Application
                 return;
             }
         }
+    }
+
+    @SuppressWarnings("unused")
+    private void checkSize(Stage stage, Scene scene, GridPane objGridPane)
+    {
+        stage.centerOnScreen();
+        double BorderWidth = abs((scene.getWidth() - stage.getWidth()) / 2);
+        _Config.getConfiguration().setAppBorderWidth(BorderWidth);
+
+        double height;// = _TestPane.getHeight(); // tab + borders
+        if (null != _Config.getConfiguration().getMenuBar() && true == _Config.getConfiguration().getShowMenuBar())
+        {
+            height = _TestPane.getHeight() + _Config.getConfiguration().getMenuBar().getHeight(); //menu + borders + tab
+        }
+
+        objGridPane.getChildren().remove(_TestPane);
+    }
+
+    private void DisableWebCerts()
+    {
+        LOGGER.info("Disabling Web Certificates.");
+        // Completely disable, by trusting everything!
+        TrustManager[] myTM = new TrustManager[]
+        {
+            new X509TrustManager()
+            {
+                @Override
+                public void checkClientTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType)
+                {
+                }
+
+                @Override
+                public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType)
+                {
+                }
+
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers()
+                {
+                    return null;
+                }
+            }
+        };
+
+        try
+        {
+            SSLContext context = SSLContext.getInstance("SSL");
+            context.init(null, myTM, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+        }
+        catch (Exception ex)
+        {
+            LOGGER.severe("Error Disabling Web Certificates: " + ex.toString());
+        }
+    }
+
+    private void DisplayHelp()
+    {
+        String help = "-? | -help \t\t: Display this help\n";
+        help += "-i application.xml file [default Application.xml\n";
+        help += "-log application.log file [default MarvinLog.html\n";
+        help += "-aliasfile externalFile aliases you want to define outside of your xml\n";
+        help += "-altSplash image file to use for splash screen\n";
+        help += "-v | -vv |-vvv |-vvvv \t: - logging level\n";
+//        help += "-version \t\t: - show version information\n";
+        help += "-dumpalias - dumps top level alias to log\n";
+        help += "-dumpWidgetInfo - dumps info on all widgets\n";
+        help += "-ns - supresses splash screen\n";
+        System.out.println(help);
+        JOptionPane.showMessageDialog(null, help, "Command Line Options", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void DumpAllWidgetsInformation()
+    {
+        if (_Config.getConfiguration().isDebugMode())
+        {
+            for (BaseWidget objWidget : BaseWidget.getWidgetList())
+            {
+                if (dumpWidgetInfo)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Widget Information: ");
+                    sb.append(objWidget.toString(false));
+                    LOGGER.config(sb.toString());
+                }
+                objWidget.SetupTaskAction(); // setup shift and ctrl click actions for debug
+                if (null != objWidget.getRegionObject())
+                {
+                    // objWidget.getRegionObject().requestLayout();
+                }
+            }
+            if (dumpWidgetInfo)
+            {
+                LOGGER.config("External Grid/Tab usage file from " + ConfigFilename + "\n" + kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.GetFileTree());
+            }
+        }
+    }
+
+    @SuppressWarnings("exports")
+    public void FinishLoad(Stage stage)
+    {
+        stage.setIconified(true);
+
+        long elapsedTime = BeginLoadProcess();
+        LOGGER.info("Time taken to load Configuration: " + Long.toString(elapsedTime) + "ms.");
+
+        if (null == this.appConfig)
+        {
+            Platform.exit();
+            return;
+        }
+        _Config.getConfiguration().setAppStage(stage);
+
+        if (null == _objTabPane)
+        {
+            _objTabPane = new TabPane();
+            _objTabPane.setSide(_Config.getConfiguration().getSide());
+        }
+        GridPane sceneGrid = new GridPane();
+
+        Scene scene = null;
+        Rectangle2D visualBounds = _Config.getConfiguration().getPrimaryScreen().getVisualBounds();
+        int appWidth = (int) visualBounds.getWidth();
+        int appHeight = (int) visualBounds.getHeight();
+
+        if (appConfig.getWidth() > 0)
+        {
+            appWidth = appConfig.getWidth();
+        }
+        else
+        {
+            appConfig.setWidth(appWidth);
+        }
+        if (appConfig.getHeight() > 0)
+        {
+            appHeight = appConfig.getHeight();
+        }
+        else
+        {
+            appConfig.setHeight(appHeight);
+        }
+
+        sceneGrid.add(_objTabPane, 0, 1);
+        //sceneGrid.setStyle("-fx-background-color:red;");
+        SetupSizeCheckPane(sceneGrid);
+        //sceneGrid.setMaxHeight(340);
+        if (null != _Config.getConfiguration().getMenuBar() && true == _Config.getConfiguration().getShowMenuBar())
+        {
+            //vbox.getChildren().add(_Config.getConfiguration().getMenuBar());
+            GridPane.setHalignment(_Config.getConfiguration().getMenuBar(), HPos.LEFT);
+            GridPane.setValignment(_Config.getConfiguration().getMenuBar(), VPos.TOP);
+
+            sceneGrid.add(_Config.getConfiguration().getMenuBar(), 0, 0);
+        }
+
+        scene = new Scene(sceneGrid);
+
+        _Config.getConfiguration().setAppScene(scene);
+        _Config.getConfiguration().getCurrentHeightProperty().bind(scene.heightProperty());
+        _Config.getConfiguration().getCurrentWidthProperty().bind(scene.widthProperty());
+        _objTabPane.prefWidthProperty().bind(scene.widthProperty());
+
+        _objTabPane.prefHeightProperty().bind(scene.heightProperty());
+
+        SetAppStyle(scene.getStylesheets());
+
+        if (false == SetupGoodies(_objTabPane))
+        {
+            JOptionPane.showMessageDialog(null, "Error loading Configuation. \nCheck log file.", "Configuration Error", JOptionPane.ERROR_MESSAGE);
+            Platform.exit();
+            return;
+        }
+
+        if (false == _receiveServer.Setup(_Config.getConfiguration().getAddress(), _Config.getConfiguration().getPort()))
+        {
+            JOptionPane.showMessageDialog(null, "Error setting up Network Configuation. \nCheck log file.", "Configuration Error", JOptionPane.ERROR_MESSAGE);
+            Platform.exit();
+            return;
+        }
+        checkSize(stage, scene, sceneGrid); // go resize based upon scaling
+
+        stage.setTitle(_Config.getConfiguration().getAppTitle());
+        stage.setIconified(false);
+        stage.setScene(scene);
+        stage.setMaximized(false);
+        stage.setHeight(appHeight);
+        stage.setWidth(appWidth);
+
+        if (true == ShowHelp)
+        {
+            DisplayHelp();
+        }
+
+        if (_Config.getConfiguration().getIgnoreWebCerts())
+        {
+            DisableWebCerts();
+        }
+
+        _stage = stage;
+
+        TimerInterval = _Config.getConfiguration().getTimerInterval();
+        lastTimerCall = System.currentTimeMillis() + TimerInterval;
+        LastMemoryUsageReportingTime = lastTimerCall;
+
+        strOldSuffix = "dummy";
+
+        _animationTimer = new AnimationTimer() // can't update the Widgets outside of GUI thread, so this is a little worker to do so
+        {
+            boolean Showing = false;
+            Configuration config = _Config.getConfiguration();
+
+            @Override
+            public void handle(long now)
+            {
+                if (config.terminating())
+                {
+                    return;
+                }
+
+                if (!Showing && _Splash.isSplashClosed())
+                { // will only happen once
+                    try
+                    {
+                        Showing = true;
+
+                        Thread.currentThread().setName("Animation Timer Thread");
+                        SetupDebugToolTips();
+                        BeginServerEtc();
+                        _Splash.appVisible();
+                    }
+                    catch (Exception e)
+                    {
+                        StringWriter strWriter = new StringWriter();
+                        PrintWriter pntWriter = new PrintWriter(strWriter);
+                        e.printStackTrace(pntWriter);
+                        //LOGGER.severe(strWriter.toString());
+                        JOptionPane.showMessageDialog(null, "Error trying to launch application. \nCheck log file.", "Error", JOptionPane.ERROR_MESSAGE);
+                        Platform.exit();
+                    }
+                    Showing = true;
+                    return;
+                }
+                boolean refreshRequested = config.refreshRequested();
+                
+                if ( refreshRequested || System.currentTimeMillis() > lastTimerCall + TimerInterval)
+                {
+                    _DataMgr.PerformUpdates();
+                    config.DetermineMemorex();
+                    if (!strOldSuffix.equals(config.TitleSuffix)) // title could be 'recorded' 'lived'
+                    {
+                        _stage.setTitle(config.getAppTitle() + config.TitleSuffix);
+                        strOldSuffix = config.TitleSuffix;
+                    }
+                    // for remote marvin admin updates, can't update gui outside of gui thread
+                    TaskManager.getTaskManager().PerformDeferredTasks();
+                    if (!refreshRequested)
+                    {
+                        lastTimerCall = System.currentTimeMillis();
+                    }
+                }
+
+                else if (ReportMemoryUsage && System.currentTimeMillis() > LastMemoryUsageReportingTime + MemoryUsageReportingInterval)
+                {
+                    LastMemoryUsageReportingTime = System.currentTimeMillis();
+                    long freeMem = Runtime.getRuntime().freeMemory();
+                    long totalMem = Runtime.getRuntime().maxMemory();
+                    long usedMem = totalMem - freeMem;
+                    usedMem /= 1024.0;
+                    String MBMemStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem / 1024);
+                    //String BytesStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem);
+                    //int qSize = DataManager.getDataManager().getQueuedSize();
+                    //LOGGER.info("Used Memory: " + MBMemStr + " MB. Outstanding DataPoints: " + Integer.toString(qSize));
+                    LOGGER.info("Used Memory: " + MBMemStr);
+                }
+            }
+        };
+
+        int waitBeforeRun = ShowSplash ? SplashWait : NoSplashWait;
+        new java.util.Timer().schedule(// Start goodies in a few seconds
+                new java.util.TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                _animationTimer.start();
+                this.cancel();
+            }
+        },
+                waitBeforeRun
+        );
+
+        DumpAllWidgetsInformation();
+
+        stage.setX(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX());
+        stage.setY(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY());
+    }
+
+    @Override
+    public void init()
+    {
+        CheckForLogFileName();
+        try
+        {
+            MarvinLogger.setup(LogFileName);
+            MarvinLogger.setDebugLevel(Level.SEVERE);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        ParseCommandLineArgs();
+        if (true == ShowHelp)
+        {
+            return;
+        }
+
+        _Splash = new MySplash(ShowSplash, altSplash);
     }
 
     private void ParseCommandLineArgs()
@@ -335,71 +710,57 @@ public class Marvin extends Application
         }
     }
 
-    private void DisplayHelp()
+    private boolean SetAppStyle(ObservableList<String> StyleSheets)
     {
-        String help = "-? | -help \t\t: Display this help\n";
-        help += "-i application.xml file [default Application.xml\n";
-        help += "-log application.log file [default MarvinLog.html\n";
-        help += "-aliasfile externalFile aliases you want to define outside of your xml\n";
-        help += "-altSplash image file to use for splash screen\n";
-        help += "-v | -vv |-vvv |-vvvv \t: - logging level\n";
-//        help += "-version \t\t: - show version information\n";
-        help += "-dumpalias - dumps top level alias to log\n";
-        help += "-dumpWidgetInfo - dumps info on all widgets\n";
-        help += "-ns - supresses splash screen\n";
-        System.out.println(help);
-        JOptionPane.showMessageDialog(null, help, "Command Line Options", JOptionPane.INFORMATION_MESSAGE);
-    }
+        if (null != _Config.getConfiguration().getCSSFile())
+        {
+            String osIndepFN = BaseWidget.convertToFileOSSpecific(_Config.getConfiguration().getCSSFile());
 
-    @Override
-    public void init()
-    {
-        CheckForLogFileName();
-        try
-        {
-            MarvinLogger.setup(LogFileName);
-            MarvinLogger.setDebugLevel(Level.SEVERE);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        ParseCommandLineArgs();
-        if (true == ShowHelp)
-        {
-            return;
-        }
-
-        _Splash = new MySplash(ShowSplash, altSplash);
-    }
-
-    private long BeginLoadProcess()
-    {
-        long start = System.currentTimeMillis();
-        if (null == _Config)
-        {
-            _Config = new ConfigurationReader();
-        }
-
-        if (null == _Config)
-        {
-            return 0;
-        }
-        
-        TASKMAN.setDataMgr(_DataMgr); // kludgy I know, I know.  I hang my head in shame
-        appConfig = _Config.ReadAppConfigFile(ConfigFilename);
-        
-        if (null != appConfig)
-        {
-            appConfig.setEnforceMediaSupport(enforceMediaSupport);
-            if (dumpAlias)
+            if (null == osIndepFN)
             {
-                AliasMgr.getAliasMgr().DumpTop();
+                return true;
             }
+            String strCSS = BaseWidget.convertToFileURL(osIndepFN);
 
-            _receiveServer = new Server(_DataMgr);
+            if (null != strCSS)
+            {
+                try
+                {
+                    if (false == StyleSheets.add(strCSS))
+                    {
+                        LOGGER.severe("Problems with application stylesheet: " + _Config.getConfiguration().getCSSFile());
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.severe("Problems with application stylesheet: " + _Config.getConfiguration().getCSSFile());
+                    return false;
+                }
+            }
         }
-        return System.currentTimeMillis() - start;
+
+        return true;
+    }
+
+    private void SetupDebugToolTips()
+    {
+        if (_Config.getConfiguration().isDebugMode())
+        {
+            for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
+            {
+                _Config.getTabs().get(iIndex).PerformPostCreateActions(null, true);
+            }
+        }
+
+        //check if a widget is bigger than it's parent grid - not working yet
+        if (_CheckForSizeProblems)
+        {
+            for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
+            {
+                _Config.getTabs().get(iIndex).CheckSizingBounds(1);
+            }
+        }
     }
 
     private boolean SetupGoodies(TabPane pane)
@@ -455,112 +816,6 @@ public class Marvin extends Application
         return RetVal;
     }
 
-    private void SetupDebugToolTips()
-    {
-        if (_Config.getConfiguration().isDebugMode())
-        {
-            for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
-            {
-                _Config.getTabs().get(iIndex).PerformPostCreateActions(null, true);
-            }
-        }
-
-        //check if a widget is bigger than it's parent grid - not working yet
-        if (_CheckForSizeProblems)
-        {
-            for (int iIndex = 0; iIndex < _Config.getTabs().size(); iIndex++)
-            {
-                _Config.getTabs().get(iIndex).CheckSizingBounds(1);
-            }
-        }
-    }
-
-    private void StopWidgets()
-    {
-        if (null != _Config && null != _Config.getTabs())
-        {
-            for (Widget tab : _Config.getTabs())
-            {
-                tab.PrepareForAppShutdown();
-            }
-        }
-    }
-
-    private void DumpAllWidgetsInformation()
-    {
-        if (_Config.getConfiguration().isDebugMode())
-        {
-            for (BaseWidget objWidget : BaseWidget.getWidgetList())
-            {
-                if (dumpWidgetInfo)
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Widget Information: ");
-                    sb.append(objWidget.toString(false));
-                    LOGGER.config(sb.toString());
-                }
-                objWidget.SetupTaskAction(); // setup shift and ctrl click actions for debug
-                if (null != objWidget.getRegionObject())
-                {
-                    // objWidget.getRegionObject().requestLayout();
-                }
-            }
-            if (dumpWidgetInfo)
-            {
-                LOGGER.config("External Grid/Tab usage file from " + ConfigFilename + "\n" + kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.GetFileTree());
-            }
-        }
-    }
-
-    private boolean SetAppStyle(ObservableList<String> StyleSheets)
-    {
-        if (null != _Config.getConfiguration().getCSSFile())
-        {
-            String osIndepFN = BaseWidget.convertToFileOSSpecific(_Config.getConfiguration().getCSSFile());
-
-            if (null == osIndepFN)
-            {
-                return true;
-            }
-            String strCSS = BaseWidget.convertToFileURL(osIndepFN);
-
-            if (null != strCSS)
-            {
-                try
-                {
-                    if (false == StyleSheets.add(strCSS))
-                    {
-                        LOGGER.severe("Problems with application stylesheet: " + _Config.getConfiguration().getCSSFile());
-                        return false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Problems with application stylesheet: " + _Config.getConfiguration().getCSSFile());
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    @SuppressWarnings("unused")
-    private void checkSize(Stage stage, Scene scene, GridPane objGridPane)
-    {
-        stage.centerOnScreen();
-        double BorderWidth = abs((scene.getWidth() - stage.getWidth()) / 2);
-        _Config.getConfiguration().setAppBorderWidth(BorderWidth);
-
-        double height;// = _TestPane.getHeight(); // tab + borders
-        if (null != _Config.getConfiguration().getMenuBar() && true == _Config.getConfiguration().getShowMenuBar())
-        {
-            height = _TestPane.getHeight() + _Config.getConfiguration().getMenuBar().getHeight(); //menu + borders + tab
-        }
-
-        objGridPane.getChildren().remove(_TestPane);
-    }
-
     /**
      * Creates a dummy tab pane, so I can measure the height of the tab portion
      * for other calculations
@@ -576,6 +831,65 @@ public class Marvin extends Application
         _TestPane.setVisible(false);
 
         basePlane.add(_TestPane, 2, 2);
+    }
+
+    @SuppressWarnings("exports")
+    @Override
+    public void start(Stage stage) throws Exception
+    {
+        _DataMgr = new DataManager();
+
+        if (false == testAppSize(stage))
+        {
+            stage.close();
+            stop();
+            System.exit(5);
+        }
+        MySplash.getSplash().start(stage);
+
+    }
+
+    @Override
+    public void stop()
+    {
+        if (null != Configuration.getConfig())
+        {
+            Configuration.getConfig().setTerminating();
+            StopWidgets();
+        }
+
+        if (null != objLocalMarvinData)
+        {
+            objLocalMarvinData.Shutdown();
+        }
+        if (null != _receiveServer)
+        {
+            _receiveServer.Stop();
+        }
+
+        if (null != _Heartbeat)
+        {
+            _Heartbeat.Stop();
+        }
+        /*
+        if (null != _animationTimer)
+        {
+            _animationTimer.stop();
+        }
+        LOGGER.info("Animation Timer Stopped");
+         */
+        //Marvin.DumpThreads(true);
+    }
+
+    private void StopWidgets()
+    {
+        if (null != _Config && null != _Config.getTabs())
+        {
+            for (Widget tab : _Config.getTabs())
+            {
+                tab.PrepareForAppShutdown();
+            }
+        }
     }
 
     /*
@@ -790,319 +1104,5 @@ public class Marvin extends Application
             stage.setMaximized(true);
         }
         return true;
-    }
-
-    @SuppressWarnings("exports")
-    @Override
-    public void start(Stage stage) throws Exception
-    {
-        _DataMgr = new DataManager();
-
-        if (false == testAppSize(stage))
-        {
-            stage.close();
-            stop();
-            System.exit(5);
-        }
-        MySplash.getSplash().start(stage);
-
-    }
-
-    @SuppressWarnings("exports")
-    public void FinishLoad(Stage stage)
-    {
-        stage.setIconified(true);
-
-        long elapsedTime = BeginLoadProcess();
-        LOGGER.info("Time taken to load Configuration: " + Long.toString(elapsedTime) + "ms.");
-
-        if (null == this.appConfig)
-        {
-            Platform.exit();
-            return;
-        }
-        _Config.getConfiguration().setAppStage(stage);
-
-        if (null == _objTabPane)
-        {
-            _objTabPane = new TabPane();
-            _objTabPane.setSide(_Config.getConfiguration().getSide());
-        }
-        GridPane sceneGrid = new GridPane();
-
-        Scene scene = null;
-        Rectangle2D visualBounds = _Config.getConfiguration().getPrimaryScreen().getVisualBounds();
-        int appWidth = (int) visualBounds.getWidth();
-        int appHeight = (int) visualBounds.getHeight();
-
-        if (appConfig.getWidth() > 0)
-        {
-            appWidth = appConfig.getWidth();
-        }
-        else
-        {
-            appConfig.setWidth(appWidth);
-        }
-        if (appConfig.getHeight() > 0)
-        {
-            appHeight = appConfig.getHeight();
-        }
-        else
-        {
-            appConfig.setHeight(appHeight);
-        }
-
-        sceneGrid.add(_objTabPane, 0, 1);
-        //sceneGrid.setStyle("-fx-background-color:red;");
-        SetupSizeCheckPane(sceneGrid);
-        //sceneGrid.setMaxHeight(340);
-        if (null != _Config.getConfiguration().getMenuBar() && true == _Config.getConfiguration().getShowMenuBar())
-        {
-            //vbox.getChildren().add(_Config.getConfiguration().getMenuBar());
-            GridPane.setHalignment(_Config.getConfiguration().getMenuBar(), HPos.LEFT);
-            GridPane.setValignment(_Config.getConfiguration().getMenuBar(), VPos.TOP);
-
-            sceneGrid.add(_Config.getConfiguration().getMenuBar(), 0, 0);
-        }
-
-        scene = new Scene(sceneGrid);
-
-        _Config.getConfiguration().setAppScene(scene);
-        _Config.getConfiguration().getCurrentHeightProperty().bind(scene.heightProperty());
-        _Config.getConfiguration().getCurrentWidthProperty().bind(scene.widthProperty());
-        _objTabPane.prefWidthProperty().bind(scene.widthProperty());
-
-        _objTabPane.prefHeightProperty().bind(scene.heightProperty());
-
-        SetAppStyle(scene.getStylesheets());
-
-        if (false == SetupGoodies(_objTabPane))
-        {
-            JOptionPane.showMessageDialog(null, "Error loading Configuation. \nCheck log file.", "Configuration Error", JOptionPane.ERROR_MESSAGE);
-            Platform.exit();
-            return;
-        }
-
-        if (false == _receiveServer.Setup(_Config.getConfiguration().getAddress(), _Config.getConfiguration().getPort()))
-        {
-            JOptionPane.showMessageDialog(null, "Error setting up Network Configuation. \nCheck log file.", "Configuration Error", JOptionPane.ERROR_MESSAGE);
-            Platform.exit();
-            return;
-        }
-        checkSize(stage, scene, sceneGrid); // go resize based upon scaling
-
-        stage.setTitle(_Config.getConfiguration().getAppTitle());
-        stage.setIconified(false);
-        stage.setScene(scene);
-        stage.setMaximized(false);
-        stage.setHeight(appHeight);
-        stage.setWidth(appWidth);
-
-        if (true == ShowHelp)
-        {
-            DisplayHelp();
-        }
-
-        if (_Config.getConfiguration().getIgnoreWebCerts())
-        {
-            DisableWebCerts();
-        }
-
-        _stage = stage;
-
-        TimerInterval = _Config.getConfiguration().getTimerInterval();
-        lastTimerCall = System.currentTimeMillis() + TimerInterval;
-        LastMemoryUsageReportingTime = lastTimerCall;
-
-        strOldSuffix = "dummy";
-
-        _animationTimer = new AnimationTimer() // can't update the Widgets outside of GUI thread, so this is a little worker to do so
-        {
-            boolean Showing = false;
-            Configuration config = _Config.getConfiguration();
-
-            @Override
-            public void handle(long now)
-            {
-                if (config.terminating())
-                {
-                    return;
-                }
-
-                if (!Showing && _Splash.isSplashClosed())
-                { // will only happen once
-                    try
-                    {
-                        Showing = true;
-
-                        Thread.currentThread().setName("Animation Timer Thread");
-                        SetupDebugToolTips();
-                        BeginServerEtc();
-                        _Splash.appVisible();
-                    }
-                    catch (Exception e)
-                    {
-                        StringWriter strWriter = new StringWriter();
-                        PrintWriter pntWriter = new PrintWriter(strWriter);
-                        e.printStackTrace(pntWriter);
-                        //LOGGER.severe(strWriter.toString());
-                        JOptionPane.showMessageDialog(null, "Error trying to launch application. \nCheck log file.", "Error", JOptionPane.ERROR_MESSAGE);
-                        Platform.exit();
-                    }
-                    Showing = true;
-                    return;
-                }
-                boolean refreshRequested = config.refreshRequested();
-                
-                if ( refreshRequested || System.currentTimeMillis() > lastTimerCall + TimerInterval)
-                {
-                    _DataMgr.PerformUpdates();
-                    config.DetermineMemorex();
-                    if (!strOldSuffix.equals(config.TitleSuffix)) // title could be 'recorded' 'lived'
-                    {
-                        _stage.setTitle(config.getAppTitle() + config.TitleSuffix);
-                        strOldSuffix = config.TitleSuffix;
-                    }
-                    // for remote marvin admin updates, can't update gui outside of gui thread
-                    TaskManager.getTaskManager().PerformDeferredTasks();
-                    if (!refreshRequested)
-                    {
-                        lastTimerCall = System.currentTimeMillis();
-                    }
-                }
-
-                else if (ReportMemoryUsage && System.currentTimeMillis() > LastMemoryUsageReportingTime + MemoryUsageReportingInterval)
-                {
-                    LastMemoryUsageReportingTime = System.currentTimeMillis();
-                    long freeMem = Runtime.getRuntime().freeMemory();
-                    long totalMem = Runtime.getRuntime().maxMemory();
-                    long usedMem = totalMem - freeMem;
-                    usedMem /= 1024.0;
-                    String MBMemStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem / 1024);
-                    //String BytesStr = NumberFormat.getNumberInstance(Locale.US).format(usedMem);
-                    //int qSize = DataManager.getDataManager().getQueuedSize();
-                    //LOGGER.info("Used Memory: " + MBMemStr + " MB. Outstanding DataPoints: " + Integer.toString(qSize));
-                    LOGGER.info("Used Memory: " + MBMemStr);
-                }
-            }
-        };
-
-        int waitBeforeRun = ShowSplash ? SplashWait : NoSplashWait;
-        new java.util.Timer().schedule(// Start goodies in a few seconds
-                new java.util.TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                _animationTimer.start();
-                this.cancel();
-            }
-        },
-                waitBeforeRun
-        );
-
-        DumpAllWidgetsInformation();
-
-        stage.setX(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinX());
-        stage.setY(_Config.getConfiguration().getPrimaryScreen().getVisualBounds().getMinY());
-    }
-
-    private void BeginServerEtc()
-    {
-        LOGGER.info("Starting Server");
-        _receiveServer.Start();
-
-        TaskManager.getTaskManager().PerformOnStartupTasks(); // perform any tasks designated to be run on startup
-        _Heartbeat = new Heartbeat(_Config.getConfiguration().getHeartbeatInterval()); // every n seconds  TODO: make configurable
-        _Heartbeat.Start();
-        if (_Config.getConfiguration().getMarvinLocalDatafeed())
-        {
-            objLocalMarvinData = new MarvinLocalData(1);
-        }
-        _stage.setMaximized(true);
-    }
-
-    public static void DumpThreads(boolean showStack)
-    {
-        showStack = false;
-        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-        Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
-
-        LOGGER.info("******* Dumping " + Integer.toString(threadArray.length) + " Threads from thread: " + Thread.currentThread().getName() + " ****************");
-
-        String dumpString = "";
-        for (Thread entry : threadArray)
-        {
-            // info is name,priority,threadgroup
-            dumpString += "\t" + entry.toString() + " -- " + entry.getState().toString() + "\n";
-            if (true == showStack)
-            {
-                for (StackTraceElement element : entry.getStackTrace())
-                {
-                    dumpString += "\t\t" + element.toString() + "\n";
-                }
-            }
-        }
-        LOGGER.info(dumpString);
-    }
-
-    @Override
-    public void stop()
-    {
-        if (null != Configuration.getConfig())
-        {
-            Configuration.getConfig().setTerminating();
-            StopWidgets();
-        }
-
-        if (null != objLocalMarvinData)
-        {
-            objLocalMarvinData.Shutdown();
-        }
-        if (null != _receiveServer)
-        {
-            _receiveServer.Stop();
-        }
-
-        if (null != _Heartbeat)
-        {
-            _Heartbeat.Stop();
-        }
-        /*
-        if (null != _animationTimer)
-        {
-            _animationTimer.stop();
-        }
-        LOGGER.info("Animation Timer Stopped");
-         */
-        //Marvin.DumpThreads(true);
-    }
-
-    public static void main(final String[] args)
-    {
-        if (!JVMversion.meetsMinimumVersion())
-        {
-            System.out.println("Not valid JVM version.  Requires 1." + JVMversion.MINIMUM_MAJOR_VERSION + " build " + JVMversion.MINIMUM_BUILD_VERSION + " or newer");
-            return;
-        }
-        try
-        {
-            Thread.currentThread().setName("Main Application Thread");
-            Application.launch(args);
-            System.exit(0);
-        }
-        catch (OutOfMemoryError ex)
-        {
-            JOptionPane.showMessageDialog(null, "Insufficient Memory.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        catch (Exception ex)
-        {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            ex.printStackTrace(pw);
-            LOGGER.severe(sw.toString());
-            LOGGER.severe(ex.toString());
-        }
-        System.exit(1);
     }
 }

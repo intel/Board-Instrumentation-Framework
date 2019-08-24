@@ -41,9 +41,10 @@ public class UpdateProxyTask extends BaseTask
 	_ProxyID = proxyID;
     }
     
-    public void setNamespaceMask(String newNS)
+    @Override
+    public void PerformTask()
     {
-	_NewNamespaceCriterea = newNS;
+	DataManager.getDataManager().UpdateGenerateDatapointProxy(getDataValue(_ProxyID), getDataValue(_NewNamespaceCriterea), getDataValue(_NewIDCriterea),getDataValue(_newListEntry));
     }
     
     
@@ -57,9 +58,8 @@ public class UpdateProxyTask extends BaseTask
 	_newListEntry = newEntry;
     }
 
-    @Override
-    public void PerformTask()
+    public void setNamespaceMask(String newNS)
     {
-	DataManager.getDataManager().UpdateGenerateDatapointProxy(getDataValue(_ProxyID), getDataValue(_NewNamespaceCriterea), getDataValue(_NewIDCriterea),getDataValue(_newListEntry));
+	_NewNamespaceCriterea = newNS;
     }
 }

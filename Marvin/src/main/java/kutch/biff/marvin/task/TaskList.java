@@ -32,8 +32,8 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 public class TaskList
 {
-    protected  ArrayList<BaseTask> _TaskItems;
     protected final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    protected  ArrayList<BaseTask> _TaskItems;
     protected  TaskManager TASKMAN = TaskManager.getTaskManager();
     
     public TaskList()
@@ -41,11 +41,6 @@ public class TaskList
         _TaskItems = null;
     }
 
-    public ArrayList<BaseTask> GetTasks()
-    {
-        return _TaskItems;
-    }
-    
     public void AddTaskItem(BaseTask objTask)
     {
         if (null == _TaskItems)
@@ -54,6 +49,11 @@ public class TaskList
         }
 
         _TaskItems.add(objTask);
+    }
+    
+    public ArrayList<BaseTask> GetTasks()
+    {
+        return _TaskItems;
     }
 
     public boolean PerformTasks()

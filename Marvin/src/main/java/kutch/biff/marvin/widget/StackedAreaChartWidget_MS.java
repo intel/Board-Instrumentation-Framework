@@ -40,17 +40,6 @@ public class StackedAreaChartWidget_MS extends AreaChartWidget_MS
         _isStackedChart = true;
     }
     @Override
-    public boolean Create(GridPane pane, DataManager dataMgr)
-    {
-        return _CreateMSChart(pane, dataMgr);
-    }
-  @Override
-    protected Chart CreateChartObject()
-    {
-        return new StackedAreaChart<>(getxAxis(), getyAxis());
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     protected void _CreateChart()
     {
@@ -59,20 +48,32 @@ public class StackedAreaChartWidget_MS extends AreaChartWidget_MS
         for (SeriesDataSet ds : getSeries())
         {
             ds.getSeries().getData().add(new XYChart.Data<>(0,0)); // Stacked Charts will crash if you don't have any data in a series.
-           ((StackedAreaChart) (getChart())).getData().add(ds.getSeries());
+           ((StackedAreaChart<?, ?>) (getChart())).getData().add(ds.getSeries());
         }
     }
+  @Override
+public boolean Create(GridPane pane, DataManager dataMgr)
+{
+    return _CreateMSChart(pane, dataMgr);
+}
+
+    @SuppressWarnings("unchecked")
+    @Override
+        protected Chart CreateChartObject()
+        {
+            return new StackedAreaChart<>(getxAxis(), getyAxis());
+        }
 
     @Override
     public javafx.scene.Node getStylableObject()
     {
-        return ((StackedAreaChart) (getChart()));
+        return ((StackedAreaChart<?, ?>) (getChart()));
     }
 
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return ((StackedAreaChart) (getChart())).getStylesheets();
+        return ((StackedAreaChart<?, ?>) (getChart())).getStylesheets();
     }    
     
 }

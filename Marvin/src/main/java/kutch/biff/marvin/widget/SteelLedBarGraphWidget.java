@@ -62,70 +62,6 @@ public class SteelLedBarGraphWidget extends BaseWidget
     }
 
     @Override
-    public ObservableList<String> getStylesheets()
-    {
-        //return _Pane.getStylesheets();
-        return _BarGraph.getStylesheets();
-    }
-
-    @Override
-    public javafx.scene.Node getStylableObject()
-    {
-        //return _Pane;
-        return _BarGraph;
-    }
-
-    public boolean isShowPeakValue()
-    {
-        return _ShowPeakValue;
-    }
-
-    public void setShowPeakValue(boolean _ShowPeakValue)
-    {
-        this._ShowPeakValue = _ShowPeakValue;
-    }
-
-    public int getLedSize()
-    {
-        return _LedSize;
-    }
-
-    public void setLedSize(int _LedSize)
-    {
-        this._LedSize = _LedSize;
-    }
-
-    public Led.LedType getLedType()
-    {
-        return _LedType;
-    }
-
-    public void setLedType(Led.LedType _LedType)
-    {
-        this._LedType = _LedType;
-    }
-
-    public int getNumberOfLeds()
-    {
-        return _NumberOfLeds;
-    }
-
-    public void setNumberOfLeds(int _NumberOfLeds)
-    {
-        this._NumberOfLeds = _NumberOfLeds;
-    }
-
-    public Orientation getOrientation()
-    {
-        return _Orientation;
-    }
-
-    public void setOrientation(Orientation _Orientation)
-    {
-        this._Orientation = _Orientation;
-    }
-
-    @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
@@ -183,6 +119,70 @@ public class SteelLedBarGraphWidget extends BaseWidget
         SetupTaskAction();
 
         return ApplyCSS();
+    }
+
+    public int getLedSize()
+    {
+        return _LedSize;
+    }
+
+    public Led.LedType getLedType()
+    {
+        return _LedType;
+    }
+
+    public int getNumberOfLeds()
+    {
+        return _NumberOfLeds;
+    }
+
+    public Orientation getOrientation()
+    {
+        return _Orientation;
+    }
+
+    @Override
+    public javafx.scene.Node getStylableObject()
+    {
+        //return _Pane;
+        return _BarGraph;
+    }
+
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+        //return _Pane.getStylesheets();
+        return _BarGraph.getStylesheets();
+    }
+
+    public boolean isShowPeakValue()
+    {
+        return _ShowPeakValue;
+    }
+
+    public void setLedSize(int _LedSize)
+    {
+        this._LedSize = _LedSize;
+    }
+
+    public void setLedType(Led.LedType _LedType)
+    {
+        this._LedType = _LedType;
+    }
+
+    public void setNumberOfLeds(int _NumberOfLeds)
+    {
+        this._NumberOfLeds = _NumberOfLeds;
+    }
+
+    public void setOrientation(Orientation _Orientation)
+    {
+        this._Orientation = _Orientation;
+    }
+
+    public void setShowPeakValue(boolean _ShowPeakValue)
+    {
+        this._ShowPeakValue = _ShowPeakValue;
     }
 
     private boolean SetupBarGraph()

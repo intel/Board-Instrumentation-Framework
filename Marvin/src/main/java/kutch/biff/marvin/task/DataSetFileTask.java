@@ -50,26 +50,6 @@ public class DataSetFileTask extends BaseTask
         _fluxRangeLower = _fluxRangeUpper = 0;
     }
 
-    public void setRepeatCount(int count)
-    {
-        _RepeatCount = count;
-    }
-    
-    public void setFluxRange(double lower, double upper)
-    {
-        _fluxRangeLower = lower;
-        _fluxRangeUpper = upper;
-    }
-
-    @Override
-    public void PerformTask()
-    {
-        String fname = getDataValue(_strFileName);
-        fname = convertToFileOSSpecific(_strFileName);
-        @SuppressWarnings("unused")
-	int count = HandleDataFile(fname);
-    }
-
     private int HandleDataFile(String inpFile)
     {
         int addedCount = 0;
@@ -114,5 +94,25 @@ public class DataSetFileTask extends BaseTask
         }
         
         return addedCount;
+    }
+    
+    @Override
+    public void PerformTask()
+    {
+        String fname = getDataValue(_strFileName);
+        fname = convertToFileOSSpecific(_strFileName);
+        @SuppressWarnings("unused")
+	int count = HandleDataFile(fname);
+    }
+
+    public void setFluxRange(double lower, double upper)
+    {
+        _fluxRangeLower = lower;
+        _fluxRangeUpper = upper;
+    }
+
+    public void setRepeatCount(int count)
+    {
+        _RepeatCount = count;
     }
 }

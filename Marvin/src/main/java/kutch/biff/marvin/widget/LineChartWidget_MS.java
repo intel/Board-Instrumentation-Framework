@@ -45,12 +45,15 @@ public class LineChartWidget_MS extends BaseChartWidget
 
     }
 
-    @Override
-    public boolean Create(GridPane pane, DataManager dataMgr)
+    @SuppressWarnings("unchecked")
+    protected void _CreateChart()
     {
-        SetParent(pane);
-        return _CreateMSChart(pane, dataMgr);
+        CreateChart();
 
+        for (SeriesDataSet ds : getSeries())
+        {
+            ((LineChart<?, ?>) (getChart())).getData().add(ds.getSeries());
+        }
     }
 
     /**
@@ -111,6 +114,14 @@ public class LineChartWidget_MS extends BaseChartWidget
     }
 
     @Override
+    public boolean Create(GridPane pane, DataManager dataMgr)
+    {
+        SetParent(pane);
+        return _CreateMSChart(pane, dataMgr);
+
+    }
+
+    @Override
     protected void CreateAxisObjects()
     {
         super.CreateAxisObjects();
@@ -121,14 +132,10 @@ public class LineChartWidget_MS extends BaseChartWidget
     }
 
     @SuppressWarnings("unchecked")
-    protected void _CreateChart()
+    @Override
+    protected Chart CreateChartObject()
     {
-        CreateChart();
-
-        for (SeriesDataSet ds : getSeries())
-        {
-            ((LineChart<?, ?>) (getChart())).getData().add(ds.getSeries());
-        }
+        return new LineChart<Number, Number>(getxAxis(), getyAxis());
     }
 
     @Override
@@ -141,13 +148,6 @@ public class LineChartWidget_MS extends BaseChartWidget
     public ObservableList<String> getStylesheets()
     {
         return ((LineChart<?, ?>) (getChart())).getStylesheets();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected Chart CreateChartObject()
-    {
-        return new LineChart<Number, Number>(getxAxis(), getyAxis());
     }
 
     @Override

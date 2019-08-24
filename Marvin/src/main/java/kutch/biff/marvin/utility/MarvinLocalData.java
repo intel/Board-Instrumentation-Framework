@@ -43,9 +43,9 @@ import kutch.biff.marvin.widget.BaseWidget;
  */
 public class MarvinLocalData
 {
-    private final ConfigurationReader CONFIG = ConfigurationReader.GetConfigReader();
     @SuppressWarnings("unused")
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    private final ConfigurationReader CONFIG = ConfigurationReader.GetConfigReader();
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private final String Namespace = "MarvinLocalNamespace";
     private final long startTime = System.currentTimeMillis();
@@ -77,12 +77,6 @@ public class MarvinLocalData
         }
     }
     
-    public void Shutdown()
-    {
-        _StopSignalled = true;
-        executor.shutdown();
-    }
-
     private void DoStaticMagic()
     {
         TASKMAN.getDataMgr().ChangeValue("TaskCount", Namespace, Integer.toString(BaseTask.getTaskCount()));
@@ -94,26 +88,6 @@ public class MarvinLocalData
         {
             TASKMAN.getDataMgr().ChangeValue("MarvinID", Namespace, "Not Set");
         }
-    }
-
-    private void PerformMagic()
-    {
-        TASKMAN.getDataMgr().ChangeValue("Datapoints", Namespace, Integer.toString(DataManager.getDataManager().NumberOfRegisteredDatapoints()));
-        long runtime = (System.currentTimeMillis() - startTime) / 1000;
-        TASKMAN.getDataMgr().ChangeValue("RuntimeSecs", Namespace, Long.toString(runtime));
-        TASKMAN.getDataMgr().ChangeValue("RuntimeFormatted", Namespace, GetTimeString(runtime));
-        LocalTime now = LocalTime.now(ZoneId.systemDefault());
-        TASKMAN.getDataMgr().ChangeValue("LocalTime", Namespace, GetTimeString(now.toSecondOfDay()));
-        TASKMAN.getDataMgr().ChangeValue("WidgetCount", Namespace, Integer.toString(BaseWidget.getWidgetCount()));
-        TASKMAN.getDataMgr().ChangeValue("DataUpdateCount", Namespace, Long.toString(TASKMAN.getDataMgr().getUpdateCount()));
-        TASKMAN.getDataMgr().ChangeValue("UnassignedDatapointCount", Namespace, Long.toString(TASKMAN.getDataMgr().getUnassignedCount()));
-        TASKMAN.getDataMgr().ChangeValue("TasksExecutedCount", Namespace, Long.toString(TASKMAN.GetPerformedCount()));
-        TASKMAN.getDataMgr().ChangeValue("PendingTasksCount", Namespace, Long.toString(TASKMAN.GetPendingTaskCount()));
-        long freeMem = Runtime.getRuntime().freeMemory();
-        String KBMemStr = NumberFormat.getNumberInstance(Locale.US).format(freeMem / 1024);
-        String BytesStr = NumberFormat.getNumberInstance(Locale.US).format(freeMem);
-        TASKMAN.getDataMgr().ChangeValue("FreeMemB", Namespace, BytesStr);
-        TASKMAN.getDataMgr().ChangeValue("FreeMemKB", Namespace, KBMemStr);
     }
 
     private String GetTimeString(long seconds)
@@ -138,5 +112,31 @@ public class MarvinLocalData
         }
 
         return strRet;
+    }
+
+    private void PerformMagic()
+    {
+        TASKMAN.getDataMgr().ChangeValue("Datapoints", Namespace, Integer.toString(DataManager.getDataManager().NumberOfRegisteredDatapoints()));
+        long runtime = (System.currentTimeMillis() - startTime) / 1000;
+        TASKMAN.getDataMgr().ChangeValue("RuntimeSecs", Namespace, Long.toString(runtime));
+        TASKMAN.getDataMgr().ChangeValue("RuntimeFormatted", Namespace, GetTimeString(runtime));
+        LocalTime now = LocalTime.now(ZoneId.systemDefault());
+        TASKMAN.getDataMgr().ChangeValue("LocalTime", Namespace, GetTimeString(now.toSecondOfDay()));
+        TASKMAN.getDataMgr().ChangeValue("WidgetCount", Namespace, Integer.toString(BaseWidget.getWidgetCount()));
+        TASKMAN.getDataMgr().ChangeValue("DataUpdateCount", Namespace, Long.toString(TASKMAN.getDataMgr().getUpdateCount()));
+        TASKMAN.getDataMgr().ChangeValue("UnassignedDatapointCount", Namespace, Long.toString(TASKMAN.getDataMgr().getUnassignedCount()));
+        TASKMAN.getDataMgr().ChangeValue("TasksExecutedCount", Namespace, Long.toString(TASKMAN.GetPerformedCount()));
+        TASKMAN.getDataMgr().ChangeValue("PendingTasksCount", Namespace, Long.toString(TASKMAN.GetPendingTaskCount()));
+        long freeMem = Runtime.getRuntime().freeMemory();
+        String KBMemStr = NumberFormat.getNumberInstance(Locale.US).format(freeMem / 1024);
+        String BytesStr = NumberFormat.getNumberInstance(Locale.US).format(freeMem);
+        TASKMAN.getDataMgr().ChangeValue("FreeMemB", Namespace, BytesStr);
+        TASKMAN.getDataMgr().ChangeValue("FreeMemKB", Namespace, KBMemStr);
+    }
+
+    public void Shutdown()
+    {
+        _StopSignalled = true;
+        executor.shutdown();
     }
 }

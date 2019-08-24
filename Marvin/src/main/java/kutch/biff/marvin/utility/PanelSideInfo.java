@@ -49,6 +49,11 @@ public class PanelSideInfo
         Position = setButtonAlignment(loc);
     }
 
+    public Pos GetButtonAlignment()
+    {
+        return this.Position;
+    }
+
     public String getButtonText()
     {
         if (null == ButtonText)
@@ -66,14 +71,9 @@ public class PanelSideInfo
         }
         return CSSFile;
     }
-
     public String getStyleID()
     {
         return StyleID;
-    }
-    public Pos GetButtonAlignment()
-    {
-        return this.Position;
     }
     public boolean IsButtonOnTop()
     {

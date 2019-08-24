@@ -56,6 +56,35 @@ public class OnDemandGridWidget extends GridWidget
         __AddedGridList = new ArrayList<>();
     }
 
+    public boolean AddOnDemandWidget(BaseWidget objWidget, String sortStr)
+    {
+        Pair<Integer, Integer> position = getNextPosition();
+
+        objWidget.setColumn(position.getKey());
+        objWidget.setRow(position.getValue());
+        objWidget.setWidth(getWidth());
+        objWidget.setHeight(getHeight());
+
+        if (objWidget.Create(getGridPane(), DataManager.getDataManager()))
+        {
+            if (objWidget.PerformPostCreateActions(this, false))
+            {
+                __AddedGridList.add(new Pair<>(objWidget, sortStr));
+                if (__criterea.getSortByMethod() != SortMethod.NONE)
+                {
+                    resortWidgets(); // OddEven Style applied in here
+                }
+                else
+                {   
+                    __criterea.ApplyOddEvenStyle(objWidget,__AddedGridList.size());
+                }
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
     @Override
     public boolean Create(GridPane parentPane, DataManager dataMgr)
     {
@@ -65,58 +94,6 @@ public class OnDemandGridWidget extends GridWidget
         dataMgr.AddOnDemandWidgetCriterea(__criterea, objBuilder);
         // grab ALL aliases to use when contained widgets created
         return true;
-    }
-    
-    private void setupPositioning()
-    {
-       if ("HZ".equals(__strPrimaryGrowth))
-        {
-            __nextPositionX = -1;
-            if ("VT".equals(__strSecondaryGrowth))
-            {
-                __nextPositionY = 0;
-            }
-            else
-            {
-                __nextPositionY = 125;
-            }
-        }
-        else if ("ZH".equals(__strPrimaryGrowth))
-        {
-            __nextPositionX = __NewLineCount - 1;
-            if ("VT".equals(__strSecondaryGrowth))
-            {
-                __nextPositionY = 0;
-            }
-            else
-            {
-                __nextPositionY = 125;
-            }
-        }
-        else if ("VT".equals(__strPrimaryGrowth))
-        {
-            __nextPositionY = -1;
-            if ("HZ".equals(__strSecondaryGrowth))
-            {
-                __nextPositionX = -1;
-            }
-            else
-            {
-                __nextPositionX = 125;
-            }
-        }
-        else if ("TV".equals(__strPrimaryGrowth))
-        {
-            __nextPositionY = __NewLineCount - 1;
-            if ("HZ".equals(__strSecondaryGrowth))
-            {
-                __nextPositionX = -1;
-            }
-            else
-            {
-                __nextPositionX = 125;
-            }
-        }        
     }
 
     public DynamicItemInfoContainer getCriterea()
@@ -201,67 +178,6 @@ public class OnDemandGridWidget extends GridWidget
         return retObj;
     }
 
-    private void sortGrids()
-    {
-        Collections.sort(__AddedGridList, new Comparator<Pair<BaseWidget, String>>()
-                 {
-                     @Override
-                     public int compare(Pair<BaseWidget, String> o1, Pair<BaseWidget, String> o2)
-                     {
-                         return o1.getValue().compareTo(o2.getValue());
-                     }
-                 }
-        );
-    }
-
-    private void resortWidgets()
-    {
-//        getGridPane().getChildren().removeAll(getGridPane().getChildren());
-        getGridPane().getChildren().clear();
-        sortGrids();
-        
-        setupPositioning();
-        int widgetNum = 0;
-        for (Pair<BaseWidget, String> tuple : __AddedGridList)
-        {
-            widgetNum++;
-            BaseWidget objWidget = tuple.getKey();
-            Pair<Integer, Integer> position = getNextPosition();
-            getGridPane().add(objWidget.getStylableObject(), position.getKey(), position.getValue());
-            __criterea.ApplyOddEvenStyle(objWidget,widgetNum);
-        }
-    }
-
-    public boolean AddOnDemandWidget(BaseWidget objWidget, String sortStr)
-    {
-        Pair<Integer, Integer> position = getNextPosition();
-
-        objWidget.setColumn(position.getKey());
-        objWidget.setRow(position.getValue());
-        objWidget.setWidth(getWidth());
-        objWidget.setHeight(getHeight());
-
-        if (objWidget.Create(getGridPane(), DataManager.getDataManager()))
-        {
-            if (objWidget.PerformPostCreateActions(this, false))
-            {
-                __AddedGridList.add(new Pair<>(objWidget, sortStr));
-                if (__criterea.getSortByMethod() != SortMethod.NONE)
-                {
-                    resortWidgets(); // OddEven Style applied in here
-                }
-                else
-                {   
-                    __criterea.ApplyOddEvenStyle(objWidget,__AddedGridList.size());
-                }
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    
     public boolean ReadGrowthInfo(FrameworkNode growthNode)
     {
         String strPrimary = growthNode.getAttribute("Primary");
@@ -343,5 +259,89 @@ public class OnDemandGridWidget extends GridWidget
         }
 
         return true;
+    }
+
+    private void resortWidgets()
+    {
+//        getGridPane().getChildren().removeAll(getGridPane().getChildren());
+        getGridPane().getChildren().clear();
+        sortGrids();
+        
+        setupPositioning();
+        int widgetNum = 0;
+        for (Pair<BaseWidget, String> tuple : __AddedGridList)
+        {
+            widgetNum++;
+            BaseWidget objWidget = tuple.getKey();
+            Pair<Integer, Integer> position = getNextPosition();
+            getGridPane().add(objWidget.getStylableObject(), position.getKey(), position.getValue());
+            __criterea.ApplyOddEvenStyle(objWidget,widgetNum);
+        }
+    }
+
+    private void setupPositioning()
+    {
+       if ("HZ".equals(__strPrimaryGrowth))
+        {
+            __nextPositionX = -1;
+            if ("VT".equals(__strSecondaryGrowth))
+            {
+                __nextPositionY = 0;
+            }
+            else
+            {
+                __nextPositionY = 125;
+            }
+        }
+        else if ("ZH".equals(__strPrimaryGrowth))
+        {
+            __nextPositionX = __NewLineCount - 1;
+            if ("VT".equals(__strSecondaryGrowth))
+            {
+                __nextPositionY = 0;
+            }
+            else
+            {
+                __nextPositionY = 125;
+            }
+        }
+        else if ("VT".equals(__strPrimaryGrowth))
+        {
+            __nextPositionY = -1;
+            if ("HZ".equals(__strSecondaryGrowth))
+            {
+                __nextPositionX = -1;
+            }
+            else
+            {
+                __nextPositionX = 125;
+            }
+        }
+        else if ("TV".equals(__strPrimaryGrowth))
+        {
+            __nextPositionY = __NewLineCount - 1;
+            if ("HZ".equals(__strSecondaryGrowth))
+            {
+                __nextPositionX = -1;
+            }
+            else
+            {
+                __nextPositionX = 125;
+            }
+        }        
+    }
+
+    
+    private void sortGrids()
+    {
+        Collections.sort(__AddedGridList, new Comparator<Pair<BaseWidget, String>>()
+                 {
+                     @Override
+                     public int compare(Pair<BaseWidget, String> o1, Pair<BaseWidget, String> o2)
+                     {
+                         return o1.getValue().compareTo(o2.getValue());
+                     }
+                 }
+        );
     }
 }

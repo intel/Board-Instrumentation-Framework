@@ -34,6 +34,15 @@ public class MarvinLogger
     static private Formatter _marvinLogFormatObj;
     //private static ConsoleHandler _
 
+    static public void setDebugLevel(Level newLevel)
+    {
+        Logger logger =  Logger.getLogger(MarvinLogger.class.getName());
+        logger.setLevel(newLevel);
+        for (Handler hdl :logger.getHandlers())
+        {
+            hdl.setLevel(newLevel);
+        }
+    }
     static public void setup(String fileName) throws IOException
     {
         try
@@ -60,15 +69,6 @@ public class MarvinLogger
         catch (Exception ex)
         {
             System.out.println(ex.toString());
-        }
-    }
-    static public void setDebugLevel(Level newLevel)
-    {
-        Logger logger =  Logger.getLogger(MarvinLogger.class.getName());
-        logger.setLevel(newLevel);
-        for (Handler hdl :logger.getHandlers())
-        {
-            hdl.setLevel(newLevel);
         }
     }
 }

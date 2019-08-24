@@ -47,7 +47,6 @@ import javafx.stage.StageStyle;
 import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.task.BaseTask;
-import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.version.Version;
 import kutch.biff.marvin.widget.BaseWidget;
 
@@ -57,19 +56,6 @@ import kutch.biff.marvin.widget.BaseWidget;
  */
 public class AboutBox
 {
-    public static void ShowAboutBox()
-    {
-        Stage dialog = new Stage(); 
-        dialog.setTitle("About Marvin");
-        dialog.initStyle(StageStyle.UNDECORATED);
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.setWidth(250);
-        Scene scene = new Scene(AboutBox.Setup(dialog));
-
-        dialog.setScene(scene);
-        dialog.showAndWait(); 
-    }
-
     private static Pane Setup(Stage stage)
     {
         //TaskManager TASKMAN = TaskManager.getTaskManager();
@@ -170,7 +156,6 @@ public class AboutBox
 
     private static int SetupExtraInfoPane(GridPane grid, int iStartRow, int column)
     {
-        TaskManager TASKMAN = TaskManager.getTaskManager();
         ConfigurationReader CONFIG = ConfigurationReader.GetConfigReader();
         //ConfigurationReader CONFIG = GetConfigReader();
 
@@ -224,5 +209,18 @@ public class AboutBox
 
         return iStartRow;
 
+    }
+
+    public static void ShowAboutBox()
+    {
+        Stage dialog = new Stage(); 
+        dialog.setTitle("About Marvin");
+        dialog.initStyle(StageStyle.UNDECORATED);
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setWidth(250);
+        Scene scene = new Scene(AboutBox.Setup(dialog));
+
+        dialog.setScene(scene);
+        dialog.showAndWait(); 
     }
 }

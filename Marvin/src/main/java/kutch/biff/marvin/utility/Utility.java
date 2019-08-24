@@ -40,6 +40,26 @@ public class Utility
     private static String __KeyConjunction="MarvinKeyJoinerString";
 
     
+    public static String combineWildcards(String s1, String s2)
+    {
+	if (s1.contains("*"))
+	{
+	    s1 = s1.replace("*", s2);
+	}
+	return s1;
+    }
+    
+    public static String generateKey(String s1, String s2)
+    {
+	return s1.toUpperCase() + Utility.__KeyConjunction + s2.toUpperCase();
+    }
+    
+    public static String[] splitKey(String key)
+    {
+	String parts[] = key.split(Utility.__KeyConjunction);
+	return parts;
+    }
+    
     public static boolean ValidateAttributes(String ValidAttributes[],FrameworkNode node)
     {
         boolean retVal = true;
@@ -87,26 +107,6 @@ public class Utility
         Attributes.addAll(Arrays.asList(MoreAttributes));
         
         return ValidateAttributes(Attributes.toArray(new String[Attributes.size()]),node);
-    }
-    
-    public static String generateKey(String s1, String s2)
-    {
-	return s1.toUpperCase() + Utility.__KeyConjunction + s2.toUpperCase();
-    }
-    
-    public static String[] splitKey(String key)
-    {
-	String parts[] = key.split(Utility.__KeyConjunction);
-	return parts;
-    }
-    
-    public static String combineWildcards(String s1, String s2)
-    {
-	if (s1.contains("*"))
-	{
-	    s1 = s1.replace("*", s2);
-	}
-	return s1;
     }
 
     

@@ -48,8 +48,8 @@ public class MarvinPlayback implements Runnable
 	public int Time;
     }
     
-    private String _Name;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    private String _Name;
     private double _PlaybackSpeed;
     private boolean _LoopPlayback;
     private boolean _Playing;
@@ -72,23 +72,22 @@ public class MarvinPlayback implements Runnable
 	return _Name;
     }
     
-    public void stopPlayback()
+    public boolean loadFile(String fName)
     {
-	_Terminate = true;
-	if (_Paused)
+	if (_Playing)
 	{
-	    _Paused = false;
+	    stopPlayback();
 	}
-	while (_Playing)
+	List<DataSet> newData = ReadFile(fName);
+	_playbackData = newData;
+	
+	if (null == newData)
 	{
-	    try
-	    {
-		Thread.sleep(5);
-	    }
-	    catch(InterruptedException e)
-	    {
-	    }
+	    return false;
 	}
+	_NextEntry = 0;
+	
+	return true;
     }
     
     public void pausePlayback()
@@ -98,25 +97,6 @@ public class MarvinPlayback implements Runnable
 	    LOGGER.warning("Asked to pause Playback " + getName() + ", when already paused.");
 	}
 	_Paused = true;
-    }
-    
-    public void resumePlayback()
-    {
-	if (!_Paused)
-	{
-	    LOGGER.warning("Asked to resume Playback " + getName() + ", when not paused.");
-	}
-	_Paused = false;
-    }
-    
-    public void setSpeed(double newSpeed)
-    {
-	_PlaybackSpeed = newSpeed;
-    }
-    
-    public void setRepeat(boolean repeat)
-    {
-	_LoopPlayback = repeat;
     }
     
     public void Play()
@@ -137,24 +117,6 @@ public class MarvinPlayback implements Runnable
 	_Paused = false;
 	_PlaybackThread = new Thread(this);
 	_PlaybackThread.start();
-    }
-    
-    public boolean loadFile(String fName)
-    {
-	if (_Playing)
-	{
-	    stopPlayback();
-	}
-	List<DataSet> newData = ReadFile(fName);
-	_playbackData = newData;
-	
-	if (null == newData)
-	{
-	    return false;
-	}
-	_NextEntry = 0;
-	
-	return true;
     }
     
     private List<DataSet> ReadFile(String fName)
@@ -227,6 +189,15 @@ public class MarvinPlayback implements Runnable
 	
     }
     
+    public void resumePlayback()
+    {
+	if (!_Paused)
+	{
+	    LOGGER.warning("Asked to resume Playback " + getName() + ", when not paused.");
+	}
+	_Paused = false;
+    }
+    
     @Override
     public void run()
     {
@@ -289,5 +260,34 @@ public class MarvinPlayback implements Runnable
 	_PlaybackThread = null;
 	LOGGER.info("Playback [" + getName() + "] Finished");
 	_Playing = false;
+    }
+    
+    public void setRepeat(boolean repeat)
+    {
+	_LoopPlayback = repeat;
+    }
+    
+    public void setSpeed(double newSpeed)
+    {
+	_PlaybackSpeed = newSpeed;
+    }
+    
+    public void stopPlayback()
+    {
+	_Terminate = true;
+	if (_Paused)
+	{
+	    _Paused = false;
+	}
+	while (_Playing)
+	{
+	    try
+	    {
+		Thread.sleep(5);
+	    }
+	    catch(InterruptedException e)
+	    {
+	    }
+	}
     }
 }

@@ -54,18 +54,6 @@ public class DoubleBarGaugeWidget extends BaseWidget
         _Gauge = new AvGauge();
     }
 
-    @Override
-    public javafx.scene.Node getStylableObject()
-    {
-        return _Gauge;
-    }
-
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-        return _Gauge.getStylesheets();
-    }
-
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
@@ -140,44 +128,15 @@ public class DoubleBarGaugeWidget extends BaseWidget
     }
 
     @Override
-    public void SetInitialValue(String value)
+    public javafx.scene.Node getStylableObject()
     {
-        try
-        {
-            _InitialValue = Double.parseDouble(value);
-        }
-        catch (NumberFormatException ex)
-        {
-            LOGGER.severe("Invalid Default Value data for BarGauge: " + value);
-        }
+        return _Gauge;
     }
 
-    public void setMinValue(double MinValue)
+    @Override
+    public ObservableList<String> getStylesheets()
     {
-        _InitialValue = MinValue;
-        this.MinValue = MinValue;
-    }
-
-    public void setMaxValue(double MaxValue)
-    {
-        this.MaxValue = MaxValue;
-    }
-
-    private boolean SetupGauge()
-    {
-        _Gauge.setMinValue(MinValue);
-        _Gauge.setMaxValue(MaxValue);
-
-        if (getTitle().length() > 0)
-        {
-            _Gauge.setTitle(getTitle());
-        }
-
-        _Gauge.setDecimals(getDecimalPlaces());
-
-        SetupTaskAction();
-
-        return false != ApplyCSS();
+        return _Gauge.getStylesheets();
     }
 
     /**
@@ -211,12 +170,6 @@ public class DoubleBarGaugeWidget extends BaseWidget
             this.MaxValue = Max;
         }
         return true;
-    }
-
-    @Override
-    public void UpdateTitle(String strTitle)
-    {
-        _Gauge.setTitle(getTitle());
     }
 
     @Override
@@ -267,6 +220,53 @@ public class DoubleBarGaugeWidget extends BaseWidget
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void SetInitialValue(String value)
+    {
+        try
+        {
+            _InitialValue = Double.parseDouble(value);
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe("Invalid Default Value data for BarGauge: " + value);
+        }
+    }
+
+    public void setMaxValue(double MaxValue)
+    {
+        this.MaxValue = MaxValue;
+    }
+
+    public void setMinValue(double MinValue)
+    {
+        _InitialValue = MinValue;
+        this.MinValue = MinValue;
+    }
+
+    private boolean SetupGauge()
+    {
+        _Gauge.setMinValue(MinValue);
+        _Gauge.setMaxValue(MaxValue);
+
+        if (getTitle().length() > 0)
+        {
+            _Gauge.setTitle(getTitle());
+        }
+
+        _Gauge.setDecimals(getDecimalPlaces());
+
+        SetupTaskAction();
+
+        return false != ApplyCSS();
+    }
+
+    @Override
+    public void UpdateTitle(String strTitle)
+    {
+        _Gauge.setTitle(getTitle());
     }
     
 

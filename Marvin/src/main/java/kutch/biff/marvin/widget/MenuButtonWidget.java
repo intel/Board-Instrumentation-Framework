@@ -63,66 +63,10 @@ public class MenuButtonWidget extends ButtonWidget
 	__LastValue="";
     }
     
-    public void setCommonTaskNode(FrameworkNode commonTask)
-    {
-	__CommonTaskNode = new FrameworkNode(commonTask);  // make new instance, to get alias resolved now
-	//__CommonTaskNode.ResolveAlias();
-    }
-    
     @Override
     protected ButtonBase getButton()
     {
 	return _Button;
-    }
-    
-    @Override
-    public EventHandler<MouseEvent> SetupTaskAction()
-    {
-	// Tasks for Menu Button are setup down in Configuration:ReadMenuItem
-	return null;
-    }
-    
-    @Override
-    public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode)
-    {
-	if (super.HandleWidgetSpecificSettings(widgetNode))
-	{
-	    return true;
-	}
-	
-	if (widgetNode.getNodeName().equalsIgnoreCase("MenuItem"))
-	{
-	    ConfigurationReader rdr = ConfigurationReader.GetConfigReader();
-	    
-	    MenuItem objItem = rdr.ReadMenuItem(widgetNode,_Button.getItems().size());
-	    if (null != objItem)
-	    {
-		_Button.getItems().add(objItem);
-		setupChangeTitleListener(objItem);
-		return true;
-	    }
-	}
-	
-	return false;
-    }
-    
-    private void setupChangeTitleListener(MenuItem objItem)
-    {
-	if (__UpdateTitleFromSelection)
-	{
-	    EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>()
-	    {
-		@Override
-		public void handle(ActionEvent event)
-		{
-		    if (__UpdateTitleFromSelection) // sometimes flag is read AFTER handler setup
-		    {
-			_Button.setText(objItem.getText());
-		    }
-		}
-	    };
-	    objItem.addEventHandler(ActionEvent.ACTION, eventHandler);
-	}
     }
     
     @Override
@@ -153,6 +97,30 @@ public class MenuButtonWidget extends ButtonWidget
 	}
 	
 	return true;
+    }
+    
+    @Override
+    public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode)
+    {
+	if (super.HandleWidgetSpecificSettings(widgetNode))
+	{
+	    return true;
+	}
+	
+	if (widgetNode.getNodeName().equalsIgnoreCase("MenuItem"))
+	{
+	    ConfigurationReader rdr = ConfigurationReader.GetConfigReader();
+	    
+	    MenuItem objItem = rdr.ReadMenuItem(widgetNode,_Button.getItems().size());
+	    if (null != objItem)
+	    {
+		_Button.getItems().add(objItem);
+		setupChangeTitleListener(objItem);
+		return true;
+	    }
+	}
+	
+	return false;
     }
     
     @Override
@@ -196,5 +164,37 @@ public class MenuButtonWidget extends ButtonWidget
 	    }
 	}
 	ApplyCSS();
+    }
+    
+    public void setCommonTaskNode(FrameworkNode commonTask)
+    {
+	__CommonTaskNode = new FrameworkNode(commonTask);  // make new instance, to get alias resolved now
+	//__CommonTaskNode.ResolveAlias();
+    }
+    
+    private void setupChangeTitleListener(MenuItem objItem)
+    {
+	if (__UpdateTitleFromSelection)
+	{
+	    EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>()
+	    {
+		@Override
+		public void handle(ActionEvent event)
+		{
+		    if (__UpdateTitleFromSelection) // sometimes flag is read AFTER handler setup
+		    {
+			_Button.setText(objItem.getText());
+		    }
+		}
+	    };
+	    objItem.addEventHandler(ActionEvent.ACTION, eventHandler);
+	}
+    }
+    
+    @Override
+    public EventHandler<MouseEvent> SetupTaskAction()
+    {
+	// Tasks for Menu Button are setup down in Configuration:ReadMenuItem
+	return null;
     }
 }

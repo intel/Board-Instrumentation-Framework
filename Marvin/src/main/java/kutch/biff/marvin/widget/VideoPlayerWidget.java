@@ -38,35 +38,11 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class VideoPlayerWidget extends MediaPlayerWidget
 {
-    private final MediaView _mediaView;
-    private boolean _RetainAspectRatio;
     private static boolean _HasBeenVerified = false;
     private static boolean _IsValid = true;
+    private final MediaView _mediaView;
+    private boolean _RetainAspectRatio;
 
-    @Override
-    public boolean HasBeenVerified()
-    {
-        return VideoPlayerWidget._HasBeenVerified;
-    }
-
-    @Override
-    public void setHasBeenVerified(boolean _HasBeenVerified)
-    {
-        VideoPlayerWidget._HasBeenVerified = _HasBeenVerified;
-    }
-    
-    @Override
-    public boolean IsValid()
-    {
-        return _IsValid;
-    }
-    
-    @Override
-    public void SetIsValid(boolean flag)
-    {
-        _IsValid = flag;
-    }
-    
     /**
      *
      */
@@ -78,9 +54,53 @@ public class VideoPlayerWidget extends MediaPlayerWidget
     }
 
     @Override
-    protected boolean VerifyMedia(Media objMedia)
+    protected void ConfigureDimentions()
     {
-        return true;
+        if (getHeight() > 0)
+        {
+            _mediaView.setFitHeight(getHeight());
+        }
+        if (getWidth() > 0)
+        {
+            _mediaView.setFitWidth(getWidth());
+        }
+    }
+    
+    @Override
+    
+   public boolean Create(GridPane pane, DataManager dataMgr)
+   {
+    ConfigureDimentions();
+    ConfigureAlignment();
+    
+    SetupPeekaboo(dataMgr);
+    _mediaView.setPreserveRatio(_RetainAspectRatio);
+    
+    if (!Create(dataMgr))
+    {
+        return false;
+    }
+    pane.add(_mediaView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+    
+    SetupTaskAction();
+    return true;
+   }
+    
+    public boolean getRetainAspectRatio()
+    {
+        return _RetainAspectRatio;
+    }
+    
+    @Override
+    public Node getStylableObject()
+    {
+        return _mediaView;
+    }
+
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+        return _mediaView.getStyleClass();
     }
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode node)
@@ -88,24 +108,41 @@ public class VideoPlayerWidget extends MediaPlayerWidget
         return HandleWidgetSpecificSettings(node,"Video");
     }
         @Override
-        
-    public boolean Create(GridPane pane, DataManager dataMgr)
+	public boolean HasBeenVerified()
+	{
+	    return VideoPlayerWidget._HasBeenVerified;
+	}
+    @Override
+    public boolean IsValid()
     {
-        ConfigureDimentions();
-        ConfigureAlignment();
+        return _IsValid;
+    }
+    
+    @Override
+    protected boolean OnNewMedia(MediaPlayer objMediaPlayer)
+    {
+        _mediaView.setMediaPlayer(objMediaPlayer);
         
-        SetupPeekaboo(dataMgr);
-        _mediaView.setPreserveRatio(_RetainAspectRatio);
-        
-        if (!Create(dataMgr))
-        {
-            return false;
-        }
-        pane.add(_mediaView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        
-        SetupTaskAction();
         return true;
     }
+
+    @Override
+    public void setHasBeenVerified(boolean _HasBeenVerified)
+    {
+        VideoPlayerWidget._HasBeenVerified = _HasBeenVerified;
+    }
+
+    @Override
+    public void SetIsValid(boolean flag)
+    {
+        _IsValid = flag;
+    }
+    
+    public void setRetainAspectRatio(boolean _RetainAspectRatio)
+    {
+        this._RetainAspectRatio = _RetainAspectRatio;
+    }
+
     @Override
     public EventHandler<MouseEvent> SetupTaskAction()
     {
@@ -142,45 +179,8 @@ public class VideoPlayerWidget extends MediaPlayerWidget
     }
     
     @Override
-    protected boolean OnNewMedia(MediaPlayer objMediaPlayer)
+    protected boolean VerifyMedia(Media objMedia)
     {
-        _mediaView.setMediaPlayer(objMediaPlayer);
-        
         return true;
-    }
-
-    public boolean getRetainAspectRatio()
-    {
-        return _RetainAspectRatio;
-    }
-
-    public void setRetainAspectRatio(boolean _RetainAspectRatio)
-    {
-        this._RetainAspectRatio = _RetainAspectRatio;
-    }
-    
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-        return _mediaView.getStyleClass();
-    }
-
-    @Override
-    public Node getStylableObject()
-    {
-        return _mediaView;
-    }
-    
-    @Override
-    protected void ConfigureDimentions()
-    {
-        if (getHeight() > 0)
-        {
-            _mediaView.setFitHeight(getHeight());
-        }
-        if (getWidth() > 0)
-        {
-            _mediaView.setFitWidth(getWidth());
-        }
     }
 }

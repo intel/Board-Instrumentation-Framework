@@ -30,6 +30,15 @@ import java.util.logging.LogRecord;
 
 class MarvinHtmlLoggerFormatter extends Formatter
 {
+    // helper to format nice timesamp
+    public static String getDateStr(LogRecord rec)
+    {
+        long milliseconds = rec.getMillis();
+        SimpleDateFormat date_format = new SimpleDateFormat("MMM dd,yyyy HH:mm");
+        Date retVal = new Date(milliseconds);
+        return date_format.format(retVal);
+    }
+
     // Called by Log framework to add an entry
     @Override
     public String format(LogRecord record)
@@ -71,15 +80,6 @@ class MarvinHtmlLoggerFormatter extends Formatter
         }
         strBuffer.append(Message);
         return strBuffer.toString();
-    }
-
-    // helper to format nice timesamp
-    public static String getDateStr(LogRecord rec)
-    {
-        long milliseconds = rec.getMillis();
-        SimpleDateFormat date_format = new SimpleDateFormat("MMM dd,yyyy HH:mm");
-        Date retVal = new Date(milliseconds);
-        return date_format.format(retVal);
     }
     
     // Called to write the file header

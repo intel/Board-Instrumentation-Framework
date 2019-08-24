@@ -38,15 +38,15 @@ public class DefaultPeekabooTask extends BaseTask
     }
 
     @Override
-    public void PerformTask()
-    {
-        _objWidget.HandleDefaultPeekaboo();
-    }
-
-    @Override
     public boolean getMustBeInGUIThread()
     {
         return true;
+    }
+
+    @Override
+    public void PerformTask()
+    {
+        _objWidget.HandleDefaultPeekaboo();
     }
 
 }

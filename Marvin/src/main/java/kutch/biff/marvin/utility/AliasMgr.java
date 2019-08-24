@@ -53,8 +53,6 @@ import kutch.biff.marvin.logger.MarvinLogger;
 public class AliasMgr
 {
     
-    @SuppressWarnings("rawtypes")
-    private final List<Map> _AliasList;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static AliasMgr _Mgr = new AliasMgr();
     private final static String strCurrentRowIsOddAlias = "CurrentRowIsOddAlias";
@@ -65,300 +63,10 @@ public class AliasMgr
     private final static String strNextColumnAlias = "NextColumnAlias";
     private final static String strPrevColumnAlias = "PrevColumnAlias";
     private final static String strPrevRowAlias = "PrevRowAlias";
-    private int randomVal;
-    private String _ExternalAliasFile;
-    
     public static AliasMgr getAliasMgr()
     {
 	return _Mgr;
     }
-    
-    private AliasMgr()
-    {
-	_AliasList = new ArrayList<>();
-	_ExternalAliasFile = null;
-	ClearAll();
-    }
-    
-    public final void ClearAll()
-    {
-	_AliasList.clear();
-	PushAliasList(true);
-	randomVal = 1;
-	AddAlias("RandomVal", Integer.toString(randomVal));
-	AddAlias("DEBUG_STYLE", "-fx-border-color:blue;-fx-border-style: dashed");
-	PushAliasList(true);
-	AddEnvironmentVars();
-	if (null != _ExternalAliasFile)
-	{
-	    ReadExternalAliasFile(_ExternalAliasFile);
-	}
-	
-    }
-    
-    /**
-     * Fetches the string associated with the alias if exists, else null
-     *
-     * @param strAliasRequested
-     * @return
-     */
-    @SuppressWarnings("rawtypes")
-    public String GetAlias(String strAliasRequested)
-    {
-	String strAlias = strAliasRequested.toUpperCase();
-	
-	for (Map map : _AliasList)
-	{
-	    if (map.containsKey(strAlias))
-	    {
-		String strRetVal = (String) map.get(strAlias);
-		if (strAlias.equalsIgnoreCase(strNextRowAlias))
-		{
-		    int currVal = Integer.parseInt(GetAlias(strCurrentRowAlias));
-		    strRetVal = Integer.toString(currVal + 1);
-		}
-		else if (strAlias.equalsIgnoreCase(strPrevRowAlias))
-		{
-		    int currVal = Integer.parseInt(GetAlias(strCurrentRowAlias));
-		    currVal -= 1;
-		    if (currVal < 0)
-		    {
-			currVal = 0;
-		    }
-		    strRetVal = Integer.toString(currVal);
-		}
-		else if (strAlias.equalsIgnoreCase(strNextColumnAlias))
-		{
-		    int currVal = Integer.parseInt(GetAlias(strCurrentColumnAlias));
-		    strRetVal = Integer.toString(currVal + 1);
-		}
-		else if (strAlias.equalsIgnoreCase(strPrevColumnAlias))
-		{
-		    int currVal = Integer.parseInt(GetAlias(strCurrentColumnAlias));
-		    currVal -= 1;
-		    if (currVal < 0)
-		    {
-			currVal = 0;
-		    }
-		    strRetVal = Integer.toString(currVal);
-		}
-		return strRetVal;
-	    }
-	}
-	String strError = "Tried to use Alias [" + strAliasRequested + "] that has not been set.";
-	LOGGER.severe(strError);
-	return strError;
-    }
-    
-    /**
-     * Just checks to see if the given string is an Alias
-     *
-     * @param strAlias
-     * @return
-     */
-    @SuppressWarnings("rawtypes")
-    public boolean IsAliased(String strAlias)
-    {
-	strAlias = strAlias.toUpperCase();
-	for (Map map : _AliasList)
-	{
-	    if (map.containsKey(strAlias))
-	    {
-		return true;
-	    }
-	}
-	return false;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public void SilentAddAlias(String Alias, String Value)
-    {
-	if (null == Alias)
-	{
-	    return;
-	}
-	Map<String, String> map = _AliasList.get(0);
-	if (map.containsKey(Alias.toUpperCase()))
-	{
-	    return;
-	}
-	if (null == Value)
-	{
-	    String strError = "Alias [" + Alias + "] has NULL value!";
-	    map.put(Alias.toUpperCase(), strError);
-	}
-	else
-	{
-	    map.put(Alias.toUpperCase(), Value);
-	}
-    }
-    
-    /**
-     *
-     * @param Alias
-     * @param Value
-     */
-    @SuppressWarnings({ "unchecked" })
-    public void AddAlias(String Alias, String Value)
-    {
-	if (null == Alias)
-	{
-	    LOGGER.severe("Attempted to set an ALIAS ID to NULL");
-	    return;
-	}
-	Map<String, String> map = _AliasList.get(0);
-	if (map.containsKey(Alias.toUpperCase()))
-	{
-	    LOGGER.config("Duplicate Alias detected for : " + Alias + ". Ignoring.");
-	    return;
-	}
-	if (null == Value)
-	{
-	    String strError = "Alias [" + Alias + "] has NULL value!";
-	    LOGGER.severe(strError);
-	    map.put(Alias.toUpperCase(), strError);
-	}
-	else
-	{
-	    map.put(Alias.toUpperCase(), Value);
-	}
-    }
-    
-    @SuppressWarnings("unchecked")
-    public void AddUpdateAlias(String Alias, String Value)
-    {
-	if (null == Alias)
-	{
-	    LOGGER.severe("Attempted to set an ALIAS ID to NULL");
-	    return;
-	}
-	Map<String, String> map = _AliasList.get(0);
-	if (map.containsKey(Alias.toUpperCase()))
-	{
-	    UpdateAlias(Alias, Value);
-	}
-	if (null == Value)
-	{
-	    String strError = "Alias [" + Alias + "] has NULL value!";
-	    LOGGER.severe(strError);
-	    map.put(Alias.toUpperCase(), strError);
-	}
-	else
-	{
-	    map.put(Alias.toUpperCase(), Value);
-	}
-    }
-    
-    @SuppressWarnings("unchecked")
-    public void AddRootAlias(String Alias, String Value)
-    {
-	if (null == Alias)
-	{
-	    LOGGER.severe("Attempted to set a Root ALIAS ID to NULL");
-	    return;
-	}
-	Map<String, String> map = _AliasList.get(_AliasList.size() - 1);
-	if (map.containsKey(Alias.toUpperCase()))
-	{
-	    return;
-	}
-	if (null == Value)
-	{
-	    String strError = "Root Alias [" + Alias + "] has NULL value!";
-	    LOGGER.severe(strError);
-	    map.put(Alias.toUpperCase(), strError);
-	}
-	else
-	{
-	    map.put(Alias.toUpperCase(), Value);
-	}
-    }
-    
-    public void UpdateCurrentColumn(int newValue)
-    {
-	UpdateAlias(strNextColumnAlias, Integer.toString(newValue + 1));
-	UpdateAlias(strCurrentColumnAlias, Integer.toString(newValue));
-	UpdateAlias(strCurrentColumnIsOddAlias, (newValue % 2) == 0 ? "FALSE" : "TRUE");
-    }
-    
-    public void UpdateCurrentRow(int newValue)
-    {
-	UpdateAlias(strNextRowAlias, Integer.toString(newValue + 1));
-	UpdateAlias(strCurrentRowAlias, Integer.toString(newValue));
-	UpdateAlias(strCurrentRowIsOddAlias, (newValue % 2) == 0 ? "FALSE" : "TRUE");
-    }
-    
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private boolean UpdateAlias(String Alias, String newValue)
-    {
-	String strCheck = Alias.toUpperCase();
-	
-	for (Map map : _AliasList)
-	{
-	    if (map.containsKey(strCheck))
-	    {
-		map.replace(strCheck, newValue);
-		return true;
-	    }
-	}
-	LOGGER.severe("Asked to updated alias: " + Alias + ". However it did not exist.");
-	return false;
-    }
-    
-    /**
-     * Implemented as a kind of stack for scope reasons meaning that if an alias is
-     * used in a file, it is valid for all nested files, but not outside of that
-     * scope
-     */
-    public final void PushAliasList(boolean addRowColAliases)
-    {
-	_AliasList.add(0, new HashMap<>()); // put in position 0
-	
-	if (addRowColAliases)
-	{
-	    AddAlias(strCurrentColumnIsOddAlias, "FALSE");
-	    AddAlias(strCurrentRowIsOddAlias, "FALSE");
-	    AddAlias(strCurrentRowAlias, "0");
-	    AddAlias(strNextRowAlias, "1");
-	    AddAlias(strCurrentColumnAlias, "0");
-	    AddAlias(strNextColumnAlias, "1");
-	    AddAlias(strPrevColumnAlias, "0");
-	    AddAlias(strPrevRowAlias, "0");
-	}
-	GridMacroMgr.getGridMacroMgr().PushGridMacroList();
-    }
-    
-    /**
-     *
-     */
-    public void PopAliasList()
-    {
-	_AliasList.remove(0);
-	GridMacroMgr.getGridMacroMgr().PopGridMacroList();
-    }
-    
-    /**
-     * Simple debug routine to dump top alias list
-     */
-    @SuppressWarnings("rawtypes")
-    public void DumpTop()
-    {
-	Map map = _AliasList.get(0);
-	String AliasStr = "Global Alias List:\n";
-	
-	if (map.isEmpty())
-	{
-	    return;
-	}
-	
-	for (Object objKey : map.keySet())
-	{
-	    String key = (String) objKey;
-	    AliasStr += key + "-->" + map.get(objKey) + "\n";
-	}
-	LOGGER.info(AliasStr);
-    }
-    
     /**
      * Looks for <AliasList> aliases and processes them
      *
@@ -474,19 +182,12 @@ public class AliasMgr
 	}
 	return true;
     }
-    
     public static boolean ReadAliasFromExternalFile(String FileName)
     {
 	Document doc = OpenXMLFile(FileName);
 	AliasMgr.getAliasMgr().SetCurrentConfigFile(FileName);
 	AliasMgr.getAliasMgr().AddRandomValueAlias();
 	return ReadAliasFromRootDocument(doc);
-    }
-    
-    public void AddRandomValueAlias()
-    {
-	randomVal++;
-	AddAlias("RandomVal", Integer.toString(randomVal));
     }
     
     public static boolean ReadAliasFromRootDocument(Document doc)
@@ -524,6 +225,91 @@ public class AliasMgr
 	    return true;
 	}
 	return false;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    private final List<Map> _AliasList;
+    
+    private int randomVal;
+    
+    private String _ExternalAliasFile;
+    
+    private AliasMgr()
+    {
+	_AliasList = new ArrayList<>();
+	_ExternalAliasFile = null;
+	ClearAll();
+    }
+    
+    /**
+     *
+     * @param Alias
+     * @param Value
+     */
+    @SuppressWarnings({ "unchecked" })
+    public void AddAlias(String Alias, String Value)
+    {
+	if (null == Alias)
+	{
+	    LOGGER.severe("Attempted to set an ALIAS ID to NULL");
+	    return;
+	}
+	Map<String, String> map = _AliasList.get(0);
+	if (map.containsKey(Alias.toUpperCase()))
+	{
+	    LOGGER.config("Duplicate Alias detected for : " + Alias + ". Ignoring.");
+	    return;
+	}
+	if (null == Value)
+	{
+	    String strError = "Alias [" + Alias + "] has NULL value!";
+	    LOGGER.severe(strError);
+	    map.put(Alias.toUpperCase(), strError);
+	}
+	else
+	{
+	    map.put(Alias.toUpperCase(), Value);
+	}
+    }
+    
+    public void AddAliasFromAttibuteList(FrameworkNode node, String KnownAttributes[])
+    {
+	if (node.hasAttributes())
+	{
+	    NamedNodeMap attrs = node.GetNode().getAttributes();
+	    
+	    for (int oLoop = 0; oLoop < attrs.getLength(); oLoop++)
+	    {
+		boolean found = false;
+		Attr attribute = (Attr) attrs.item(oLoop);
+		String strAlias = attribute.getName();
+		for (int iLoop = 0; iLoop < KnownAttributes.length; iLoop++) // compare to list of valid
+		{
+		    if (0 == KnownAttributes[iLoop].compareToIgnoreCase(strAlias)) // 1st check case independent just
+										   // for fun
+		    {
+			found = true;
+			break;
+		    }
+		}
+		if (false == found)
+		{
+		    String strValue = node.getAttribute(strAlias);
+		    AddAlias(strAlias, strValue);
+		    LOGGER.config(
+			    "Adding Alias for external file from attribute list : " + strAlias + "-->" + strValue);
+		}
+	    }
+	}
+    }
+    
+    private void AddEnvironmentVars()
+    {
+	Map<String, String> env = System.getenv();
+	for (String envName : env.keySet())
+	{
+	    AddAlias(envName, env.get(envName));
+	}
     }
     
     public void addMarvinInfo()
@@ -567,44 +353,227 @@ public class AliasMgr
 	AddRootAlias("SCREEN_W2H_RATIO", Double.toString(W2H_Ratio));
     }
     
-    private void AddEnvironmentVars()
+    public void AddRandomValueAlias()
     {
-	Map<String, String> env = System.getenv();
-	for (String envName : env.keySet())
+	randomVal++;
+	AddAlias("RandomVal", Integer.toString(randomVal));
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void AddRootAlias(String Alias, String Value)
+    {
+	if (null == Alias)
 	{
-	    AddAlias(envName, env.get(envName));
+	    LOGGER.severe("Attempted to set a Root ALIAS ID to NULL");
+	    return;
+	}
+	Map<String, String> map = _AliasList.get(_AliasList.size() - 1);
+	if (map.containsKey(Alias.toUpperCase()))
+	{
+	    return;
+	}
+	if (null == Value)
+	{
+	    String strError = "Root Alias [" + Alias + "] has NULL value!";
+	    LOGGER.severe(strError);
+	    map.put(Alias.toUpperCase(), strError);
+	}
+	else
+	{
+	    map.put(Alias.toUpperCase(), Value);
 	}
     }
     
-    public void AddAliasFromAttibuteList(FrameworkNode node, String KnownAttributes[])
+    @SuppressWarnings("unchecked")
+    public void AddUpdateAlias(String Alias, String Value)
     {
-	if (node.hasAttributes())
+	if (null == Alias)
 	{
-	    NamedNodeMap attrs = node.GetNode().getAttributes();
-	    
-	    for (int oLoop = 0; oLoop < attrs.getLength(); oLoop++)
+	    LOGGER.severe("Attempted to set an ALIAS ID to NULL");
+	    return;
+	}
+	Map<String, String> map = _AliasList.get(0);
+	if (map.containsKey(Alias.toUpperCase()))
+	{
+	    UpdateAlias(Alias, Value);
+	}
+	if (null == Value)
+	{
+	    String strError = "Alias [" + Alias + "] has NULL value!";
+	    LOGGER.severe(strError);
+	    map.put(Alias.toUpperCase(), strError);
+	}
+	else
+	{
+	    map.put(Alias.toUpperCase(), Value);
+	}
+    }
+    
+    public final void ClearAll()
+    {
+	_AliasList.clear();
+	PushAliasList(true);
+	randomVal = 1;
+	AddAlias("RandomVal", Integer.toString(randomVal));
+	AddAlias("DEBUG_STYLE", "-fx-border-color:blue;-fx-border-style: dashed");
+	PushAliasList(true);
+	AddEnvironmentVars();
+	if (null != _ExternalAliasFile)
+	{
+	    ReadExternalAliasFile(_ExternalAliasFile);
+	}
+	
+    }
+    
+    /**
+     * Simple debug routine to dump top alias list
+     */
+    @SuppressWarnings("rawtypes")
+    public void DumpTop()
+    {
+	Map map = _AliasList.get(0);
+	String AliasStr = "Global Alias List:\n";
+	
+	if (map.isEmpty())
+	{
+	    return;
+	}
+	
+	for (Object objKey : map.keySet())
+	{
+	    String key = (String) objKey;
+	    AliasStr += key + "-->" + map.get(objKey) + "\n";
+	}
+	LOGGER.info(AliasStr);
+    }
+    
+    /**
+     * Fetches the string associated with the alias if exists, else null
+     *
+     * @param strAliasRequested
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public String GetAlias(String strAliasRequested)
+    {
+	String strAlias = strAliasRequested.toUpperCase();
+	
+	for (Map map : _AliasList)
+	{
+	    if (map.containsKey(strAlias))
 	    {
-		boolean found = false;
-		Attr attribute = (Attr) attrs.item(oLoop);
-		String strAlias = attribute.getName();
-		for (int iLoop = 0; iLoop < KnownAttributes.length; iLoop++) // compare to list of valid
+		String strRetVal = (String) map.get(strAlias);
+		if (strAlias.equalsIgnoreCase(strNextRowAlias))
 		{
-		    if (0 == KnownAttributes[iLoop].compareToIgnoreCase(strAlias)) // 1st check case independent just
-										   // for fun
+		    int currVal = Integer.parseInt(GetAlias(strCurrentRowAlias));
+		    strRetVal = Integer.toString(currVal + 1);
+		}
+		else if (strAlias.equalsIgnoreCase(strPrevRowAlias))
+		{
+		    int currVal = Integer.parseInt(GetAlias(strCurrentRowAlias));
+		    currVal -= 1;
+		    if (currVal < 0)
 		    {
-			found = true;
-			break;
+			currVal = 0;
 		    }
+		    strRetVal = Integer.toString(currVal);
 		}
-		if (false == found)
+		else if (strAlias.equalsIgnoreCase(strNextColumnAlias))
 		{
-		    String strValue = node.getAttribute(strAlias);
-		    AddAlias(strAlias, strValue);
-		    LOGGER.config(
-			    "Adding Alias for external file from attribute list : " + strAlias + "-->" + strValue);
+		    int currVal = Integer.parseInt(GetAlias(strCurrentColumnAlias));
+		    strRetVal = Integer.toString(currVal + 1);
 		}
+		else if (strAlias.equalsIgnoreCase(strPrevColumnAlias))
+		{
+		    int currVal = Integer.parseInt(GetAlias(strCurrentColumnAlias));
+		    currVal -= 1;
+		    if (currVal < 0)
+		    {
+			currVal = 0;
+		    }
+		    strRetVal = Integer.toString(currVal);
+		}
+		return strRetVal;
 	    }
 	}
+	String strError = "Tried to use Alias [" + strAliasRequested + "] that has not been set.";
+	LOGGER.severe(strError);
+	return strError;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Map<String, String> getSnapshot()
+    {
+	Map<String, String> retMap = new HashMap<>();
+	for (int i = _AliasList.size() - 1; i >= 0; i--)
+	{
+	    Map<String, String> aliasMap = _AliasList.get(i);
+	    for (String key : aliasMap.keySet())
+	    {
+		retMap.put(key, aliasMap.get(key));
+	    }
+	}
+	return retMap;
+    }
+    
+    /**
+     * Just checks to see if the given string is an Alias
+     *
+     * @param strAlias
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public boolean IsAliased(String strAlias)
+    {
+	strAlias = strAlias.toUpperCase();
+	for (Map map : _AliasList)
+	{
+	    if (map.containsKey(strAlias))
+	    {
+		return true;
+	    }
+	}
+	return false;
+    }
+    
+    public int LoadAliasFile(String encodedFilename)
+    {
+	StringTokenizer tokens = new StringTokenizer(encodedFilename, "=");
+	tokens.nextElement(); // eat up the -alaisfile=
+	_ExternalAliasFile = (String) tokens.nextElement(); // to get to the real filename!
+	return ReadExternalAliasFile(_ExternalAliasFile);
+    }
+    
+    /**
+     *
+     */
+    public void PopAliasList()
+    {
+	_AliasList.remove(0);
+	GridMacroMgr.getGridMacroMgr().PopGridMacroList();
+    }
+    
+    /**
+     * Implemented as a kind of stack for scope reasons meaning that if an alias is
+     * used in a file, it is valid for all nested files, but not outside of that
+     * scope
+     */
+    public final void PushAliasList(boolean addRowColAliases)
+    {
+	_AliasList.add(0, new HashMap<>()); // put in position 0
+	
+	if (addRowColAliases)
+	{
+	    AddAlias(strCurrentColumnIsOddAlias, "FALSE");
+	    AddAlias(strCurrentRowIsOddAlias, "FALSE");
+	    AddAlias(strCurrentRowAlias, "0");
+	    AddAlias(strNextRowAlias, "1");
+	    AddAlias(strCurrentColumnAlias, "0");
+	    AddAlias(strNextColumnAlias, "1");
+	    AddAlias(strPrevColumnAlias, "0");
+	    AddAlias(strPrevRowAlias, "0");
+	}
+	GridMacroMgr.getGridMacroMgr().PushGridMacroList();
     }
     
     private int ReadExternalAliasFile(String filename)
@@ -677,31 +646,62 @@ public class AliasMgr
 	return 0;
     }
     
-    public int LoadAliasFile(String encodedFilename)
-    {
-	StringTokenizer tokens = new StringTokenizer(encodedFilename, "=");
-	tokens.nextElement(); // eat up the -alaisfile=
-	_ExternalAliasFile = (String) tokens.nextElement(); // to get to the real filename!
-	return ReadExternalAliasFile(_ExternalAliasFile);
-    }
-    
     public void SetCurrentConfigFile(String strFname)
     {
 	AddAlias("CurrentConfigFilename", strFname);
     }
     
     @SuppressWarnings("unchecked")
-    public Map<String, String> getSnapshot()
+    public void SilentAddAlias(String Alias, String Value)
     {
-	Map<String, String> retMap = new HashMap<>();
-	for (int i = _AliasList.size() - 1; i >= 0; i--)
+	if (null == Alias)
 	{
-	    Map<String, String> aliasMap = _AliasList.get(i);
-	    for (String key : aliasMap.keySet())
+	    return;
+	}
+	Map<String, String> map = _AliasList.get(0);
+	if (map.containsKey(Alias.toUpperCase()))
+	{
+	    return;
+	}
+	if (null == Value)
+	{
+	    String strError = "Alias [" + Alias + "] has NULL value!";
+	    map.put(Alias.toUpperCase(), strError);
+	}
+	else
+	{
+	    map.put(Alias.toUpperCase(), Value);
+	}
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private boolean UpdateAlias(String Alias, String newValue)
+    {
+	String strCheck = Alias.toUpperCase();
+	
+	for (Map map : _AliasList)
+	{
+	    if (map.containsKey(strCheck))
 	    {
-		retMap.put(key, aliasMap.get(key));
+		map.replace(strCheck, newValue);
+		return true;
 	    }
 	}
-	return retMap;
+	LOGGER.severe("Asked to updated alias: " + Alias + ". However it did not exist.");
+	return false;
+    }
+    
+    public void UpdateCurrentColumn(int newValue)
+    {
+	UpdateAlias(strNextColumnAlias, Integer.toString(newValue + 1));
+	UpdateAlias(strCurrentColumnAlias, Integer.toString(newValue));
+	UpdateAlias(strCurrentColumnIsOddAlias, (newValue % 2) == 0 ? "FALSE" : "TRUE");
+    }
+    
+    public void UpdateCurrentRow(int newValue)
+    {
+	UpdateAlias(strNextRowAlias, Integer.toString(newValue + 1));
+	UpdateAlias(strCurrentRowAlias, Integer.toString(newValue));
+	UpdateAlias(strCurrentRowIsOddAlias, (newValue % 2) == 0 ? "FALSE" : "TRUE");
     }
 }

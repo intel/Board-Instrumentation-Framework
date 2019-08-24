@@ -35,29 +35,18 @@ import kutch.biff.marvin.logger.MarvinLogger;
 public class GridMacroMgr
 {
     private final static GridMacroMgr _Mgr = new GridMacroMgr();
-    @SuppressWarnings("rawtypes")
-    private final ArrayList<Map> _GridMacroList;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    
     public static GridMacroMgr getGridMacroMgr()
     {
         return _Mgr;
     }
     
+    @SuppressWarnings("rawtypes")
+    private final ArrayList<Map> _GridMacroList;
+    
     private GridMacroMgr()
     {
         _GridMacroList = new ArrayList<>();
-    }
-    
-    public void PushGridMacroList()
-    {
-        _GridMacroList.add(0, new HashMap<>()); // put in position 0 
-        
-    }
-    
-    public void PopGridMacroList()
-    {
-        _GridMacroList.remove(0);
     }
     
     public boolean AddGridMacro(String nameMacro, FrameworkNode macroNode)
@@ -79,6 +68,20 @@ public class GridMacroMgr
         return true;
     }
     
+    public FrameworkNode getGridMacro(String strMacro)
+    {
+        String strName = strMacro.toUpperCase();
+        for (Map<?, ?> map : _GridMacroList)
+        {
+            if (map.containsKey(strName))
+            {
+                return (FrameworkNode)map.get(strName);
+            }
+        }
+        
+        return null;
+    }
+    
     public boolean macroExists(String strMacro)
     {
         String strName = strMacro.toUpperCase();
@@ -92,17 +95,14 @@ public class GridMacroMgr
         return false;
     }
     
-    public FrameworkNode getGridMacro(String strMacro)
+    public void PopGridMacroList()
     {
-        String strName = strMacro.toUpperCase();
-        for (Map<?, ?> map : _GridMacroList)
-        {
-            if (map.containsKey(strName))
-            {
-                return (FrameworkNode)map.get(strName);
-            }
-        }
+        _GridMacroList.remove(0);
+    }
+    
+    public void PushGridMacroList()
+    {
+        _GridMacroList.add(0, new HashMap<>()); // put in position 0 
         
-        return null;
     }
 }

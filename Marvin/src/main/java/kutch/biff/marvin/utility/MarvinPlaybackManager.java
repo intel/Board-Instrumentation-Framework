@@ -36,12 +36,6 @@ public class MarvinPlaybackManager
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static MarvinPlaybackManager _inst = new MarvinPlaybackManager();
     
-    private Map<String,MarvinPlayback> _PlaybackInstancesMap;
-    private MarvinPlaybackManager()
-    {
-	_PlaybackInstancesMap = new HashMap<String,MarvinPlayback>();
-    }
-    
     public static MarvinPlayback getMarvinPlayback(String strName)
     {
 	if (!_inst._PlaybackInstancesMap.containsKey(strName.toUpperCase()))
@@ -50,6 +44,12 @@ public class MarvinPlaybackManager
 	    _inst._PlaybackInstancesMap.put(strName.toUpperCase(), mp);
 	}
 	return _inst._PlaybackInstancesMap.get(strName.toUpperCase());
+    }
+    private Map<String,MarvinPlayback> _PlaybackInstancesMap;
+    
+    private MarvinPlaybackManager()
+    {
+	_PlaybackInstancesMap = new HashMap<String,MarvinPlayback>();
     }
     
     public int getCount()

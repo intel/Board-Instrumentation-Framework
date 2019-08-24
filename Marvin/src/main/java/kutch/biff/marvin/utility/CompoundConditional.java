@@ -19,53 +19,6 @@ import kutch.biff.marvin.task.TaskManager;
 public class CompoundConditional extends Conditional
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    private final TaskManager TASKMAN = TaskManager.getTaskManager();
-    protected ArrayList<Conditional> AndList;
-    protected ArrayList<Conditional> OrList;
-    public CompoundConditional(Type type)
-    {
-        super(type,true);
-        AndList = new ArrayList<>();
-        OrList = new ArrayList<>();
-        _UsesThen = true;
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        int hash = super.hashCode();
-        hash = 59 * hash + AndList.hashCode();
-        hash = 59 * hash + OrList.hashCode();
-        return hash;
-    }    
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (obj == null)
-        {
-            return false;
-        }
-        if (getClass() != obj.getClass())
-        {
-            return false;
-        }
-        final CompoundConditional other = (CompoundConditional) obj;
-        if (!Objects.equals(this.AndList, other.AndList))
-        {
-            return false;
-        }
-        if (!Objects.equals(this.OrList, other.OrList))
-        {
-            return false;
-        }
-        return true;
-    }
-    
     private static Conditional ReadCompoundConditional(FrameworkNode condNode)
     {
         String strType = null;
@@ -101,38 +54,41 @@ public class CompoundConditional extends Conditional
 
         return objConditional;
     }
-
+    private final TaskManager TASKMAN = TaskManager.getTaskManager();
+    protected ArrayList<Conditional> AndList;
+    protected ArrayList<Conditional> OrList;
     
-    @Override
-    protected boolean readCondition(FrameworkNode condNode)    
+    public CompoundConditional(Type type)
     {
-        if (!super.readCondition(condNode))
+        super(type,true);
+        AndList = new ArrayList<>();
+        OrList = new ArrayList<>();
+        _UsesThen = true;
+    }    
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null)
         {
             return false;
         }
-        for (FrameworkNode andNode : condNode.getChildNodes("And"))
+        if (getClass() != obj.getClass())
         {
-            Conditional andCond = ReadCompoundConditional(andNode);
-            if (null != andCond)
-            {
-                AndList.add(andCond);
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
-        for (FrameworkNode orNode : condNode.getChildNodes("Or"))
+        final CompoundConditional other = (CompoundConditional) obj;
+        if (!Objects.equals(this.AndList, other.AndList))
         {
-            Conditional orCond = ReadCompoundConditional(orNode);
-            if (null != orCond)
-            {
-                OrList.add(orCond);
-            }
-            else
-            {
-                return false;
-            }
+            return false;
+        }
+        if (!Objects.equals(this.OrList, other.OrList))
+        {
+            return false;
         }
         return true;
     }
@@ -149,6 +105,16 @@ public class CompoundConditional extends Conditional
         }
     }
 
+    
+    @Override
+    public int hashCode()
+    {
+        int hash = super.hashCode();
+        hash = 59 * hash + AndList.hashCode();
+        hash = 59 * hash + OrList.hashCode();
+        return hash;
+    }
+    
     /**
      *
      * @param Val1
@@ -221,4 +187,38 @@ public class CompoundConditional extends Conditional
             Evaluated(true);
         }
    }
+
+    @Override
+    protected boolean readCondition(FrameworkNode condNode)    
+    {
+        if (!super.readCondition(condNode))
+        {
+            return false;
+        }
+        for (FrameworkNode andNode : condNode.getChildNodes("And"))
+        {
+            Conditional andCond = ReadCompoundConditional(andNode);
+            if (null != andCond)
+            {
+                AndList.add(andCond);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        for (FrameworkNode orNode : condNode.getChildNodes("Or"))
+        {
+            Conditional orCond = ReadCompoundConditional(orNode);
+            if (null != orCond)
+            {
+                OrList.add(orCond);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }

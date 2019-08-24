@@ -52,10 +52,14 @@ public class MySplash
 {
     private static MySplash _Splash;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    private static int SPLASH_WIDTH = 676;
+    static public MySplash getSplash()
+    {
+        return _Splash;
+    }
     private Pane splashLayout;
     private ProgressBar loadProgress;
     private Label progressText;
-    private static int SPLASH_WIDTH = 676;
     private final boolean _Show;
     Stage _Stage;
     AnimationTimer _splashAnimationTimer;
@@ -64,17 +68,9 @@ public class MySplash
     double TimerInterval = 3000;
     public boolean _appVisible;
     Rectangle2D AppVisualBounds = null;
+
     private boolean _SplashClosed = true;
 
-    static public MySplash getSplash()
-    {
-        return _Splash;
-    }
-
-    public boolean isSplashClosed()
-    {
-        return _SplashClosed;
-    }
     public MySplash(boolean show, String alternateSplashImage)
     {
         _Splash = this;
@@ -83,6 +79,10 @@ public class MySplash
         
         strAltSplash = alternateSplashImage;
         init();
+    }
+    public void appVisible()
+    {
+        _appVisible = true;
     }
 
     private Image getAlternateSplashImage()
@@ -141,10 +141,22 @@ public class MySplash
         splashLayout.setEffect(new DropShadow());
     }
 
-    public void appVisible()
+    public boolean isSplashClosed()
     {
-        _appVisible = true;
+        return _SplashClosed;
     }
+    private void showSplash(Stage initStage)
+    {
+        Scene splashScene = new Scene(splashLayout);
+        initStage.initStyle(StageStyle.UNDECORATED);
+
+        initStage.setScene(splashScene);
+
+        initStage.centerOnScreen();
+        initStage.setAlwaysOnTop(true);
+        initStage.show();
+    }
+
     public void start(Stage parentStage)
     {
         if (false == _Show)
@@ -227,18 +239,6 @@ public class MySplash
        //startTimerTime = System.currentTimeMillis();
         
         _splashAnimationTimer.start();
-    }
-
-    private void showSplash(Stage initStage)
-    {
-        Scene splashScene = new Scene(splashLayout);
-        initStage.initStyle(StageStyle.UNDECORATED);
-
-        initStage.setScene(splashScene);
-
-        initStage.centerOnScreen();
-        initStage.setAlwaysOnTop(true);
-        initStage.show();
     }
     
     public void stopSplash()

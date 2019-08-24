@@ -81,34 +81,9 @@ import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 public class ConfigurationReader
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    private Configuration _Configuration = null;
-    private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private static ConfigurationReader _ConfigReader;
     private static HashMap<Conditional, Conditional> _conditionalMap = new HashMap<>();
     private static List<String> _OnDemandID_List = new ArrayList<>();
-    
-    public ConfigurationReader()
-    {
-	_ConfigReader = this;
-    }
-    
-    public Configuration getConfiguration()
-    {
-	return _Configuration;
-    }
-    
-    private List<TabWidget> _tabs = null;
-    
-    public static ConfigurationReader GetConfigReader()
-    {
-	return _ConfigReader;
-    }
-    
-    public List<TabWidget> getTabs()
-    {
-	return _tabs;
-    }
-    
     private static Document _OpenXMLFile(String filename, boolean fReport)
     {
 	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -158,6 +133,128 @@ public class ConfigurationReader
 	}
 	return null;
     }
+    public static ConfigurationReader GetConfigReader()
+    {
+	return _ConfigReader;
+    }
+    
+    public static ImageView GetImage(FrameworkNode node)
+    {
+	if (node.getNodeName().equalsIgnoreCase("Image"))
+	{
+	    String fName = node.getTextContent();
+	    double ImageWidthConstraint = 0.0;
+	    double ImageHeightConstraint = 0.0;
+	    
+	    Utility.ValidateAttributes(new String[] { "Height", "Width" }, node);
+	    if (node.hasAttribute("Width"))
+	    {
+		try
+		{
+		    ImageWidthConstraint = Double.parseDouble(node.getAttribute("Width"));
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Widget Image has invalid Width specified: " + node.getAttribute("Width"));
+		    return null;
+		}
+	    }
+	    if (node.hasAttribute("Height"))
+	    {
+		try
+		{
+		    ImageHeightConstraint = Double.parseDouble(node.getAttribute("Height"));
+		}
+		catch(NumberFormatException ex)
+		{
+		    LOGGER.severe("Widget Image has invalid Height specified: " + node.getAttribute("Height"));
+		    return null;
+		}
+	    }
+	    
+	    return ConfigurationReader.GetImage(fName, ImageHeightConstraint, ImageWidthConstraint);
+	}
+	return null;
+    }
+    
+    public static ImageView GetImage(String ImageFileName, double ImageHeightConstraint, double ImageWidthConstraint)
+    {
+	ImageView view = null;
+	if (null != ImageFileName)
+	{
+	    String fname = convertToFileOSSpecific(ImageFileName);
+	    File file = new File(fname);
+	    if (file.exists())
+	    {
+		String fn = "file:" + fname;
+		Image img = new Image(fn);
+		view = new ImageView(img);
+		
+		if (ImageHeightConstraint > 0)
+		{
+		    view.setFitHeight(ImageHeightConstraint);
+		}
+		if (ImageWidthConstraint > 0)
+		{
+		    view.setFitWidth(ImageWidthConstraint);
+		}
+		
+	    }
+	    else
+	    {
+		LOGGER.severe("Invalid Image File specified for Widget: " + ImageFileName);
+	    }
+	}
+	return view;
+    }
+    
+    private static Pair<String, String> getNamespaceAndIdPattern(FrameworkNode node, boolean noID)
+    {
+	if (node.hasAttribute("Namespace"))
+	{
+	    if (node.hasAttribute("ID") || !noID)
+	    {
+		return new Pair<String, String>(node.getAttribute("Namespace"), node.getAttribute("ID"));
+	    }
+	    if (noID)
+	    {
+		return new Pair<String, String>(node.getAttribute("Namespace"), null);
+	    }
+	}
+	else if (noID) // is ID List
+	{
+	    if (node.hasAttribute("ID"))
+	    {
+		return new Pair<String, String>(null, node.getAttribute("ID"));
+	    }
+	}
+	return null;
+    }
+    
+    private static boolean InList(List<String> list, String toCheck)
+    {
+	for (String item : list)
+	{
+	    if (item.equalsIgnoreCase(toCheck))
+	    {
+		return true;
+	    }
+	}
+	return false;
+    }
+    
+    /**
+     * Allows one to define the tab contents (widgets) in an onother file Node that
+     * the tab attributes (hgp,vgap,id) must still be in Application.xml
+     *
+     * @param inputFilename
+     * @return Base node with the config goodies
+     */
+    public static FrameworkNode OpenTabDefinitionFile(String inputFilename)
+    {
+	FrameworkNode TabNode = OpenDefinitionFile(inputFilename, "Tab");
+	return TabNode;
+    }
     
     public static Document OpenXMLFile(String filename)
     {
@@ -169,55 +266,786 @@ public class ConfigurationReader
 	return _OpenXMLFile(filename, false);
     }
     
-    public Configuration ReadStartupInfo(String filename)
+    private static Conditional ReadConditional(FrameworkNode condNode)
     {
-	Document doc = OpenXMLFile(filename);
-	if (null == doc)
+	String strType = null;
+	boolean CaseSensitive = false;
+	
+	Utility.ValidateAttributes(new String[] { "CaseSensitive", "Type" }, condNode);
+	if (!condNode.hasAttribute("type"))
 	{
+	    LOGGER.severe("Conditional defined with no Type");
 	    return null;
 	}
-	if (null == _Configuration)
+	if (condNode.hasAttribute("CaseSensitive"))
 	{
-	    _Configuration = new Configuration();
+	    CaseSensitive = condNode.getBooleanAttribute("CaseSensitive");
 	}
-	if (false == ReadAppSettings(doc, true))
+	
+	strType = condNode.getAttribute("type");
+	Conditional.Type type = Conditional.GetType(strType);
+	if (type == Conditional.Type.Invalid)
 	{
+	    LOGGER.severe("Conditional defined with invalid type: " + strType);
 	    return null;
 	}
 	
-	AliasMgr.getAliasMgr().ClearAll(); // nuke anything already read, will start fresh
-	return _Configuration;
+	Conditional objConditional = Conditional.BuildConditional(type, condNode, true);
+	if (null != objConditional)
+	{
+	    objConditional.setCaseSensitive(CaseSensitive);
+	}
+	
+	return objConditional;
     }
     
-    public Configuration ReadAppConfigFile(String filename)
+    private static boolean ReadConditionals(Document doc)
     {
-	Document doc = OpenXMLFile(filename);
-	if (null != doc)
+	/*
+	 * <Conditional type='IF_EQ' CaseSensitive="True"> <MinionSrc ID="myID"
+	 * Namespace="myNS"/> <Value> <MinionSrc ID="myID" Namespace="myNS"/> </Value>
+	 * or <Value>44</Value>
+	 * 
+	 * <Then>Task12</Then> <Else>Task3</Else> </Conditional>
+	 */
+	boolean retVal = true;
+	
+	NodeList conditionals = doc.getElementsByTagName("Conditional");
+	if (conditionals.getLength() < 1)
 	{
-	    AliasMgr.getAliasMgr().SetCurrentConfigFile(filename);
-	    if (null == _Configuration)
+	    return true;
+	}
+	for (int iLoop = 0; iLoop < conditionals.getLength(); iLoop++)
+	{
+	    FrameworkNode condNode = new FrameworkNode(conditionals.item(iLoop));
+	    Conditional objCond = ReadConditional(condNode);
+	    if (null == objCond)
 	    {
-		_Configuration = new Configuration();
+		retVal = false;
 	    }
-	    if (false == ReadAppSettings(doc, false))
+	    else
+	    {
+		if (_conditionalMap.containsKey(objCond))
+		{
+		    LOGGER.config(
+			    "Duplicate conditional found.  Might want to check for multiple inclusions of same conditional. Conditional Information: "
+				    + objCond.toString());
+		}
+		else
+		{
+		    _conditionalMap.put(objCond, objCond);
+		}
+		objCond.Enable();
+	    }
+	}
+	
+	return retVal;
+    }
+    
+    public static List<DataPointGenerator> ReadDataPointsForTask(int itemIndex, String strInput, String strTaskText, String strTask)
+    {
+	List<DataPointGenerator> retList = new ArrayList<>();
+	if (strInput.contains("^")) // might be replacement of ^Text or ^Task
+	{
+	    if (strInput.contains("^Text"))
+	    {
+		strInput = strInput.replace("^Text", strTaskText);
+	    }
+	    if (strInput.contains("^Task"))
+	    {
+		strInput = strInput.replace("^Task", strTask);
+	    }
+	    if (strInput.contains("^Index"))
+	    {
+		String strIndex = Integer.toString(itemIndex);
+		strInput = strInput.replace("^Index", strIndex);
+	    }
+	}
+	String[] points = strInput.split("\\]");
+	for (String point : points)
+	{
+	    if (point.length() == 0)
+	    {
+		continue;
+	    }
+	    if (point.charAt(0) == ',' && point.charAt(1) == '[')
+	    {
+		point = point.substring(1);
+	    }
+	    if (point.charAt(0) == '[')
+	    {
+		point = point.substring(1);
+		String[] parts = point.split(",",3);
+		if (parts.length != 3)
+		{
+		    retList.clear();
+		    return retList;
+		}
+		String Namespace = parts[0];
+		String ID = parts[1];
+		String val = parts[2];
+		retList.add(new DataPointGenerator(Namespace,ID,val));
+	    }
+	    else
+	    {
+		    retList.clear();
+		    return retList;
+	    }
+	}
+	
+	
+	return retList;
+    }
+    
+    public static GenerateDatapointInfo ReadGenerateDatapointInfo(FrameworkNode inputNode)
+    {
+	ArrayList<Pair<String, String>> maskList = new ArrayList<>();
+	ArrayList<Pair<String, String>> excludeList = new ArrayList<>();
+	@SuppressWarnings("unused")
+	ListSortMethod sortPolicy = ListSortMethod.ASCENDING;
+	int precision = -1;
+	boolean hasListEntry = false;
+	int listEntry = 0;
+	
+	if (!inputNode.hasAttribute("Method"))
+	{
+	    LOGGER.severe("GenerateDatapoint did not specify the Method of generate. ");
+	    return null;
+	}
+	
+	boolean IsGenerateNamespaceList = inputNode.getAttribute("Method").equalsIgnoreCase("MakeNamespaceList") || inputNode.getAttribute("Method").equalsIgnoreCase("MakeIDList");
+	String strMethod = inputNode.getAttribute("Method");
+	
+	Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode, false);
+	Pair<ValueRange,String> rangeInfo = WidgetBuilder.ReadMinionSrcIndexInfo(inputNode);
+	if (null == genDPInfo)
+	{
+	    LOGGER.severe("Invalid GenerateDatapoint.");
+	    return null;
+	}
+	
+	for (FrameworkNode node : inputNode.getChildNodes(true))
+	{
+	    if (node.getNodeName().equalsIgnoreCase("InputPattern"))
+	    {
+		Pair<String, String> input = getNamespaceAndIdPattern(node, IsGenerateNamespaceList);
+		if (null == input)
+		{
+		    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(),
+			    genDPInfo.getValue(), node.getAttributeList()));
+		    return null;
+		}
+		maskList.add(input);
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("ExcludePattern"))
+	    {
+		Pair<String, String> exclude = getNamespaceAndIdPattern(node, IsGenerateNamespaceList);
+		if (null == exclude)
+		{
+		    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(),
+			    genDPInfo.getValue(), node.getAttributeList()));
+		    return null;
+		}
+		excludeList.add(exclude);
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("ListEntry"))
+	    {
+		try
+		{
+		    listEntry = node.getIntegerContent();
+		    hasListEntry = true;
+		}
+		catch(NumberFormatException ex)
+		{
+		    LOGGER.severe("Invalid ListEntry specified for <GenerateDatapoint>: " + node.getTextContent());
+		    return null;
+		}
+	    }
+	    
+	    else if (node.getNodeName().equalsIgnoreCase("Decimals"))
+	    {
+		try
+		{
+		    precision = node.getIntegerContent();
+		}
+		catch(NumberFormatException ex)
+		{
+		    LOGGER.severe("Invalid Decimals specified for <GenerateDatapoint>: " + node.getTextContent());
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("Refresh"))
+	    { // handle below
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("Sort"))
+	    {
+		if (strMethod.equalsIgnoreCase("MakeList") || strMethod.equalsIgnoreCase("MakeNamespaceList") || 
+			strMethod.equalsIgnoreCase("MakeIDList") )
+		{
+		    String strSort = node.getTextContent();
+		    if (strSort.equalsIgnoreCase("Ascending"))
+		    {
+			sortPolicy = ListSortMethod.ASCENDING;
+		    }
+		    else if (strSort.equalsIgnoreCase("Descending"))
+		    {
+			sortPolicy = ListSortMethod.DESCENDING;
+		    }
+		    else if (strSort.equalsIgnoreCase("None"))
+		    {
+			sortPolicy = ListSortMethod.NONE;
+		    }
+		    else
+		    {
+			LOGGER.severe("Invalid Sort Method for Generate Datapoint: " + strSort);
+			return null;
+		    }
+		}
+		else
+		{
+			LOGGER.warning("Specified Sort Method for Generate Datapoint, however " + strMethod + " does not support sorting.  Ignoring.");
+		}
+	    }
+	    else
+	    {
+		LOGGER.severe("Unknown entry in <GenerateDatapoint>: " + node.getNodeName());
+		return null;
+	    }
+	}
+	GenerateDatapointInfo info = new GenerateDatapointInfo(genDPInfo.getKey(), genDPInfo.getValue(), maskList,
+		excludeList,rangeInfo.getKey(),rangeInfo.getValue());
+	
+	if (hasListEntry)
+	{
+	    if (!info.setListEntry(listEntry))
+	    {
+		LOGGER.severe("Invalid ListEntry specified for <GenerateDatapoint>: " + Integer.toString(listEntry));
+		return null;
+	    }
+	    if (inputNode.hasAttribute("Separator"))
+	    {
+		String token = inputNode.getAttribute("Separator");
+		info.setSplitToken(token);
+	    }
+	    else
+	    {
+		info.setSplitToken(",");
+	    }
+	}
+	
+	if (inputNode.getAttribute("Method").equalsIgnoreCase("Add"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.ADD);
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("Average"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.AVERAGE);
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeList"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_LIST);
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeNamespaceList"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_NAMESPACE_LIST);
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeIDList"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_ID_LIST);
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("Proxy"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.PROXY);
+	    if (inputNode.hasAttribute("ProxyID"))
+	    {
+		String proxyID = inputNode.getAttribute("ProxyID");
+		info.setProxyID(proxyID);
+	    }
+	    else
+	    {
+		LOGGER.warning(
+			"GenerateDatapoint [Proxy] did not have a ProxyID, you will be unable to change it with a task.");
+		String proxyID = Long.toString(new Random().nextLong());
+		info.setProxyID(proxyID);
+	    }
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("SplitList"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.SPLIT_LIST);
+	    if (inputNode.hasAttribute("Separator"))
+	    {
+		String token = inputNode.getAttribute("Separator");
+		info.setSplitToken(token);
+	    }
+	    else
+	    {
+		info.setSplitToken(",");
+	    }
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("GetListSize"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.GET_LIST_SIZE);
+	}
+	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeIndexList"))
+	{
+	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_INDEX_LIST);
+	}
+	
+	else
+	{
+	    LOGGER.severe("Invalid Method specified for GenerateDatapoint: " + inputNode.getAttribute("Method"));
+	    return null;
+	}
+	if (inputNode.hasAttribute("Scale"))
+	{
+	    try
+	    {
+		double scale = Double.parseDouble(inputNode.getAttribute("Scale"));
+		info.setScale(scale);
+	    }
+	    catch(Exception ex)
+	    {
+		
+	    }
+	}
+	if (inputNode.hasChild("Refresh"))
+	{
+	    FrameworkNode rfNode = inputNode.getChild("Refresh");
+	    if (rfNode.hasAttribute("Frequency"))
+	    {
+		int freq = rfNode.getIntegerAttribute("Frequency", -1);
+		if (freq > 0)
+		{
+		    info.setMinFrequency(freq);
+		}
+		else
+		{
+		    return null;
+		}
+	    }
+	    else
+	    {
+		LOGGER.severe("<GenerateDatapoint> specified <Refresh> without a Frequency.");
+		return null;
+	    }
+	    if (rfNode.hasAttribute("Policy"))
+	    {
+		String strPolicy = rfNode.getAttribute("Policy");
+		if (strPolicy.equalsIgnoreCase("REMOVE"))
+		{
+		    info.setPolicy(GenerateDatapointInfo.RefreshPolicy.REMOVE);
+		}
+		else if (strPolicy.equalsIgnoreCase("REUSE"))
+		{
+		    info.setPolicy(GenerateDatapointInfo.RefreshPolicy.REUSE);
+		}
+		else if (strPolicy.equalsIgnoreCase("ZERO_OUT"))
+		{
+		    info.setPolicy(GenerateDatapointInfo.RefreshPolicy.ZERO_OUT);
+		}
+		else
+		{
+		    LOGGER.severe("<GenerateDatapoint> specified invalid <Refresh> without a policy: " + strPolicy);
+		    return null;
+		}
+	    }
+	    else
+	    {
+		LOGGER.severe("<GenerateDatapoint> specified <Refresh> without a Policy.");
+		return null;
+	    }
+	}
+	
+	info.setPrecision(precision);
+	return info;
+    }
+    
+    public static boolean ReadGenerateDataPoints(FrameworkNode node)
+    {
+	GenerateDatapointInfo info = ConfigurationReader.ReadGenerateDatapointInfo(node);
+	if (null == info)
+	{
+	    return false;
+	}
+	return DataManager.getDataManager().AddGenerateDatapointInfo(info);
+    }
+    
+    /**
+     * *
+     *
+     * @param sourceNode
+     * @return
+     */
+    public static DynamicItemInfoContainer ReadOnDemandInfo(FrameworkNode sourceNode)
+    {
+	ArrayList<String> namespaceMaskList = new ArrayList<>();
+	ArrayList<String> namespaceExcludeList = new ArrayList<>();
+	ArrayList<String> idMaskList = new ArrayList<>();
+	ArrayList<String> idExcludeList = new ArrayList<>();
+	
+	for (FrameworkNode dynaNode : sourceNode.getChildNodes(true))
+	{
+	    if (dynaNode.getNodeName().equalsIgnoreCase("NamespaceTriggerPattern"))
+	    {
+		String Mask = dynaNode.getTextContent();
+		if (InList(namespaceMaskList, Mask))
+		{
+		    LOGGER.warning("On Demand item specified duplicate NamespaceTriggerPattern.  Ignoring.");
+		}
+		else
+		{
+		    namespaceMaskList.add(dynaNode.getTextContent());
+		}
+	    }
+	    else if (dynaNode.getNodeName().equalsIgnoreCase("NamespaceTriggerExcludePattern"))
+	    {
+		String Exclude = dynaNode.getTextContent();
+		if (InList(namespaceExcludeList, Exclude))
+		{
+		    LOGGER.warning("On Demand item specified duplicate NamespaceTriggerExcludePattern.  Ignoring.");
+		}
+		
+		else
+		{
+		    namespaceExcludeList.add(dynaNode.getTextContent());
+		}
+		
+		if (InList(namespaceMaskList, Exclude))
+		{
+		    LOGGER.warning(
+			    "On Demand item specified duplicate NamespaceTriggerExcludePattern that matches NamespaceTriggerExcludePattern.");
+		}
+	    }
+	    else if (dynaNode.getNodeName().equalsIgnoreCase("IDTriggerPattern"))
+	    {
+		String Mask = dynaNode.getTextContent();
+		if (InList(idMaskList, Mask))
+		{
+		    LOGGER.warning("On Demand item specified duplicate IDTriggerPattern.  Ignoring.");
+		}
+		else
+		{
+		    idMaskList.add(dynaNode.getTextContent());
+		}
+		
+	    }
+	    else if (dynaNode.getNodeName().equalsIgnoreCase("IDTriggerExcludePattern"))
+	    {
+		String Exclude = dynaNode.getTextContent();
+		if (InList(idExcludeList, Exclude))
+		{
+		    LOGGER.warning("On Demand item specified duplicate IDTriggerExcludePattern.  Ignoring.");
+		}
+		
+		else
+		{
+		    idExcludeList.add(dynaNode.getTextContent());
+		}
+		
+		if (InList(idMaskList, Exclude))
+		{
+		    LOGGER.warning(
+			    "On Demand item specified duplicate IDTriggerExcludePattern that matches IDTriggerExcludePattern.");
+		}
+	    }
+	    else if (dynaNode.getNodeName().equalsIgnoreCase("StyleOverride-Odd")
+		    || dynaNode.getNodeName().equalsIgnoreCase("StyleOverride-Even"))
+	    {
+		
+	    }
+	    else if (dynaNode.getNodeName().equalsIgnoreCase("Growth"))
+	    {
+		
+	    }
+	    else
+	    {
+		LOGGER.warning("Invalid Tag found in <OnDemand>: " + dynaNode.getNodeName());
+	    }
+	}
+	if (namespaceMaskList.isEmpty() && idMaskList.isEmpty())
+	{
+	    LOGGER.severe("On Demand item did not specify a namespace or ID Trigger pattern");
+	    return null;
+	}
+	
+	Pair<ArrayList<String>, ArrayList<String>> namespaceCriterea;
+	namespaceCriterea = new Pair<>(namespaceMaskList, namespaceExcludeList);
+	Pair<ArrayList<String>, ArrayList<String>> idCriterea = new Pair<>(idMaskList, idExcludeList);
+	
+	DynamicItemInfoContainer dynaInfo = new DynamicItemInfoContainer(namespaceCriterea, idCriterea);
+	
+	dynaInfo.ReadStyles(sourceNode);
+	
+	if (sourceNode.hasAttribute("SortBy"))
+	{
+	    String strSortBy = sourceNode.getAttribute("SortBy");
+	    if (strSortBy.equalsIgnoreCase("Namespace"))
+	    {
+		dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NAMESPACE);
+	    }
+	    else if (strSortBy.equalsIgnoreCase("ID"))
+	    {
+		dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.ID);
+	    }
+	    else if (strSortBy.equalsIgnoreCase("Value"))
+	    {
+		dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.VALUE);
+	    }
+	    else if (strSortBy.equalsIgnoreCase("None"))
+	    {
+		dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NONE);
+	    }
+	    else
+	    {
+		LOGGER.severe("OnDemand item specified invalid SortBy: " + strSortBy + ". Ignoring.");
+		dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NONE);
+	    }
+	}
+	
+	if (sourceNode.hasAttribute("TriggeredIdToken"))
+	{
+	    String strToken = sourceNode.getAttribute("TriggeredIdToken");
+	    dynaInfo.setToken(strToken);
+	}
+	
+	return dynaInfo;
+    }
+    
+    public static boolean ReadPrompt(FrameworkNode promptNode)
+    {
+	PromptManager PROMPTMAN = PromptManager.getPromptManager();
+	boolean retVal = true;
+	
+	Utility.ValidateAttributes(new String[] { "ID", "Type", "Height", "Width" }, promptNode);
+	
+	if (false == promptNode.hasAttribute("ID"))
+	{
+	    LOGGER.warning("Prompt defined with no ID, ignoring");
+	    retVal = false;
+	}
+	else if (false == PROMPTMAN.CreatePromptObject(promptNode.getAttribute("ID"), promptNode))
+	{
+	    retVal = false;
+	}
+	
+	return retVal;
+    }
+    
+    private static boolean ReadPrompts(Document doc)
+    {
+	boolean retVal = true;
+	
+	NodeList prompts = doc.getElementsByTagName("Prompt");
+	if (prompts.getLength() < 1)
+	{
+	    return true;
+	}
+	for (int iLoop = 0; iLoop < prompts.getLength(); iLoop++)
+	{
+	    FrameworkNode promptNode = new FrameworkNode(prompts.item(iLoop));
+	    if (!ReadPrompt(promptNode))
+	    {
+		retVal = false;
+		break;
+	    }
+	}
+	
+	return retVal;
+    }
+    
+    static public TabWidget ReadTab(FrameworkNode node, TabWidget tab, String id)
+    {
+	FrameworkNode tabNode = null;
+	AliasMgr.getAliasMgr().PushAliasList(true);
+	AliasMgr.getAliasMgr().AddAlias("TabID", id); // Make TabID an alias = to the ID :-)
+	
+	if (node.hasAttribute("File")) // can externally define widgets within
+	{
+	    WidgetBuilder.StartReadingExternalFile(node);
+	    tabNode = OpenTabDefinitionFile(node.getAttribute("File"));
+	    if (null == tabNode)
+	    {
+		LOGGER.severe("Invalid tab definition file: " + node.getAttribute("File"));
+		return null;
+	    }
+	    if (tabNode.hasAttribute("OnDemandTask"))
+	    {
+		tab.setOnDemandTask(tabNode.getAttribute("OnDemandTask"));
+	    }
+	    
+	    AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node,
+		    new String[] { "ID", "File", "Align", "hgap", "vgap", "Task" });
+	    
+	    if (false == AliasMgr.ReadAliasFromExternalFile(node.getAttribute("File")))
 	    {
 		return null;
 	    }
-	    
-	    if (false == ReadTaskAndConditionals(doc))
+	    if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("File")))
 	    {
-		_Configuration = null;
-	    }
-	    else if (false == ReadPrompts(doc))
-	    {
-		_Configuration = null;
+		return null;
 	    }
 	}
-	if (null != _Configuration)
+	else
 	{
-	    CalculateScaling();
+	    Utility.ValidateAttributes(new String[] { "ID", "File", "Align", "hgap", "vgap", "Task" }, node);
+	    tabNode = node;
 	}
-	return _Configuration;
+	if (false == tab.LoadConfiguration(tabNode))
+	{
+	    return null;
+	}
+	if (node.hasAttribute("File"))
+	{
+	    WidgetBuilder.DoneReadingExternalFile();
+	}
+	
+	if (true == node.hasAttribute("Align"))
+	{
+	    String str = node.getAttribute("Align");
+	    tab.setAlignment(str);
+	}
+	if (node.hasAttribute("task"))
+	{
+	    tab.setOnActivateTask(node.getAttribute("task"));
+	}
+	if (node.hasAttribute("OnDemandTask"))
+	{
+	    tab.setOnDemandTask(node.getAttribute("OnDemandTask"));
+	}
+	if (node.hasAttribute("hgap"))
+	{
+	    try
+	    {
+		if (!tab.parsehGapValue(node))
+		{
+		    LOGGER.config("Setting hGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("hgap"));
+		}
+		// tab.sethGap(Integer.parseInt(node.getAttribute("hgap")));
+	    }
+	    catch(Exception ex)
+	    {
+		LOGGER.warning("Tab ID=" + tab.getMinionID() + " has invalid hgap.  Ignoring");
+	    }
+	}
+	if (node.hasAttribute("vgap"))
+	{
+	    try
+	    {
+		if (!tab.parsevGapValue(node))
+		{
+		    LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("vgap"));
+		}
+		// tab.setvGap(Integer.parseInt(node.getAttribute("vgap")));
+		// LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " +
+		// node.getAttribute("vgap"));
+	    }
+	    catch(Exception ex)
+	    {
+		LOGGER.warning("Tab ID=" + tab.getMinionID() + " has invalid vgap.  Ignoring");
+	    }
+	}
+	return tab;
+    }
+    
+    private static boolean ReadTaskAndConditionals(Document doc)
+    {
+	boolean retVal = true;
+	
+	List<FrameworkNode> taskListNodes = FrameworkNode.GetChildNodes(doc, "TaskList");
+	
+	if (taskListNodes.size() < 1)
+	{
+	    // LOGGER.info("No Tasks defined in config file.");
+	    // return true;
+	}
+	for (FrameworkNode taskNode : taskListNodes)
+	{
+	    retVal = ConfigurationReader.ReadTaskList(taskNode);
+	    if (!retVal)
+	    {
+		break;
+	    }
+	}
+	
+	if (true == retVal)
+	{
+	    retVal = ReadConditionals(doc);
+	}
+	
+	return retVal;
+    }
+    
+    public static boolean ReadTaskList(FrameworkNode taskNode)
+    {
+	TaskManager TASKMAN = TaskManager.getTaskManager();
+	boolean retVal = true;
+	
+	String taskID = null;
+	String externFile = null;
+	FrameworkNode nodeToPass = taskNode;
+	
+	Utility.ValidateAttributes(new String[] { "ID", "File", "PerformOnStartup", "PerformOnConnect", "stepped" },
+		taskNode);
+	if (false == taskNode.hasAttribute("ID"))
+	{
+	    LOGGER.warning("Task defined with no ID, ignoring");
+	    return false;
+	}
+	taskID = taskNode.getAttribute("ID");
+	if (taskNode.hasAttribute("File"))
+	{
+	    externFile = taskNode.getAttribute("File");
+	    if (!ConfigurationReader.ReadTasksFromExternalFile(externFile)) // could also be tasks defined in external
+									    // file
+	    {
+		return false;
+	    }
+	    Document externDoc = OpenXMLFile(externFile); // TODO, likely need to make path OS independent in
+							  // OpenXMLFile app
+	    if (externDoc != null)
+	    {
+		nodeToPass = new FrameworkNode((Node) externDoc);
+	    }
+	    else
+	    {
+		retVal = false; // something wrong with file, already notified in OpenXMLFile. Continue
+				// processing, looking for more issues
+	    }
+	}
+	if (TASKMAN.CreateTask(taskID, nodeToPass))
+	{
+	    
+	}
+	else
+	{
+	    retVal = false;
+	}
+	return retVal;
+    }
+    
+    public static boolean ReadTasksFromExternalFile(String filename)
+    {
+	Document doc = OpenXMLFile(filename);
+	
+	if (null != doc)
+	{
+	    if (ReadPrompts(doc))
+	    {
+		return ReadTaskAndConditionals(doc);
+	    }
+	}
+	return false;
+    }
+    
+    private Configuration _Configuration = null;
+    
+    private final TaskManager TASKMAN = TaskManager.getTaskManager();
+    
+    private List<TabWidget> _tabs = null;
+    
+    public ConfigurationReader()
+    {
+	_ConfigReader = this;
     }
     
     private void CalculateScaling()
@@ -276,6 +1104,78 @@ public class ConfigurationReader
 	{
 	    _Configuration.setAutoScale(false);
 	}
+    }
+    
+    private void FetchDimenstions(FrameworkNode node)
+    {
+	try
+	{
+	    if (node.hasAttribute("Width"))
+	    {
+		int appWidth = Integer.parseInt(node.getAttribute("Width"));
+		_Configuration.setWidth(appWidth);
+	    }
+	    if (node.hasAttribute("Height"))
+	    {
+		int appHeight = Integer.parseInt(node.getAttribute("Height"));
+		_Configuration.setHeight(appHeight);
+	    }
+	}
+	catch(Exception ex)
+	{
+	}
+	
+    }
+    
+    public Configuration getConfiguration()
+    {
+	return _Configuration;
+    }
+    
+    public List<TabWidget> getTabs()
+    {
+	return _tabs;
+    }
+    
+    private boolean HandleMenuStyleOverride(MenuItem menu, FrameworkNode menuNode)
+    {
+	List<String> styles = new ArrayList<>();
+	
+	FrameworkNode styleNode;
+	if (menuNode.hasChild("StyleOverride"))
+	{
+	    styleNode = menuNode.getChild("StyleOverride");
+	}
+	else
+	{
+	    return false;
+	}
+	
+	for (FrameworkNode node : styleNode.getChildNodes())
+	{
+	    if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
+	    {
+		continue;
+	    }
+	    if (node.getNodeName().equalsIgnoreCase("Item"))
+	    {
+		styles.add(node.getTextContent());
+	    }
+	    else
+	    {
+		LOGGER.severe("Unknown Tag under <StyleOverride>: " + node.getNodeName());
+		return false;
+	    }
+	}
+	String StyleString = "";
+	for (String Style : styles)
+	{
+	    StyleString += Style + ";";
+	}
+	
+	menu.setStyle(StyleString);
+	
+	return true;
     }
     
     /**
@@ -373,70 +1273,106 @@ public class ConfigurationReader
 	}
     }
     
-    private boolean ReadOscarConnection(FrameworkNode oscarNode)
+    public Configuration ReadAppConfigFile(String filename)
     {
-	Utility.ValidateAttributes(new String[] { "IP", "Port", "Key" }, oscarNode);
-	String IP = null;
-	int Port = -1;
-	String Key = "Biff Rulz!"; // default key
-	boolean retVal = false;
-	
-	if (oscarNode.hasAttribute("IP") && oscarNode.hasAttribute("Port"))
+	Document doc = OpenXMLFile(filename);
+	if (null != doc)
 	{
-	    IP = oscarNode.getAttribute("IP");
-	    Port = oscarNode.getIntegerAttribute("Port", -1);
-	    if (Port != -1)
+	    AliasMgr.getAliasMgr().SetCurrentConfigFile(filename);
+	    if (null == _Configuration)
 	    {
-		retVal = true;
+		_Configuration = new Configuration();
+	    }
+	    if (false == ReadAppSettings(doc, false))
+	    {
+		return null;
+	    }
+	    
+	    if (false == ReadTaskAndConditionals(doc))
+	    {
+		_Configuration = null;
+	    }
+	    else if (false == ReadPrompts(doc))
+	    {
+		_Configuration = null;
 	    }
 	}
-	if (oscarNode.hasAttribute("Key"))
+	if (null != _Configuration)
 	{
-	    Key = oscarNode.getAttribute("Key");
+	    CalculateScaling();
 	}
-	if (false == retVal)
-	{
-	    LOGGER.severe("<Network><Oscar> requires IP and Port");
-	}
-	else
-	{
-	    _Configuration.addOscarBullhornEntry(IP, Port, Key);
-	}
-	
-	return retVal;
+	return _Configuration;
     }
     
-    private void FetchDimenstions(FrameworkNode node)
+    private boolean ReadAppMenu(FrameworkNode menuNode, boolean basicInfoOnly)
     {
-	try
+	if (null != _Configuration.getMenuBar())
 	{
-	    if (node.hasAttribute("Width"))
+	    return true;
+	}
+	if (menuNode.hasAttribute("Show"))
+	{
+	    String strVal = menuNode.getAttribute("Show");
+	    if (strVal.equalsIgnoreCase("True"))
 	    {
-		int appWidth = Integer.parseInt(node.getAttribute("Width"));
-		_Configuration.setWidth(appWidth);
+		_Configuration.setShowMenuBar(true);
+		if (!basicInfoOnly)
+		{
+		    LOGGER.config("Show Menu Bar = TRUE");
+		}
 	    }
-	    if (node.hasAttribute("Height"))
+	    else
 	    {
-		int appHeight = Integer.parseInt(node.getAttribute("Height"));
-		_Configuration.setHeight(appHeight);
+		_Configuration.setShowMenuBar(false);
+		if (!basicInfoOnly)
+		{
+		    LOGGER.config("Show Menu Bar = FALSE");
+		}
 	    }
 	}
-	catch(Exception ex)
+	if (basicInfoOnly)
 	{
+	    return true;
 	}
+	MenuBar objMenuBar = new MenuBar();
 	
-    }
-    
-    private static boolean InList(List<String> list, String toCheck)
-    {
-	for (String item : list)
+	for (FrameworkNode node : menuNode.getChildNodes())
 	{
-	    if (item.equalsIgnoreCase(toCheck))
+	    if (node.getNodeName().equalsIgnoreCase("Menu"))
 	    {
-		return true;
+		Utility.ValidateAttributes(new String[] { "Title" }, node);
+		if (node.hasAttribute("Title"))
+		{
+		    Menu objMenu = ReadMenu(node.getAttribute("Title"), node);
+		    if (null != objMenu)
+		    {
+			HandleMenuStyleOverride(objMenu, node);
+			
+			objMenuBar.getMenus().add(objMenu);
+			if (node.hasChild("Image"))
+			{
+			    ImageView iv = ConfigurationReader.GetImage(node.getChild("Image"));
+			    if (null != iv)
+			    {
+				objMenu.setGraphic(iv);
+			    }
+			}
+		    }
+		    else
+		    {
+			return false;
+		    }
+		}
+		else
+		{
+		    LOGGER.severe("Invalid Menu defined, no Title");
+		    return false;
+		}
+		
 	    }
 	}
-	return false;
+	_Configuration.setMenuBar(objMenuBar);
+	return true;
     }
     
     private boolean ReadAppSettings(Document doc, boolean basicInfoOnly)
@@ -828,430 +1764,92 @@ public class ConfigurationReader
 	return NetworkSettingsRead;
     }
     
-    /**
-     * *
-     *
-     * @param sourceNode
-     * @return
-     */
-    public static DynamicItemInfoContainer ReadOnDemandInfo(FrameworkNode sourceNode)
+    private Menu ReadMenu(String Title, FrameworkNode menuNode)
     {
-	ArrayList<String> namespaceMaskList = new ArrayList<>();
-	ArrayList<String> namespaceExcludeList = new ArrayList<>();
-	ArrayList<String> idMaskList = new ArrayList<>();
-	ArrayList<String> idExcludeList = new ArrayList<>();
-	
-	for (FrameworkNode dynaNode : sourceNode.getChildNodes(true))
+	Menu objMenu = new Menu(Title);
+	List<MenuItem> items = ReadMenuItems(menuNode);
+	if (null == items)
 	{
-	    if (dynaNode.getNodeName().equalsIgnoreCase("NamespaceTriggerPattern"))
-	    {
-		String Mask = dynaNode.getTextContent();
-		if (InList(namespaceMaskList, Mask))
-		{
-		    LOGGER.warning("On Demand item specified duplicate NamespaceTriggerPattern.  Ignoring.");
-		}
-		else
-		{
-		    namespaceMaskList.add(dynaNode.getTextContent());
-		}
-	    }
-	    else if (dynaNode.getNodeName().equalsIgnoreCase("NamespaceTriggerExcludePattern"))
-	    {
-		String Exclude = dynaNode.getTextContent();
-		if (InList(namespaceExcludeList, Exclude))
-		{
-		    LOGGER.warning("On Demand item specified duplicate NamespaceTriggerExcludePattern.  Ignoring.");
-		}
-		
-		else
-		{
-		    namespaceExcludeList.add(dynaNode.getTextContent());
-		}
-		
-		if (InList(namespaceMaskList, Exclude))
-		{
-		    LOGGER.warning(
-			    "On Demand item specified duplicate NamespaceTriggerExcludePattern that matches NamespaceTriggerExcludePattern.");
-		}
-	    }
-	    else if (dynaNode.getNodeName().equalsIgnoreCase("IDTriggerPattern"))
-	    {
-		String Mask = dynaNode.getTextContent();
-		if (InList(idMaskList, Mask))
-		{
-		    LOGGER.warning("On Demand item specified duplicate IDTriggerPattern.  Ignoring.");
-		}
-		else
-		{
-		    idMaskList.add(dynaNode.getTextContent());
-		}
-		
-	    }
-	    else if (dynaNode.getNodeName().equalsIgnoreCase("IDTriggerExcludePattern"))
-	    {
-		String Exclude = dynaNode.getTextContent();
-		if (InList(idExcludeList, Exclude))
-		{
-		    LOGGER.warning("On Demand item specified duplicate IDTriggerExcludePattern.  Ignoring.");
-		}
-		
-		else
-		{
-		    idExcludeList.add(dynaNode.getTextContent());
-		}
-		
-		if (InList(idMaskList, Exclude))
-		{
-		    LOGGER.warning(
-			    "On Demand item specified duplicate IDTriggerExcludePattern that matches IDTriggerExcludePattern.");
-		}
-	    }
-	    else if (dynaNode.getNodeName().equalsIgnoreCase("StyleOverride-Odd")
-		    || dynaNode.getNodeName().equalsIgnoreCase("StyleOverride-Even"))
-	    {
-		
-	    }
-	    else if (dynaNode.getNodeName().equalsIgnoreCase("Growth"))
-	    {
-		
-	    }
-	    else
-	    {
-		LOGGER.warning("Invalid Tag found in <OnDemand>: " + dynaNode.getNodeName());
-	    }
-	}
-	if (namespaceMaskList.isEmpty() && idMaskList.isEmpty())
-	{
-	    LOGGER.severe("On Demand item did not specify a namespace or ID Trigger pattern");
+	    LOGGER.severe("Invalid Menu with Title of " + Title + " defined");
 	    return null;
+	    
 	}
-	
-	Pair<ArrayList<String>, ArrayList<String>> namespaceCriterea;
-	namespaceCriterea = new Pair<>(namespaceMaskList, namespaceExcludeList);
-	Pair<ArrayList<String>, ArrayList<String>> idCriterea = new Pair<>(idMaskList, idExcludeList);
-	
-	DynamicItemInfoContainer dynaInfo = new DynamicItemInfoContainer(namespaceCriterea, idCriterea);
-	
-	dynaInfo.ReadStyles(sourceNode);
-	
-	if (sourceNode.hasAttribute("SortBy"))
-	{
-	    String strSortBy = sourceNode.getAttribute("SortBy");
-	    if (strSortBy.equalsIgnoreCase("Namespace"))
-	    {
-		dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NAMESPACE);
-	    }
-	    else if (strSortBy.equalsIgnoreCase("ID"))
-	    {
-		dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.ID);
-	    }
-	    else if (strSortBy.equalsIgnoreCase("Value"))
-	    {
-		dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.VALUE);
-	    }
-	    else if (strSortBy.equalsIgnoreCase("None"))
-	    {
-		dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NONE);
-	    }
-	    else
-	    {
-		LOGGER.severe("OnDemand item specified invalid SortBy: " + strSortBy + ". Ignoring.");
-		dynaInfo.setSortByMethod(DynamicItemInfoContainer.SortMethod.NONE);
-	    }
-	}
-	
-	if (sourceNode.hasAttribute("TriggeredIdToken"))
-	{
-	    String strToken = sourceNode.getAttribute("TriggeredIdToken");
-	    dynaInfo.setToken(strToken);
-	}
-	
-	return dynaInfo;
+	objMenu.getItems().addAll(items);
+	return objMenu;
     }
     
-    private static Pair<String, String> getNamespaceAndIdPattern(FrameworkNode node, boolean noID)
+    public MenuItem ReadMenuItem(FrameworkNode menuNode, int itemIndex)
     {
-	if (node.hasAttribute("Namespace"))
+	if (menuNode.getNodeName().equalsIgnoreCase("MenuItem"))
 	{
-	    if (node.hasAttribute("ID") || !noID)
+	    Utility.ValidateAttributes(new String[] { "Text", "Task", "CreateDataPoint" }, menuNode);
+	    if (menuNode.hasAttribute("Text") && menuNode.hasAttribute("Task"))
 	    {
-		return new Pair<String, String>(node.getAttribute("Namespace"), node.getAttribute("ID"));
-	    }
-	    if (noID)
-	    {
-		return new Pair<String, String>(node.getAttribute("Namespace"), null);
-	    }
-	}
-	else if (noID) // is ID List
-	{
-	    if (node.hasAttribute("ID"))
-	    {
-		return new Pair<String, String>(null, node.getAttribute("ID"));
+		MenuItem objItem = new MenuItem(menuNode.getAttribute("Text"));
+		HandleMenuStyleOverride(objItem, menuNode);
+		
+		if (menuNode.hasChild("Image"))
+		{
+		    ImageView iv = ConfigurationReader.GetImage(menuNode.getChild("Image"));
+		    if (null != iv)
+		    {
+			objItem.setGraphic(iv);
+		    }
+		}
+		
+		if (true == Configuration.getConfig().getAllowTasks())
+		{
+		    List<DataPointGenerator> dataPoints = new ArrayList<>();
+		    
+		    String strTask = menuNode.getAttribute("Task");
+		    if (menuNode.hasAttribute("CreateDataPoint"))
+		    {
+			dataPoints.addAll(ReadDataPointsForTask(itemIndex,menuNode.getAttribute("CreateDataPoint"),
+				menuNode.getAttribute("Text"), menuNode.getAttribute("Task")));
+			if (dataPoints.size() == 0)
+			{
+			    return null;
+			}
+		    }
+		    objItem.setOnAction(new EventHandler<ActionEvent>()
+		    {
+			@Override
+			public void handle(ActionEvent t)
+			{
+			    for (DataPointGenerator dpGen : dataPoints)
+			    {
+				dpGen.generate();
+			    }
+			    TASKMAN.PerformTask(strTask);
+			}
+		    });
+		}
+		return objItem;
 	    }
 	}
 	return null;
     }
     
-    public static GenerateDatapointInfo ReadGenerateDatapointInfo(FrameworkNode inputNode)
+    public List<MenuItem> ReadMenuItems(FrameworkNode menuNode)
     {
-	ArrayList<Pair<String, String>> maskList = new ArrayList<>();
-	ArrayList<Pair<String, String>> excludeList = new ArrayList<>();
-	ListSortMethod sortPolicy = ListSortMethod.ASCENDING;
-	int precision = -1;
-	boolean hasListEntry = false;
-	int listEntry = 0;
-	
-	if (!inputNode.hasAttribute("Method"))
+	ArrayList<MenuItem> retList = new ArrayList<>();
+	for (FrameworkNode node : menuNode.getChildNodes())
 	{
-	    LOGGER.severe("GenerateDatapoint did not specify the Method of generate. ");
-	    return null;
-	}
-	
-	boolean IsGenerateNamespaceList = inputNode.getAttribute("Method").equalsIgnoreCase("MakeNamespaceList") || inputNode.getAttribute("Method").equalsIgnoreCase("MakeIDList");
-	String strMethod = inputNode.getAttribute("Method");
-	
-	Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode, false);
-	Pair<ValueRange,String> rangeInfo = WidgetBuilder.ReadMinionSrcIndexInfo(inputNode);
-	if (null == genDPInfo)
-	{
-	    LOGGER.severe("Invalid GenerateDatapoint.");
-	    return null;
-	}
-	
-	for (FrameworkNode node : inputNode.getChildNodes(true))
-	{
-	    if (node.getNodeName().equalsIgnoreCase("InputPattern"))
+	    if (node.getNodeName().equalsIgnoreCase("MenuItem"))
 	    {
-		Pair<String, String> input = getNamespaceAndIdPattern(node, IsGenerateNamespaceList);
-		if (null == input)
+		MenuItem objItem = ReadMenuItem(node,retList.size());
+		if (null != objItem)
 		{
-		    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(),
-			    genDPInfo.getValue(), node.getAttributeList()));
-		    return null;
-		}
-		maskList.add(input);
-	    }
-	    else if (node.getNodeName().equalsIgnoreCase("ExcludePattern"))
-	    {
-		Pair<String, String> exclude = getNamespaceAndIdPattern(node, IsGenerateNamespaceList);
-		if (null == exclude)
-		{
-		    LOGGER.severe(String.format("Invalid GenerateDatapoint %s:%s -->%s", genDPInfo.getKey(),
-			    genDPInfo.getValue(), node.getAttributeList()));
-		    return null;
-		}
-		excludeList.add(exclude);
-	    }
-	    else if (node.getNodeName().equalsIgnoreCase("ListEntry"))
-	    {
-		try
-		{
-		    listEntry = node.getIntegerContent();
-		    hasListEntry = true;
-		}
-		catch(NumberFormatException ex)
-		{
-		    LOGGER.severe("Invalid ListEntry specified for <GenerateDatapoint>: " + node.getTextContent());
-		    return null;
-		}
-	    }
-	    
-	    else if (node.getNodeName().equalsIgnoreCase("Decimals"))
-	    {
-		try
-		{
-		    precision = node.getIntegerContent();
-		}
-		catch(NumberFormatException ex)
-		{
-		    LOGGER.severe("Invalid Decimals specified for <GenerateDatapoint>: " + node.getTextContent());
-		    return null;
-		}
-	    }
-	    else if (node.getNodeName().equalsIgnoreCase("Refresh"))
-	    { // handle below
-	    }
-	    else if (node.getNodeName().equalsIgnoreCase("Sort"))
-	    {
-		if (strMethod.equalsIgnoreCase("MakeList") || strMethod.equalsIgnoreCase("MakeNamespaceList") || 
-			strMethod.equalsIgnoreCase("MakeIDList") )
-		{
-		    String strSort = node.getTextContent();
-		    if (strSort.equalsIgnoreCase("Ascending"))
-		    {
-			sortPolicy = ListSortMethod.ASCENDING;
-		    }
-		    else if (strSort.equalsIgnoreCase("Descending"))
-		    {
-			sortPolicy = ListSortMethod.DESCENDING;
-		    }
-		    else if (strSort.equalsIgnoreCase("None"))
-		    {
-			sortPolicy = ListSortMethod.NONE;
-		    }
-		    else
-		    {
-			LOGGER.severe("Invalid Sort Method for Generate Datapoint: " + strSort);
-			return null;
-		    }
-		}
-		else
-		{
-			LOGGER.warning("Specified Sort Method for Generate Datapoint, however " + strMethod + " does not support sorting.  Ignoring.");
-		}
-	    }
-	    else
-	    {
-		LOGGER.severe("Unknown entry in <GenerateDatapoint>: " + node.getNodeName());
-		return null;
-	    }
-	}
-	GenerateDatapointInfo info = new GenerateDatapointInfo(genDPInfo.getKey(), genDPInfo.getValue(), maskList,
-		excludeList,rangeInfo.getKey(),rangeInfo.getValue());
-	
-	if (hasListEntry)
-	{
-	    if (!info.setListEntry(listEntry))
-	    {
-		LOGGER.severe("Invalid ListEntry specified for <GenerateDatapoint>: " + Integer.toString(listEntry));
-		return null;
-	    }
-	    if (inputNode.hasAttribute("Separator"))
-	    {
-		String token = inputNode.getAttribute("Separator");
-		info.setSplitToken(token);
-	    }
-	    else
-	    {
-		info.setSplitToken(",");
-	    }
-	}
-	
-	if (inputNode.getAttribute("Method").equalsIgnoreCase("Add"))
-	{
-	    info.setMethod(GenerateDatapointInfo.GenerateMethod.ADD);
-	}
-	else if (inputNode.getAttribute("Method").equalsIgnoreCase("Average"))
-	{
-	    info.setMethod(GenerateDatapointInfo.GenerateMethod.AVERAGE);
-	}
-	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeList"))
-	{
-	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_LIST);
-	}
-	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeNamespaceList"))
-	{
-	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_NAMESPACE_LIST);
-	}
-	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeIDList"))
-	{
-	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_ID_LIST);
-	}
-	else if (inputNode.getAttribute("Method").equalsIgnoreCase("Proxy"))
-	{
-	    info.setMethod(GenerateDatapointInfo.GenerateMethod.PROXY);
-	    if (inputNode.hasAttribute("ProxyID"))
-	    {
-		String proxyID = inputNode.getAttribute("ProxyID");
-		info.setProxyID(proxyID);
-	    }
-	    else
-	    {
-		LOGGER.warning(
-			"GenerateDatapoint [Proxy] did not have a ProxyID, you will be unable to change it with a task.");
-		String proxyID = Long.toString(new Random().nextLong());
-		info.setProxyID(proxyID);
-	    }
-	}
-	else if (inputNode.getAttribute("Method").equalsIgnoreCase("SplitList"))
-	{
-	    info.setMethod(GenerateDatapointInfo.GenerateMethod.SPLIT_LIST);
-	    if (inputNode.hasAttribute("Separator"))
-	    {
-		String token = inputNode.getAttribute("Separator");
-		info.setSplitToken(token);
-	    }
-	    else
-	    {
-		info.setSplitToken(",");
-	    }
-	}
-	else if (inputNode.getAttribute("Method").equalsIgnoreCase("GetListSize"))
-	{
-	    info.setMethod(GenerateDatapointInfo.GenerateMethod.GET_LIST_SIZE);
-	}
-	else if (inputNode.getAttribute("Method").equalsIgnoreCase("MakeIndexList"))
-	{
-	    info.setMethod(GenerateDatapointInfo.GenerateMethod.MAKE_INDEX_LIST);
-	}
-	
-	else
-	{
-	    LOGGER.severe("Invalid Method specified for GenerateDatapoint: " + inputNode.getAttribute("Method"));
-	    return null;
-	}
-	if (inputNode.hasAttribute("Scale"))
-	{
-	    try
-	    {
-		double scale = Double.parseDouble(inputNode.getAttribute("Scale"));
-		info.setScale(scale);
-	    }
-	    catch(Exception ex)
-	    {
-		
-	    }
-	}
-	if (inputNode.hasChild("Refresh"))
-	{
-	    FrameworkNode rfNode = inputNode.getChild("Refresh");
-	    if (rfNode.hasAttribute("Frequency"))
-	    {
-		int freq = rfNode.getIntegerAttribute("Frequency", -1);
-		if (freq > 0)
-		{
-		    info.setMinFrequency(freq);
+		    retList.add(objItem);
 		}
 		else
 		{
 		    return null;
 		}
 	    }
-	    else
-	    {
-		LOGGER.severe("<GenerateDatapoint> specified <Refresh> without a Frequency.");
-		return null;
-	    }
-	    if (rfNode.hasAttribute("Policy"))
-	    {
-		String strPolicy = rfNode.getAttribute("Policy");
-		if (strPolicy.equalsIgnoreCase("REMOVE"))
-		{
-		    info.setPolicy(GenerateDatapointInfo.RefreshPolicy.REMOVE);
-		}
-		else if (strPolicy.equalsIgnoreCase("REUSE"))
-		{
-		    info.setPolicy(GenerateDatapointInfo.RefreshPolicy.REUSE);
-		}
-		else if (strPolicy.equalsIgnoreCase("ZERO_OUT"))
-		{
-		    info.setPolicy(GenerateDatapointInfo.RefreshPolicy.ZERO_OUT);
-		}
-		else
-		{
-		    LOGGER.severe("<GenerateDatapoint> specified invalid <Refresh> without a policy: " + strPolicy);
-		    return null;
-		}
-	    }
-	    else
-	    {
-		LOGGER.severe("<GenerateDatapoint> specified <Refresh> without a Policy.");
-		return null;
-	    }
 	}
 	
-	info.setPrecision(precision);
-	return info;
+	return retList;
     }
     
     private void ReadOnDemandTabs(Document doc)
@@ -1289,249 +1887,57 @@ public class ConfigurationReader
 	}
     }
     
-    private boolean ReadUnregisteredDataInfo(FrameworkNode UnregisteredDataNode)
+    private boolean ReadOscarConnection(FrameworkNode oscarNode)
     {
-	Utility.ValidateAttributes(new String[] { "Enabled", "Width", "Title" }, UnregisteredDataNode);
+	Utility.ValidateAttributes(new String[] { "IP", "Port", "Key" }, oscarNode);
+	String IP = null;
+	int Port = -1;
+	String Key = "Biff Rulz!"; // default key
+	boolean retVal = false;
 	
-	if (UnregisteredDataNode.hasAttributes())
+	if (oscarNode.hasAttribute("IP") && oscarNode.hasAttribute("Port"))
 	{
-	    if (UnregisteredDataNode.hasAttribute("Enabled"))
+	    IP = oscarNode.getAttribute("IP");
+	    Port = oscarNode.getIntegerAttribute("Port", -1);
+	    if (Port != -1)
 	    {
-		if (UnregisteredDataNode.getBooleanAttribute("Enabled"))
-		{
-		    DynamicTabWidget.setEnabled(true);
-		}
-		else
-		{
-		    return true; // if it's not enabled, no reason to read the rest
-		}
+		retVal = true;
 	    }
-	    if (UnregisteredDataNode.hasAttribute("Title"))
-	    {
-		DynamicTabWidget.setTitleStr(UnregisteredDataNode.getAttribute("Title"));
-	    }
-	    DynamicTabWidget
-		    .setMaxWidth(UnregisteredDataNode.getIntegerAttribute("Width", DynamicTabWidget.getMaxWidth()));
+	}
+	if (oscarNode.hasAttribute("Key"))
+	{
+	    Key = oscarNode.getAttribute("Key");
+	}
+	if (false == retVal)
+	{
+	    LOGGER.severe("<Network><Oscar> requires IP and Port");
 	}
 	else
 	{
-	    return true; // if no attributes, then it's not enabled, so we are outta here
+	    _Configuration.addOscarBullhornEntry(IP, Port, Key);
 	}
 	
-	for (FrameworkNode node : UnregisteredDataNode.getChildNodes())
-	{
-	    if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
-	    {
-		continue;
-	    }
-	    
-	    if (node.getNodeName().equalsIgnoreCase("TitleStyle"))
-	    {
-		DynamicTabWidget.setTitleStyle(node.getTextContent());
-	    }
-	    else if (node.getNodeName().equalsIgnoreCase("EvenStyle"))
-	    {
-		for (FrameworkNode evenNode : node.getChildNodes())
-		{
-		    if (evenNode.getNodeName().equalsIgnoreCase("#Text")
-			    || evenNode.getNodeName().equalsIgnoreCase("#Comment"))
-		    {
-			continue;
-		    }
-		    if (evenNode.getNodeName().equalsIgnoreCase("Background"))
-		    {
-			DynamicTabWidget.setEven_Background(evenNode.getTextContent());
-		    }
-		    else if (evenNode.getNodeName().equalsIgnoreCase("Id"))
-		    {
-			DynamicTabWidget.setEven_ID(evenNode.getTextContent());
-		    }
-		    else if (evenNode.getNodeName().equalsIgnoreCase("Value"))
-		    {
-			DynamicTabWidget.setEven_Value(evenNode.getTextContent());
-		    }
-		    else
-		    {
-			LOGGER.warning("Unknown tag: " + evenNode.getNodeName() + " in <UnregisteredData><EvenStyle> ");
-		    }
-		}
-	    }
-	    else if (node.getNodeName().equalsIgnoreCase("OddStyle"))
-	    {
-		for (FrameworkNode oddNode : node.getChildNodes())
-		{
-		    if (oddNode.getNodeName().equalsIgnoreCase("#Text")
-			    || oddNode.getNodeName().equalsIgnoreCase("#Comment"))
-		    {
-			continue;
-		    }
-		    
-		    if (oddNode.getNodeName().equalsIgnoreCase("Background"))
-		    {
-			DynamicTabWidget.setOdd_Background(oddNode.getTextContent());
-		    }
-		    else if (oddNode.getNodeName().equalsIgnoreCase("Id"))
-		    {
-			DynamicTabWidget.setOdd_ID(oddNode.getTextContent());
-		    }
-		    else if (oddNode.getNodeName().equalsIgnoreCase("Value"))
-		    {
-			DynamicTabWidget.setOdd_Value(oddNode.getTextContent());
-		    }
-		    else
-		    {
-			LOGGER.warning("Unknown tag: " + oddNode.getNodeName() + " in <UnregisteredData><OddStyle> ");
-		    }
-		}
-	    }
-	    else
-	    {
-		LOGGER.warning("Unknown tag: " + node.getNodeName() + " in <UnregisteredData>");
-	    }
-	}
-	return true;
+	return retVal;
     }
     
-    /**
-     * Verifies no duplicate Tab ID's in <Tabs> section
-     *
-     * @param ListTabID
-     * @return true if all good, otherwise false
-     */
-    boolean VerifyTabList(ArrayList<String> ListTabID)
+    public Configuration ReadStartupInfo(String filename)
     {
-	boolean RetVal = true;
-	for (int iIndex = 0; iIndex < ListTabID.size(); iIndex++)
-	{
-	    for (int index = iIndex + 1; index < ListTabID.size(); index++)
-	    {
-		if (0 == ListTabID.get(iIndex).compareToIgnoreCase(ListTabID.get(index)))
-		{
-		    RetVal = false;
-		    LOGGER.severe("Duplicate Tab ID's found in <Application> settings: ID=" + ListTabID.get(iIndex));
-		}
-	    }
-	}
-	return RetVal;
-    }
-    
-    /**
-     * Allows one to define the tab contents (widgets) in an onother file Node that
-     * the tab attributes (hgp,vgap,id) must still be in Application.xml
-     *
-     * @param inputFilename
-     * @return Base node with the config goodies
-     */
-    public static FrameworkNode OpenTabDefinitionFile(String inputFilename)
-    {
-	FrameworkNode TabNode = OpenDefinitionFile(inputFilename, "Tab");
-	return TabNode;
-    }
-    
-    private boolean TabAlreadyLoaded(ArrayList<TabWidget> tabs, String checkID)
-    {
-	for (TabWidget tab : tabs)
-	{
-	    if (tab.getMinionID().equalsIgnoreCase(checkID))
-	    {
-		return true;
-	    }
-	}
-	return false;
-    }
-    
-    static public TabWidget ReadTab(FrameworkNode node, TabWidget tab, String id)
-    {
-	FrameworkNode tabNode = null;
-	AliasMgr.getAliasMgr().PushAliasList(true);
-	AliasMgr.getAliasMgr().AddAlias("TabID", id); // Make TabID an alias = to the ID :-)
-	
-	if (node.hasAttribute("File")) // can externally define widgets within
-	{
-	    WidgetBuilder.StartReadingExternalFile(node);
-	    tabNode = OpenTabDefinitionFile(node.getAttribute("File"));
-	    if (null == tabNode)
-	    {
-		LOGGER.severe("Invalid tab definition file: " + node.getAttribute("File"));
-		return null;
-	    }
-	    if (tabNode.hasAttribute("OnDemandTask"))
-	    {
-		tab.setOnDemandTask(tabNode.getAttribute("OnDemandTask"));
-	    }
-	    
-	    AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node,
-		    new String[] { "ID", "File", "Align", "hgap", "vgap", "Task" });
-	    
-	    if (false == AliasMgr.ReadAliasFromExternalFile(node.getAttribute("File")))
-	    {
-		return null;
-	    }
-	    if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("File")))
-	    {
-		return null;
-	    }
-	}
-	else
-	{
-	    Utility.ValidateAttributes(new String[] { "ID", "File", "Align", "hgap", "vgap", "Task" }, node);
-	    tabNode = node;
-	}
-	if (false == tab.LoadConfiguration(tabNode))
+	Document doc = OpenXMLFile(filename);
+	if (null == doc)
 	{
 	    return null;
 	}
-	if (node.hasAttribute("File"))
+	if (null == _Configuration)
 	{
-	    WidgetBuilder.DoneReadingExternalFile();
+	    _Configuration = new Configuration();
+	}
+	if (false == ReadAppSettings(doc, true))
+	{
+	    return null;
 	}
 	
-	if (true == node.hasAttribute("Align"))
-	{
-	    String str = node.getAttribute("Align");
-	    tab.setAlignment(str);
-	}
-	if (node.hasAttribute("task"))
-	{
-	    tab.setOnActivateTask(node.getAttribute("task"));
-	}
-	if (node.hasAttribute("OnDemandTask"))
-	{
-	    tab.setOnDemandTask(node.getAttribute("OnDemandTask"));
-	}
-	if (node.hasAttribute("hgap"))
-	{
-	    try
-	    {
-		if (!tab.parsehGapValue(node))
-		{
-		    LOGGER.config("Setting hGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("hgap"));
-		}
-		// tab.sethGap(Integer.parseInt(node.getAttribute("hgap")));
-	    }
-	    catch(Exception ex)
-	    {
-		LOGGER.warning("Tab ID=" + tab.getMinionID() + " has invalid hgap.  Ignoring");
-	    }
-	}
-	if (node.hasAttribute("vgap"))
-	{
-	    try
-	    {
-		if (!tab.parsevGapValue(node))
-		{
-		    LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " + node.getAttribute("vgap"));
-		}
-		// tab.setvGap(Integer.parseInt(node.getAttribute("vgap")));
-		// LOGGER.config("Setting vGap for Tab ID=" + tab.getMinionID() + " to " +
-		// node.getAttribute("vgap"));
-	    }
-	    catch(Exception ex)
-	    {
-		LOGGER.warning("Tab ID=" + tab.getMinionID() + " has invalid vgap.  Ignoring");
-	    }
-	}
-	return tab;
+	AliasMgr.getAliasMgr().ClearAll(); // nuke anything already read, will start fresh
+	return _Configuration;
     }
     
     private List<TabWidget> ReadTabs(Document doc, List<String> TabID_List)
@@ -1720,29 +2126,107 @@ public class ConfigurationReader
 	return SortTabs(TabList, TabID_List);
     }
     
-    private boolean VerifyDesiredTabsPresent(List<TabWidget> listTabs, List<String> TabID_List)
+    private boolean ReadUnregisteredDataInfo(FrameworkNode UnregisteredDataNode)
     {
-	boolean RetVal = true;
+	Utility.ValidateAttributes(new String[] { "Enabled", "Width", "Title" }, UnregisteredDataNode);
 	
-	for (String id : TabID_List)
+	if (UnregisteredDataNode.hasAttributes())
 	{
-	    boolean found = false;
-	    
-	    for (TabWidget tab : listTabs)
+	    if (UnregisteredDataNode.hasAttribute("Enabled"))
 	    {
-		if (0 == id.compareToIgnoreCase(tab.getMinionID()))
+		if (UnregisteredDataNode.getBooleanAttribute("Enabled"))
 		{
-		    found = true;
-		    break;
+		    DynamicTabWidget.setEnabled(true);
+		}
+		else
+		{
+		    return true; // if it's not enabled, no reason to read the rest
 		}
 	    }
-	    if (false == found)
+	    if (UnregisteredDataNode.hasAttribute("Title"))
 	    {
-		LOGGER.severe("Tab with ID=" + id + " defined in <Tabs>, however not in <Tab> definitions.");
-		RetVal = false;
+		DynamicTabWidget.setTitleStr(UnregisteredDataNode.getAttribute("Title"));
+	    }
+	    DynamicTabWidget
+		    .setMaxWidth(UnregisteredDataNode.getIntegerAttribute("Width", DynamicTabWidget.getMaxWidth()));
+	}
+	else
+	{
+	    return true; // if no attributes, then it's not enabled, so we are outta here
+	}
+	
+	for (FrameworkNode node : UnregisteredDataNode.getChildNodes())
+	{
+	    if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
+	    {
+		continue;
+	    }
+	    
+	    if (node.getNodeName().equalsIgnoreCase("TitleStyle"))
+	    {
+		DynamicTabWidget.setTitleStyle(node.getTextContent());
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("EvenStyle"))
+	    {
+		for (FrameworkNode evenNode : node.getChildNodes())
+		{
+		    if (evenNode.getNodeName().equalsIgnoreCase("#Text")
+			    || evenNode.getNodeName().equalsIgnoreCase("#Comment"))
+		    {
+			continue;
+		    }
+		    if (evenNode.getNodeName().equalsIgnoreCase("Background"))
+		    {
+			DynamicTabWidget.setEven_Background(evenNode.getTextContent());
+		    }
+		    else if (evenNode.getNodeName().equalsIgnoreCase("Id"))
+		    {
+			DynamicTabWidget.setEven_ID(evenNode.getTextContent());
+		    }
+		    else if (evenNode.getNodeName().equalsIgnoreCase("Value"))
+		    {
+			DynamicTabWidget.setEven_Value(evenNode.getTextContent());
+		    }
+		    else
+		    {
+			LOGGER.warning("Unknown tag: " + evenNode.getNodeName() + " in <UnregisteredData><EvenStyle> ");
+		    }
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("OddStyle"))
+	    {
+		for (FrameworkNode oddNode : node.getChildNodes())
+		{
+		    if (oddNode.getNodeName().equalsIgnoreCase("#Text")
+			    || oddNode.getNodeName().equalsIgnoreCase("#Comment"))
+		    {
+			continue;
+		    }
+		    
+		    if (oddNode.getNodeName().equalsIgnoreCase("Background"))
+		    {
+			DynamicTabWidget.setOdd_Background(oddNode.getTextContent());
+		    }
+		    else if (oddNode.getNodeName().equalsIgnoreCase("Id"))
+		    {
+			DynamicTabWidget.setOdd_ID(oddNode.getTextContent());
+		    }
+		    else if (oddNode.getNodeName().equalsIgnoreCase("Value"))
+		    {
+			DynamicTabWidget.setOdd_Value(oddNode.getTextContent());
+		    }
+		    else
+		    {
+			LOGGER.warning("Unknown tag: " + oddNode.getNodeName() + " in <UnregisteredData><OddStyle> ");
+		    }
+		}
+	    }
+	    else
+	    {
+		LOGGER.warning("Unknown tag: " + node.getNodeName() + " in <UnregisteredData>");
 	    }
 	}
-	return RetVal;
+	return true;
     }
     
     /**
@@ -1772,546 +2256,63 @@ public class ConfigurationReader
 	return sortedTabs;
     }
     
-    public static boolean ReadTasksFromExternalFile(String filename)
+    private boolean TabAlreadyLoaded(ArrayList<TabWidget> tabs, String checkID)
     {
-	Document doc = OpenXMLFile(filename);
-	
-	if (null != doc)
+	for (TabWidget tab : tabs)
 	{
-	    if (ReadPrompts(doc))
+	    if (tab.getMinionID().equalsIgnoreCase(checkID))
 	    {
-		return ReadTaskAndConditionals(doc);
+		return true;
 	    }
 	}
 	return false;
     }
     
-    private static Conditional ReadConditional(FrameworkNode condNode)
+    private boolean VerifyDesiredTabsPresent(List<TabWidget> listTabs, List<String> TabID_List)
     {
-	String strType = null;
-	boolean CaseSensitive = false;
+	boolean RetVal = true;
 	
-	Utility.ValidateAttributes(new String[] { "CaseSensitive", "Type" }, condNode);
-	if (!condNode.hasAttribute("type"))
+	for (String id : TabID_List)
 	{
-	    LOGGER.severe("Conditional defined with no Type");
-	    return null;
-	}
-	if (condNode.hasAttribute("CaseSensitive"))
-	{
-	    CaseSensitive = condNode.getBooleanAttribute("CaseSensitive");
-	}
-	
-	strType = condNode.getAttribute("type");
-	Conditional.Type type = Conditional.GetType(strType);
-	if (type == Conditional.Type.Invalid)
-	{
-	    LOGGER.severe("Conditional defined with invalid type: " + strType);
-	    return null;
-	}
-	
-	Conditional objConditional = Conditional.BuildConditional(type, condNode, true);
-	if (null != objConditional)
-	{
-	    objConditional.setCaseSensitive(CaseSensitive);
-	}
-	
-	return objConditional;
-    }
-    
-    private static boolean ReadConditionals(Document doc)
-    {
-	/*
-	 * <Conditional type='IF_EQ' CaseSensitive="True"> <MinionSrc ID="myID"
-	 * Namespace="myNS"/> <Value> <MinionSrc ID="myID" Namespace="myNS"/> </Value>
-	 * or <Value>44</Value>
-	 * 
-	 * <Then>Task12</Then> <Else>Task3</Else> </Conditional>
-	 */
-	boolean retVal = true;
-	
-	NodeList conditionals = doc.getElementsByTagName("Conditional");
-	if (conditionals.getLength() < 1)
-	{
-	    return true;
-	}
-	for (int iLoop = 0; iLoop < conditionals.getLength(); iLoop++)
-	{
-	    FrameworkNode condNode = new FrameworkNode(conditionals.item(iLoop));
-	    Conditional objCond = ReadConditional(condNode);
-	    if (null == objCond)
-	    {
-		retVal = false;
-	    }
-	    else
-	    {
-		if (_conditionalMap.containsKey(objCond))
-		{
-		    LOGGER.config(
-			    "Duplicate conditional found.  Might want to check for multiple inclusions of same conditional. Conditional Information: "
-				    + objCond.toString());
-		}
-		else
-		{
-		    _conditionalMap.put(objCond, objCond);
-		}
-		objCond.Enable();
-	    }
-	}
-	
-	return retVal;
-    }
-    
-    private static boolean ReadTaskAndConditionals(Document doc)
-    {
-	boolean retVal = true;
-	
-	List<FrameworkNode> taskListNodes = FrameworkNode.GetChildNodes(doc, "TaskList");
-	
-	if (taskListNodes.size() < 1)
-	{
-	    // LOGGER.info("No Tasks defined in config file.");
-	    // return true;
-	}
-	for (FrameworkNode taskNode : taskListNodes)
-	{
-	    retVal = ConfigurationReader.ReadTaskList(taskNode);
-	    if (!retVal)
-	    {
-		break;
-	    }
-	}
-	
-	if (true == retVal)
-	{
-	    retVal = ReadConditionals(doc);
-	}
-	
-	return retVal;
-    }
-    
-    public static boolean ReadGenerateDataPoints(FrameworkNode node)
-    {
-	GenerateDatapointInfo info = ConfigurationReader.ReadGenerateDatapointInfo(node);
-	if (null == info)
-	{
-	    return false;
-	}
-	return DataManager.getDataManager().AddGenerateDatapointInfo(info);
-    }
-    
-    public static boolean ReadTaskList(FrameworkNode taskNode)
-    {
-	TaskManager TASKMAN = TaskManager.getTaskManager();
-	boolean retVal = true;
-	
-	String taskID = null;
-	String externFile = null;
-	FrameworkNode nodeToPass = taskNode;
-	
-	Utility.ValidateAttributes(new String[] { "ID", "File", "PerformOnStartup", "PerformOnConnect", "stepped" },
-		taskNode);
-	if (false == taskNode.hasAttribute("ID"))
-	{
-	    LOGGER.warning("Task defined with no ID, ignoring");
-	    return false;
-	}
-	taskID = taskNode.getAttribute("ID");
-	if (taskNode.hasAttribute("File"))
-	{
-	    externFile = taskNode.getAttribute("File");
-	    if (!ConfigurationReader.ReadTasksFromExternalFile(externFile)) // could also be tasks defined in external
-									    // file
-	    {
-		return false;
-	    }
-	    Document externDoc = OpenXMLFile(externFile); // TODO, likely need to make path OS independent in
-							  // OpenXMLFile app
-	    if (externDoc != null)
-	    {
-		nodeToPass = new FrameworkNode((Node) externDoc);
-	    }
-	    else
-	    {
-		retVal = false; // something wrong with file, already notified in OpenXMLFile. Continue
-				// processing, looking for more issues
-	    }
-	}
-	if (TASKMAN.CreateTask(taskID, nodeToPass))
-	{
+	    boolean found = false;
 	    
+	    for (TabWidget tab : listTabs)
+	    {
+		if (0 == id.compareToIgnoreCase(tab.getMinionID()))
+		{
+		    found = true;
+		    break;
+		}
+	    }
+	    if (false == found)
+	    {
+		LOGGER.severe("Tab with ID=" + id + " defined in <Tabs>, however not in <Tab> definitions.");
+		RetVal = false;
+	    }
 	}
-	else
-	{
-	    retVal = false;
-	}
-	return retVal;
+	return RetVal;
     }
     
-    private static boolean ReadPrompts(Document doc)
+    /**
+     * Verifies no duplicate Tab ID's in <Tabs> section
+     *
+     * @param ListTabID
+     * @return true if all good, otherwise false
+     */
+    boolean VerifyTabList(ArrayList<String> ListTabID)
     {
-	boolean retVal = true;
-	
-	NodeList prompts = doc.getElementsByTagName("Prompt");
-	if (prompts.getLength() < 1)
+	boolean RetVal = true;
+	for (int iIndex = 0; iIndex < ListTabID.size(); iIndex++)
 	{
-	    return true;
-	}
-	for (int iLoop = 0; iLoop < prompts.getLength(); iLoop++)
-	{
-	    FrameworkNode promptNode = new FrameworkNode(prompts.item(iLoop));
-	    if (!ReadPrompt(promptNode))
+	    for (int index = iIndex + 1; index < ListTabID.size(); index++)
 	    {
-		retVal = false;
-		break;
-	    }
-	}
-	
-	return retVal;
-    }
-    
-    public static boolean ReadPrompt(FrameworkNode promptNode)
-    {
-	PromptManager PROMPTMAN = PromptManager.getPromptManager();
-	boolean retVal = true;
-	
-	Utility.ValidateAttributes(new String[] { "ID", "Type", "Height", "Width" }, promptNode);
-	
-	if (false == promptNode.hasAttribute("ID"))
-	{
-	    LOGGER.warning("Prompt defined with no ID, ignoring");
-	    retVal = false;
-	}
-	else if (false == PROMPTMAN.CreatePromptObject(promptNode.getAttribute("ID"), promptNode))
-	{
-	    retVal = false;
-	}
-	
-	return retVal;
-    }
-    
-    public static ImageView GetImage(String ImageFileName, double ImageHeightConstraint, double ImageWidthConstraint)
-    {
-	ImageView view = null;
-	if (null != ImageFileName)
-	{
-	    String fname = convertToFileOSSpecific(ImageFileName);
-	    File file = new File(fname);
-	    if (file.exists())
-	    {
-		String fn = "file:" + fname;
-		Image img = new Image(fn);
-		view = new ImageView(img);
-		
-		if (ImageHeightConstraint > 0)
+		if (0 == ListTabID.get(iIndex).compareToIgnoreCase(ListTabID.get(index)))
 		{
-		    view.setFitHeight(ImageHeightConstraint);
-		}
-		if (ImageWidthConstraint > 0)
-		{
-		    view.setFitWidth(ImageWidthConstraint);
-		}
-		
-	    }
-	    else
-	    {
-		LOGGER.severe("Invalid Image File specified for Widget: " + ImageFileName);
-	    }
-	}
-	return view;
-    }
-    
-    public static ImageView GetImage(FrameworkNode node)
-    {
-	if (node.getNodeName().equalsIgnoreCase("Image"))
-	{
-	    String fName = node.getTextContent();
-	    double ImageWidthConstraint = 0.0;
-	    double ImageHeightConstraint = 0.0;
-	    
-	    Utility.ValidateAttributes(new String[] { "Height", "Width" }, node);
-	    if (node.hasAttribute("Width"))
-	    {
-		try
-		{
-		    ImageWidthConstraint = Double.parseDouble(node.getAttribute("Width"));
-		}
-		catch(Exception ex)
-		{
-		    LOGGER.severe("Widget Image has invalid Width specified: " + node.getAttribute("Width"));
-		    return null;
-		}
-	    }
-	    if (node.hasAttribute("Height"))
-	    {
-		try
-		{
-		    ImageHeightConstraint = Double.parseDouble(node.getAttribute("Height"));
-		}
-		catch(NumberFormatException ex)
-		{
-		    LOGGER.severe("Widget Image has invalid Height specified: " + node.getAttribute("Height"));
-		    return null;
-		}
-	    }
-	    
-	    return ConfigurationReader.GetImage(fName, ImageHeightConstraint, ImageWidthConstraint);
-	}
-	return null;
-    }
-    
-    private boolean HandleMenuStyleOverride(MenuItem menu, FrameworkNode menuNode)
-    {
-	List<String> styles = new ArrayList<>();
-	
-	FrameworkNode styleNode;
-	if (menuNode.hasChild("StyleOverride"))
-	{
-	    styleNode = menuNode.getChild("StyleOverride");
-	}
-	else
-	{
-	    return false;
-	}
-	
-	for (FrameworkNode node : styleNode.getChildNodes())
-	{
-	    if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
-	    {
-		continue;
-	    }
-	    if (node.getNodeName().equalsIgnoreCase("Item"))
-	    {
-		styles.add(node.getTextContent());
-	    }
-	    else
-	    {
-		LOGGER.severe("Unknown Tag under <StyleOverride>: " + node.getNodeName());
-		return false;
-	    }
-	}
-	String StyleString = "";
-	for (String Style : styles)
-	{
-	    StyleString += Style + ";";
-	}
-	
-	menu.setStyle(StyleString);
-	
-	return true;
-    }
-    
-    private boolean ReadAppMenu(FrameworkNode menuNode, boolean basicInfoOnly)
-    {
-	if (null != _Configuration.getMenuBar())
-	{
-	    return true;
-	}
-	if (menuNode.hasAttribute("Show"))
-	{
-	    String strVal = menuNode.getAttribute("Show");
-	    if (strVal.equalsIgnoreCase("True"))
-	    {
-		_Configuration.setShowMenuBar(true);
-		if (!basicInfoOnly)
-		{
-		    LOGGER.config("Show Menu Bar = TRUE");
-		}
-	    }
-	    else
-	    {
-		_Configuration.setShowMenuBar(false);
-		if (!basicInfoOnly)
-		{
-		    LOGGER.config("Show Menu Bar = FALSE");
+		    RetVal = false;
+		    LOGGER.severe("Duplicate Tab ID's found in <Application> settings: ID=" + ListTabID.get(iIndex));
 		}
 	    }
 	}
-	if (basicInfoOnly)
-	{
-	    return true;
-	}
-	MenuBar objMenuBar = new MenuBar();
-	
-	for (FrameworkNode node : menuNode.getChildNodes())
-	{
-	    if (node.getNodeName().equalsIgnoreCase("Menu"))
-	    {
-		Utility.ValidateAttributes(new String[] { "Title" }, node);
-		if (node.hasAttribute("Title"))
-		{
-		    Menu objMenu = ReadMenu(node.getAttribute("Title"), node);
-		    if (null != objMenu)
-		    {
-			HandleMenuStyleOverride(objMenu, node);
-			
-			objMenuBar.getMenus().add(objMenu);
-			if (node.hasChild("Image"))
-			{
-			    ImageView iv = ConfigurationReader.GetImage(node.getChild("Image"));
-			    if (null != iv)
-			    {
-				objMenu.setGraphic(iv);
-			    }
-			}
-		    }
-		    else
-		    {
-			return false;
-		    }
-		}
-		else
-		{
-		    LOGGER.severe("Invalid Menu defined, no Title");
-		    return false;
-		}
-		
-	    }
-	}
-	_Configuration.setMenuBar(objMenuBar);
-	return true;
-    }
-    
-    public MenuItem ReadMenuItem(FrameworkNode menuNode, int itemIndex)
-    {
-	if (menuNode.getNodeName().equalsIgnoreCase("MenuItem"))
-	{
-	    Utility.ValidateAttributes(new String[] { "Text", "Task", "CreateDataPoint" }, menuNode);
-	    if (menuNode.hasAttribute("Text") && menuNode.hasAttribute("Task"))
-	    {
-		MenuItem objItem = new MenuItem(menuNode.getAttribute("Text"));
-		HandleMenuStyleOverride(objItem, menuNode);
-		
-		if (menuNode.hasChild("Image"))
-		{
-		    ImageView iv = ConfigurationReader.GetImage(menuNode.getChild("Image"));
-		    if (null != iv)
-		    {
-			objItem.setGraphic(iv);
-		    }
-		}
-		
-		if (true == Configuration.getConfig().getAllowTasks())
-		{
-		    List<DataPointGenerator> dataPoints = new ArrayList<>();
-		    
-		    String strTask = menuNode.getAttribute("Task");
-		    if (menuNode.hasAttribute("CreateDataPoint"))
-		    {
-			dataPoints.addAll(ReadDataPointsForTask(itemIndex,menuNode.getAttribute("CreateDataPoint"),
-				menuNode.getAttribute("Text"), menuNode.getAttribute("Task")));
-			if (dataPoints.size() == 0)
-			{
-			    return null;
-			}
-		    }
-		    objItem.setOnAction(new EventHandler<ActionEvent>()
-		    {
-			@Override
-			public void handle(ActionEvent t)
-			{
-			    for (DataPointGenerator dpGen : dataPoints)
-			    {
-				dpGen.generate();
-			    }
-			    TASKMAN.PerformTask(strTask);
-			}
-		    });
-		}
-		return objItem;
-	    }
-	}
-	return null;
-    }
-    
-    public List<MenuItem> ReadMenuItems(FrameworkNode menuNode)
-    {
-	ArrayList<MenuItem> retList = new ArrayList<>();
-	for (FrameworkNode node : menuNode.getChildNodes())
-	{
-	    if (node.getNodeName().equalsIgnoreCase("MenuItem"))
-	    {
-		MenuItem objItem = ReadMenuItem(node,retList.size());
-		if (null != objItem)
-		{
-		    retList.add(objItem);
-		}
-		else
-		{
-		    return null;
-		}
-	    }
-	}
-	
-	return retList;
-    }
-    
-    private Menu ReadMenu(String Title, FrameworkNode menuNode)
-    {
-	Menu objMenu = new Menu(Title);
-	List<MenuItem> items = ReadMenuItems(menuNode);
-	if (null == items)
-	{
-	    LOGGER.severe("Invalid Menu with Title of " + Title + " defined");
-	    return null;
-	    
-	}
-	objMenu.getItems().addAll(items);
-	return objMenu;
-    }
-    
-    public static List<DataPointGenerator> ReadDataPointsForTask(int itemIndex, String strInput, String strTaskText, String strTask)
-    {
-	List<DataPointGenerator> retList = new ArrayList<>();
-	if (strInput.contains("^")) // might be replacement of ^Text or ^Task
-	{
-	    if (strInput.contains("^Text"))
-	    {
-		strInput = strInput.replace("^Text", strTaskText);
-	    }
-	    if (strInput.contains("^Task"))
-	    {
-		strInput = strInput.replace("^Task", strTask);
-	    }
-	    if (strInput.contains("^Index"))
-	    {
-		String strIndex = Integer.toString(itemIndex);
-		strInput = strInput.replace("^Index", strIndex);
-	    }
-	}
-	String[] points = strInput.split("\\]");
-	for (String point : points)
-	{
-	    if (point.length() == 0)
-	    {
-		continue;
-	    }
-	    if (point.charAt(0) == ',' && point.charAt(1) == '[')
-	    {
-		point = point.substring(1);
-	    }
-	    if (point.charAt(0) == '[')
-	    {
-		point = point.substring(1);
-		String[] parts = point.split(",",3);
-		if (parts.length != 3)
-		{
-		    retList.clear();
-		    return retList;
-		}
-		String Namespace = parts[0];
-		String ID = parts[1];
-		String val = parts[2];
-		retList.add(new DataPointGenerator(Namespace,ID,val));
-	    }
-	    else
-	    {
-		    retList.clear();
-		    return retList;
-	    }
-	}
-	
-	
-	return retList;
+	return RetVal;
     }    
 }

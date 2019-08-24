@@ -127,49 +127,6 @@ public class SteelSimpleGaugeBuilder
         return sg;
     }
 
-    private static ArrayList<Section> ProcessSections(FrameworkNode sections)
-    {
-        ArrayList<Section> sectList = new ArrayList<Section>();
-        for (FrameworkNode node :sections.getChildNodes())
-        {
-            if (node.getNodeName().equalsIgnoreCase("#Text"))
-            {
-                continue;
-            }
-            else if (node.getNodeName().equalsIgnoreCase("Section"))
-            {
-                Utility.ValidateAttributes(new String[] {"start","end"},node);      
-                if (node.hasAttribute("start") && node.hasAttribute("end"))
-                {
-                    Section objSect = new Section();
-                    try
-                    {
-                        String str = node.getAttribute("start");
-                        objSect.setStart(Double.parseDouble(str));
-                        str = node.getAttribute("end");
-                        objSect.setStop(Double.parseDouble(str));
-                        sectList.add(objSect);
-                    }
-                    catch (Exception ex)
-                    {
-                        LOGGER.severe("Invalid <Sections> in SteelSimpleGauge Widget Definition File.");
-                        return null;
-                    }
-                }
-                else
-                {
-                    LOGGER.severe("Invalid <Sections> in SteelSimpleGauge Widget Definition File.");
-                    return null;
-                }
-            }
-            else
-            {
-                LOGGER.severe("Invalid <Sections> in SteelSimpleGauge Widget Definition File. Unknown tag: " + node.getNodeName());
-                return null;
-            }
-        }
-        return sectList;
-    }
     protected static List<Pair<Double, Double>> ProcessPercentageSections(FrameworkNode sections)
     {
         ArrayList<Pair<Double, Double>> sectList = new ArrayList<>();
@@ -226,6 +183,49 @@ public class SteelSimpleGaugeBuilder
             }
             else
             {
+                return null;
+            }
+        }
+        return sectList;
+    }
+    private static ArrayList<Section> ProcessSections(FrameworkNode sections)
+    {
+        ArrayList<Section> sectList = new ArrayList<Section>();
+        for (FrameworkNode node :sections.getChildNodes())
+        {
+            if (node.getNodeName().equalsIgnoreCase("#Text"))
+            {
+                continue;
+            }
+            else if (node.getNodeName().equalsIgnoreCase("Section"))
+            {
+                Utility.ValidateAttributes(new String[] {"start","end"},node);      
+                if (node.hasAttribute("start") && node.hasAttribute("end"))
+                {
+                    Section objSect = new Section();
+                    try
+                    {
+                        String str = node.getAttribute("start");
+                        objSect.setStart(Double.parseDouble(str));
+                        str = node.getAttribute("end");
+                        objSect.setStop(Double.parseDouble(str));
+                        sectList.add(objSect);
+                    }
+                    catch (Exception ex)
+                    {
+                        LOGGER.severe("Invalid <Sections> in SteelSimpleGauge Widget Definition File.");
+                        return null;
+                    }
+                }
+                else
+                {
+                    LOGGER.severe("Invalid <Sections> in SteelSimpleGauge Widget Definition File.");
+                    return null;
+                }
+            }
+            else
+            {
+                LOGGER.severe("Invalid <Sections> in SteelSimpleGauge Widget Definition File. Unknown tag: " + node.getNodeName());
                 return null;
             }
         }

@@ -36,12 +36,29 @@ import kutch.biff.marvin.version.Version;
 public class WatchdogTask extends BaseTask
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    private TaskManager TASKMAN = TaskManager.getTaskManager();
-    private boolean FirstWatchdogMessage;
-    private Random rnd = new Random();
-    
     private static WatchdogTask objSingleton = null;
+    public static void ForceRefresh()
+    {
+        if (null != WatchdogTask.objSingleton)
+        {
+            WatchdogTask.objSingleton.FirstWatchdogMessage = true;
+            WatchdogTask.objSingleton.PerformTask();
+        }
+    }
+    // Backdoor kludge to improve initial startup time
+    public static void OnInitialOscarConnection()
+    {
+        if (null != WatchdogTask.objSingleton)
+        {
+            WatchdogTask.objSingleton.PerformTask();
+        }
+    }
     
+    private TaskManager TASKMAN = TaskManager.getTaskManager();
+    
+    private boolean FirstWatchdogMessage;
+
+    private Random rnd = new Random();
     public WatchdogTask()
     {
         FirstWatchdogMessage = true; // tells Oscar to send a refresh to Minions
@@ -69,23 +86,6 @@ public class WatchdogTask extends BaseTask
         {
             FirstWatchdogMessage = false;  // only reset flag after successful transmit
             LOGGER.info("Sent Request Refresh message");
-        }
-    }
-    // Backdoor kludge to improve initial startup time
-    public static void OnInitialOscarConnection()
-    {
-        if (null != WatchdogTask.objSingleton)
-        {
-            WatchdogTask.objSingleton.PerformTask();
-        }
-    }
-
-    public static void ForceRefresh()
-    {
-        if (null != WatchdogTask.objSingleton)
-        {
-            WatchdogTask.objSingleton.FirstWatchdogMessage = true;
-            WatchdogTask.objSingleton.PerformTask();
         }
     }
 }

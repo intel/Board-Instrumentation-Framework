@@ -46,29 +46,24 @@ public class SeriesDataSet
         _ScaleValue = 1.0;
     }
 
-    public void setScaleValue(double dVal)
+    public String getHashKey()
     {
-        _ScaleValue = dVal;
-    }
-    
-    public double getScaleValue()
-    {
-        return _ScaleValue;
+        return Namespace.toUpperCase() + ID.toUpperCase();
     }
     
     public String getID()
     {
         return ID;
     }
-
-    public void setID(String ID)
-    {
-        this.ID = ID;
-    }
-
+    
     public String getNamespace()
     {
         return Namespace;
+    }
+
+    public double getScaleValue()
+    {
+        return _ScaleValue;
     }
 
     @SuppressWarnings("rawtypes")
@@ -76,18 +71,23 @@ public class SeriesDataSet
     {
         return _Series;
     }
-    public void setNamespace(String Namespace)
-    {
-        this.Namespace = Namespace;
-    }
 
     public String getTitle()
     {
         return Title;
     }
-    
-    public String getHashKey()
+    public void setID(String ID)
     {
-        return Namespace.toUpperCase() + ID.toUpperCase();
+        this.ID = ID;
+    }
+
+    public void setNamespace(String Namespace)
+    {
+        this.Namespace = Namespace;
+    }
+    
+    public void setScaleValue(double dVal)
+    {
+        _ScaleValue = dVal;
     }
 }

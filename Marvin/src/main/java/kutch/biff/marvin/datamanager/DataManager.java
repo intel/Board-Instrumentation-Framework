@@ -53,14 +53,19 @@ public class DataManager
     private static DataManager _DataManager = null;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     
+    public static DataManager getDataManager()
+    {
+	return _DataManager;
+    }
     private ConcurrentHashMap<String, DataSet> _DataMap;
     private Map<String, List<GenerateDatapointInfo>> _ProxyIDMap;
     private ConcurrentHashMap<String, List<WildcardListItem>> _WildcardDataMap;
-    private final Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> _OnDemandQueue; // a queue solves some of
-											       // my concurency issues
+											       private final Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> _OnDemandQueue; // a queue solves some of
+    // my concurency issues
     private final Queue<GenerateDatapointInfo> __GenerateDatapointList;
     private long _UpdateCount;
     private long _UnassignedDataPoints;
+    
     private boolean __DynamicTabRegistered = false;
     
     public DataManager()
@@ -73,11 +78,6 @@ public class DataManager
 	_OnDemandQueue = new ConcurrentLinkedQueue<>();
 	__GenerateDatapointList = new ConcurrentLinkedQueue<>();
 	_ProxyIDMap = new HashMap<>();
-    }
-    
-    public boolean DynamicTabRegistered()
-    {
-	return __DynamicTabRegistered;
     }
     
     public boolean AddGenerateDatapointInfo(GenerateDatapointInfo genInfo)
@@ -102,99 +102,6 @@ public class DataManager
 	return true;
     }
     
-    public void UpdateGenerateDatapointProxy(String proxyID, String newNamespaceCriteria, String newIDCriterea, String newListEntry)
-    {
-	if (!_ProxyIDMap.containsKey(proxyID.toUpperCase()))
-	{
-	    LOGGER.warning("Unknown ProxyID: " + proxyID);
-	    return;
-	}
-	
-	LOGGER.info("Updating proxy [" + proxyID + "] to [" + newNamespaceCriteria + ":" + newIDCriterea + "]");
-	for (GenerateDatapointInfo genInfo : _ProxyIDMap.get(proxyID.toUpperCase()))
-	{
-	    genInfo.ProxyReset(newNamespaceCriteria, newIDCriterea,newListEntry);
-	}
-    }
-    
-    public Queue<GenerateDatapointInfo> getGenerateDatapointList()
-    {
-	return __GenerateDatapointList;
-    }
-    
-    public void AddOnDemandWidgetCriterea(DynamicItemInfoContainer criterea, OnDemandWidgetBuilder objBuilder)
-    {
-	_OnDemandQueue.add(new Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>(criterea, objBuilder));
-	
-	if (objBuilder instanceof OnDemandTabBuilder)
-	{
-	    __DynamicTabRegistered = true; // flag so can know if something is registered for startup check for any tabs
-	}
-    }
-    
-    public Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> getOnDemandList()
-    {
-	return _OnDemandQueue;
-    }
-    
-    public static DataManager getDataManager()
-    {
-	return _DataManager;
-    }
-    
-    public int NumberOfRegisteredDatapoints()
-    {
-	return _DataMap.size();
-    }
-    
-    public int getQueuedSize()
-    {
-	int tSize = 0;
-	for (Map.Entry<String, DataSet> entry : _DataMap.entrySet())
-	{
-	    DataSet objData = entry.getValue();
-	    tSize += objData.getSize();
-	}
-	return tSize;
-    }
-    
-    public long getUpdateCount()
-    {
-	return _UpdateCount;
-    }
-    
-    public long getUnassignedCount()
-    {
-	return _UnassignedDataPoints;
-    }
-    
-    public void RemoveListener(String ID, String Namespace, ChangeListener<?> listener)
-    {
-	if (null == ID || null == Namespace)
-	{
-	    return;
-	}
-	
-	String Key = Utility.generateKey(Namespace, ID);
-	
-	if (_DataMap.containsKey(Key))
-	{
-	    synchronized (this)
-	    {
-		_DataMap.get(Key).removeListener(listener);
-	    }
-	}
-    }
-    
-    public void RemoveListener(ChangeListener<?> listener)
-    {
-	// super inefficient.....
-	for (String key : _DataMap.keySet())
-	{
-	    _DataMap.get(key).removeListener(listener);
-	}
-    }
-    
     public void AddListener(String ID, String Namespace, ChangeListener<?> listener)
     {
 	if (null == ID || null == Namespace)
@@ -210,6 +117,16 @@ public class DataManager
 	}
 	
 	_DataMap.get(Key).addListener(listener);
+    }
+    
+    public void AddOnDemandWidgetCriterea(DynamicItemInfoContainer criterea, OnDemandWidgetBuilder objBuilder)
+    {
+	_OnDemandQueue.add(new Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>(criterea, objBuilder));
+	
+	if (objBuilder instanceof OnDemandTabBuilder)
+	{
+	    __DynamicTabRegistered = true; // flag so can know if something is registered for startup check for any tabs
+	}
     }
     
     public void AddWildcardListener(String ID, String Namespace, ChangeListener<?> listener)
@@ -243,25 +160,6 @@ public class DataManager
 	WildcardListItem item = new WildcardListItem(ID);
 	item.getDataSet().addListener(listener);
 	_WildcardDataMap.get(Key).add(item);
-    }
-    
-    private boolean HandleWildcardChangeValue(String ID, String Namespace, String Value)
-    {
-	String Key = Namespace.toUpperCase();
-	boolean RetVal = false;
-	if (_WildcardDataMap.containsKey(Key))
-	{
-	    for (WildcardListItem wcNode : _WildcardDataMap.get(Key)) // go through the list for the namespace
-	    {
-		if (wcNode.Matches(ID))
-		{
-		    wcNode.getDataSet().setLatestValue(ID + ":" + Value); // need 2 pass ID here, since it's a RegEx
-		    RetVal = true;
-		}
-	    }
-	}
-	
-	return RetVal;
     }
     
     public void ChangeValue(String ID, String Namespace, String Value)
@@ -336,6 +234,42 @@ public class DataManager
 	}
     }
     
+    public boolean DynamicTabRegistered()
+    {
+	return __DynamicTabRegistered;
+    }
+    
+    public Queue<GenerateDatapointInfo> getGenerateDatapointList()
+    {
+	return __GenerateDatapointList;
+    }
+    
+    public Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> getOnDemandList()
+    {
+	return _OnDemandQueue;
+    }
+    
+    public int getQueuedSize()
+    {
+	int tSize = 0;
+	for (Map.Entry<String, DataSet> entry : _DataMap.entrySet())
+	{
+	    DataSet objData = entry.getValue();
+	    tSize += objData.getSize();
+	}
+	return tSize;
+    }
+    
+    public long getUnassignedCount()
+    {
+	return _UnassignedDataPoints;
+    }
+    
+    public long getUpdateCount()
+    {
+	return _UpdateCount;
+    }
+    
     public String GetValue(String ID, String Namespace)
     {
 	synchronized (this)
@@ -374,6 +308,30 @@ public class DataManager
 	    }
 	    return null;
 	}
+    }
+    
+    private boolean HandleWildcardChangeValue(String ID, String Namespace, String Value)
+    {
+	String Key = Namespace.toUpperCase();
+	boolean RetVal = false;
+	if (_WildcardDataMap.containsKey(Key))
+	{
+	    for (WildcardListItem wcNode : _WildcardDataMap.get(Key)) // go through the list for the namespace
+	    {
+		if (wcNode.Matches(ID))
+		{
+		    wcNode.getDataSet().setLatestValue(ID + ":" + Value); // need 2 pass ID here, since it's a RegEx
+		    RetVal = true;
+		}
+	    }
+	}
+	
+	return RetVal;
+    }
+    
+    public int NumberOfRegisteredDatapoints()
+    {
+	return _DataMap.size();
     }
     
     public int PerformUpdates()
@@ -427,5 +385,47 @@ public class DataManager
 	}
 	
 	return count;
+    }
+    
+    public void RemoveListener(ChangeListener<?> listener)
+    {
+	// super inefficient.....
+	for (String key : _DataMap.keySet())
+	{
+	    _DataMap.get(key).removeListener(listener);
+	}
+    }
+    
+    public void RemoveListener(String ID, String Namespace, ChangeListener<?> listener)
+    {
+	if (null == ID || null == Namespace)
+	{
+	    return;
+	}
+	
+	String Key = Utility.generateKey(Namespace, ID);
+	
+	if (_DataMap.containsKey(Key))
+	{
+	    synchronized (this)
+	    {
+		_DataMap.get(Key).removeListener(listener);
+	    }
+	}
+    }
+    
+    public void UpdateGenerateDatapointProxy(String proxyID, String newNamespaceCriteria, String newIDCriterea, String newListEntry)
+    {
+	if (!_ProxyIDMap.containsKey(proxyID.toUpperCase()))
+	{
+	    LOGGER.warning("Unknown ProxyID: " + proxyID);
+	    return;
+	}
+	
+	LOGGER.info("Updating proxy [" + proxyID + "] to [" + newNamespaceCriteria + ":" + newIDCriterea + "]");
+	for (GenerateDatapointInfo genInfo : _ProxyIDMap.get(proxyID.toUpperCase()))
+	{
+	    genInfo.ProxyReset(newNamespaceCriteria, newIDCriterea,newListEntry);
+	}
     }
 }

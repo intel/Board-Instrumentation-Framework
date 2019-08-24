@@ -48,6 +48,7 @@ import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
 public class DynamicGridWidget extends GridWidget
 {
 
+    private static int _AutoAdvanceGridNumber = 0;
     private final HashMap<String, DynamicGrid> _GridMap;
     private final HashMap<String, String> _TaskOnGridActivatekMap;
     private final CircularList<String> _ListID;
@@ -56,7 +57,6 @@ public class DynamicGridWidget extends GridWidget
     private boolean _AutoAdvance;
     private boolean _AutoLoopWithAdvance;
     private int _AutoAdvanceInterval;
-    private static int _AutoAdvanceGridNumber = 0;
     private GridPane _TransitionPane;
     private DynamicTransition _latestTransition;
 
@@ -72,6 +72,158 @@ public class DynamicGridWidget extends GridWidget
         _AutoAdvanceInterval = 0;
         _TransitionPane = null;
         _latestTransition = null;
+    }
+
+    private void ActivateGrid(String key)
+    {
+        String prevKey = _CurrentKey;
+        key = key.toLowerCase();
+
+        if (_GridMap.containsKey(key)) // specified grid ID is valid, so let's proceed
+        {
+            DynamicGrid objGridCurrent, objGridNext;
+            objGridCurrent = null;
+            if (prevKey != null && !prevKey.equalsIgnoreCase(key))
+            {
+                objGridCurrent = _GridMap.get(prevKey);
+                if (null != objGridCurrent)
+                {
+                    //objGridCurrent.getStylableObject().setVisible(false);
+                }
+            }
+            objGridNext = _GridMap.get(key);
+            if (null != objGridNext)
+            {
+                setAlignment(objGridNext.getAlignment());
+                getGridPane().setAlignment(getPosition());
+                if (null == objGridCurrent)
+                {
+                    objGridNext.getStylableObject().setVisible(true);
+                }
+                else
+                {
+                    if (null != _latestTransition && _latestTransition.stillPlaying())
+                    {
+                        _latestTransition.stopTransition(); // current transition still playing, so stop it
+                    }
+                    _latestTransition = objGridNext.getTransition(objGridCurrent, _TransitionPane);
+                }
+                _CurrentKey = key;
+            }
+
+            if (_TaskOnGridActivatekMap.containsKey(key))  // Grid now active - is there a task associated with it?
+            {
+                TASKMAN.PerformTask(_TaskOnGridActivatekMap.get(key)); // yup, go run it!
+            }
+        }
+        else
+        {
+            LOGGER.warning("Received unknown ID: [" + key + "] for DynamicGrid #" + getName() + ": [" + getNamespace() + ":" + getMinionID() + "]");
+            return;
+        }
+        if (_AutoAdvance)
+        {
+            if (!_AutoLoopWithAdvance && _ListID.IsLast(key))
+            {
+                _AutoAdvance = false;
+                return;
+            }
+            MarvinTask mt = new MarvinTask();
+            mt.AddDataset(getMinionID(), getNamespace(), "Next");
+            TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
+        }
+    }
+
+    private GridWidget BuildGrid(FrameworkNode node)
+    {
+        GridWidget retWidget = new DynamicGrid(); // DynamicGrid is a superset, so can do this
+
+        if (true == node.hasAttribute("Source") || node.hasAttribute("Macro"))
+        {
+            FrameworkNode GridNode = null;
+            AliasMgr.getAliasMgr().PushAliasList(true);
+            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
+                                                    {
+                                                        "hgap", "vgap", "Align", "Source", "ID"
+            });
+            if (node.hasAttribute("Source"))
+            {
+                if (false == AliasMgr.ReadAliasFromExternalFile(node.getAttribute("Source")))
+                {
+                    AliasMgr.getAliasMgr().PopAliasList();
+                    return null;
+                }
+                WidgetBuilder.StartReadingExternalFile(node);
+                GridNode = WidgetBuilder.OpenDefinitionFile(node.getAttribute("Source"), "Grid");
+                if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("Source"))) // could also be tasks defined in external file
+                {
+                    return null;
+                }
+                WidgetBuilder.DoneReadingExternalFile();
+            }
+            else
+            {
+                GridNode = GridMacroMgr.getGridMacroMgr().getGridMacro(node.getAttribute("Macro"));
+                if (null == GridNode)
+                {
+                    LOGGER.severe("Unknown Grid Macro [" + node.getAttribute("Macro") + "] specified for Dynamic Grid Source");
+                }
+            }
+
+            if (null == GridNode)
+            {
+                return null;
+            }
+            retWidget = ReadGridInfo(GridNode, retWidget, null); // read grid from external file
+            if (null == retWidget)
+            {
+                return null;
+            }
+            if (node.hasAttribute("hgap"))
+            {
+                if (retWidget.parsehGapValue(node))
+                {
+                    LOGGER.config("Setting hGap for DynamicGrid :" + node.getAttribute("hgap"));
+                }
+                else
+                {
+                    LOGGER.warning("hgap for DynamicGrid  invalid: " + node.getAttribute("hgap") + ".  Ignoring");
+                    return null;
+                }
+            }
+            if (node.hasAttribute("vgap"))
+            {
+                if (retWidget.parsevGapValue(node))
+                {
+                    LOGGER.config("Setting vGap for DynamicGrid :" + node.getAttribute("vgap"));
+                }
+                else
+                {
+                    LOGGER.warning("vgap for DynamicGrid invalid: " + node.getAttribute("vgap") + ".  Ignoring");
+                    return null;
+                }
+            }
+            if (true == node.hasAttribute("Align"))
+            {
+                String str = node.getAttribute("Align");
+                retWidget.setAlignment(str);
+            }
+            else
+            {
+                retWidget.setAlignment(getAlignment()); // if one wasn't specifice for the grid file, use whatever the master for the widget is.
+            }
+
+            if (node.hasAttribute("Task"))
+            {
+                retWidget.setTaskID(node.getAttribute("Task"));
+            }
+            else if (null != getTaskID())
+            {
+                retWidget.setTaskID(getTaskID()); // if no task setup for individual grid, use the one for this grid
+            }
+            AliasMgr.getAliasMgr().PopAliasList();
+        }
+        return retWidget;
     }
 
     @Override
@@ -190,102 +342,6 @@ public class DynamicGridWidget extends GridWidget
         return false;
     }
 
-    private void ActivateGrid(String key)
-    {
-        String prevKey = _CurrentKey;
-        key = key.toLowerCase();
-
-        if (_GridMap.containsKey(key)) // specified grid ID is valid, so let's proceed
-        {
-            DynamicGrid objGridCurrent, objGridNext;
-            objGridCurrent = null;
-            if (prevKey != null && !prevKey.equalsIgnoreCase(key))
-            {
-                objGridCurrent = _GridMap.get(prevKey);
-                if (null != objGridCurrent)
-                {
-                    //objGridCurrent.getStylableObject().setVisible(false);
-                }
-            }
-            objGridNext = _GridMap.get(key);
-            if (null != objGridNext)
-            {
-                setAlignment(objGridNext.getAlignment());
-                getGridPane().setAlignment(getPosition());
-                if (null == objGridCurrent)
-                {
-                    objGridNext.getStylableObject().setVisible(true);
-                }
-                else
-                {
-                    if (null != _latestTransition && _latestTransition.stillPlaying())
-                    {
-                        _latestTransition.stopTransition(); // current transition still playing, so stop it
-                    }
-                    _latestTransition = objGridNext.getTransition(objGridCurrent, _TransitionPane);
-                }
-                _CurrentKey = key;
-            }
-
-            if (_TaskOnGridActivatekMap.containsKey(key))  // Grid now active - is there a task associated with it?
-            {
-                TASKMAN.PerformTask(_TaskOnGridActivatekMap.get(key)); // yup, go run it!
-            }
-        }
-        else
-        {
-            LOGGER.warning("Received unknown ID: [" + key + "] for DynamicGrid #" + getName() + ": [" + getNamespace() + ":" + getMinionID() + "]");
-            return;
-        }
-        if (_AutoAdvance)
-        {
-            if (!_AutoLoopWithAdvance && _ListID.IsLast(key))
-            {
-                _AutoAdvance = false;
-                return;
-            }
-            MarvinTask mt = new MarvinTask();
-            mt.AddDataset(getMinionID(), getNamespace(), "Next");
-            TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
-        }
-    }
-
-    @Override
-    public boolean PerformPostCreateActions(GridWidget objParentGrid, boolean updateToolTipOnly)
-    {
-        if (true == updateToolTipOnly)
-        {
-            if (CONFIG.isDebugMode())
-            {
-                _ToolTip = this.toString();
-            }
-            if (_ToolTip != null && null != getStylableObject())
-            {
-                HandleToolTipInit();
-                Tooltip.install(this.getStylableObject(), _objToolTip);
-            }
-            return super.PerformPostCreateActions(objParentGrid, updateToolTipOnly);
-        }
-
-        _WidgetParentGridWidget = objParentGrid;
-        if (CONFIG.isDebugMode())
-        {
-            _ToolTip = this.toString();
-        }
-        if (_ToolTip != null)
-        {
-            HandleToolTipInit();
-            for (String key : _GridMap.keySet())
-            {
-                DynamicGrid objGrid = _GridMap.get(key);
-                Tooltip.install(objGrid.getStylableObject(), _objToolTip);
-            }
-        }
-        super.PerformPostCreateActions(objParentGrid, updateToolTipOnly);
-
-        return handlePercentageDimentions();
-    }
-
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode node)
     {
@@ -398,98 +454,6 @@ public class DynamicGridWidget extends GridWidget
         return true;
     }
 
-    private GridWidget BuildGrid(FrameworkNode node)
-    {
-        GridWidget retWidget = new DynamicGrid(); // DynamicGrid is a superset, so can do this
-
-        if (true == node.hasAttribute("Source") || node.hasAttribute("Macro"))
-        {
-            FrameworkNode GridNode = null;
-            AliasMgr.getAliasMgr().PushAliasList(true);
-            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(node, new String[]
-                                                    {
-                                                        "hgap", "vgap", "Align", "Source", "ID"
-            });
-            if (node.hasAttribute("Source"))
-            {
-                if (false == AliasMgr.ReadAliasFromExternalFile(node.getAttribute("Source")))
-                {
-                    AliasMgr.getAliasMgr().PopAliasList();
-                    return null;
-                }
-                WidgetBuilder.StartReadingExternalFile(node);
-                GridNode = WidgetBuilder.OpenDefinitionFile(node.getAttribute("Source"), "Grid");
-                if (!ConfigurationReader.ReadTasksFromExternalFile(node.getAttribute("Source"))) // could also be tasks defined in external file
-                {
-                    return null;
-                }
-                WidgetBuilder.DoneReadingExternalFile();
-            }
-            else
-            {
-                GridNode = GridMacroMgr.getGridMacroMgr().getGridMacro(node.getAttribute("Macro"));
-                if (null == GridNode)
-                {
-                    LOGGER.severe("Unknown Grid Macro [" + node.getAttribute("Macro") + "] specified for Dynamic Grid Source");
-                }
-            }
-
-            if (null == GridNode)
-            {
-                return null;
-            }
-            retWidget = ReadGridInfo(GridNode, retWidget, null); // read grid from external file
-            if (null == retWidget)
-            {
-                return null;
-            }
-            if (node.hasAttribute("hgap"))
-            {
-                if (retWidget.parsehGapValue(node))
-                {
-                    LOGGER.config("Setting hGap for DynamicGrid :" + node.getAttribute("hgap"));
-                }
-                else
-                {
-                    LOGGER.warning("hgap for DynamicGrid  invalid: " + node.getAttribute("hgap") + ".  Ignoring");
-                    return null;
-                }
-            }
-            if (node.hasAttribute("vgap"))
-            {
-                if (retWidget.parsevGapValue(node))
-                {
-                    LOGGER.config("Setting vGap for DynamicGrid :" + node.getAttribute("vgap"));
-                }
-                else
-                {
-                    LOGGER.warning("vgap for DynamicGrid invalid: " + node.getAttribute("vgap") + ".  Ignoring");
-                    return null;
-                }
-            }
-            if (true == node.hasAttribute("Align"))
-            {
-                String str = node.getAttribute("Align");
-                retWidget.setAlignment(str);
-            }
-            else
-            {
-                retWidget.setAlignment(getAlignment()); // if one wasn't specifice for the grid file, use whatever the master for the widget is.
-            }
-
-            if (node.hasAttribute("Task"))
-            {
-                retWidget.setTaskID(node.getAttribute("Task"));
-            }
-            else if (null != getTaskID())
-            {
-                retWidget.setTaskID(getTaskID()); // if no task setup for individual grid, use the one for this grid
-            }
-            AliasMgr.getAliasMgr().PopAliasList();
-        }
-        return retWidget;
-    }
-
     @Override
     public void OnResumed()
     {
@@ -513,5 +477,41 @@ public class DynamicGridWidget extends GridWidget
             mt.AddDataset(getMinionID(), getNamespace(), "Next");
             TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
         }
+    }
+
+    @Override
+    public boolean PerformPostCreateActions(GridWidget objParentGrid, boolean updateToolTipOnly)
+    {
+        if (true == updateToolTipOnly)
+        {
+            if (CONFIG.isDebugMode())
+            {
+                _ToolTip = this.toString();
+            }
+            if (_ToolTip != null && null != getStylableObject())
+            {
+                HandleToolTipInit();
+                Tooltip.install(this.getStylableObject(), _objToolTip);
+            }
+            return super.PerformPostCreateActions(objParentGrid, updateToolTipOnly);
+        }
+
+        _WidgetParentGridWidget = objParentGrid;
+        if (CONFIG.isDebugMode())
+        {
+            _ToolTip = this.toString();
+        }
+        if (_ToolTip != null)
+        {
+            HandleToolTipInit();
+            for (String key : _GridMap.keySet())
+            {
+                DynamicGrid objGrid = _GridMap.get(key);
+                Tooltip.install(objGrid.getStylableObject(), _objToolTip);
+            }
+        }
+        super.PerformPostCreateActions(objParentGrid, updateToolTipOnly);
+
+        return handlePercentageDimentions();
     }
 }

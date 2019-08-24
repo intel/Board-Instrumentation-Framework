@@ -47,6 +47,50 @@ public class StackedBarChartWidget extends BarChartWidget
         _isStackedChart = true;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    protected Chart CreateChartObject()
+    {
+        ArrayList<String> list = new ArrayList<>();
+
+        for (String key : _SeriesOrder)
+        {
+            if (null == _SeriesMap.get(key))
+            {
+                LOGGER.severe("Unexpected probelm in CreateChartObject");
+                break;
+            }
+            
+            ArrayList<SeriesDataSet> setList = _SeriesMap.get(key).getSeriesList();
+            if (null == setList)
+            {
+                LOGGER.severe("Unexpected probelm in CreateChartObject");
+                break;
+            }
+            
+            for (SeriesDataSet set : setList)
+            {
+                list.add(set.getTitle());
+            }
+            break; 
+        }
+
+        getAxis_X().setCategories(FXCollections.observableArrayList(list));
+        return new StackedBarChart<String, Number>(getAxis_X(), getyAxis());
+    }
+
+    @Override
+    public javafx.scene.Node getStylableObject()
+    {
+        return ((getChart()));
+    }
+
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+        return ((StackedBarChart<?, ?>) (getChart())).getStylesheets();
+    }
+
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void setupListeners(DataManager dataMgr)
@@ -119,49 +163,6 @@ public class StackedBarChartWidget extends BarChartWidget
             ((StackedBarChart) getChart()).getData().add(objSeries);
 
         }
-    }
-
-    @Override
-    protected Chart CreateChartObject()
-    {
-        ArrayList<String> list = new ArrayList<>();
-
-        for (String key : _SeriesOrder)
-        {
-            if (null == _SeriesMap.get(key))
-            {
-                LOGGER.severe("Unexpected probelm in CreateChartObject");
-                break;
-            }
-            
-            ArrayList<SeriesDataSet> setList = _SeriesMap.get(key).getSeriesList();
-            if (null == setList)
-            {
-                LOGGER.severe("Unexpected probelm in CreateChartObject");
-                break;
-            }
-            
-            for (SeriesDataSet set : setList)
-            {
-                list.add(set.getTitle());
-            }
-            break; 
-        }
-
-        getAxis_X().setCategories(FXCollections.observableArrayList(list));
-        return new StackedBarChart<String, Number>(getAxis_X(), getyAxis());
-    }
-
-    @Override
-    public javafx.scene.Node getStylableObject()
-    {
-        return ((StackedBarChart) (getChart()));
-    }
-
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-        return ((StackedBarChart) (getChart())).getStylesheets();
     }
 
 }

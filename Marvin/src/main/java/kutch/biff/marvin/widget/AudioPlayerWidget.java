@@ -36,63 +36,29 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class AudioPlayerWidget extends MediaPlayerWidget
 {
-    private Button _objDummyButton;
     private static boolean _HasBeenVerified = false;
     private static boolean _IsValid = true;
+    private Button _objDummyButton;
     
 
-    @Override
-    public boolean HasBeenVerified()
-    {
-        return AudioPlayerWidget._HasBeenVerified;
-    }
-
-    @Override
-    public void setHasBeenVerified(boolean _HasBeenVerified)
-    {
-        AudioPlayerWidget._HasBeenVerified = _HasBeenVerified;
-    }
-
-    @Override
-    public boolean IsValid()
-    {
-        return _IsValid;
-    }
-    
-    @Override
-    public void SetIsValid(boolean flag)
-    {
-        _IsValid = flag;
-    }
-    
     public AudioPlayerWidget()
     {
         super("AudioPlayerWidget");
         _objDummyButton = new Button();
         _objDummyButton.setVisible(false);
     }
-    
+
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
         return Create(dataMgr);
     }
-    
+
     @Override
-    protected boolean VerifyMedia(Media objMedia)
+    public Node getStylableObject()
     {
-        return true;
-    }
-    @Override
-    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
-    {
-        return HandleWidgetSpecificSettings(node,"Audio");
-    }
-    @Override
-    protected boolean OnNewMedia(MediaPlayer objMediaPlayer)
-    {
-        return true;
+        return _objDummyButton;
     }
     
     @Override
@@ -100,11 +66,45 @@ public class AudioPlayerWidget extends MediaPlayerWidget
     {
         return _objDummyButton.getStylesheets();
     }
+    
+    @Override
+    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
+    {
+        return HandleWidgetSpecificSettings(node,"Audio");
+    }
+    
+    @Override
+    public boolean HasBeenVerified()
+    {
+        return AudioPlayerWidget._HasBeenVerified;
+    }
+    
+    @Override
+    public boolean IsValid()
+    {
+        return _IsValid;
+    }
+    @Override
+    protected boolean OnNewMedia(MediaPlayer objMediaPlayer)
+    {
+        return true;
+    }
+    @Override
+    public void setHasBeenVerified(boolean _HasBeenVerified)
+    {
+        AudioPlayerWidget._HasBeenVerified = _HasBeenVerified;
+    }
+    
+    @Override
+    public void SetIsValid(boolean flag)
+    {
+        _IsValid = flag;
+    }
 
     @Override
-    public Node getStylableObject()
+    protected boolean VerifyMedia(Media objMedia)
     {
-        return _objDummyButton;
+        return true;
     }
    
 }

@@ -47,15 +47,6 @@ public class PostponedTask
         _PerformTime = System.currentTimeMillis() + Period;
     }
 
-    public boolean ReadyToPerform()
-    {
-        if (System.currentTimeMillis() >= _PerformTime)
-        {
-            return true;
-        }
-        return false;
-    }
-
     public void Perform()
     {
         if (null == _objTask)
@@ -64,6 +55,15 @@ public class PostponedTask
             return;
         }
         _objTask.PerformTask();
+    }
+
+    public boolean ReadyToPerform()
+    {
+        if (System.currentTimeMillis() >= _PerformTime)
+        {
+            return true;
+        }
+        return false;
     }
 
 }

@@ -33,9 +33,9 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 public class DataSrcParameter extends Parameter
 {
+   private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
    private final String _Namespace, _ID;
-   private final DataManager _DataMgr;
-   private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());    
+   private final DataManager _DataMgr;    
 
    public DataSrcParameter(String Namespace, String ID, DataManager DataMgr)
    {

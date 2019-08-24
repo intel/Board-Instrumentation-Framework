@@ -47,6 +47,11 @@ public class ListBoxText extends BaseWidget
       _listView = new ListView<>(_list);
     }
     
+    public void addEntry(String strNewEntry)
+    {
+        _list.add(strNewEntry);
+    }
+    
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
@@ -76,17 +81,6 @@ public class ListBoxText extends BaseWidget
 
     }
     
-    public void addEntry(String strNewEntry)
-    {
-        _list.add(strNewEntry);
-    }
-    
-
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-        return _listView.getStylesheets();
-    }
 
     @Override
     public Node getStylableObject()
@@ -95,14 +89,20 @@ public class ListBoxText extends BaseWidget
     }
 
     @Override
-    public void UpdateTitle(String newTitle)
+    public ObservableList<String> getStylesheets()
     {
-        
+        return _listView.getStylesheets();
     }
+
     @Override
     public void SetInitialValue(String value)
     {
         addEntry(value);
+    }
+    @Override
+    public void UpdateTitle(String newTitle)
+    {
+        
     }
 
 }

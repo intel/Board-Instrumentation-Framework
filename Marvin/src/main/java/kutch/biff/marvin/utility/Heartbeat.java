@@ -47,16 +47,6 @@ public class Heartbeat extends TimerTask
         _ThreadNameSet = false;
     }
     
-    public void Start()
-    {
-        _heartbeatTimer.scheduleAtFixedRate(this, 100, _interval);
-    }
-    
-    public void Stop()
-    {
-        _heartbeatTimer.cancel();
-    }
-    
     @Override
     public void run()
     {
@@ -66,5 +56,15 @@ public class Heartbeat extends TimerTask
             Thread.currentThread().setName("Heartbeat Thread");
         }
         TaskManager.getTaskManager().PerformTask(_HeartbeatTaskID);
+    }
+    
+    public void Start()
+    {
+        _heartbeatTimer.scheduleAtFixedRate(this, 100, _interval);
+    }
+    
+    public void Stop()
+    {
+        _heartbeatTimer.cancel();
     }
 }

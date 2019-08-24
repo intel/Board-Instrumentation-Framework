@@ -38,6 +38,30 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class SteelGaugeRadialWidget extends BaseWidget
 {
+    protected static String DumpDimensions(String ID, Radial objGauge)
+    {
+        String prefWidth = "Pref Width: " + objGauge.getPrefWidth() + " ";
+        String prefHeight = "Pref Height: " + objGauge.getPrefHeight() + " ";
+        String maxWidth = "MAX Width: " + objGauge.getMaxWidth() + " ";
+        String maxHeight = "MAX Width: " + objGauge.getMaxWidth() + " ";
+        String minWidth = "MIN Width: " + objGauge.getMinWidth() + " ";
+        String minHeight = "MIN Height: " + objGauge.getMinHeight() + " ";
+        String currWidth = "Curr Width: " + objGauge.getWidth() + " ";
+        String currHeight = "Curr Height: " + objGauge.getHeight() + " ";
+
+        String retString = "Dimensions for " + ID + " Widget\n";
+        retString += "Current";
+        retString += "\t" + currWidth + "\t" + currHeight;
+        retString += "\nPreferred";
+        retString += "\t" + prefWidth + "\t" + prefHeight;
+        retString += "\nMaximum";
+        retString += "\t" + maxWidth + "\t" + maxHeight;
+        retString += "\nMinimum";
+        retString += "\t" + minWidth + "\t" + minHeight;
+
+        return retString;
+
+    }
     private String UnitText;
     private double MinValue;
     private double MaxValue;
@@ -55,6 +79,7 @@ public class SteelGaugeRadialWidget extends BaseWidget
     private GridPane _ParentGridPane;
     private double _InitialValue = 0;
     private double MajorTickCount = 0;
+
     private double MinorTickCount = 0;
 
     public SteelGaugeRadialWidget()
@@ -121,63 +146,14 @@ public class SteelGaugeRadialWidget extends BaseWidget
         return ApplyCSS();
     }
 
-    private boolean SetupGauge()
+    public double getMajorTickCount()
     {
-        _Gauge.setMinValue(MinValue);
-        _Gauge.setMaxValue(MaxValue);
-        // For some reason there is a bug in this gauge, so going to IGNORE this field for now
-//        _Gauge.setStartAngle(DialStartAngle);
-//        _Gauge.setAngleRange(DialRangeAngle);
-        _Gauge.setTickLabelOrientation(eOrientation);
-
-        if (getTitle().length() > 0)
-        {
-            _Gauge.setTitle(getTitle());
-        }
-        SetupTicksFromTickCount();
-        if (MajorTick > 0)
-        {
-            _Gauge.setMajorTickSpace(MajorTick);
-        }
-        if (MinorTick > 0)
-        {
-            _Gauge.setMinorTickSpace(MinorTick);
-        }
-        if (null != getUnitsOverride())
-        {
-            _Gauge.setUnit(getUnitsOverride());
-            LOGGER.config("Overriding Widget Units Text to " + getUnitsOverride());
-        }
-        else if (UnitText.length() > 0)
-        {
-            _Gauge.setUnit(UnitText);
-        }
-//        if (null != Sections)
-//        {
-//            _Gauge.setSections(Sections);
-//        }
-
-        _Gauge.setDecimals(getDecimalPlaces());
-        ConfigureDimentions();
-        SetupTaskAction();
-        ConfigureAlignment();
-
-//        _Gauge.setMouseTransparent(true);
-        //LOGGER.config(DumpDimensions("SteelGauge take 2", _Gauge));
-        return true;
+        return MajorTickCount;
     }
 
-    @Override
-    public void SetInitialValue(String value)
+    public double getMinorTickCount()
     {
-        try
-        {
-            _InitialValue = Double.parseDouble(value);
-        }
-        catch (NumberFormatException ex)
-        {
-            LOGGER.severe("Invalid Default Value data for SteelGaugeRadial  Gauge: " + value);
-        }
+        return MinorTickCount;
     }
 
     @Override
@@ -186,85 +162,27 @@ public class SteelGaugeRadialWidget extends BaseWidget
         return _Gauge;
     }
 
-    public void setUnitText(String UnitText)
-    {
-        this.UnitText = UnitText;
-    }
-
-    public void setDialRangeAngle(int DialRangeAngle)
-    {
-        this.DialRangeAngle = DialRangeAngle;
-    }
-
-    public void setOrientation(TickLabelOrientation eOrientation)
-    {
-        this.eOrientation = eOrientation;
-    }
-
-    public void setMinValue(double MinValue)
-    {
-        this.MinValue = MinValue;
-    }
-
-    public void setMaxValue(double MaxValue)
-    {
-        this.MaxValue = MaxValue;
-    }
-
-    public void setDialStartAngle(int DialStartAngle)
-    {
-        this.DialStartAngle = DialStartAngle;
-    }
-
-    public void setRangeAngle(int DialEndAngle)
-    {
-        this.DialRangeAngle = DialEndAngle;
-    }
-
-    public void setMajorTick(double MajorTick)
-    {
-        this.MajorTick = MajorTick;
-    }
-
-    public void setMinorTick(double MinorTick)
-    {
-        this.MinorTick = MinorTick;
-    }
-
-    public void setEnhancedRateText(boolean EnhancedRateText)
-    {
-        this.EnhancedRateText = EnhancedRateText;
-    }
-
     @Override
     public ObservableList<String> getStylesheets()
     {
         return _Gauge.getStylesheets();
     }
 
-    protected static String DumpDimensions(String ID, Radial objGauge)
+    protected void HandleSteppedRange(double newValue)
     {
-        String prefWidth = "Pref Width: " + objGauge.getPrefWidth() + " ";
-        String prefHeight = "Pref Height: " + objGauge.getPrefHeight() + " ";
-        String maxWidth = "MAX Width: " + objGauge.getMaxWidth() + " ";
-        String maxHeight = "MAX Width: " + objGauge.getMaxWidth() + " ";
-        String minWidth = "MIN Width: " + objGauge.getMinWidth() + " ";
-        String minHeight = "MIN Height: " + objGauge.getMinHeight() + " ";
-        String currWidth = "Curr Width: " + objGauge.getWidth() + " ";
-        String currHeight = "Curr Height: " + objGauge.getHeight() + " ";
-
-        String retString = "Dimensions for " + ID + " Widget\n";
-        retString += "Current";
-        retString += "\t" + currWidth + "\t" + currHeight;
-        retString += "\nPreferred";
-        retString += "\t" + prefWidth + "\t" + prefHeight;
-        retString += "\nMaximum";
-        retString += "\t" + maxWidth + "\t" + maxHeight;
-        retString += "\nMinimum";
-        retString += "\t" + minWidth + "\t" + minHeight;
-
-        return retString;
-
+        if (SupportsSteppedRanges())
+        {
+            if (getExceededMaxSteppedRange(newValue))
+            {
+                MaxValue = getNextMaxSteppedRange(newValue);
+                UpdateValueRange();
+            }
+            else if (getExceededMinSteppedRange(newValue))
+            {
+                MinValue = getNextMinSteppedRange(newValue);
+                UpdateValueRange();
+            }
+        }
     }
 
     /**
@@ -338,18 +256,6 @@ public class SteelGaugeRadialWidget extends BaseWidget
         return true;
     }
 
-    @Override
-    public void UpdateTitle(String strTitle)
-    {
-        _Gauge.setTitle(getTitle());
-    }
-
-    @Override
-    public void UpdateValueRange()
-    {
-        makeNewGauge();
-    }
-
     private void makeNewGauge()
     {
         Radial oldGauge = _Gauge;
@@ -369,9 +275,37 @@ public class SteelGaugeRadialWidget extends BaseWidget
         ApplyCSS();
     }
 
-    public double getMajorTickCount()
+    public void setDialRangeAngle(int DialRangeAngle)
     {
-        return MajorTickCount;
+        this.DialRangeAngle = DialRangeAngle;
+    }
+
+    public void setDialStartAngle(int DialStartAngle)
+    {
+        this.DialStartAngle = DialStartAngle;
+    }
+
+    public void setEnhancedRateText(boolean EnhancedRateText)
+    {
+        this.EnhancedRateText = EnhancedRateText;
+    }
+
+    @Override
+    public void SetInitialValue(String value)
+    {
+        try
+        {
+            _InitialValue = Double.parseDouble(value);
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe("Invalid Default Value data for SteelGaugeRadial  Gauge: " + value);
+        }
+    }
+
+    public void setMajorTick(double MajorTick)
+    {
+        this.MajorTick = MajorTick;
     }
 
     public void setMajorTickCount(double MajorTickCount)
@@ -379,9 +313,14 @@ public class SteelGaugeRadialWidget extends BaseWidget
         this.MajorTickCount = MajorTickCount;
     }
 
-    public double getMinorTickCount()
+    public void setMaxValue(double MaxValue)
     {
-        return MinorTickCount;
+        this.MaxValue = MaxValue;
+    }
+
+    public void setMinorTick(double MinorTick)
+    {
+        this.MinorTick = MinorTick;
     }
 
     public void setMinorTickCount(double MinorTickCount)
@@ -389,26 +328,69 @@ public class SteelGaugeRadialWidget extends BaseWidget
         this.MinorTickCount = MinorTickCount;
     }
 
-    protected void HandleSteppedRange(double newValue)
+    public void setMinValue(double MinValue)
     {
-        if (SupportsSteppedRanges())
-        {
-            if (getExceededMaxSteppedRange(newValue))
-            {
-                MaxValue = getNextMaxSteppedRange(newValue);
-                UpdateValueRange();
-            }
-            else if (getExceededMinSteppedRange(newValue))
-            {
-                MinValue = getNextMinSteppedRange(newValue);
-                UpdateValueRange();
-            }
-        }
+        this.MinValue = MinValue;
     }
 
-    @Override
-    public boolean SupportsSteppedRanges()
+    public void setOrientation(TickLabelOrientation eOrientation)
     {
+        this.eOrientation = eOrientation;
+    }
+
+    public void setRangeAngle(int DialEndAngle)
+    {
+        this.DialRangeAngle = DialEndAngle;
+    }
+
+    public void setUnitText(String UnitText)
+    {
+        this.UnitText = UnitText;
+    }
+
+    private boolean SetupGauge()
+    {
+        _Gauge.setMinValue(MinValue);
+        _Gauge.setMaxValue(MaxValue);
+        // For some reason there is a bug in this gauge, so going to IGNORE this field for now
+//        _Gauge.setStartAngle(DialStartAngle);
+//        _Gauge.setAngleRange(DialRangeAngle);
+        _Gauge.setTickLabelOrientation(eOrientation);
+
+        if (getTitle().length() > 0)
+        {
+            _Gauge.setTitle(getTitle());
+        }
+        SetupTicksFromTickCount();
+        if (MajorTick > 0)
+        {
+            _Gauge.setMajorTickSpace(MajorTick);
+        }
+        if (MinorTick > 0)
+        {
+            _Gauge.setMinorTickSpace(MinorTick);
+        }
+        if (null != getUnitsOverride())
+        {
+            _Gauge.setUnit(getUnitsOverride());
+            LOGGER.config("Overriding Widget Units Text to " + getUnitsOverride());
+        }
+        else if (UnitText.length() > 0)
+        {
+            _Gauge.setUnit(UnitText);
+        }
+//        if (null != Sections)
+//        {
+//            _Gauge.setSections(Sections);
+//        }
+
+        _Gauge.setDecimals(getDecimalPlaces());
+        ConfigureDimentions();
+        SetupTaskAction();
+        ConfigureAlignment();
+
+//        _Gauge.setMouseTransparent(true);
+        //LOGGER.config(DumpDimensions("SteelGauge take 2", _Gauge));
         return true;
     }
 
@@ -427,6 +409,24 @@ public class SteelGaugeRadialWidget extends BaseWidget
                 MinorTick = MajorTick / MinorTickCount;
             }
         }
+    }
+
+    @Override
+    public boolean SupportsSteppedRanges()
+    {
+        return true;
+    }
+
+    @Override
+    public void UpdateTitle(String strTitle)
+    {
+        _Gauge.setTitle(getTitle());
+    }
+
+    @Override
+    public void UpdateValueRange()
+    {
+        makeNewGauge();
     }
 
 }

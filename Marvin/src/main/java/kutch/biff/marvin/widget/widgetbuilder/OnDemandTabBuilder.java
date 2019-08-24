@@ -61,14 +61,17 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         __createdTabs = new ArrayList<TabWidget>();
     }
 
-    public String getTabID()
+    public void ApplyOddEvenStyle()
     {
-        return __tabID;
-    }
-
-    public void setSourceNode(FrameworkNode sourceNode)
-    {
-        __node = sourceNode;
+        int iIndex = 1;
+        for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs())
+        {
+            if (__createdTabs.contains(tabWidget))  // on demand tab, that was created by this builder
+            {
+                __onDemandTrigger.ApplyOddEvenStyle(tabWidget, iIndex, tabWidget.getTitle());
+            }
+            iIndex++;
+        }
     }
 
     @Override
@@ -126,16 +129,13 @@ public class OnDemandTabBuilder implements OnDemandWidgetBuilder
         return true;
     }
 
-    public void ApplyOddEvenStyle()
+    public String getTabID()
     {
-        int iIndex = 1;
-        for (TabWidget tabWidget : ConfigurationReader.GetConfigReader().getTabs())
-        {
-            if (__createdTabs.contains(tabWidget))  // on demand tab, that was created by this builder
-            {
-                __onDemandTrigger.ApplyOddEvenStyle(tabWidget, iIndex, tabWidget.getTitle());
-            }
-            iIndex++;
-        }
+        return __tabID;
+    }
+
+    public void setSourceNode(FrameworkNode sourceNode)
+    {
+        __node = sourceNode;
     }
 }

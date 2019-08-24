@@ -43,6 +43,16 @@ public class WildcardListItem
         this._DataSet = new DataSet();
     }
     
+    public DataSet getDataSet()
+    {
+        return _DataSet;
+    }
+
+    public String getWildCard()
+    {
+        return _WildCard;
+    }
+
     public boolean Matches(String Wildcard)
     {
         try
@@ -56,16 +66,6 @@ public class WildcardListItem
         }
         
         return false;
-    }
-
-    public String getWildCard()
-    {
-        return _WildCard;
-    }
-
-    public DataSet getDataSet()
-    {
-        return _DataSet;
     }
     
 }

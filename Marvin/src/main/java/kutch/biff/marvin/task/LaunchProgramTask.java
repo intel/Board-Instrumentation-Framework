@@ -32,21 +32,10 @@ public class LaunchProgramTask extends BaseTask
     {
         _Application = null;
     }
-    public boolean SetApplication(String strApplication)
-    {
-        if (null != _Application)
-        {
-            LOGGER.severe("Application already defined for RunProgram Task");
-            return false;
-        }
-        _Application = strApplication;
-        return true;
-    }
     public boolean isValid()
     {
         return null != _Application;
     }
-    
     @Override
     public void PerformTask()
     {
@@ -67,6 +56,17 @@ public class LaunchProgramTask extends BaseTask
             LOGGER.severe("Error trying to launch program: " + execString);
         }
         
+    }
+    
+    public boolean SetApplication(String strApplication)
+    {
+        if (null != _Application)
+        {
+            LOGGER.severe("Application already defined for RunProgram Task");
+            return false;
+        }
+        _Application = strApplication;
+        return true;
     }
     
 }

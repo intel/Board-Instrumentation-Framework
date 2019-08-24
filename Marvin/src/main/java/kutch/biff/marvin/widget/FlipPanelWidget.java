@@ -71,14 +71,42 @@ public class FlipPanelWidget extends BaseWidget
         setDefaultIsSquare(false);
     }
 
-    public double getAnimationDuration()
+    @Override
+    protected boolean ApplyCSS()
     {
-        return _AnimationDuration;
-    }
+        //super.ApplyCSS(); // can do CSS for entire widget here, and below is for individual sides
+        _BackGrid.setWidgetInformation(getDefinintionFileDirectory(), null, "FlipPanel");
+        _FrontGrid.setWidgetInformation(getDefinintionFileDirectory(), null, "FlipPanel");
+        if (null == _FrontGrid.GetCSS_File())
+        {
+            _FrontGrid.setBaseCSSFilename(getBaseCSSFilename());
+        }
+        if (null == _BackGrid.GetCSS_File())
+        {
+            _BackGrid.setBaseCSSFilename(getBaseCSSFilename());
+        }
 
-    public void setAnimationDuration(double _AnimationDuration)
-    {
-        this._AnimationDuration = _AnimationDuration;
+        _FrontGrid.ApplyCSS();
+        _BackGrid.ApplyCSS();
+
+        _vFront.getStylesheets().clear();
+        _vBack.getStylesheets().clear();
+
+        if (null != getStyleID())
+        {
+            _vFront.setId(getStyleID());
+            _vBack.setId(getStyleID());
+        }
+        if (null != GetCSS_File())
+        {
+            _vFront.getStylesheets().add(GetCSS_File());
+            _vBack.getStylesheets().add(GetCSS_File());
+        }
+        ApplyStyleOverrides(_vFront, getStyleOverride());
+        ApplyStyleOverrides(_vBack, getStyleOverride());
+        ApplyStyleOverrides(_vFront, _FrontGrid.getStyleOverride());
+        ApplyStyleOverrides(_vBack, _BackGrid.getStyleOverride());
+        return true;
     }
 
     @Override
@@ -153,6 +181,68 @@ public class FlipPanelWidget extends BaseWidget
         return ApplyCSS();
     }
 
+    private void DoFlip()
+    {
+        try
+        {
+            _Panel.setFlipDirection(getOrientation());
+            if (_Front2Back)
+            {
+                _Panel.flipToBack();
+            }
+            else
+            {
+                _Panel.flipToFront();
+            }
+            _Front2Back = !_Front2Back;
+        }
+        catch (Exception ex)  // latest Enzo build works, but sometimes has an exeption in here
+        {
+        }
+    }
+
+    private void DoFlip(boolean toBack, Orientation orientation)
+    {
+        if (null != orientation) // am on one side and want to go to other
+        {
+            _Panel.setFlipDirection(orientation);
+            if (_Front2Back)
+            {
+                _Panel.flipToBack();
+            }
+            else
+            {
+                _Panel.flipToFront();
+            }
+            _Front2Back = !_Front2Back;
+        }
+    }
+
+    public double getAnimationDuration()
+    {
+        return _AnimationDuration;
+    }
+
+    public PanelSideInfo getBackInfo()
+    {
+        return _BackInfo;
+    }
+
+    public GridWidget getFrontGrid()
+    {
+        return _FrontGrid;
+    }
+
+    public PanelSideInfo getFrontInfo()
+    {
+        return _FrontInfo;
+    }
+
+    public Orientation getOrientation()
+    {
+        return _Orientation;
+    }
+
     private Orientation getRequestedOrientation(String strRequest)
     {
         String[] parts = strRequest.split(":");
@@ -169,6 +259,129 @@ public class FlipPanelWidget extends BaseWidget
             LOGGER.warning("Received invalid action for Flip Panel: " + strRequest);
         }
         return null;
+    }
+
+    @Override
+    public javafx.scene.Node getStylableObject()
+    {
+        return _Panel;
+    }
+
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+        return _Panel.getStylesheets();
+    }
+
+    @Override
+    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
+    {
+        if (super.HandleWidgetSpecificSettings(node)) // see if anything in GridWidget (like padding override)
+        {
+            return true;
+        }
+        if (node.getNodeName().equalsIgnoreCase("Front"))
+        {
+            //_FrontGrid = WidgetBuilder.ReadGridInfo(node, new GridWidget());
+            _FrontGrid = WidgetBuilder.BuildGrid(node, true);
+            return _FrontGrid != null;
+        }
+        if (node.getNodeName().equalsIgnoreCase("Back"))
+        {
+            //_BackGrid =  WidgetBuilder.ReadGridInfo(node, new GridWidget());
+            _BackGrid = WidgetBuilder.BuildGrid(node, true);
+            return _BackGrid != null;
+        }
+        if (node.getNodeName().equalsIgnoreCase("AnimationDuration"))
+        {
+            String str = node.getTextContent();
+            try
+            {
+                setAnimationDuration(Double.parseDouble(str));
+                return true;
+            }
+            catch (NumberFormatException ex)
+            {
+                LOGGER.severe("Invlid value for <AnimationDuration> tag for FlipPanel Widget");
+            }
+        }
+        if (node.getNodeName().equalsIgnoreCase("RotationOverride"))
+        {
+            String str = node.getTextContent();
+            if (0 == str.compareToIgnoreCase("Horizontal"))
+            {
+                setOrientation(Orientation.HORIZONTAL);
+            }
+            else if (0 == str.compareToIgnoreCase("Vertical"))
+            {
+                setOrientation(Orientation.VERTICAL);
+            }
+            else
+            {
+                LOGGER.severe("Invalid Orientation in FlipPanel Orientation overvide. Should be Horizontal or Vertical, not : " + str);
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean PerformPostCreateActions(GridWidget objParentGrid, boolean updateToolTipOnly)
+    {
+        if (true == updateToolTipOnly)
+        {
+            if (CONFIG.isDebugMode())
+            {
+                _ToolTip = this.toString();
+            }
+            if (_ToolTip != null && null != getStylableObject())
+            {
+                HandleToolTipInit();
+                Tooltip.install(_vFront, _objToolTip);
+                Tooltip.install(_vBack, _objToolTip);
+            }
+            return true;
+        }
+
+        if (CONFIG.isDebugMode())
+        {
+            _ToolTip = this.toString();
+        }
+        if (_ToolTip != null)
+        {
+            HandleToolTipInit();
+            Tooltip.install(_vFront, _objToolTip);
+            Tooltip.install(_vBack, _objToolTip);
+        }
+        FireDefaultPeekaboo();
+
+        return true;
+    }
+
+    public void setAnimationDuration(double _AnimationDuration)
+    {
+        this._AnimationDuration = _AnimationDuration;
+    }
+
+    public void setBackInfo(PanelSideInfo _BackInfo)
+    {
+        this._BackInfo = _BackInfo;
+    }
+
+    public void setFrontGrid(GridWidget _FrontGrid)
+    {
+        this._FrontGrid = _FrontGrid;
+    }
+
+    public void setFrontInfo(PanelSideInfo _FrontInfo)
+    {
+        this._FrontInfo = _FrontInfo;
+    }
+
+    public void setOrientation(Orientation _Orientation)
+    {
+        this._Orientation = _Orientation;
     }
 
     private boolean SetupPanel(DataManager dataMgr)
@@ -270,222 +483,9 @@ public class FlipPanelWidget extends BaseWidget
         return _button;
     }
 
-    private void DoFlip()
-    {
-        try
-        {
-            _Panel.setFlipDirection(getOrientation());
-            if (_Front2Back)
-            {
-                _Panel.flipToBack();
-            }
-            else
-            {
-                _Panel.flipToFront();
-            }
-            _Front2Back = !_Front2Back;
-        }
-        catch (Exception ex)  // latest Enzo build works, but sometimes has an exeption in here
-        {
-        }
-    }
-
-    private void DoFlip(boolean toBack, Orientation orientation)
-    {
-        if (null != orientation) // am on one side and want to go to other
-        {
-            _Panel.setFlipDirection(orientation);
-            if (_Front2Back)
-            {
-                _Panel.flipToBack();
-            }
-            else
-            {
-                _Panel.flipToFront();
-            }
-            _Front2Back = !_Front2Back;
-        }
-    }
-
-    @Override
-    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
-    {
-        if (super.HandleWidgetSpecificSettings(node)) // see if anything in GridWidget (like padding override)
-        {
-            return true;
-        }
-        if (node.getNodeName().equalsIgnoreCase("Front"))
-        {
-            //_FrontGrid = WidgetBuilder.ReadGridInfo(node, new GridWidget());
-            _FrontGrid = WidgetBuilder.BuildGrid(node, true);
-            return _FrontGrid != null;
-        }
-        if (node.getNodeName().equalsIgnoreCase("Back"))
-        {
-            //_BackGrid =  WidgetBuilder.ReadGridInfo(node, new GridWidget());
-            _BackGrid = WidgetBuilder.BuildGrid(node, true);
-            return _BackGrid != null;
-        }
-        if (node.getNodeName().equalsIgnoreCase("AnimationDuration"))
-        {
-            String str = node.getTextContent();
-            try
-            {
-                setAnimationDuration(Double.parseDouble(str));
-                return true;
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.severe("Invlid value for <AnimationDuration> tag for FlipPanel Widget");
-            }
-        }
-        if (node.getNodeName().equalsIgnoreCase("RotationOverride"))
-        {
-            String str = node.getTextContent();
-            if (0 == str.compareToIgnoreCase("Horizontal"))
-            {
-                setOrientation(Orientation.HORIZONTAL);
-            }
-            else if (0 == str.compareToIgnoreCase("Vertical"))
-            {
-                setOrientation(Orientation.VERTICAL);
-            }
-            else
-            {
-                LOGGER.severe("Invalid Orientation in FlipPanel Orientation overvide. Should be Horizontal or Vertical, not : " + str);
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public javafx.scene.Node getStylableObject()
-    {
-        return _Panel;
-    }
-
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-        return _Panel.getStylesheets();
-    }
-
-    public Orientation getOrientation()
-    {
-        return _Orientation;
-    }
-
-    public void setOrientation(Orientation _Orientation)
-    {
-        this._Orientation = _Orientation;
-    }
-
-    public GridWidget getFrontGrid()
-    {
-        return _FrontGrid;
-    }
-
-    public void setFrontGrid(GridWidget _FrontGrid)
-    {
-        this._FrontGrid = _FrontGrid;
-    }
-
-    public PanelSideInfo getFrontInfo()
-    {
-        return _FrontInfo;
-    }
-
-    public void setFrontInfo(PanelSideInfo _FrontInfo)
-    {
-        this._FrontInfo = _FrontInfo;
-    }
-
-    public PanelSideInfo getBackInfo()
-    {
-        return _BackInfo;
-    }
-
-    public void setBackInfo(PanelSideInfo _BackInfo)
-    {
-        this._BackInfo = _BackInfo;
-    }
-
-    @Override
-    protected boolean ApplyCSS()
-    {
-        //super.ApplyCSS(); // can do CSS for entire widget here, and below is for individual sides
-        _BackGrid.setWidgetInformation(getDefinintionFileDirectory(), null, "FlipPanel");
-        _FrontGrid.setWidgetInformation(getDefinintionFileDirectory(), null, "FlipPanel");
-        if (null == _FrontGrid.GetCSS_File())
-        {
-            _FrontGrid.setBaseCSSFilename(getBaseCSSFilename());
-        }
-        if (null == _BackGrid.GetCSS_File())
-        {
-            _BackGrid.setBaseCSSFilename(getBaseCSSFilename());
-        }
-
-        _FrontGrid.ApplyCSS();
-        _BackGrid.ApplyCSS();
-
-        _vFront.getStylesheets().clear();
-        _vBack.getStylesheets().clear();
-
-        if (null != getStyleID())
-        {
-            _vFront.setId(getStyleID());
-            _vBack.setId(getStyleID());
-        }
-        if (null != GetCSS_File())
-        {
-            _vFront.getStylesheets().add(GetCSS_File());
-            _vBack.getStylesheets().add(GetCSS_File());
-        }
-        ApplyStyleOverrides(_vFront, getStyleOverride());
-        ApplyStyleOverrides(_vBack, getStyleOverride());
-        ApplyStyleOverrides(_vFront, _FrontGrid.getStyleOverride());
-        ApplyStyleOverrides(_vBack, _BackGrid.getStyleOverride());
-        return true;
-    }
-
     @Override
     public void UpdateTitle(String strTitle)
     {
         LOGGER.warning("Tried to update Title of a FlipPanel Widget to " + strTitle);
-    }
-
-    @Override
-    public boolean PerformPostCreateActions(GridWidget objParentGrid, boolean updateToolTipOnly)
-    {
-        if (true == updateToolTipOnly)
-        {
-            if (CONFIG.isDebugMode())
-            {
-                _ToolTip = this.toString();
-            }
-            if (_ToolTip != null && null != getStylableObject())
-            {
-                HandleToolTipInit();
-                Tooltip.install(_vFront, _objToolTip);
-                Tooltip.install(_vBack, _objToolTip);
-            }
-            return true;
-        }
-
-        if (CONFIG.isDebugMode())
-        {
-            _ToolTip = this.toString();
-        }
-        if (_ToolTip != null)
-        {
-            HandleToolTipInit();
-            Tooltip.install(_vFront, _objToolTip);
-            Tooltip.install(_vBack, _objToolTip);
-        }
-        FireDefaultPeekaboo();
-
-        return true;
     }
 }

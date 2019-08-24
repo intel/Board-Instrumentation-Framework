@@ -57,15 +57,20 @@ public class SteelLCDWidget extends BaseWidget
     }
     
     @Override
-    public javafx.scene.Node getStylableObject()
+    protected void ConfigureDimentions()
     {
-	return _LCD;
-    }
-    
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-	return _LCD.getStylesheets();
+	if (KeepAspectRatio)
+	{
+	    if (getWidth() > 0)
+	    {
+		setHeight(getWidth() / aspectRatio);
+	    }
+	    else if (getHeight() > 0)
+	    {
+		setWidth(getHeight() * aspectRatio);
+	    }
+	}
+	super.ConfigureDimentions();
     }
     
     @Override
@@ -104,113 +109,9 @@ public class SteelLCDWidget extends BaseWidget
 	return ApplyCSS();
     }
     
-    @Override
-    public void SetInitialValue(String value)
+    public double getMaxValue()
     {
-	_InitialValue = value;
-    }
-    
-    public boolean getTextMode()
-    {
-	return _TextMode;
-    }
-    
-    public void setTextMode(boolean newMode)
-    {
-	_TextMode = newMode;
-	_LCD.setTextMode(newMode);
-	if (newMode)
-	{
-	    _LCD.setDecimals(0);
-	}
-	else
-	{
-	    _LCD.setDecimals(getDecimalPlaces());
-	}
-    }
-    
-    public void SetValue(String newVal)
-    {
-//        if (true || !_TextMode)
-	if (!_TextMode)
-	{
-	    double newDialValue;
-	    String strVal = newVal;
-	    try
-	    {
-		newDialValue = Double.parseDouble(strVal);
-		setTextMode(false);
-	    }
-	    catch(NumberFormatException ex)
-	    {
-		_LCD.setText(strVal);
-		return;
-	    }
-	    _LCD.setValue(newDialValue);
-	}
-	else
-	{
-	    _LCD.setText(newVal);
-	}
-    }
-    
-    private boolean SetupLCD()
-    {
-	if (!_TextMode)
-	{
-	    _LCD.setMinMeasuredValueVisible(ShowMeasuredMin);
-	    _LCD.setMaxMeasuredValueVisible(ShowMeasuredMax);
-	    _LCD.setMaxValue(getMaxValue());
-	    _LCD.setKeepAspect(KeepAspectRatio);
-	    _LCD.setDecimals(getDecimalPlaces());
-	}
-	
-	if (getTitle().length() > 0)
-	{
-	    _LCD.setTitle(getTitle());
-	}
-	if (null != getUnitsOverride())
-	{
-	    _LCD.setUnit(getUnitsOverride());
-	    LOGGER.config("Overriding Widget Units Text to " + getUnitsOverride());
-	}
-	else if (UnitText.length() > 0)
-	{
-	    _LCD.setUnit(UnitText);
-	}
-	
-	_LCD.setCrystalOverlayVisible(true); // 'rgainy, LCD like overlay, very subtle
-	return true;
-    }
-    
-    public String getUnitText()
-    {
-	return UnitText;
-    }
-    
-    public void setUnitText(String UnitText)
-    {
-	this.UnitText = UnitText;
-    }
-    
-    public boolean isShowMeasuredMax()
-    {
-	return ShowMeasuredMax;
-    }
-    
-    public void setShowMeasuredMax(boolean ShowMeasuredMax)
-    {
-	this.ShowMeasuredMax = ShowMeasuredMax;
-    }
-    
-    public boolean isShowMeasuredMin()
-    {
-	return ShowMeasuredMin;
-    }
-    
-    public void setShowMeasuredMin(boolean ShowMeasuredMin)
-    {
-	this.ShowMeasuredMin = ShowMeasuredMin;
+	return MaxValue;
     }
     
     public double getMinValue()
@@ -218,46 +119,26 @@ public class SteelLCDWidget extends BaseWidget
 	return MinValue;
     }
     
-    public void setMinValue(double MinValue)
+    @Override
+    public javafx.scene.Node getStylableObject()
     {
-	this.MinValue = MinValue;
-    }
-    
-    public double getMaxValue()
-    {
-	return MaxValue;
-    }
-    
-    public void setMaxValue(double MaxValue)
-    {
-	this.MaxValue = MaxValue;
-    }
-    
-    public boolean isKeepAspectRatio()
-    {
-	return KeepAspectRatio;
-    }
-    
-    public void setKeepAspectRatio(boolean KeepAspectRation)
-    {
-	this.KeepAspectRatio = KeepAspectRation;
+	return _LCD;
     }
     
     @Override
-    protected void ConfigureDimentions()
+    public ObservableList<String> getStylesheets()
     {
-	if (KeepAspectRatio)
-	{
-	    if (getWidth() > 0)
-	    {
-		setHeight(getWidth() / aspectRatio);
-	    }
-	    else if (getHeight() > 0)
-	    {
-		setWidth(getHeight() * aspectRatio);
-	    }
-	}
-	super.ConfigureDimentions();
+	return _LCD.getStylesheets();
+    }
+    
+    public boolean getTextMode()
+    {
+	return _TextMode;
+    }
+    
+    public String getUnitText()
+    {
+	return UnitText;
     }
     
     /**
@@ -290,6 +171,125 @@ public class SteelLCDWidget extends BaseWidget
 	    this.MaxValue = Max;
 	}
 	return true;
+    }
+    
+    public boolean isKeepAspectRatio()
+    {
+	return KeepAspectRatio;
+    }
+    
+    public boolean isShowMeasuredMax()
+    {
+	return ShowMeasuredMax;
+    }
+    
+    public boolean isShowMeasuredMin()
+    {
+	return ShowMeasuredMin;
+    }
+    
+    @Override
+    public void SetInitialValue(String value)
+    {
+	_InitialValue = value;
+    }
+    
+    public void setKeepAspectRatio(boolean KeepAspectRation)
+    {
+	this.KeepAspectRatio = KeepAspectRation;
+    }
+    
+    public void setMaxValue(double MaxValue)
+    {
+	this.MaxValue = MaxValue;
+    }
+    
+    public void setMinValue(double MinValue)
+    {
+	this.MinValue = MinValue;
+    }
+    
+    public void setShowMeasuredMax(boolean ShowMeasuredMax)
+    {
+	this.ShowMeasuredMax = ShowMeasuredMax;
+    }
+    
+    public void setShowMeasuredMin(boolean ShowMeasuredMin)
+    {
+	this.ShowMeasuredMin = ShowMeasuredMin;
+    }
+    
+    public void setTextMode(boolean newMode)
+    {
+	_TextMode = newMode;
+	_LCD.setTextMode(newMode);
+	if (newMode)
+	{
+	    _LCD.setDecimals(0);
+	}
+	else
+	{
+	    _LCD.setDecimals(getDecimalPlaces());
+	}
+    }
+    
+    public void setUnitText(String UnitText)
+    {
+	this.UnitText = UnitText;
+    }
+    
+    private boolean SetupLCD()
+    {
+	if (!_TextMode)
+	{
+	    _LCD.setMinMeasuredValueVisible(ShowMeasuredMin);
+	    _LCD.setMaxMeasuredValueVisible(ShowMeasuredMax);
+	    _LCD.setMaxValue(getMaxValue());
+	    _LCD.setKeepAspect(KeepAspectRatio);
+	    _LCD.setDecimals(getDecimalPlaces());
+	}
+	
+	if (getTitle().length() > 0)
+	{
+	    _LCD.setTitle(getTitle());
+	}
+	if (null != getUnitsOverride())
+	{
+	    _LCD.setUnit(getUnitsOverride());
+	    LOGGER.config("Overriding Widget Units Text to " + getUnitsOverride());
+	}
+	else if (UnitText.length() > 0)
+	{
+	    _LCD.setUnit(UnitText);
+	}
+	
+	_LCD.setCrystalOverlayVisible(true); // 'rgainy, LCD like overlay, very subtle
+	return true;
+    }
+    
+    public void SetValue(String newVal)
+    {
+//        if (true || !_TextMode)
+	if (!_TextMode)
+	{
+	    double newDialValue;
+	    String strVal = newVal;
+	    try
+	    {
+		newDialValue = Double.parseDouble(strVal);
+		setTextMode(false);
+	    }
+	    catch(NumberFormatException ex)
+	    {
+		_LCD.setText(strVal);
+		return;
+	    }
+	    _LCD.setValue(newDialValue);
+	}
+	else
+	{
+	    _LCD.setText(newVal);
+	}
     }
     
     @Override

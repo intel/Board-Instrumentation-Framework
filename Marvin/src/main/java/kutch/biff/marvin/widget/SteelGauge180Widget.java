@@ -55,18 +55,6 @@ public class SteelGauge180Widget extends BaseWidget
     }
 
     @Override
-    public javafx.scene.Node getStylableObject()
-    {
-        return _Gauge;
-    }
-
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-        return _Gauge.getStylesheets();
-    }
-
-    @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
@@ -110,63 +98,34 @@ public class SteelGauge180Widget extends BaseWidget
     }
 
     @Override
-    public void SetInitialValue(String value)
+    public javafx.scene.Node getStylableObject()
     {
-        try
+        return _Gauge;
+    }
+
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+        return _Gauge.getStylesheets();
+    }
+
+    protected void HandleSteppedRange(double newValue)
+    {
+        if (SupportsSteppedRanges())
         {
-            _InitialValue = Double.parseDouble(value);
-        }
-        catch (NumberFormatException ex)
-        {
-            LOGGER.severe("Invalid Default Value data for 180  Gauge: " + value);
+            if (getExceededMaxSteppedRange(newValue))
+            {
+                MaxValue = getNextMaxSteppedRange(newValue);
+                UpdateValueRange();
+            }
+            else if (getExceededMinSteppedRange(newValue))
+            {
+                MinValue = getNextMinSteppedRange(newValue);
+                UpdateValueRange();
+            }
         }
     }
     
-    public void setUnitText(String UnitText)
-    {
-        this.UnitText = UnitText;
-    }
-
-    public void setMinValue(double MinValue)
-    {
-        _InitialValue = MinValue;
-        this.MinValue = MinValue;
-    }
-
-    public void setMaxValue(double MaxValue)
-    {
-        this.MaxValue = MaxValue;
-    }
-
-    private boolean SetupGauge()
-    {
-        _Gauge.setMinValue(MinValue);
-        _Gauge.setMaxValue(MaxValue);
-
-        if (getTitle().length() > 0)
-        {
-            _Gauge.setTitle(getTitle());
-        }
-
-        if (null != getUnitsOverride())
-        {
-            _Gauge.setUnit(getUnitsOverride());
-            LOGGER.config("Overriding Widget Units Text to " + getUnitsOverride());
-        }
-        else if (UnitText.length() > 0)
-        {
-            _Gauge.setUnit(UnitText);
-        }
-        ConfigureAlignment();
-        ConfigureDimentions();
-
-        _Gauge.setDecimals(getDecimalPlaces());
-        _Gauge.setAnimated(true);
-
-        SetupTaskAction();
-
-        return false != ApplyCSS();
-    }
     /**
      * Sets range for widget - not valid for all widgets
      * @param rangeNode
@@ -198,19 +157,7 @@ public class SteelGauge180Widget extends BaseWidget
         }
         return true;
     }
-    
-    @Override
-    public void UpdateTitle(String strTitle)
-    {
-        _Gauge.setTitle(getTitle());
-    }
-  
-    @Override
-    public void UpdateValueRange()
-    {
-        makeNewGauge();
-    }
-    
+
     private void makeNewGauge()
     {
         OneEightyGauge oldGauge = _Gauge;
@@ -229,27 +176,80 @@ public class SteelGauge180Widget extends BaseWidget
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
         ApplyCSS();
     }
-    protected void HandleSteppedRange(double newValue)
+
+    @Override
+    public void SetInitialValue(String value)
     {
-        if (SupportsSteppedRanges())
+        try
         {
-            if (getExceededMaxSteppedRange(newValue))
-            {
-                MaxValue = getNextMaxSteppedRange(newValue);
-                UpdateValueRange();
-            }
-            else if (getExceededMinSteppedRange(newValue))
-            {
-                MinValue = getNextMinSteppedRange(newValue);
-                UpdateValueRange();
-            }
+            _InitialValue = Double.parseDouble(value);
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe("Invalid Default Value data for 180  Gauge: " + value);
         }
     }
 
+    public void setMaxValue(double MaxValue)
+    {
+        this.MaxValue = MaxValue;
+    }
+    public void setMinValue(double MinValue)
+    {
+        _InitialValue = MinValue;
+        this.MinValue = MinValue;
+    }
+    
+    public void setUnitText(String UnitText)
+    {
+        this.UnitText = UnitText;
+    }
+  
+    private boolean SetupGauge()
+    {
+        _Gauge.setMinValue(MinValue);
+        _Gauge.setMaxValue(MaxValue);
+
+        if (getTitle().length() > 0)
+        {
+            _Gauge.setTitle(getTitle());
+        }
+
+        if (null != getUnitsOverride())
+        {
+            _Gauge.setUnit(getUnitsOverride());
+            LOGGER.config("Overriding Widget Units Text to " + getUnitsOverride());
+        }
+        else if (UnitText.length() > 0)
+        {
+            _Gauge.setUnit(UnitText);
+        }
+        ConfigureAlignment();
+        ConfigureDimentions();
+
+        _Gauge.setDecimals(getDecimalPlaces());
+        _Gauge.setAnimated(true);
+
+        SetupTaskAction();
+
+        return false != ApplyCSS();
+    }
+    
     @Override
     public boolean SupportsSteppedRanges()
     {
         return true;
+    }
+    @Override
+    public void UpdateTitle(String strTitle)
+    {
+        _Gauge.setTitle(getTitle());
+    }
+
+    @Override
+    public void UpdateValueRange()
+    {
+        makeNewGauge();
     }
     
 }

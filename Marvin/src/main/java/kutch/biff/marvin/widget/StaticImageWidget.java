@@ -55,6 +55,21 @@ public class StaticImageWidget extends BaseWidget
     }
     
     @Override
+    protected void ConfigureDimentions()
+    {
+        if (getHeight() > 0)
+        {
+            _ImageView.setFitHeight(getHeight());
+        }
+        
+        if (getWidth() > 0)
+        {
+            _ImageView.setFitWidth(getWidth());
+            
+        }
+    }
+    
+    @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
@@ -72,40 +87,60 @@ public class StaticImageWidget extends BaseWidget
         return false;
     }
     
-    @Override
-    public javafx.scene.Node getStylableObject()
-    {
-//        return _Pane;
-        return _ImageView;
-    }
-    
-        @Override
-    public ObservableList<String> getStylesheets()
-    {
-        //return _Pane.getStylesheets();
-        return _ImageView.getStyleClass();
-    }
+        public boolean getPreserveRatio()
+	{
+	    return _PreserveRatio;
+	}
 
     public boolean getScaleToFit()
     {
         return _ScaleToFit;
     }
 
-    public void setScaleToFit(boolean _ScaleToFit)
+    public String getSrcFile()
     {
-        this._ScaleToFit = _ScaleToFit;
+        return _SrcFile;
     }
 
-    public boolean getPreserveRatio()
+    @Override
+    public javafx.scene.Node getStylableObject()
     {
-        return _PreserveRatio;
+//        return _Pane;
+        return _ImageView;
+    }
+
+    @Override
+   public ObservableList<String> getStylesheets()
+   {
+    //return _Pane.getStylesheets();
+    return _ImageView.getStyleClass();
+   }
+@Override
+    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
+    {
+        if (node.getNodeName().equalsIgnoreCase("Source"))
+        {
+            setSrcFile(node.getTextContent());
+            return true;
+        }
+        return false;
     }
 
     public void setPreserveRatio(boolean _PreserveRatio)
     {
         this._PreserveRatio = _PreserveRatio;
     }
-/*
+
+    public void setScaleToFit(boolean _ScaleToFit)
+    {
+        this._ScaleToFit = _ScaleToFit;
+    }
+    public void setSrcFile(String strSrcFile)
+    {
+        _SrcFile = strSrcFile;
+    }
+    
+    /*
     public boolean GetClickThroughTransparentRegion()
     {
         return _ClickThroughTransparentRegion;
@@ -144,41 +179,6 @@ public class StaticImageWidget extends BaseWidget
         }
         LOGGER.severe("Image file does not exist:" + _SrcFile);
         return false;
-    }
-
-    public String getSrcFile()
-    {
-        return _SrcFile;
-    }
-
-    public void setSrcFile(String strSrcFile)
-    {
-        _SrcFile = strSrcFile;
-    }
-    @Override
-    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
-    {
-        if (node.getNodeName().equalsIgnoreCase("Source"))
-        {
-            setSrcFile(node.getTextContent());
-            return true;
-        }
-        return false;
-    }
-    
-    @Override
-    protected void ConfigureDimentions()
-    {
-        if (getHeight() > 0)
-        {
-            _ImageView.setFitHeight(getHeight());
-        }
-        
-        if (getWidth() > 0)
-        {
-            _ImageView.setFitWidth(getWidth());
-            
-        }
     }
     @Override
     public void UpdateTitle(String strTitle)

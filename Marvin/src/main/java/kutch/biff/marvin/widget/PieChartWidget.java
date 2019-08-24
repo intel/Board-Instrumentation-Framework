@@ -50,16 +50,10 @@ public class PieChartWidget extends BaseWidget
         _Slices = new ArrayList<>();
     }
 
-    @Override
-    public javafx.scene.Node getStylableObject()
+    public void AddSlide(String slice)
     {
-        return _Chart;
-    }
 
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-        return _Chart.getStylesheets();
+        _Slices.add(slice);
     }
 
     @Override
@@ -114,10 +108,16 @@ public class PieChartWidget extends BaseWidget
         return ApplyCSS();
     }
 
-    public void AddSlide(String slice)
+    @Override
+    public javafx.scene.Node getStylableObject()
     {
+        return _Chart;
+    }
 
-        _Slices.add(slice);
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+        return _Chart.getStylesheets();
     }
 
     @Override
@@ -148,14 +148,14 @@ public class PieChartWidget extends BaseWidget
         _Chart.setTitle(getTitle());
     }   
     @Override
-    public void UpdateTitle(String strTitle)
-    {
-        _Chart.setTitle(strTitle);
-    }
-
-    @Override
     public boolean SupportsSteppedRanges()
     {
         return false;
+    }
+
+    @Override
+    public void UpdateTitle(String strTitle)
+    {
+        _Chart.setTitle(strTitle);
     }
 }

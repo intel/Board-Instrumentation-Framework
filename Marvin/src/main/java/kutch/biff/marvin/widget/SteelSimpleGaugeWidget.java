@@ -62,18 +62,6 @@ public class SteelSimpleGaugeWidget extends BaseWidget
     }
 
     @Override
-    public javafx.scene.Node getStylableObject()
-    {
-        return _Gauge;
-    }
-
-    @Override
-    public ObservableList<String> getStylesheets()
-    {
-        return _Gauge.getStylesheets();
-    }
-
-    @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
         SetParent(pane);
@@ -116,6 +104,86 @@ public class SteelSimpleGaugeWidget extends BaseWidget
     }
 
     @Override
+    public javafx.scene.Node getStylableObject()
+    {
+        return _Gauge;
+    }
+
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+        return _Gauge.getStylesheets();
+    }
+
+    protected void HandleSteppedRange(double newValue)
+    {
+        if (SupportsSteppedRanges())
+        {
+            if (getExceededMaxSteppedRange(newValue))
+            {
+                MaxValue = getNextMaxSteppedRange(newValue);
+                UpdateValueRange();
+            }
+            else if (getExceededMinSteppedRange(newValue))
+            {
+                MinValue = getNextMinSteppedRange(newValue);
+                UpdateValueRange();
+            }
+        }
+    }
+    
+    /**
+     * Sets range for widget - not valid for all widgets
+     * @param rangeNode
+     * @return
+     */
+
+    @Override
+    public boolean HandleValueRange(FrameworkNode rangeNode)
+    {
+        double Min = -1234.5678;
+        double Max = -1234.5678;
+        if (rangeNode.hasAttribute("Min"))
+        {
+            Min = rangeNode.getDoubleAttribute("Min", Min);
+            if (Min == -1234.5678)
+            {
+                return false;
+            }
+            this.MinValue = Min;
+        }
+        if (rangeNode.hasAttribute("Max"))
+        {
+            Max = rangeNode.getDoubleAttribute("Max", Max);
+            if (Max == -1234.5678)
+            {
+                return false;
+            }
+            this.MaxValue = Max;
+        }
+        return true;
+    }
+
+    private void makeNewGauge()
+    {
+        SimpleGauge oldGauge = _Gauge;
+        _Gauge = new SimpleGauge();
+        _Gauge.setVisible(oldGauge.isVisible());
+
+        GridPane pane = getParentPane();
+        pane.getChildren().remove(oldGauge);
+
+        if (false == SetupGauge())
+        {
+            LOGGER.severe("Tried to re-create SteelGaugeWidget for Stepped Range, but something bad happened.");
+            _Gauge = oldGauge;
+            return;
+        }
+        pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+        ApplyCSS();
+    }
+
+    @Override
     public void SetInitialValue(String value)
     {
         try
@@ -127,15 +195,10 @@ public class SteelSimpleGaugeWidget extends BaseWidget
             LOGGER.severe("Invalid Default Value data for 180  Gauge: " + value);
         }
     }
-    
-    public void setSections(List<Section> objSections)
-    {
-        this.Sections = objSections;
-    }
 
-    public void setUnitText(String UnitText)
+    public void setMaxValue(double MaxValue)
     {
-        this.UnitText = UnitText;
+        this.MaxValue = MaxValue;
     }
 
     public void setMinValue(double MinValue)
@@ -143,11 +206,35 @@ public class SteelSimpleGaugeWidget extends BaseWidget
         this.MinValue = MinValue;
     }
 
-    public void setMaxValue(double MaxValue)
+    public void setPercentageSections(List<Pair<Double, Double>> Sections)
     {
-        this.MaxValue = MaxValue;
+        this.SectionPercentages = Sections;
     }
-
+    public void setSections(List<Section> objSections)
+    {
+        this.Sections = objSections;
+    }
+    private void setSectionsFromPercentages()
+    {
+        if (null == SectionPercentages)
+        {
+            return;
+        }
+        List<Section> sections = new ArrayList<>();
+        double range = abs(MaxValue - MinValue);
+        for (Pair<Double, Double> sect : SectionPercentages)
+        {
+            double start, end;
+            start = MinValue + sect.getKey() / 100 * range;
+            end = MinValue + sect.getValue() / 100 * range;
+            sections.add(new Section(start, end));
+        }
+        setSections(sections);
+    }
+    public void setUnitText(String UnitText)
+    {
+        this.UnitText = UnitText;
+    }
     private boolean SetupGauge()
     {
         _Gauge.setMinValue(MinValue);
@@ -190,37 +277,12 @@ public class SteelSimpleGaugeWidget extends BaseWidget
         return false != ApplyCSS();
     }
 
-    /**
-     * Sets range for widget - not valid for all widgets
-     * @param rangeNode
-     * @return
-     */
-
     @Override
-    public boolean HandleValueRange(FrameworkNode rangeNode)
+    public boolean SupportsSteppedRanges()
     {
-        double Min = -1234.5678;
-        double Max = -1234.5678;
-        if (rangeNode.hasAttribute("Min"))
-        {
-            Min = rangeNode.getDoubleAttribute("Min", Min);
-            if (Min == -1234.5678)
-            {
-                return false;
-            }
-            this.MinValue = Min;
-        }
-        if (rangeNode.hasAttribute("Max"))
-        {
-            Max = rangeNode.getDoubleAttribute("Max", Max);
-            if (Max == -1234.5678)
-            {
-                return false;
-            }
-            this.MaxValue = Max;
-        }
         return true;
     }
+
     @Override
     public void UpdateTitle(String strTitle)
     {
@@ -230,67 +292,5 @@ public class SteelSimpleGaugeWidget extends BaseWidget
     public void UpdateValueRange()
     {
         makeNewGauge();
-    }
-    private void setSectionsFromPercentages()
-    {
-        if (null == SectionPercentages)
-        {
-            return;
-        }
-        List<Section> sections = new ArrayList<>();
-        double range = abs(MaxValue - MinValue);
-        for (Pair<Double, Double> sect : SectionPercentages)
-        {
-            double start, end;
-            start = MinValue + sect.getKey() / 100 * range;
-            end = MinValue + sect.getValue() / 100 * range;
-            sections.add(new Section(start, end));
-        }
-        setSections(sections);
-    }
-    public void setPercentageSections(List<Pair<Double, Double>> Sections)
-    {
-        this.SectionPercentages = Sections;
-    }
-
-    protected void HandleSteppedRange(double newValue)
-    {
-        if (SupportsSteppedRanges())
-        {
-            if (getExceededMaxSteppedRange(newValue))
-            {
-                MaxValue = getNextMaxSteppedRange(newValue);
-                UpdateValueRange();
-            }
-            else if (getExceededMinSteppedRange(newValue))
-            {
-                MinValue = getNextMinSteppedRange(newValue);
-                UpdateValueRange();
-            }
-        }
-    }
-
-    @Override
-    public boolean SupportsSteppedRanges()
-    {
-        return true;
-    }
-    private void makeNewGauge()
-    {
-        SimpleGauge oldGauge = _Gauge;
-        _Gauge = new SimpleGauge();
-        _Gauge.setVisible(oldGauge.isVisible());
-
-        GridPane pane = getParentPane();
-        pane.getChildren().remove(oldGauge);
-
-        if (false == SetupGauge())
-        {
-            LOGGER.severe("Tried to re-create SteelGaugeWidget for Stepped Range, but something bad happened.");
-            _Gauge = oldGauge;
-            return;
-        }
-        pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        ApplyCSS();
     }  
 }

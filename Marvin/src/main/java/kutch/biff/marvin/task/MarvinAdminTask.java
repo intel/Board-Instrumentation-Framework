@@ -82,10 +82,23 @@ public class MarvinAdminTask extends BaseTask
     }
 
     
-    private void TerminateMarvin()
+    private void SetTab()
     {
-        LOGGER.info("Terminating Marvin based upon MarvinAdminTask");
-        System.exit(0);
+        LOGGER.info("Performing Set Tab MarvinAdminTask, to Tab: " + _Data);
+        List<TabWidget> tabs = GetConfigReader().getTabs();
+        for (int iLoop = 0; iLoop < tabs.size(); iLoop++)
+        {
+            TabWidget tabWidget = tabs.get(iLoop);
+           
+            if (tabWidget.getMinionID().equalsIgnoreCase(_Data))
+            {
+                SingleSelectionModel<Tab> selectionModel = getConfig().getPane().getSelectionModel();
+                selectionModel.select(tabWidget.getTabIndex());
+
+                return;
+            }
+        }
+        LOGGER.warning("Invalid Tab ID [" + _Data + "] specified for a SetActiveTab MarvinAdminTask");
     }
     /**
      * Make a tab visible or invisible
@@ -164,22 +177,9 @@ public class MarvinAdminTask extends BaseTask
         LOGGER.warning("Invalid Tab ID [" + _Data + "] specified for a SetActiveTab MarvinAdminTask");
     }
 
-    private void SetTab()
+    private void TerminateMarvin()
     {
-        LOGGER.info("Performing Set Tab MarvinAdminTask, to Tab: " + _Data);
-        List<TabWidget> tabs = GetConfigReader().getTabs();
-        for (int iLoop = 0; iLoop < tabs.size(); iLoop++)
-        {
-            TabWidget tabWidget = tabs.get(iLoop);
-           
-            if (tabWidget.getMinionID().equalsIgnoreCase(_Data))
-            {
-                SingleSelectionModel<Tab> selectionModel = getConfig().getPane().getSelectionModel();
-                selectionModel.select(tabWidget.getTabIndex());
-
-                return;
-            }
-        }
-        LOGGER.warning("Invalid Tab ID [" + _Data + "] specified for a SetActiveTab MarvinAdminTask");
+        LOGGER.info("Terminating Marvin based upon MarvinAdminTask");
+        System.exit(0);
     }
 }

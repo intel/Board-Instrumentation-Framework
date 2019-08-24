@@ -77,18 +77,18 @@ public class Server
         return true;
     }
 
+    public void Start()
+    {
+        _RecvThreadMgr = new ReceiveThreadMgr(_socket, _DataManager);
+        _Thread = new Thread(_RecvThreadMgr,"Receve Thread Manager Worker");
+        _Thread.start();
+    }
+
     public void Stop()
     {
         if (null != _RecvThreadMgr)
         {
             _RecvThreadMgr.Stop();
         }
-    }
-
-    public void Start()
-    {
-        _RecvThreadMgr = new ReceiveThreadMgr(_socket, _DataManager);
-        _Thread = new Thread(_RecvThreadMgr,"Receve Thread Manager Worker");
-        _Thread.start();
     }
 }

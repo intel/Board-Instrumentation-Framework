@@ -66,56 +66,6 @@ public class TranslationCalculator
         SetupListeners();
     }
 
-    private void Calculate()
-    {
-        double tX = CalcTranslationX();
-        double tY = CalcTranslationY();
-        // Don't think I need this anymor
-        _Translate.setX(tX);
-        _Translate.setY(tY);
-    }
-
-    private void SetupListeners()
-    {
-        _WorkingPane.widthProperty().addListener(new ChangeListener<Number>() // when things are resized
-        {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number number, Number oldNumber)
-            {
-                Calculate();
-            }
-        });
-        _WorkingPane.heightProperty().addListener(new ChangeListener<Number>() // when things are resized
-        {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number number, Number oldNumber)
-            {
-                Calculate();
-            }
-        });
-        /*
-        _ReferencePane.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() // when things are resized
-        {
-            @Override
-            public void changed(ObservableValue<? extends Bounds> observable, Bounds oldBounds, Bounds bounds)
-            {
-                clip.setWidth(bounds.getWidth());
-                clip.setHeight(bounds.getHeight());
-                _ReferencePane.setClip(clip);
-                Calculate();
-            }
-        });
-        */
-        _Scale.addListener(new ChangeListener<Number>() // when the scale changes
-        {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2)
-            {
-                Calculate();
-            }
-        });
-    }
-
     private double CalcTranslationX()
     {
         double refWidth, paneWidth;
@@ -188,5 +138,55 @@ public class TranslationCalculator
         }
         */
         return ty;
+    }
+
+    private void Calculate()
+    {
+        double tX = CalcTranslationX();
+        double tY = CalcTranslationY();
+        // Don't think I need this anymor
+        _Translate.setX(tX);
+        _Translate.setY(tY);
+    }
+
+    private void SetupListeners()
+    {
+        _WorkingPane.widthProperty().addListener(new ChangeListener<Number>() // when things are resized
+        {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number number, Number oldNumber)
+            {
+                Calculate();
+            }
+        });
+        _WorkingPane.heightProperty().addListener(new ChangeListener<Number>() // when things are resized
+        {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number number, Number oldNumber)
+            {
+                Calculate();
+            }
+        });
+        /*
+        _ReferencePane.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() // when things are resized
+        {
+            @Override
+            public void changed(ObservableValue<? extends Bounds> observable, Bounds oldBounds, Bounds bounds)
+            {
+                clip.setWidth(bounds.getWidth());
+                clip.setHeight(bounds.getHeight());
+                _ReferencePane.setClip(clip);
+                Calculate();
+            }
+        });
+        */
+        _Scale.addListener(new ChangeListener<Number>() // when the scale changes
+        {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2)
+            {
+                Calculate();
+            }
+        });
     }
 }

@@ -35,6 +35,13 @@ public class Version
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private static Properties _Props = null;
     
+    /**
+     *
+     */
+    public static void Display()
+    {
+        System.out.println(Version.getVersion());
+    }
     public static String getBuildNumber()
     {
         if (null != Version.getProperties())
@@ -43,23 +50,6 @@ public class Version
         }
         return "1";
     }
-    public static String getYearVersion()
-    {
-        if (null != Version.getProperties())
-        {
-            return Version.getProperties().getProperty("Year_Version");
-        }
-        return "0";
-    }
-    public static String getMonthVersion()
-    {
-        if (null != Version.getProperties())
-        {
-            return Version.getProperties().getProperty("Month_Version");
-        }
-        return "9";
-    }
-    
     public static String getDayVersion()
     {
         if (null != Version.getProperties())
@@ -68,20 +58,16 @@ public class Version
         }
         return "9";
     }
-
     
-    public static String getRelease()
+    public static String getMonthVersion()
     {
         if (null != Version.getProperties())
         {
-            return Version.getProperties().getProperty("Release");
+            return Version.getProperties().getProperty("Month_Version");
         }
-        return "[Undefined]";
+        return "9";
     }
-    public static String getVersion()
-    {
-        return  Version.getRelease() + " - " + Version.getYearVersion() +"." + Version.getMonthVersion() +"." + Version.getDayVersion() + " build " + Version.getBuildNumber();
-    }
+
     
     private static Properties getProperties() 
     {
@@ -111,12 +97,26 @@ public class Version
         }
         return null;
     }
-    
-    /**
-     *
-     */
-    public static void Display()
+    public static String getRelease()
     {
-        System.out.println(Version.getVersion());
+        if (null != Version.getProperties())
+        {
+            return Version.getProperties().getProperty("Release");
+        }
+        return "[Undefined]";
+    }
+    
+    public static String getVersion()
+    {
+        return  Version.getRelease() + " - " + Version.getYearVersion() +"." + Version.getMonthVersion() +"." + Version.getDayVersion() + " build " + Version.getBuildNumber();
+    }
+    
+    public static String getYearVersion()
+    {
+        if (null != Version.getProperties())
+        {
+            return Version.getProperties().getProperty("Year_Version");
+        }
+        return "0";
     }
 }

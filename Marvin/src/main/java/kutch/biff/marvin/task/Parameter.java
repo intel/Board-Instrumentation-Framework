@@ -32,43 +32,33 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 public class Parameter
 {
-    private String _value;
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    
-    public Parameter()
-    {
-	
-    }
-    
-    public Parameter(String val)
-    {
-	_value = val;
-    }
-    
-    @Override
-    public String toString()
-    {
-	if (_value.charAt(0) == '@' && null != PromptManager.getPromptManager().getPrompt(_value.substring(1)))
-	{
-	    BasePrompt objPrompt = PromptManager.getPromptManager().getPrompt(_value.substring(1));
-	    if (null == objPrompt)
-	    {
-		return null;
-	    }
-	    if (objPrompt.PerformPrompt())
-	    {
-		return objPrompt.GetPromptedValue();
-	    }
-	    LOGGER.info("Prompted value was cancelled");
-	    return null;
-	}
-	
-	return CheckForDataSrcParameter(_value);
-    }
-    
     public static String CheckForDataSrcParameter(String strCheck)
     {
 	return Parameter.HandleDataSrc(strCheck);
+    }
+    
+    public static int findClosingParen(String text, int openPos)
+    {
+	int closePos = openPos;
+	int counter = 1;
+	while (counter > 0)
+	{
+	    if (++closePos >= text.length())
+	    {
+		return -1;
+	    }
+	    char c = text.charAt(closePos);
+	    if (c == '(')
+	    {
+		counter++;
+	    }
+	    else if (c == ')')
+	    {
+		counter--;
+	    }
+	}
+	return closePos;
     }
     
     public static String GetDataSrcVal(String strAlias)
@@ -111,29 +101,6 @@ public class Parameter
 	    }
 	}
 	return strVal;
-    }
-    
-    public static int findClosingParen(String text, int openPos)
-    {
-	int closePos = openPos;
-	int counter = 1;
-	while (counter > 0)
-	{
-	    if (++closePos >= text.length())
-	    {
-		return -1;
-	    }
-	    char c = text.charAt(closePos);
-	    if (c == '(')
-	    {
-		counter++;
-	    }
-	    else if (c == ')')
-	    {
-		counter--;
-	    }
-	}
-	return closePos;
     }
     
     /***
@@ -186,5 +153,38 @@ public class Parameter
 	}
 	
 	return retString;
+    }
+    
+    private String _value;
+    
+    public Parameter()
+    {
+	
+    }
+    
+    public Parameter(String val)
+    {
+	_value = val;
+    }
+    
+    @Override
+    public String toString()
+    {
+	if (_value.charAt(0) == '@' && null != PromptManager.getPromptManager().getPrompt(_value.substring(1)))
+	{
+	    BasePrompt objPrompt = PromptManager.getPromptManager().getPrompt(_value.substring(1));
+	    if (null == objPrompt)
+	    {
+		return null;
+	    }
+	    if (objPrompt.PerformPrompt())
+	    {
+		return objPrompt.GetPromptedValue();
+	    }
+	    LOGGER.info("Prompted value was cancelled");
+	    return null;
+	}
+	
+	return CheckForDataSrcParameter(_value);
     }
 }

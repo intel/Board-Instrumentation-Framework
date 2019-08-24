@@ -45,6 +45,16 @@ public class ToggleButtonWidget extends ButtonWidget
     }    
     
     @Override
+    public void HandleWidgetSpecificAttributes(FrameworkNode widgetNode)
+    {
+        if (widgetNode.hasAttribute("ToggleTask"))
+        {
+            _UnToggleTask = widgetNode.getAttribute("ToggleTask");
+        }
+        
+    }
+    
+    @Override
     public void mouseHandler(MouseEvent event)
     {
         BaseWidget objWidget = this;
@@ -75,16 +85,6 @@ public class ToggleButtonWidget extends ButtonWidget
                 }
             }
         }
-    }
-    
-    @Override
-    public void HandleWidgetSpecificAttributes(FrameworkNode widgetNode)
-    {
-        if (widgetNode.hasAttribute("ToggleTask"))
-        {
-            _UnToggleTask = widgetNode.getAttribute("ToggleTask");
-        }
-        
     }
 
     

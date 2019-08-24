@@ -53,11 +53,6 @@ public class ButtonWidget extends BaseWidget
 	_ImageHeightConstraint = 0;
     }
     
-    protected ButtonBase getButton()
-    {
-	return _Button;
-    }
-    
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
@@ -88,10 +83,9 @@ public class ButtonWidget extends BaseWidget
 	return ApplyCSS();
     }
     
-    protected void onChange(ObservableValue<?> o, Object oldVal, Object newVal)
+    protected ButtonBase getButton()
     {
-	String strVal = newVal.toString();
-	getButton().setText(strVal);
+	return _Button;
     }
     
     @Override
@@ -107,9 +101,47 @@ public class ButtonWidget extends BaseWidget
     }
     
     @Override
-    public boolean SupportsEnableDisable()
+    public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode)
     {
-	return true;
+	if (widgetNode.getNodeName().equalsIgnoreCase("Image"))
+	{
+	    setImageFileName(widgetNode.getTextContent());
+	    
+	    Utility.ValidateAttributes(new String[] { "Height", "Width" }, widgetNode);
+	    if (widgetNode.hasAttribute("Width"))
+	    {
+		try
+		{
+		    _ImageWidthConstraint = Double.parseDouble(widgetNode.getAttribute("Width"));
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Button Image has invalid Width specified: " + widgetNode.getAttribute("Width"));
+		    return false;
+		}
+	    }
+	    if (widgetNode.hasAttribute("Height"))
+	    {
+		try
+		{
+		    _ImageHeightConstraint = Double.parseDouble(widgetNode.getAttribute("Height"));
+		}
+		catch(NumberFormatException ex)
+		{
+		    LOGGER.severe("Button Image has invalid Height specified: " + widgetNode.getAttribute("Height"));
+		    return false;
+		}
+	    }
+	    
+	    return true;
+	}
+	return false;
+    }
+    
+    protected void onChange(ObservableValue<?> o, Object oldVal, Object newVal)
+    {
+	String strVal = newVal.toString();
+	getButton().setText(strVal);
     }
     
     @Override
@@ -159,41 +191,9 @@ public class ButtonWidget extends BaseWidget
     }
     
     @Override
-    public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode)
+    public boolean SupportsEnableDisable()
     {
-	if (widgetNode.getNodeName().equalsIgnoreCase("Image"))
-	{
-	    setImageFileName(widgetNode.getTextContent());
-	    
-	    Utility.ValidateAttributes(new String[] { "Height", "Width" }, widgetNode);
-	    if (widgetNode.hasAttribute("Width"))
-	    {
-		try
-		{
-		    _ImageWidthConstraint = Double.parseDouble(widgetNode.getAttribute("Width"));
-		}
-		catch(Exception ex)
-		{
-		    LOGGER.severe("Button Image has invalid Width specified: " + widgetNode.getAttribute("Width"));
-		    return false;
-		}
-	    }
-	    if (widgetNode.hasAttribute("Height"))
-	    {
-		try
-		{
-		    _ImageHeightConstraint = Double.parseDouble(widgetNode.getAttribute("Height"));
-		}
-		catch(NumberFormatException ex)
-		{
-		    LOGGER.severe("Button Image has invalid Height specified: " + widgetNode.getAttribute("Height"));
-		    return false;
-		}
-	    }
-	    
-	    return true;
-	}
-	return false;
+	return true;
     }
     
     @Override

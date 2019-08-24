@@ -105,6 +105,437 @@ public class WidgetBuilder
         return null;
     }
 
+    public static DynamicGridWidget BuildDynamicGrid(FrameworkNode dynaGridNode)
+    {
+        DynamicGridWidget retWidget = new DynamicGridWidget();
+        String rowSpan = "1";
+        String colSpan = "1";
+        String strRow = "0";
+        String strColumn = "0";
+        String WhatIsIt = "DynamicGrid";
+
+        if (false == dynaGridNode.hasAttribute("row"))
+        {
+            LOGGER.severe("DynamicGrid with no row");
+            return null;
+        }
+
+        if (dynaGridNode.hasAttribute("Task"))
+        {
+            retWidget.setTaskID(dynaGridNode.getAttribute("Task"));
+        }
+
+        if (false == dynaGridNode.hasAttribute("column"))
+        {
+            LOGGER.severe("Grid with no column");
+            return null;
+        }
+        if (dynaGridNode.hasAttribute("rowSpan"))
+        {
+            rowSpan = dynaGridNode.getAttribute("rowSpan");
+        }
+        if (dynaGridNode.hasAttribute("colSpan"))
+        {
+            colSpan = dynaGridNode.getAttribute("colSpan");
+        }
+        if (dynaGridNode.hasAttribute("columnspan"))
+        {
+            colSpan = dynaGridNode.getAttribute("columnspan");
+        }
+        if (true == dynaGridNode.hasAttribute("Height"))
+        {
+            if (!retWidget.parseHeight(dynaGridNode))
+            {
+                LOGGER.severe("Invalid Height for Grid in Application.xml");
+                return null;
+            }
+        }
+        if (true == dynaGridNode.hasAttribute("Width"))
+        {
+            if (!retWidget.parseWidth(dynaGridNode))
+            {
+                LOGGER.severe("Invalid Width for Grid in Application.xml");
+                return null;
+            }
+        }
+
+        strRow = dynaGridNode.getAttribute("row");
+        strColumn = dynaGridNode.getAttribute("column");
+        if (strRow == null)
+        {
+            LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. no row defined");
+            return null;
+        }
+        if (strColumn == null)
+        {
+            LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. no row defined");
+            return null;
+        }
+
+        try
+        {
+            retWidget.setRow(Integer.parseInt(strRow));
+            retWidget.setColumn(Integer.parseInt(strColumn));
+            retWidget.setRowSpan(Integer.parseInt(rowSpan));
+            retWidget.setColumnSpan(Integer.parseInt(colSpan));
+            AliasMgr.getAliasMgr().UpdateCurrentColumn(Integer.parseInt(strColumn));
+            AliasMgr.getAliasMgr().UpdateCurrentRow(Integer.parseInt(strRow));
+            AliasMgr.getAliasMgr().PushAliasList(true);
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. ");
+            return null;
+        }
+        if (dynaGridNode.hasAttribute("hgap"))
+        {
+            try
+            {
+                retWidget.sethGap(Integer.parseInt(dynaGridNode.getAttribute("hgap")));
+                LOGGER.config("Setting hGap for " + WhatIsIt + " :" + dynaGridNode.getAttribute("hgap"));
+            }
+            catch (NumberFormatException ex)
+            {
+                LOGGER.warning("hgap for " + WhatIsIt + "  invalid: " + dynaGridNode.getAttribute("hgap") + ".  Ignoring");
+            }
+        }
+        if (dynaGridNode.hasAttribute("vgap"))
+        {
+            try
+            {
+                retWidget.setvGap(Integer.parseInt(dynaGridNode.getAttribute("vgap")));
+                LOGGER.config("Setting vGap for " + WhatIsIt + " :" + dynaGridNode.getAttribute("vgap"));
+            }
+            catch (NumberFormatException ex)
+            {
+                LOGGER.warning("vgap for " + WhatIsIt + " invalid: " + dynaGridNode.getAttribute("vgap") + ".  Ignoring");
+            }
+        }
+        if (true == dynaGridNode.hasAttribute("Align"))
+        {
+            String str = dynaGridNode.getAttribute("Align");
+            retWidget.setAlignment(str);
+        }
+
+        else
+        { // if not an external declaration, check for known options
+            Utility.ValidateAttributes(new String[]
+            {
+                "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
+            }, dynaGridNode);
+
+        }
+
+        // go read the grid contents - note that this could be a continuation from stuff already read in via file
+        // so you can define most of grid in external file, but keep adding
+        retWidget = ReadGridInfo(dynaGridNode, retWidget);
+        AliasMgr.getAliasMgr().PopAliasList();
+        return retWidget;
+    }
+    
+    public static GridWidget BuildGrid(FrameworkNode gridNode, boolean isFlipPanelGrid)
+    {
+        GridWidget retWidget = new GridWidget();
+        String rowSpan = "1";
+        String colSpan = "1";
+        String strRow = "0";
+        String strColumn = "0";
+        String WhatIsIt = "Grid";
+        boolean isOnDemand = false;
+        DynamicItemInfoContainer info = null;
+
+        if (true == isFlipPanelGrid)
+        {
+            WhatIsIt = "FlipPanel";
+        }
+
+        if (false == gridNode.hasAttribute("row") && false == isFlipPanelGrid)
+        {
+            LOGGER.severe("Grid with no row");
+            return null;
+        }
+
+        if (false == gridNode.hasAttribute("column") && false == isFlipPanelGrid)
+        {
+            LOGGER.severe("Grid with no column");
+            return null;
+        }
+        if (gridNode.hasAttribute("rowSpan"))
+        {
+            rowSpan = gridNode.getAttribute("rowSpan");
+        }
+        if (gridNode.hasAttribute("colSpan"))
+        {
+            colSpan = gridNode.getAttribute("colSpan");
+        }
+        if (gridNode.hasAttribute("columnspan"))
+        {
+            colSpan = gridNode.getAttribute("columnspan");
+        }
+
+        if (gridNode.hasChild("OnDemand"))
+        {
+            FrameworkNode demandNode = gridNode.getChild("OnDemand");
+            info = ConfigurationReader.ReadOnDemandInfo(demandNode);
+            OnDemandGridWidget objWidget = new OnDemandGridWidget(info);
+            if (demandNode.hasChild("Growth"))
+            {
+                objWidget.ReadGrowthInfo(demandNode.getChild("Growth"));
+            }
+
+            // get hgap and all those good things
+            ReadGridAttributes(objWidget, gridNode, false);
+            retWidget = objWidget;
+            WhatIsIt = "OnDemand Grid";
+            isOnDemand = true;
+            gridNode.DeleteChildNodes("OnDemand"); // delete the ondemand section, not needed anymore
+
+//            int row = gridNode.getIntegerAttribute("row", 0);
+//            int col = gridNode.getIntegerAttribute("column", 0);
+//            gridNode.AddAttibute("GRID_COLUMN_ODD", col % 2 == 0 ? "FALSE" : "TRUE");
+//            gridNode.AddAttibute("GRID_ROW_ODD", row % 2 == 0 ? "FALSE" : "TRUE");
+            info.setNode(gridNode);
+        }
+
+        if (true == gridNode.hasAttribute("Height"))
+        {
+            if (!retWidget.parseHeight(gridNode))
+            {
+                return null;
+            }
+        }
+        if (true == gridNode.hasAttribute("Width"))
+        {
+            if (!retWidget.parseWidth(gridNode))
+            {
+                return null;
+            }
+        }
+
+        if (false == isFlipPanelGrid)
+        {
+            strRow = gridNode.getAttribute("row");
+            strColumn = gridNode.getAttribute("column");
+            if (strRow == null)
+            {
+                LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. no row defined");
+                return null;
+            }
+            if (strColumn == null)
+            {
+                LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. No column defined");
+                return null;
+            }
+        }
+
+        try
+        {
+            retWidget.setRow(Integer.parseInt(strRow));
+            retWidget.setColumn(Integer.parseInt(strColumn));
+            retWidget.setRowSpan(Integer.parseInt(rowSpan));
+            retWidget.setColumnSpan(Integer.parseInt(colSpan));
+        }
+        catch (NumberFormatException ex)
+        {
+            LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. " + ex.toString());
+            return null;
+        }
+        AliasMgr.getAliasMgr().UpdateCurrentColumn(Integer.parseInt(strColumn));
+        AliasMgr.getAliasMgr().UpdateCurrentRow(Integer.parseInt(strRow));
+
+        if (isOnDemand)
+        {
+            // need to nuke these, otherwise the on-demand grid will suck them up, and that will be a problem.
+            gridNode.DeleteAttribute("rowspan");
+            gridNode.DeleteAttribute("colspan");
+            gridNode.DeleteAttribute("columnpan");
+            gridNode.DeleteAttribute("hgap");
+            gridNode.DeleteAttribute("vgap");
+            gridNode.DeleteAttribute("align");
+            gridNode.DeleteAttribute("height");
+            gridNode.DeleteAttribute("width");
+            AliasMgr.getAliasMgr().PushAliasList(false);
+            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
+                                                    {
+                                                        "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "File", "Height", "Width"
+            });
+            info.TakeAliasSnapshot(); // have to do this way down here, after the other stuff
+            AliasMgr.getAliasMgr().PopAliasList();
+            return retWidget;
+        }
+        AliasMgr.getAliasMgr().AddUpdateAlias("GRID_ROW_ODD", AliasMgr.getAliasMgr().GetAlias("CurrentRowIsOddAlias"));
+        AliasMgr.getAliasMgr().AddUpdateAlias("GRID_COLUMN_ODD", AliasMgr.getAliasMgr().GetAlias("CurrentColumnIsOddAlias"));
+
+        AliasMgr.getAliasMgr().PushAliasList(true);
+
+        if (true == gridNode.hasAttribute("File"))
+        {
+            String strFileName = gridNode.getAttribute("File");
+            StartReadingExternalFile(gridNode);
+            AliasMgr.getAliasMgr().PushAliasList(true);
+            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
+                                                    {
+                                                        "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "File", "Height", "Width"
+            });
+            if (false == AliasMgr.ReadAliasFromExternalFile(strFileName))
+            {
+                AliasMgr.getAliasMgr().PopAliasList();
+                return null;
+            }
+            FrameworkNode GridNode = WidgetBuilder.OpenDefinitionFile(gridNode.getAttribute("File"), "Grid");
+            if (null == GridNode)
+            {
+                LOGGER.severe("Invalid file: " + strFileName + " no <Grid> found.");
+                return null;
+            }
+            retWidget = ReadGridInfo(GridNode, retWidget, strFileName); // read grid from external file
+            if (null == retWidget)
+            {
+                return null;
+            }
+            if (!ConfigurationReader.ReadTasksFromExternalFile(strFileName)) // could also be tasks defined in external file
+            {
+                return null;
+            }
+            AliasMgr.getAliasMgr().PopAliasList();
+            DoneReadingExternalFile();
+        }
+
+        if (gridNode.hasAttribute("Macro"))
+        {
+            if (gridNode.hasAttribute("File"))
+            {
+                LOGGER.severe("Grid cannot have both file and Macro.");
+                return null;
+            }
+            String strMacro = gridNode.getAttribute("Macro");
+            FrameworkNode nodeMacro = GridMacroMgr.getGridMacroMgr().getGridMacro(strMacro);
+            if (null == nodeMacro)
+            {
+                LOGGER.severe("Grid Macro specified [" + strMacro + "] does not defined.");
+                return null;
+            }
+            // need to get alias from the grid macro is in
+            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
+                                                    {
+                                                        "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
+            });
+
+            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(nodeMacro, new String[]
+                                                    {
+                                                        "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
+            });
+            retWidget = ReadGridInfo(nodeMacro, retWidget, null);
+            if (null == retWidget)
+            {
+                return null;
+            }
+        }
+        // go read the grid contents - note that this could be a continuation from stuff already read in via file
+        // so you can define most of grid in external file, but keep adding
+        retWidget = ReadGridInfo(gridNode, retWidget, "");
+
+        AliasMgr.getAliasMgr().PopAliasList();
+        return retWidget;
+    }
+
+    public static List<Widget> BuildRepeatList(FrameworkNode repeatNode)
+    {
+        ArrayList<Widget> objWidgetList = new ArrayList<>();
+        int count, start;
+        String strCountAlias = "";
+        String strValueAlias = "";
+
+        AliasMgr.getAliasMgr().PushAliasList(false);
+        AliasMgr.getAliasMgr().AddAliasFromAttibuteList(repeatNode, new String[] // can define an alias list in <repeat>
+                                                {
+                                                    "Count", "startvlaue", "currentCountAlias", "currentvalueAlias"
+        });
+
+        if (!repeatNode.hasAttribute("Count"))
+        {
+            LOGGER.severe("For did not have Count attribute.");
+            return null;
+        }
+        count = repeatNode.getIntegerAttribute("Count", -1);
+        if (count < 1)
+        {
+            LOGGER.warning("For Count value invalid: " + repeatNode.getAttribute("Count"));
+            return objWidgetList;
+        }
+        start = repeatNode.getIntegerAttribute("StartValue", 0);
+
+        if (start < 0)
+        {
+            LOGGER.severe("For Start value invalid: " + repeatNode.getAttribute("startValue"));
+            return null;
+        }
+        if (repeatNode.hasAttribute("CurrentCountAlias"))
+        {
+            strCountAlias = repeatNode.getAttribute("CurrentCountAlias");
+        }
+
+        if (repeatNode.hasAttribute("CurrentValueAlias"))
+        {
+            strValueAlias = repeatNode.getAttribute("CurrentValueAlias");
+        }
+
+        for (int iLoop = 0; iLoop < count; iLoop++)
+        {
+            AliasMgr.getAliasMgr().PushAliasList(false);
+            if (!strCountAlias.isEmpty())
+            {
+                AliasMgr.getAliasMgr().AddAlias(strCountAlias, Integer.toString(iLoop));
+            }
+            if (!strValueAlias.isEmpty())
+            {
+                AliasMgr.getAliasMgr().AddAlias(strValueAlias, Integer.toString(iLoop + start));
+            }
+            // Always have these aliases
+            AliasMgr.getAliasMgr().AddAlias("CurrentValueAlias", Integer.toString(iLoop + start));
+            AliasMgr.getAliasMgr().AddAlias("CurrentCountAlias", Integer.toString(iLoop));
+
+            for (FrameworkNode node : repeatNode.getChildNodes())
+            {
+                if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
+                {
+                    continue;
+                }
+                if (node.getNodeName().equalsIgnoreCase("Widget") || node.getNodeName().equalsIgnoreCase("Grid") || node.getNodeName().equalsIgnoreCase("DynamicGrid"))
+                {
+                    Widget widget = WidgetBuilder.Build(node);
+
+                    if (null != widget)
+                    {
+                        objWidgetList.add(widget);
+                    }
+                    else
+                    {
+                        LOGGER.severe("Error creating " + node.getNodeName() + " in <Repeat>");
+                        return null;
+                    }
+                }
+                else if (node.getNodeName().equalsIgnoreCase("GridMacro") || node.getNodeName().equalsIgnoreCase("MacroGrid"))
+                {
+                    ReadGridMacro(node);
+                }
+
+                else if (node.getNodeName().equalsIgnoreCase("For")) // embedded <Repeat>s - kewl!
+                {
+                    objWidgetList.addAll(BuildRepeatList(node));
+                }
+                else
+                {
+                    LOGGER.warning("Unknown item in <For> :" + node.getNodeName() + " ignoring");
+                }
+            }
+            AliasMgr.getAliasMgr().PopAliasList();
+        }
+
+        AliasMgr.getAliasMgr().PopAliasList();
+        return objWidgetList;
+    }
+
     private static Widget BuildWidget(FrameworkNode widgetNode)
     {
         BaseWidget retWidget = null;
@@ -416,69 +847,14 @@ public class WidgetBuilder
         }
         return null;
     }
-    
-    public static Pair<ValueRange,String> ReadMinionSrcIndexInfo(FrameworkNode node)
+
+    public static void DoneReadingExternalFile()
     {
-	String cRet=",";
-	int iStart=-1,iEnd=-1;
-	
-        if (node.hasAttribute("DataIndex"))
-        {
-            	String strIndex = node.getAttribute("DataIndex");
-            	if (strIndex.contains("-"))
-            	{
-            	    String []parts = strIndex.split("-");
-            	    if (parts.length !=2)
-            	    {
-            		LOGGER.severe("Invalid DataIndex range specified for MinionSrc: " + strIndex);
-            	    }
-            	    try
-            	    {
-            		int val1 = Integer.parseInt(parts[0]);
-            		iEnd = Integer.parseInt(parts[1]);
-            		iStart = val1;
-            	    }
-                    catch (NumberFormatException ex1)
-                    {
-                	LOGGER.severe("Invalid DataIndex range specified for MinionSrc: " + strIndex);
-                    }
-            	    
-            	}
-            	else
-            	{
-                	iStart = node.getIntegerAttribute("DataIndex", -1);
-                	iEnd = iStart;
-            	}
-
-        }
-        if (node.hasAttribute("Separator"))
-        {
-        	if (!node.hasAttribute("DataIndex"))
-        	{
-        	    LOGGER.severe("Specified Separator for MinionSrc, but no DataIndex");
-        	    iStart = -1;
-        	    iEnd = iStart;        	    
-        	}
-        	String strVal = node.getAttribute("Separator");
-        	if (strVal.length() !=1)
-        	{
-        	    LOGGER.severe("Specified invalid Separator for MinionSrc: " + strVal);
-        	    iStart = -1;
-        	    iEnd = iStart;
-        	}
-        	else
-        	{
-        	    if (strVal.equalsIgnoreCase("."))
-        	    {
-        		strVal="\\.";
-        	    }
-        	    cRet = strVal;
-        	}
-        	
-        }
-	ValueRange retRange = ValueRange.of(iStart,iEnd);
-
-        return new Pair<ValueRange,String>(retRange,cRet);
+        FileDepth--;
+    }
+public static String GetFileTree()
+    {
+        return FileTree;
     }
 
     public static boolean HandlePeekaboo(BaseWidget widget, FrameworkNode widgetNode)
@@ -552,42 +928,6 @@ public class WidgetBuilder
         return false;
     }
 
-    public static boolean HandleStyleOverride(BaseWidget widget, FrameworkNode styleNode)
-    {
-        Utility.ValidateAttributes(new String[]
-        {
-            "File", "ID", "ScaleToShape"
-        }, styleNode);
-        if (styleNode.hasAttribute("File"))
-        {
-            widget.setBaseCSSFilename(styleNode.getAttribute("File"));
-        }
-        if (styleNode.hasAttribute("ID"))
-        {
-            widget.setStyleID(styleNode.getAttribute("ID"));
-
-        }
-        widget.HandleCustomStyleOverride(styleNode);
-
-        for (FrameworkNode node : styleNode.getChildNodes())
-        {
-            if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
-            {
-                continue;
-            }
-            if (node.getNodeName().equalsIgnoreCase("Item"))
-            {
-                widget.AddAdditionalStyleOverride(node.getTextContent());
-            }
-            else
-            {
-                LOGGER.severe("Unknown Tag under <StyleOverride>: " + node.getNodeName());
-                return false;
-            }
-        }
-        return true;
-    }
-
     private static boolean HandleSizeSection(FrameworkNode sizeNode, BaseWidget retWidget)
     {
         LOGGER.warning("The <Size> Tag has been deprecated - and will be removed in future release");
@@ -651,7 +991,89 @@ public class WidgetBuilder
 //
 //        return true;
     }
-/*
+
+    public static boolean HandleStyleOverride(BaseWidget widget, FrameworkNode styleNode)
+    {
+        Utility.ValidateAttributes(new String[]
+        {
+            "File", "ID", "ScaleToShape"
+        }, styleNode);
+        if (styleNode.hasAttribute("File"))
+        {
+            widget.setBaseCSSFilename(styleNode.getAttribute("File"));
+        }
+        if (styleNode.hasAttribute("ID"))
+        {
+            widget.setStyleID(styleNode.getAttribute("ID"));
+
+        }
+        widget.HandleCustomStyleOverride(styleNode);
+
+        for (FrameworkNode node : styleNode.getChildNodes())
+        {
+            if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
+            {
+                continue;
+            }
+            if (node.getNodeName().equalsIgnoreCase("Item"))
+            {
+                widget.AddAdditionalStyleOverride(node.getTextContent());
+            }
+            else
+            {
+                LOGGER.severe("Unknown Tag under <StyleOverride>: " + node.getNodeName());
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static FrameworkNode OpenDefinitionFile(String inputFilename, String DesiredNode)
+    {
+        LOGGER.config("Opening [" + DesiredNode + "] file: " + inputFilename);
+
+        Document doc = ConfigurationReader.OpenXMLFile(inputFilename);
+        if (null == doc)
+        {
+            return null;
+        }
+        boolean foundRequiredRoot = false;
+        NodeList nodes = doc.getChildNodes();
+        for (int iLoop = 0; iLoop < nodes.getLength(); iLoop++)
+        {
+            if (nodes.item(iLoop).getNodeName().equalsIgnoreCase("MarvinExternalFile"))
+            {
+                nodes = nodes.item(iLoop).getChildNodes();
+                foundRequiredRoot = true;
+                break;
+            }
+        }
+
+        if (false == foundRequiredRoot)
+        {
+            LOGGER.severe("External defintion file [" + inputFilename + "] did not have root of <MarvinExternalFile>");
+            return null;
+        }
+
+        for (int iLoop = 0; iLoop < nodes.getLength(); iLoop++)
+        {
+            Node node = nodes.item(iLoop);
+            if (null != DesiredNode)
+            {
+                if (node.getNodeName().equalsIgnoreCase(DesiredNode))
+                {
+                    return new FrameworkNode(node);
+                }
+            }
+            else if (node.hasChildNodes()) // only root should have children, so should be good
+            {
+                return new FrameworkNode(node);
+            }
+        }
+        return null;
+    }
+
+    /*
     private static int GetIntAttribute(FrameworkNode node, String Attribute, boolean fRequired)
     {
         if (node.hasAttribute(Attribute))
@@ -971,340 +1393,6 @@ public class WidgetBuilder
         return true;
     }
 
-    public static GridWidget BuildGrid(FrameworkNode gridNode, boolean isFlipPanelGrid)
-    {
-        GridWidget retWidget = new GridWidget();
-        String rowSpan = "1";
-        String colSpan = "1";
-        String strRow = "0";
-        String strColumn = "0";
-        String WhatIsIt = "Grid";
-        boolean isOnDemand = false;
-        DynamicItemInfoContainer info = null;
-
-        if (true == isFlipPanelGrid)
-        {
-            WhatIsIt = "FlipPanel";
-        }
-
-        if (false == gridNode.hasAttribute("row") && false == isFlipPanelGrid)
-        {
-            LOGGER.severe("Grid with no row");
-            return null;
-        }
-
-        if (false == gridNode.hasAttribute("column") && false == isFlipPanelGrid)
-        {
-            LOGGER.severe("Grid with no column");
-            return null;
-        }
-        if (gridNode.hasAttribute("rowSpan"))
-        {
-            rowSpan = gridNode.getAttribute("rowSpan");
-        }
-        if (gridNode.hasAttribute("colSpan"))
-        {
-            colSpan = gridNode.getAttribute("colSpan");
-        }
-        if (gridNode.hasAttribute("columnspan"))
-        {
-            colSpan = gridNode.getAttribute("columnspan");
-        }
-
-        if (gridNode.hasChild("OnDemand"))
-        {
-            FrameworkNode demandNode = gridNode.getChild("OnDemand");
-            info = ConfigurationReader.ReadOnDemandInfo(demandNode);
-            OnDemandGridWidget objWidget = new OnDemandGridWidget(info);
-            if (demandNode.hasChild("Growth"))
-            {
-                objWidget.ReadGrowthInfo(demandNode.getChild("Growth"));
-            }
-
-            // get hgap and all those good things
-            ReadGridAttributes(objWidget, gridNode, false);
-            retWidget = objWidget;
-            WhatIsIt = "OnDemand Grid";
-            isOnDemand = true;
-            gridNode.DeleteChildNodes("OnDemand"); // delete the ondemand section, not needed anymore
-
-//            int row = gridNode.getIntegerAttribute("row", 0);
-//            int col = gridNode.getIntegerAttribute("column", 0);
-//            gridNode.AddAttibute("GRID_COLUMN_ODD", col % 2 == 0 ? "FALSE" : "TRUE");
-//            gridNode.AddAttibute("GRID_ROW_ODD", row % 2 == 0 ? "FALSE" : "TRUE");
-            info.setNode(gridNode);
-        }
-
-        if (true == gridNode.hasAttribute("Height"))
-        {
-            if (!retWidget.parseHeight(gridNode))
-            {
-                return null;
-            }
-        }
-        if (true == gridNode.hasAttribute("Width"))
-        {
-            if (!retWidget.parseWidth(gridNode))
-            {
-                return null;
-            }
-        }
-
-        if (false == isFlipPanelGrid)
-        {
-            strRow = gridNode.getAttribute("row");
-            strColumn = gridNode.getAttribute("column");
-            if (strRow == null)
-            {
-                LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. no row defined");
-                return null;
-            }
-            if (strColumn == null)
-            {
-                LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. No column defined");
-                return null;
-            }
-        }
-
-        try
-        {
-            retWidget.setRow(Integer.parseInt(strRow));
-            retWidget.setColumn(Integer.parseInt(strColumn));
-            retWidget.setRowSpan(Integer.parseInt(rowSpan));
-            retWidget.setColumnSpan(Integer.parseInt(colSpan));
-        }
-        catch (NumberFormatException ex)
-        {
-            LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. " + ex.toString());
-            return null;
-        }
-        AliasMgr.getAliasMgr().UpdateCurrentColumn(Integer.parseInt(strColumn));
-        AliasMgr.getAliasMgr().UpdateCurrentRow(Integer.parseInt(strRow));
-
-        if (isOnDemand)
-        {
-            // need to nuke these, otherwise the on-demand grid will suck them up, and that will be a problem.
-            gridNode.DeleteAttribute("rowspan");
-            gridNode.DeleteAttribute("colspan");
-            gridNode.DeleteAttribute("columnpan");
-            gridNode.DeleteAttribute("hgap");
-            gridNode.DeleteAttribute("vgap");
-            gridNode.DeleteAttribute("align");
-            gridNode.DeleteAttribute("height");
-            gridNode.DeleteAttribute("width");
-            AliasMgr.getAliasMgr().PushAliasList(false);
-            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
-                                                    {
-                                                        "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "File", "Height", "Width"
-            });
-            info.TakeAliasSnapshot(); // have to do this way down here, after the other stuff
-            AliasMgr.getAliasMgr().PopAliasList();
-            return retWidget;
-        }
-        AliasMgr.getAliasMgr().AddUpdateAlias("GRID_ROW_ODD", AliasMgr.getAliasMgr().GetAlias("CurrentRowIsOddAlias"));
-        AliasMgr.getAliasMgr().AddUpdateAlias("GRID_COLUMN_ODD", AliasMgr.getAliasMgr().GetAlias("CurrentColumnIsOddAlias"));
-
-        AliasMgr.getAliasMgr().PushAliasList(true);
-
-        if (true == gridNode.hasAttribute("File"))
-        {
-            String strFileName = gridNode.getAttribute("File");
-            StartReadingExternalFile(gridNode);
-            AliasMgr.getAliasMgr().PushAliasList(true);
-            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
-                                                    {
-                                                        "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "File", "Height", "Width"
-            });
-            if (false == AliasMgr.ReadAliasFromExternalFile(strFileName))
-            {
-                AliasMgr.getAliasMgr().PopAliasList();
-                return null;
-            }
-            FrameworkNode GridNode = WidgetBuilder.OpenDefinitionFile(gridNode.getAttribute("File"), "Grid");
-            if (null == GridNode)
-            {
-                LOGGER.severe("Invalid file: " + strFileName + " no <Grid> found.");
-                return null;
-            }
-            retWidget = ReadGridInfo(GridNode, retWidget, strFileName); // read grid from external file
-            if (null == retWidget)
-            {
-                return null;
-            }
-            if (!ConfigurationReader.ReadTasksFromExternalFile(strFileName)) // could also be tasks defined in external file
-            {
-                return null;
-            }
-            AliasMgr.getAliasMgr().PopAliasList();
-            DoneReadingExternalFile();
-        }
-
-        if (gridNode.hasAttribute("Macro"))
-        {
-            if (gridNode.hasAttribute("File"))
-            {
-                LOGGER.severe("Grid cannot have both file and Macro.");
-                return null;
-            }
-            String strMacro = gridNode.getAttribute("Macro");
-            FrameworkNode nodeMacro = GridMacroMgr.getGridMacroMgr().getGridMacro(strMacro);
-            if (null == nodeMacro)
-            {
-                LOGGER.severe("Grid Macro specified [" + strMacro + "] does not defined.");
-                return null;
-            }
-            // need to get alias from the grid macro is in
-            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(gridNode, new String[]
-                                                    {
-                                                        "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
-            });
-
-            AliasMgr.getAliasMgr().AddAliasFromAttibuteList(nodeMacro, new String[]
-                                                    {
-                                                        "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
-            });
-            retWidget = ReadGridInfo(nodeMacro, retWidget, null);
-            if (null == retWidget)
-            {
-                return null;
-            }
-        }
-        // go read the grid contents - note that this could be a continuation from stuff already read in via file
-        // so you can define most of grid in external file, but keep adding
-        retWidget = ReadGridInfo(gridNode, retWidget, "");
-
-        AliasMgr.getAliasMgr().PopAliasList();
-        return retWidget;
-    }
-
-    public static DynamicGridWidget BuildDynamicGrid(FrameworkNode dynaGridNode)
-    {
-        DynamicGridWidget retWidget = new DynamicGridWidget();
-        String rowSpan = "1";
-        String colSpan = "1";
-        String strRow = "0";
-        String strColumn = "0";
-        String WhatIsIt = "DynamicGrid";
-
-        if (false == dynaGridNode.hasAttribute("row"))
-        {
-            LOGGER.severe("DynamicGrid with no row");
-            return null;
-        }
-
-        if (dynaGridNode.hasAttribute("Task"))
-        {
-            retWidget.setTaskID(dynaGridNode.getAttribute("Task"));
-        }
-
-        if (false == dynaGridNode.hasAttribute("column"))
-        {
-            LOGGER.severe("Grid with no column");
-            return null;
-        }
-        if (dynaGridNode.hasAttribute("rowSpan"))
-        {
-            rowSpan = dynaGridNode.getAttribute("rowSpan");
-        }
-        if (dynaGridNode.hasAttribute("colSpan"))
-        {
-            colSpan = dynaGridNode.getAttribute("colSpan");
-        }
-        if (dynaGridNode.hasAttribute("columnspan"))
-        {
-            colSpan = dynaGridNode.getAttribute("columnspan");
-        }
-        if (true == dynaGridNode.hasAttribute("Height"))
-        {
-            if (!retWidget.parseHeight(dynaGridNode))
-            {
-                LOGGER.severe("Invalid Height for Grid in Application.xml");
-                return null;
-            }
-        }
-        if (true == dynaGridNode.hasAttribute("Width"))
-        {
-            if (!retWidget.parseWidth(dynaGridNode))
-            {
-                LOGGER.severe("Invalid Width for Grid in Application.xml");
-                return null;
-            }
-        }
-
-        strRow = dynaGridNode.getAttribute("row");
-        strColumn = dynaGridNode.getAttribute("column");
-        if (strRow == null)
-        {
-            LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. no row defined");
-            return null;
-        }
-        if (strColumn == null)
-        {
-            LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. no row defined");
-            return null;
-        }
-
-        try
-        {
-            retWidget.setRow(Integer.parseInt(strRow));
-            retWidget.setColumn(Integer.parseInt(strColumn));
-            retWidget.setRowSpan(Integer.parseInt(rowSpan));
-            retWidget.setColumnSpan(Integer.parseInt(colSpan));
-            AliasMgr.getAliasMgr().UpdateCurrentColumn(Integer.parseInt(strColumn));
-            AliasMgr.getAliasMgr().UpdateCurrentRow(Integer.parseInt(strRow));
-            AliasMgr.getAliasMgr().PushAliasList(true);
-        }
-        catch (NumberFormatException ex)
-        {
-            LOGGER.severe("Invalid " + WhatIsIt + " definition in Configuration file. ");
-            return null;
-        }
-        if (dynaGridNode.hasAttribute("hgap"))
-        {
-            try
-            {
-                retWidget.sethGap(Integer.parseInt(dynaGridNode.getAttribute("hgap")));
-                LOGGER.config("Setting hGap for " + WhatIsIt + " :" + dynaGridNode.getAttribute("hgap"));
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.warning("hgap for " + WhatIsIt + "  invalid: " + dynaGridNode.getAttribute("hgap") + ".  Ignoring");
-            }
-        }
-        if (dynaGridNode.hasAttribute("vgap"))
-        {
-            try
-            {
-                retWidget.setvGap(Integer.parseInt(dynaGridNode.getAttribute("vgap")));
-                LOGGER.config("Setting vGap for " + WhatIsIt + " :" + dynaGridNode.getAttribute("vgap"));
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.warning("vgap for " + WhatIsIt + " invalid: " + dynaGridNode.getAttribute("vgap") + ".  Ignoring");
-            }
-        }
-        if (true == dynaGridNode.hasAttribute("Align"))
-        {
-            String str = dynaGridNode.getAttribute("Align");
-            retWidget.setAlignment(str);
-        }
-
-        else
-        { // if not an external declaration, check for known options
-            Utility.ValidateAttributes(new String[]
-            {
-                "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap", "vgap", "Align", "Height", "Width"
-            }, dynaGridNode);
-
-        }
-
-        // go read the grid contents - note that this could be a continuation from stuff already read in via file
-        // so you can define most of grid in external file, but keep adding
-        retWidget = ReadGridInfo(dynaGridNode, retWidget);
-        AliasMgr.getAliasMgr().PopAliasList();
-        return retWidget;
-    }
-
     public static DynamicGridWidget ReadGridInfo(FrameworkNode gridNode, DynamicGridWidget retWidget)
     {
         if (gridNode.getChildNodes().isEmpty())
@@ -1584,146 +1672,68 @@ public class WidgetBuilder
         return true;
     }
 
-    public static FrameworkNode OpenDefinitionFile(String inputFilename, String DesiredNode)
+    public static Pair<ValueRange,String> ReadMinionSrcIndexInfo(FrameworkNode node)
     {
-        LOGGER.config("Opening [" + DesiredNode + "] file: " + inputFilename);
-
-        Document doc = ConfigurationReader.OpenXMLFile(inputFilename);
-        if (null == doc)
+	String cRet=",";
+	int iStart=-1,iEnd=-1;
+	
+        if (node.hasAttribute("DataIndex"))
         {
-            return null;
-        }
-        boolean foundRequiredRoot = false;
-        NodeList nodes = doc.getChildNodes();
-        for (int iLoop = 0; iLoop < nodes.getLength(); iLoop++)
-        {
-            if (nodes.item(iLoop).getNodeName().equalsIgnoreCase("MarvinExternalFile"))
-            {
-                nodes = nodes.item(iLoop).getChildNodes();
-                foundRequiredRoot = true;
-                break;
-            }
-        }
-
-        if (false == foundRequiredRoot)
-        {
-            LOGGER.severe("External defintion file [" + inputFilename + "] did not have root of <MarvinExternalFile>");
-            return null;
-        }
-
-        for (int iLoop = 0; iLoop < nodes.getLength(); iLoop++)
-        {
-            Node node = nodes.item(iLoop);
-            if (null != DesiredNode)
-            {
-                if (node.getNodeName().equalsIgnoreCase(DesiredNode))
-                {
-                    return new FrameworkNode(node);
-                }
-            }
-            else if (node.hasChildNodes()) // only root should have children, so should be good
-            {
-                return new FrameworkNode(node);
-            }
-        }
-        return null;
-    }
-
-    public static List<Widget> BuildRepeatList(FrameworkNode repeatNode)
-    {
-        ArrayList<Widget> objWidgetList = new ArrayList<>();
-        int count, start;
-        String strCountAlias = "";
-        String strValueAlias = "";
-
-        AliasMgr.getAliasMgr().PushAliasList(false);
-        AliasMgr.getAliasMgr().AddAliasFromAttibuteList(repeatNode, new String[] // can define an alias list in <repeat>
-                                                {
-                                                    "Count", "startvlaue", "currentCountAlias", "currentvalueAlias"
-        });
-
-        if (!repeatNode.hasAttribute("Count"))
-        {
-            LOGGER.severe("For did not have Count attribute.");
-            return null;
-        }
-        count = repeatNode.getIntegerAttribute("Count", -1);
-        if (count < 1)
-        {
-            LOGGER.warning("For Count value invalid: " + repeatNode.getAttribute("Count"));
-            return objWidgetList;
-        }
-        start = repeatNode.getIntegerAttribute("StartValue", 0);
-
-        if (start < 0)
-        {
-            LOGGER.severe("For Start value invalid: " + repeatNode.getAttribute("startValue"));
-            return null;
-        }
-        if (repeatNode.hasAttribute("CurrentCountAlias"))
-        {
-            strCountAlias = repeatNode.getAttribute("CurrentCountAlias");
-        }
-
-        if (repeatNode.hasAttribute("CurrentValueAlias"))
-        {
-            strValueAlias = repeatNode.getAttribute("CurrentValueAlias");
-        }
-
-        for (int iLoop = 0; iLoop < count; iLoop++)
-        {
-            AliasMgr.getAliasMgr().PushAliasList(false);
-            if (!strCountAlias.isEmpty())
-            {
-                AliasMgr.getAliasMgr().AddAlias(strCountAlias, Integer.toString(iLoop));
-            }
-            if (!strValueAlias.isEmpty())
-            {
-                AliasMgr.getAliasMgr().AddAlias(strValueAlias, Integer.toString(iLoop + start));
-            }
-            // Always have these aliases
-            AliasMgr.getAliasMgr().AddAlias("CurrentValueAlias", Integer.toString(iLoop + start));
-            AliasMgr.getAliasMgr().AddAlias("CurrentCountAlias", Integer.toString(iLoop));
-
-            for (FrameworkNode node : repeatNode.getChildNodes())
-            {
-                if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
-                {
-                    continue;
-                }
-                if (node.getNodeName().equalsIgnoreCase("Widget") || node.getNodeName().equalsIgnoreCase("Grid") || node.getNodeName().equalsIgnoreCase("DynamicGrid"))
-                {
-                    Widget widget = WidgetBuilder.Build(node);
-
-                    if (null != widget)
+            	String strIndex = node.getAttribute("DataIndex");
+            	if (strIndex.contains("-"))
+            	{
+            	    String []parts = strIndex.split("-");
+            	    if (parts.length !=2)
+            	    {
+            		LOGGER.severe("Invalid DataIndex range specified for MinionSrc: " + strIndex);
+            	    }
+            	    try
+            	    {
+            		int val1 = Integer.parseInt(parts[0]);
+            		iEnd = Integer.parseInt(parts[1]);
+            		iStart = val1;
+            	    }
+                    catch (NumberFormatException ex1)
                     {
-                        objWidgetList.add(widget);
+                	LOGGER.severe("Invalid DataIndex range specified for MinionSrc: " + strIndex);
                     }
-                    else
-                    {
-                        LOGGER.severe("Error creating " + node.getNodeName() + " in <Repeat>");
-                        return null;
-                    }
-                }
-                else if (node.getNodeName().equalsIgnoreCase("GridMacro") || node.getNodeName().equalsIgnoreCase("MacroGrid"))
-                {
-                    ReadGridMacro(node);
-                }
+            	    
+            	}
+            	else
+            	{
+                	iStart = node.getIntegerAttribute("DataIndex", -1);
+                	iEnd = iStart;
+            	}
 
-                else if (node.getNodeName().equalsIgnoreCase("For")) // embedded <Repeat>s - kewl!
-                {
-                    objWidgetList.addAll(BuildRepeatList(node));
-                }
-                else
-                {
-                    LOGGER.warning("Unknown item in <For> :" + node.getNodeName() + " ignoring");
-                }
-            }
-            AliasMgr.getAliasMgr().PopAliasList();
         }
+        if (node.hasAttribute("Separator"))
+        {
+        	if (!node.hasAttribute("DataIndex"))
+        	{
+        	    LOGGER.severe("Specified Separator for MinionSrc, but no DataIndex");
+        	    iStart = -1;
+        	    iEnd = iStart;        	    
+        	}
+        	String strVal = node.getAttribute("Separator");
+        	if (strVal.length() !=1)
+        	{
+        	    LOGGER.severe("Specified invalid Separator for MinionSrc: " + strVal);
+        	    iStart = -1;
+        	    iEnd = iStart;
+        	}
+        	else
+        	{
+        	    if (strVal.equalsIgnoreCase("."))
+        	    {
+        		strVal="\\.";
+        	    }
+        	    cRet = strVal;
+        	}
+        	
+        }
+	ValueRange retRange = ValueRange.of(iStart,iEnd);
 
-        AliasMgr.getAliasMgr().PopAliasList();
-        return objWidgetList;
+        return new Pair<ValueRange,String>(retRange,cRet);
     }
 
     public static void StartReadingExternalFile(FrameworkNode node)
@@ -1737,15 +1747,5 @@ public class WidgetBuilder
         strPrint += node.getAttributeList() + "\n";
         FileTree += strPrint;
         FileDepth++;
-    }
-
-    public static void DoneReadingExternalFile()
-    {
-        FileDepth--;
-    }
-
-    public static String GetFileTree()
-    {
-        return FileTree;
     }
 }

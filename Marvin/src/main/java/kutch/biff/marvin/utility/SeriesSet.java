@@ -62,6 +62,12 @@ public class SeriesSet
         _Series.getData().add(new XYChart.Data<>(objSeries.getTitle(),110000.0));
     }
 
+    @SuppressWarnings("rawtypes")
+    public XYChart.Series getSeries()
+    {
+        return _Series;
+    }
+
     public ArrayList<SeriesDataSet> getSeriesList()
     {
         return _MinionSrcList;
@@ -70,12 +76,6 @@ public class SeriesSet
     public String getTitle()
     {
         return _Title;
-    }
-
-    @SuppressWarnings("rawtypes")
-    public XYChart.Series getSeries()
-    {
-        return _Series;
     }
    
 }

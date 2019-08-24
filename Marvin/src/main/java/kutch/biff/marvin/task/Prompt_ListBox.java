@@ -59,10 +59,10 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class Prompt_ListBox extends BasePrompt
 {
+    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final List<String> _DisplayTextList;
     private final List<String> _ParamList;
     private final List<List<DataPointGenerator>> _DataPoints;
-    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private int _PrevSelection = 0;
     public Prompt_ListBox(String ID)
     {
@@ -78,6 +78,55 @@ public class Prompt_ListBox extends BasePrompt
         _ParamList.add(strParam);
         _DataPoints.add(dps);
     }
+    
+    /**
+     * 
+     * @param baseNode
+     * @return 
+     */
+    @Override
+    public boolean HandlePromptSpecificConfig(FrameworkNode baseNode) 
+    {
+        if (baseNode.getNodeName().equalsIgnoreCase("List"))
+        {
+            for (FrameworkNode node : baseNode.getChildNodes(true))
+            {
+                if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
+                {
+                    continue;
+                }
+                if (node.getNodeName().equalsIgnoreCase("Item"))
+                {
+                    @SuppressWarnings("unused")
+		    String strDisplayText;
+                    if (node.hasAttribute("Text"))
+                    {
+                        strDisplayText = node.getAttribute("Text");
+                    }
+                    else
+                    {
+                        strDisplayText = node.getTextContent();
+                    }
+                    /* Beginning of work, but not yet done
+                    List<DataPointGenerator> dataPoints = null;
+                    if (node.hasAttribute("CreateDataPoint"))
+                    {
+                	dataPoints = ConfigurationReader.ReadDataPointsForTask(node.getAttribute("CreateDataPoint"),node.getAttribute("Text"),node.getAttribute("Task"));
+                    }
+                    AddListItem(strDisplayText,node.getTextContent(),dataPoints);
+                   */
+                }        
+                else
+                {
+                    LOGGER.severe("Invalid list item in prompt ID: " + this.toString() +" [" + node.getNodeName() +"]");
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        return false;
+    }     
     
     @Override
     protected Pane SetupDialog(Stage dialog)
@@ -166,54 +215,6 @@ public class Prompt_ListBox extends BasePrompt
         });
 
         return root;
-    }     
-    
-    /**
-     * 
-     * @param baseNode
-     * @return 
-     */
-    @Override
-    public boolean HandlePromptSpecificConfig(FrameworkNode baseNode) 
-    {
-        if (baseNode.getNodeName().equalsIgnoreCase("List"))
-        {
-            for (FrameworkNode node : baseNode.getChildNodes(true))
-            {
-                if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
-                {
-                    continue;
-                }
-                if (node.getNodeName().equalsIgnoreCase("Item"))
-                {
-                    String strDisplayText;
-                    if (node.hasAttribute("Text"))
-                    {
-                        strDisplayText = node.getAttribute("Text");
-                    }
-                    else
-                    {
-                        strDisplayText = node.getTextContent();
-                    }
-                    /* Beginning of work, but not yet done
-                    List<DataPointGenerator> dataPoints = null;
-                    if (node.hasAttribute("CreateDataPoint"))
-                    {
-                	dataPoints = ConfigurationReader.ReadDataPointsForTask(node.getAttribute("CreateDataPoint"),node.getAttribute("Text"),node.getAttribute("Task"));
-                    }
-                    AddListItem(strDisplayText,node.getTextContent(),dataPoints);
-                   */
-                }        
-                else
-                {
-                    LOGGER.severe("Invalid list item in prompt ID: " + this.toString() +" [" + node.getNodeName() +"]");
-                    return false;
-                }
-            }
-            return true;
-        }
-        
-        return false;
     }    
     
 }

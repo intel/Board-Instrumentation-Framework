@@ -54,12 +54,6 @@ public class SVG_Widget extends TextWidget
         return super.Create(pane, dataMgr);
     }   
     
-    public void SetShape(String strShape)
-    {
-        _strShape = strShape;
-    }
-    
-    
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode node)
     {
@@ -69,5 +63,11 @@ public class SVG_Widget extends TextWidget
             return true;
         }
         return false;
+    }
+    
+    
+    public void SetShape(String strShape)
+    {
+        _strShape = strShape;
     }
 }

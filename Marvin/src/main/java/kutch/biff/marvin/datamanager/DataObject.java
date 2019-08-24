@@ -36,17 +36,17 @@ public class DataObject extends Object
         _Data = data;
     }
     
-    @Override
-    public String toString()
-    {
-        return _Data;
-    }
     public boolean equals(Object obj)
     {
         return false;
     }
-    
     public String getData()
+    {
+        return _Data;
+    }
+    
+    @Override
+    public String toString()
     {
         return _Data;
     }

@@ -105,36 +105,73 @@ abstract public class BaseChartWidget extends BaseWidget
 	_isStackedChart = false;
     }
     
-    /**
-     * Routine nukes 1st entry, shifts everything left
-     *
-     * @param series
-     * @param Max
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected void ShiftSeries(XYChart.Series series, int Max)
+    @SuppressWarnings("unchecked")
+    protected void AddNewData(SeriesDataSet ds, String strNewValue)
     {
-	if (series.getData().size() < Max)
+	double newValue = 0;
+	try
 	{
+	    newValue = Double.parseDouble(strNewValue);
+	}
+	catch(Exception ex)
+	{
+	    LOGGER.severe("Invalid data for Chart received: " + strNewValue);
 	    return;
 	}
-	for (int iLoop = 0; iLoop < series.getData().size() - 1; iLoop++)
-	{
-	    XYChart.Data point = (XYChart.Data) series.getData().get(iLoop + 1);
-	    point.setXValue(iLoop);
-	}
-	series.getData().remove(0);
+	
+	ShiftSeries(ds.getSeries(), getxAxisMaxCount());
+	ds.getSeries().getData().add(new XYChart.Data<>(ds.getSeries().getData().size(), newValue));
     }
     
-    abstract Chart CreateChartObject();
-    
-    protected Chart getChart()
+    protected boolean AllDataSetsArrived()
     {
-	if (null == _chart)
+	for (SeriesDataSet ds : getSeries()) // create an entry for all
 	{
-	    LOGGER.severe("Accessing chart object before created");
+	    if (SyncronizeDataSetsMap.get(ds) == null)
+	    {
+		return false;
+	    }
 	}
-	return _chart;
+	return true;
+    }
+    
+    protected void ClearSynchronizationForMultiSource()
+    {
+	for (SeriesDataSet ds : getSeries()) // create an entry for all
+	{
+	    SyncronizeDataSetsMap.put(ds, null);
+	}
+    }
+    
+    protected void ConfigureSynchronizationForMultiSource()
+    {
+	if (true == SynchronizeMulitSourceData)
+	{
+	    SyncronizeDataSetsMap = new HashMap<>();
+	    ClearSynchronizationForMultiSource();
+	}
+    }
+    
+    protected void CreateAxisObjects()
+    {
+	if (xAxisMajorTickCount > 0)
+	{
+	    _xAxis = new NumberAxis(0d, xAxisMaxCount - 1, xAxisMaxCount / xAxisMajorTickCount);
+	}
+	else
+	{
+	    _xAxis = new NumberAxis(0d, xAxisMaxCount - 1, xAxisMajorTick);
+	}
+	
+	if (yAxisMajorTickCount > 0)
+	{
+	    _yAxis = new NumberAxis(yAxisMinValue, yAxisMaxValue, yAxisMaxValue / yAxisMajorTickCount);
+	}
+	else
+	{
+	    _yAxis = new NumberAxis(yAxisMinValue, yAxisMaxValue, yAxisMajorTick);
+	}
+	setupMinorTicks();
     }
     
     protected void CreateChart()
@@ -169,37 +206,20 @@ abstract public class BaseChartWidget extends BaseWidget
 	initialSteppedRangeSetup(yAxisMinValue, yAxisMaxValue);
     }
     
+    abstract Chart CreateChartObject();
+    
+    protected Chart getChart()
+    {
+	if (null == _chart)
+	{
+	    LOGGER.severe("Accessing chart object before created");
+	}
+	return _chart;
+    }
+    
     public ArrayList<SeriesDataSet> getSeries()
     {
 	return _Series;
-    }
-    
-    protected void CreateAxisObjects()
-    {
-	if (xAxisMajorTickCount > 0)
-	{
-	    _xAxis = new NumberAxis(0d, xAxisMaxCount - 1, xAxisMaxCount / xAxisMajorTickCount);
-	}
-	else
-	{
-	    _xAxis = new NumberAxis(0d, xAxisMaxCount - 1, xAxisMajorTick);
-	}
-	
-	if (yAxisMajorTickCount > 0)
-	{
-	    _yAxis = new NumberAxis(yAxisMinValue, yAxisMaxValue, yAxisMaxValue / yAxisMajorTickCount);
-	}
-	else
-	{
-	    _yAxis = new NumberAxis(yAxisMinValue, yAxisMaxValue, yAxisMajorTick);
-	}
-	setupMinorTicks();
-    }
-    
-    protected void setupMinorTicks()
-    {
-	((NumberAxis) (_yAxis)).setMinorTickCount((int) yAxisMinorTick + 1);
-	((NumberAxis) (_xAxis)).setMinorTickCount((int) xAxisMinorTick + 1);
     }
     
     @SuppressWarnings("rawtypes")
@@ -208,20 +228,14 @@ abstract public class BaseChartWidget extends BaseWidget
 	return _xAxis;
     }
     
-    @SuppressWarnings("rawtypes")
-    protected Axis getyAxis()
-    {
-	return _yAxis;
-    }
-    
     public String getxAxisLabel()
     {
 	return xAxisLabel;
     }
     
-    public String getyAxisLabel()
+    public double getxAxisMajorTick()
     {
-	return yAxisLabel;
+	return xAxisMajorTick;
     }
     
     public int getxAxisMaxCount()
@@ -229,59 +243,40 @@ abstract public class BaseChartWidget extends BaseWidget
 	return (int) xAxisMaxCount;
     }
     
+    public int getxAxisMinorTick()
+    {
+	return xAxisMinorTick;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    protected Axis getyAxis()
+    {
+	return _yAxis;
+    }
+    
+    public String getyAxisLabel()
+    {
+	return yAxisLabel;
+    }
+    
+    public double getyAxisMajorTick()
+    {
+	return yAxisMajorTick;
+    }
+    
+    public int getyAxisMaxCount()
+    {
+	return (int) yAxisMaxCount;
+    }
+    
     public double getyAxisMaxValue()
     {
 	return yAxisMaxValue;
     }
     
-    public void setxAxis(NumberAxis _xAxis)
+    public int getyAxisMinorTick()
     {
-	this._xAxis = _xAxis;
-    }
-    
-    public void setyAxis(NumberAxis _yAxis)
-    {
-	this._yAxis = _yAxis;
-    }
-    
-    public void setxAxisLabel(String xAxisLabel)
-    {
-	this.xAxisLabel = xAxisLabel;
-    }
-    
-    public void setyAxisLabel(String yAxisLabel)
-    {
-	this.yAxisLabel = yAxisLabel;
-    }
-    
-    public void setxAxisMaxCount(int xAxisMaxCount)
-    {
-	this.xAxisMaxCount = xAxisMaxCount;
-    }
-    
-    public void setyAxisMaxValue(double yAxisMaxValue)
-    {
-	this.yAxisMaxValue = yAxisMaxValue;
-    }
-    
-    public boolean isxAxisTickVisible()
-    {
-	return xAxisTickVisible;
-    }
-    
-    public void setxAxisTickVisible(boolean xAxisTickVisible)
-    {
-	this.xAxisTickVisible = xAxisTickVisible;
-    }
-    
-    public boolean isyAxisTickVisible()
-    {
-	return yAxisTickVisible;
-    }
-    
-    public void setyAxisTickVisible(boolean yAxisTickVisible)
-    {
-	this.yAxisTickVisible = yAxisTickVisible;
+	return yAxisMinorTick;
     }
     
     public boolean HandleChartSpecificAppSettings(FrameworkNode node)
@@ -418,86 +413,6 @@ abstract public class BaseChartWidget extends BaseWidget
 	return false;
     }
     
-    public boolean isAnimated()
-    {
-	return _Animated;
-    }
-    
-    public int getyAxisMaxCount()
-    {
-	return (int) yAxisMaxCount;
-    }
-    
-    public void setyAxisMaxCount(int yAxisMaxCount)
-    {
-	this.yAxisMaxCount = yAxisMaxCount;
-    }
-    
-    public void setAnimated(boolean _Animated)
-    {
-	this._Animated = _Animated;
-    }
-    
-    public double getyAxisMajorTick()
-    {
-	return yAxisMajorTick;
-    }
-    
-    public void setyAxisMajorTick(double yAxisMajorTick)
-    {
-	this.yAxisMajorTick = yAxisMajorTick;
-    }
-    
-    public int getyAxisMinorTick()
-    {
-	return yAxisMinorTick;
-    }
-    
-    public void setyAxisMinorTick(int yAxisMinorTick)
-    {
-	this.yAxisMinorTick = yAxisMinorTick;
-    }
-    
-    public double getxAxisMajorTick()
-    {
-	return xAxisMajorTick;
-    }
-    
-    public void setxAxisMajorTickCount(double count)
-    {
-	xAxisMajorTickCount = count;
-    }
-    
-    public void setyAxisMajorTickCount(double count)
-    {
-	yAxisMajorTickCount = count;
-    }
-    
-    public void setxAxisMinorTickCount(double count)
-    {
-	xAxisMinorTickCount = count;
-    }
-    
-    public void setyAxisMinorTickCount(double count)
-    {
-	yAxisMinorTickCount = count;
-    }
-    
-    public void setxAxisMajorTick(double xAxisMajorTick)
-    {
-	this.xAxisMajorTick = xAxisMajorTick;
-    }
-    
-    public int getxAxisMinorTick()
-    {
-	return xAxisMinorTick;
-    }
-    
-    public void setxAxisMinorTick(int xAxisMinorTick)
-    {
-	this.xAxisMinorTick = xAxisMinorTick;
-    }
-    
     protected void HandleSteppedRange(double newValue)
     {
 	if (SupportsSteppedRanges())
@@ -549,99 +464,24 @@ abstract public class BaseChartWidget extends BaseWidget
 	return true;
     }
     
-    @Override
-    public void UpdateTitle(String strTitle)
+    public boolean isAnimated()
     {
-	_chart.setTitle(strTitle);
+	return _Animated;
     }
     
-    @Override
-    public void UpdateValueRange()
+    public boolean isHorizontal()
     {
-	// if ranges changed, then change ticks
-	double currRange = abs(((NumberAxis) (_yAxis)).getUpperBound() - ((NumberAxis) (_yAxis)).getLowerBound());
-	double newRange = abs(yAxisMaxValue - yAxisMinValue);
-	double currTickCount = currRange / ((NumberAxis) (_yAxis)).getTickUnit();
-	double newTickUnit = newRange / currTickCount;
-	
-	((NumberAxis) (_yAxis)).setUpperBound(yAxisMaxValue);
-	((NumberAxis) (_yAxis)).setLowerBound(yAxisMinValue);
-	((NumberAxis) (_yAxis)).setTickUnit(newTickUnit);
-	
-	setupMinorTicks();
+	return _HorizontalChart;
     }
     
-    public void SetSynchronizeInformation(boolean flag, int timeout)
+    public boolean isxAxisTickVisible()
     {
-	SynchronizeMulitSourceData = flag;
-	MaxSynchronizeMulitSoureDataWait = timeout;
+	return xAxisTickVisible;
     }
     
-    protected void ConfigureSynchronizationForMultiSource()
+    public boolean isyAxisTickVisible()
     {
-	if (true == SynchronizeMulitSourceData)
-	{
-	    SyncronizeDataSetsMap = new HashMap<>();
-	    ClearSynchronizationForMultiSource();
-	}
-    }
-    
-    protected void ClearSynchronizationForMultiSource()
-    {
-	for (SeriesDataSet ds : getSeries()) // create an entry for all
-	{
-	    SyncronizeDataSetsMap.put(ds, null);
-	}
-    }
-    
-    @SuppressWarnings("unchecked")
-    protected void AddNewData(SeriesDataSet ds, String strNewValue)
-    {
-	double newValue = 0;
-	try
-	{
-	    newValue = Double.parseDouble(strNewValue);
-	}
-	catch(Exception ex)
-	{
-	    LOGGER.severe("Invalid data for Chart received: " + strNewValue);
-	    return;
-	}
-	
-	ShiftSeries(ds.getSeries(), getxAxisMaxCount());
-	ds.getSeries().getData().add(new XYChart.Data<>(ds.getSeries().getData().size(), newValue));
-    }
-    
-    protected boolean AllDataSetsArrived()
-    {
-	for (SeriesDataSet ds : getSeries()) // create an entry for all
-	{
-	    if (SyncronizeDataSetsMap.get(ds) == null)
-	    {
-		return false;
-	    }
-	}
-	return true;
-    }
-    
-    protected void PushSynchronizedData()
-    {
-	String strVal;
-	double tVal = 0.0;
-	for (SeriesDataSet ds : getSeries()) // create an entry for all
-	{
-	    strVal = SyncronizeDataSetsMap.put(ds, null);
-	    AddNewData(ds, strVal);
-	    if (_isStackedChart = true)
-	    { // for stacked charts, stepped range must use the aggregate value, not an
-	      // individual
-		tVal += Double.parseDouble(strVal);
-	    }
-	}
-	if (_isStackedChart = true)
-	{
-	    HandleSteppedRange(tVal);
-	}
+	return yAxisTickVisible;
     }
     
     protected void OnDataArrived(SeriesDataSet ds, String strNewValue)
@@ -661,6 +501,26 @@ abstract public class BaseChartWidget extends BaseWidget
 	{
 	    PushSynchronizedData();
 	    MaxSynchronizeMultiSourceLastUpdate = System.currentTimeMillis();
+	}
+    }
+    
+    protected void PushSynchronizedData()
+    {
+	String strVal;
+	double tVal = 0.0;
+	for (SeriesDataSet ds : getSeries()) // create an entry for all
+	{
+	    strVal = SyncronizeDataSetsMap.put(ds, null);
+	    AddNewData(ds, strVal);
+	    if (_isStackedChart = true)
+	    { // for stacked charts, stepped range must use the aggregate value, not an
+	      // individual
+		tVal += Double.parseDouble(strVal);
+	    }
+	}
+	if (_isStackedChart = true)
+	{
+	    HandleSteppedRange(tVal);
 	}
     }
     
@@ -736,9 +596,59 @@ abstract public class BaseChartWidget extends BaseWidget
 	return true;
     }
     
-    public boolean isHorizontal()
+    @SuppressWarnings("rawtypes")
+    public void resetState(String param)
     {
-	return _HorizontalChart;
+	int val = 0;
+	if (null != param)
+	{
+	    try
+	    {
+		val = Integer.parseInt(param);
+	    }
+	    catch(NumberFormatException ex)
+	    {
+	    }
+	}
+	yAxisMaxValue = yAxisMaxValue_Initial;
+	yAxisMinValue = yAxisMinValue_Initial;
+	resetSteppedRange();
+	setyAxisMaxValue(yAxisMaxValue_Initial);
+	// setyAxisMinValue(yAxisMinValue_Initial);
+	initialSteppedRangeSetup(yAxisMinValue, yAxisMaxValue);
+	UpdateValueRange();
+
+	
+	// now go and set all to zero or the specified value
+	@SuppressWarnings("unchecked")
+	ObservableList<XYChart.Series<String, Number>> dList = ((XYChart) getChart()).getData();
+	
+	for (XYChart.Series<String, Number> objSeriesEntry : dList)
+	{
+	    for (Data<String, Number> objSeries : objSeriesEntry.getData())
+	    {
+		objSeries.setYValue(val);
+	    }
+	    
+	}
+	
+    }
+    
+    public void setAnimated(boolean _Animated)
+    {
+	this._Animated = _Animated;
+    }
+    
+    public void SetSynchronizeInformation(boolean flag, int timeout)
+    {
+	SynchronizeMulitSourceData = flag;
+	MaxSynchronizeMulitSoureDataWait = timeout;
+    }
+    
+    protected void setupMinorTicks()
+    {
+	((NumberAxis) (_yAxis)).setMinorTickCount((int) yAxisMinorTick + 1);
+	((NumberAxis) (_xAxis)).setMinorTickCount((int) xAxisMinorTick + 1);
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -812,47 +722,137 @@ abstract public class BaseChartWidget extends BaseWidget
 	}
     }
     
+    public void setxAxis(NumberAxis _xAxis)
+    {
+	this._xAxis = _xAxis;
+    }
+    
+    public void setxAxisLabel(String xAxisLabel)
+    {
+	this.xAxisLabel = xAxisLabel;
+    }
+    
+    public void setxAxisMajorTick(double xAxisMajorTick)
+    {
+	this.xAxisMajorTick = xAxisMajorTick;
+    }
+    
+    public void setxAxisMajorTickCount(double count)
+    {
+	xAxisMajorTickCount = count;
+    }
+    
+    public void setxAxisMaxCount(int xAxisMaxCount)
+    {
+	this.xAxisMaxCount = xAxisMaxCount;
+    }
+    
+    public void setxAxisMinorTick(int xAxisMinorTick)
+    {
+	this.xAxisMinorTick = xAxisMinorTick;
+    }
+    
+    public void setxAxisMinorTickCount(double count)
+    {
+	xAxisMinorTickCount = count;
+    }
+    
+    public void setxAxisTickVisible(boolean xAxisTickVisible)
+    {
+	this.xAxisTickVisible = xAxisTickVisible;
+    }
+    
+    public void setyAxis(NumberAxis _yAxis)
+    {
+	this._yAxis = _yAxis;
+    }
+    
+    public void setyAxisLabel(String yAxisLabel)
+    {
+	this.yAxisLabel = yAxisLabel;
+    }
+    
+    public void setyAxisMajorTick(double yAxisMajorTick)
+    {
+	this.yAxisMajorTick = yAxisMajorTick;
+    }
+    
+    public void setyAxisMajorTickCount(double count)
+    {
+	yAxisMajorTickCount = count;
+    }
+    
+    public void setyAxisMaxCount(int yAxisMaxCount)
+    {
+	this.yAxisMaxCount = yAxisMaxCount;
+    }
+    
+    public void setyAxisMaxValue(double yAxisMaxValue)
+    {
+	this.yAxisMaxValue = yAxisMaxValue;
+    }
+    
+    public void setyAxisMinorTick(int yAxisMinorTick)
+    {
+	this.yAxisMinorTick = yAxisMinorTick;
+    }
+    
+    public void setyAxisMinorTickCount(double count)
+    {
+	yAxisMinorTickCount = count;
+    }
+    
+    public void setyAxisTickVisible(boolean yAxisTickVisible)
+    {
+	this.yAxisTickVisible = yAxisTickVisible;
+    }
+    
+    /**
+     * Routine nukes 1st entry, shifts everything left
+     *
+     * @param series
+     * @param Max
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected void ShiftSeries(XYChart.Series series, int Max)
+    {
+	if (series.getData().size() < Max)
+	{
+	    return;
+	}
+	for (int iLoop = 0; iLoop < series.getData().size() - 1; iLoop++)
+	{
+	    XYChart.Data point = (XYChart.Data) series.getData().get(iLoop + 1);
+	    point.setXValue(iLoop);
+	}
+	series.getData().remove(0);
+    }
+    
     @Override
     public boolean SupportsSteppedRanges()
     {
 	return true;
     }
     
-    @SuppressWarnings("rawtypes")
-    public void resetState(String param)
+    @Override
+    public void UpdateTitle(String strTitle)
     {
-	int val = 0;
-	if (null != param)
-	{
-	    try
-	    {
-		val = Integer.parseInt(param);
-	    }
-	    catch(NumberFormatException ex)
-	    {
-	    }
-	}
-	yAxisMaxValue = yAxisMaxValue_Initial;
-	yAxisMinValue = yAxisMinValue_Initial;
-	resetSteppedRange();
-	setyAxisMaxValue(yAxisMaxValue_Initial);
-	// setyAxisMinValue(yAxisMinValue_Initial);
-	initialSteppedRangeSetup(yAxisMinValue, yAxisMaxValue);
-	UpdateValueRange();
-
+	_chart.setTitle(strTitle);
+    }
+    
+    @Override
+    public void UpdateValueRange()
+    {
+	// if ranges changed, then change ticks
+	double currRange = abs(((NumberAxis) (_yAxis)).getUpperBound() - ((NumberAxis) (_yAxis)).getLowerBound());
+	double newRange = abs(yAxisMaxValue - yAxisMinValue);
+	double currTickCount = currRange / ((NumberAxis) (_yAxis)).getTickUnit();
+	double newTickUnit = newRange / currTickCount;
 	
-	// now go and set all to zero or the specified value
-	@SuppressWarnings("unchecked")
-	ObservableList<XYChart.Series<String, Number>> dList = ((XYChart) getChart()).getData();
+	((NumberAxis) (_yAxis)).setUpperBound(yAxisMaxValue);
+	((NumberAxis) (_yAxis)).setLowerBound(yAxisMinValue);
+	((NumberAxis) (_yAxis)).setTickUnit(newTickUnit);
 	
-	for (XYChart.Series<String, Number> objSeriesEntry : dList)
-	{
-	    for (Data<String, Number> objSeries : objSeriesEntry.getData())
-	    {
-		objSeries.setYValue(val);
-	    }
-	    
-	}
-	
+	setupMinorTicks();
     }
 }

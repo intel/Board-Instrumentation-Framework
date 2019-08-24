@@ -131,107 +131,7 @@ public class QuickViewLCDWidget extends GridWidget implements IQuickViewSort
         return true;
     }
 
-//    @Override
-//    public ObservableList<String> getStylesheets()
-//    {
-//        return _GridWidget.getStylesheets();
-//    }
-//
-//    @Override
-//    public Node getStylableObject()
-//    {
-//        return _GridWidget.getStylableObject();
-//    }
-    public int getRowWidth()
-    {
-        return _RowWidth;
-    }
-
-    public void setRowWidth(int _RowWidth)
-    {
-        this._RowWidth = _RowWidth;
-    }
-
-    public String getEvenBackgroundStyle()
-    {
-        return _EvenBackgroundStyle;
-    }
-
-    public void setEvenBackgroundStyle(String _EvenBackgroundStyle)
-    {
-        this._EvenBackgroundStyle = _EvenBackgroundStyle;
-    }
-
-    public void setEvenStyle(String ID, String File)
-    {
-        _EvenStyleID = ID;
-        _EvenStyle = File;
-    }
-
-    public String getEvenStyle()
-    {
-        return _EvenStyle;
-    }
-
-    public String getEvenStyleID()
-    {
-        return _EvenStyleID;
-    }
-
-    public String getOddEvenBackgroundStyle()
-    {
-        return _OddBackgroundStyle;
-    }
-
-    public void setOddBackgroundStyle(String _OddEvenBackgroundStyle)
-    {
-        this._OddBackgroundStyle = _OddEvenBackgroundStyle;
-    }
-
-    public void setOddStyle(String ID, String File)
-    {
-        _OddStyleID = ID;
-        _OddStyle = File;
-    }
-
-    public String getOddStyle()
-    {
-        return _OddStyle;
-    }
-
-    public String getOddStyleID()
-    {
-        return _OddStyleID;
-    }
-
-    public SortMode getSortMode()
-    {
-        return _SortMode;
-    }
-
-    public void setSortMode(SortMode _SortMode)
-    {
-        this._SortMode = _SortMode;
-    }
-
-    private void SetStyle(boolean Odd, SteelLCDWidget objWidget)
-    {
-        if (Odd)
-        {
-            objWidget.setBaseCSSFilename(_OddStyle);
-            objWidget.setStyleID(_OddStyleID);
-        }
-        else
-        {
-            objWidget.setBaseCSSFilename(_EvenStyle);
-            objWidget.setStyleID(_EvenStyleID);
-        }
-        objWidget.ApplyCSS();
-        objWidget.ApplyOverrides();
-
-    }
-
-    private SteelLCDWidget CreateDataWidget(String ID, String initialVal)
+private SteelLCDWidget CreateDataWidget(String ID, String initialVal)
     {
         SteelLCDWidget objWidget = new SteelLCDWidget();
 
@@ -260,62 +160,108 @@ public class QuickViewLCDWidget extends GridWidget implements IQuickViewSort
         return objWidget;
     }
 
-    /**
-     * Go through and sort the goodies alphabetically
-     */
-    private void Sort()
+    @Override
+    public String[] GetCustomAttributes()
     {
-        if (getSortMode() == SortMode.Ascending)
+        String[] Attributes =
         {
-            Collections.sort(_DataPoint, new Comparator<Pair<String, SteelLCDWidget>>()
-            {
-                @Override
-                public int compare(Pair<String, SteelLCDWidget> s1, Pair<String, SteelLCDWidget> s2) // do alphabetical sort
-                {
-                    NaturalComparator naturalCompare = new NaturalComparator();
-                    return naturalCompare.compare(s1.getKey(), s2.getKey());
-                }
-            });
+            "hgap", "vgap"
+        };
+        return Attributes;
+    }
+
+    public String getEvenBackgroundStyle()
+    {
+        return _EvenBackgroundStyle;
+    }
+
+    public String getEvenStyle()
+    {
+        return _EvenStyle;
+    }
+
+    public String getEvenStyleID()
+    {
+        return _EvenStyleID;
+    }
+
+    public String getOddEvenBackgroundStyle()
+    {
+        return _OddBackgroundStyle;
+    }
+
+    public String getOddStyle()
+    {
+        return _OddStyle;
+    }
+
+    public String getOddStyleID()
+    {
+        return _OddStyleID;
+    }
+
+    //    @Override
+//    public ObservableList<String> getStylesheets()
+//    {
+//        return _GridWidget.getStylesheets();
+//    }
+//
+//    @Override
+//    public Node getStylableObject()
+//    {
+//        return _GridWidget.getStylableObject();
+//    }
+    public int getRowWidth()
+    {
+        return _RowWidth;
+    }
+
+    public int getSortCount()
+    {
+        synchronized (this)
+        {
+            return _SortCount.get();
         }
-        else if (getSortMode() == SortMode.Descending)
+    }
+
+    public SortMode getSortMode()
+    {
+        return _SortMode;
+    }
+
+    @Override
+    public void HandleWidgetSpecificAttributes(FrameworkNode widgetNode)
+    {
+        if (widgetNode.hasAttribute("hgap"))
         {
-            Collections.sort(_DataPoint, new Comparator<Pair<String, SteelLCDWidget>>()
+            try
             {
-                @Override
-                public int compare(Pair<String, SteelLCDWidget> s1, Pair<String, SteelLCDWidget> s2) // do alphabetical sort
-                {
-                    NaturalComparator naturalCompare = new NaturalComparator();
-                    return naturalCompare.compare(s2.getKey(), s1.getKey());
-                }
-            });
-        }
-
-        int row = 0;
-        int column = 0;
-        boolean odd = true;
-
-        getGridPane().getChildren().clear();
-
-        for (Pair<String, SteelLCDWidget> pair : _DataPoint)
-        {
-            SteelLCDWidget objLCD = pair.getValue();
-
-            objLCD.setRow(row);
-            objLCD.setColumn(column);
-
-            //it's not getting added to the right place, its not the right grid...'
-            getGridPane().add(objLCD.getStylableObject(), column, row);
-
-            SetStyle(odd, objLCD);
-            odd = !odd;
-            objLCD.getStylableObject().setVisible(true);
-
-            if (++column >= getRowWidth())
+                sethGap(Integer.parseInt(widgetNode.getAttribute("hgap")));
+                LOGGER.config("Setting hGap for QuickViewWidget :" + widgetNode.getAttribute("hgap"));
+            }
+            catch (NumberFormatException ex)
             {
-                row++;
-                column = 0;
+                LOGGER.warning("hgap for QuickViewWidget invalid: " + widgetNode.getAttribute("hgap") + ".  Ignoring");
             }
         }
+        if (widgetNode.hasAttribute("vgap"))
+        {
+            try
+            {
+                setvGap(Integer.parseInt(widgetNode.getAttribute("vgap")));
+                LOGGER.config("Setting vGap for QuickViewWidget :" + widgetNode.getAttribute("vgap"));
+            }
+            catch (NumberFormatException ex)
+            {
+                LOGGER.warning("vgap for QuickViewWidget invalid: " + widgetNode.getAttribute("vgap") + ".  Ignoring");
+            }
+        }
+        if (true == widgetNode.hasAttribute("Align"))
+        {
+            String str = widgetNode.getAttribute("Align");
+            setAlignment(str);
+        }
+
     }
 
     @Override
@@ -407,65 +353,33 @@ public class QuickViewLCDWidget extends GridWidget implements IQuickViewSort
         return false;
     }
 
-    @Override
-    public void HandleWidgetSpecificAttributes(FrameworkNode widgetNode)
-    {
-        if (widgetNode.hasAttribute("hgap"))
-        {
-            try
-            {
-                sethGap(Integer.parseInt(widgetNode.getAttribute("hgap")));
-                LOGGER.config("Setting hGap for QuickViewWidget :" + widgetNode.getAttribute("hgap"));
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.warning("hgap for QuickViewWidget invalid: " + widgetNode.getAttribute("hgap") + ".  Ignoring");
-            }
-        }
-        if (widgetNode.hasAttribute("vgap"))
-        {
-            try
-            {
-                setvGap(Integer.parseInt(widgetNode.getAttribute("vgap")));
-                LOGGER.config("Setting vGap for QuickViewWidget :" + widgetNode.getAttribute("vgap"));
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.warning("vgap for QuickViewWidget invalid: " + widgetNode.getAttribute("vgap") + ".  Ignoring");
-            }
-        }
-        if (true == widgetNode.hasAttribute("Align"))
-        {
-            String str = widgetNode.getAttribute("Align");
-            setAlignment(str);
-        }
-
-    }
-
-    @Override
-    public String[] GetCustomAttributes()
-    {
-        String[] Attributes =
-        {
-            "hgap", "vgap"
-        };
-        return Attributes;
-    }
-
-    public int getSortCount()
-    {
-        synchronized (this)
-        {
-            return _SortCount.get();
-        }
-    }
-
     private int incrementSortCount()
     {
         synchronized (this)
         {
             return _SortCount.incrementAndGet();
         }
+    }
+
+    @Override
+    public void PerformSort()
+    {
+        if (getSortCount()>0)
+        {
+            setIncrementSortCount(0); 
+            Sort();
+        }
+    }
+
+    public void setEvenBackgroundStyle(String _EvenBackgroundStyle)
+    {
+        this._EvenBackgroundStyle = _EvenBackgroundStyle;
+    }
+
+    public void setEvenStyle(String ID, String File)
+    {
+        _EvenStyleID = ID;
+        _EvenStyle = File;
     }
 
     private void setIncrementSortCount(int newVal)
@@ -476,6 +390,44 @@ public class QuickViewLCDWidget extends GridWidget implements IQuickViewSort
         }
     }
 
+    public void setOddBackgroundStyle(String _OddEvenBackgroundStyle)
+    {
+        this._OddBackgroundStyle = _OddEvenBackgroundStyle;
+    }
+
+    public void setOddStyle(String ID, String File)
+    {
+        _OddStyleID = ID;
+        _OddStyle = File;
+    }
+
+    public void setRowWidth(int _RowWidth)
+    {
+        this._RowWidth = _RowWidth;
+    }
+
+    public void setSortMode(SortMode _SortMode)
+    {
+        this._SortMode = _SortMode;
+    }
+
+    private void SetStyle(boolean Odd, SteelLCDWidget objWidget)
+    {
+        if (Odd)
+        {
+            objWidget.setBaseCSSFilename(_OddStyle);
+            objWidget.setStyleID(_OddStyleID);
+        }
+        else
+        {
+            objWidget.setBaseCSSFilename(_EvenStyle);
+            objWidget.setStyleID(_EvenStyleID);
+        }
+        objWidget.ApplyCSS();
+        objWidget.ApplyOverrides();
+
+    }
+
     private void SetupSort() // create a deferred task to do the actual sorting, otherwise when you have 5000 datapoints it overlaods the gui
     {
         if (incrementSortCount() < 5) // don't need to stack them on if already in the queue
@@ -484,13 +436,61 @@ public class QuickViewLCDWidget extends GridWidget implements IQuickViewSort
             TaskManager.getTaskManager().AddPostponedTask(objTask, 500); // just every .5 secs do a sort
         }
     }
-    @Override
-    public void PerformSort()
+    /**
+     * Go through and sort the goodies alphabetically
+     */
+    private void Sort()
     {
-        if (getSortCount()>0)
+        if (getSortMode() == SortMode.Ascending)
         {
-            setIncrementSortCount(0); 
-            Sort();
+            Collections.sort(_DataPoint, new Comparator<Pair<String, SteelLCDWidget>>()
+            {
+                @Override
+                public int compare(Pair<String, SteelLCDWidget> s1, Pair<String, SteelLCDWidget> s2) // do alphabetical sort
+                {
+                    NaturalComparator naturalCompare = new NaturalComparator();
+                    return naturalCompare.compare(s1.getKey(), s2.getKey());
+                }
+            });
+        }
+        else if (getSortMode() == SortMode.Descending)
+        {
+            Collections.sort(_DataPoint, new Comparator<Pair<String, SteelLCDWidget>>()
+            {
+                @Override
+                public int compare(Pair<String, SteelLCDWidget> s1, Pair<String, SteelLCDWidget> s2) // do alphabetical sort
+                {
+                    NaturalComparator naturalCompare = new NaturalComparator();
+                    return naturalCompare.compare(s2.getKey(), s1.getKey());
+                }
+            });
+        }
+
+        int row = 0;
+        int column = 0;
+        boolean odd = true;
+
+        getGridPane().getChildren().clear();
+
+        for (Pair<String, SteelLCDWidget> pair : _DataPoint)
+        {
+            SteelLCDWidget objLCD = pair.getValue();
+
+            objLCD.setRow(row);
+            objLCD.setColumn(column);
+
+            //it's not getting added to the right place, its not the right grid...'
+            getGridPane().add(objLCD.getStylableObject(), column, row);
+
+            SetStyle(odd, objLCD);
+            odd = !odd;
+            objLCD.getStylableObject().setVisible(true);
+
+            if (++column >= getRowWidth())
+            {
+                row++;
+                column = 0;
+            }
         }
     }
 

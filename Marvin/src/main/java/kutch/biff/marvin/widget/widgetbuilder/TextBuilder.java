@@ -45,6 +45,21 @@ public class TextBuilder
         return ReadTextWidgetInfo(_widget, masterNode, widgetDefFilename);
     }
 
+    public static ListBoxText ListBoxText_Build(FrameworkNode masterNode, String widgetDefFilename)
+    {
+        ListBoxText _widget = new ListBoxText();
+        for (FrameworkNode node : masterNode.getChildNodes())
+        {
+            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
+            {
+            }
+            else if (node.getNodeName().equalsIgnoreCase("#comment"))
+            {
+            }
+        }
+        return _widget;
+    }
+
     public static TextWidget ReadTextWidgetInfo(TextWidget _widget, FrameworkNode masterNode, String widgetDefFilename)
     {
         for (FrameworkNode node : masterNode.getChildNodes())
@@ -71,21 +86,6 @@ public class TextBuilder
                     LOGGER.severe("Invalid Text Widget Definition File.  ScaleToShape should be True or False, not:" + str);
                     return null;
                 }
-            }
-        }
-        return _widget;
-    }
-
-    public static ListBoxText ListBoxText_Build(FrameworkNode masterNode, String widgetDefFilename)
-    {
-        ListBoxText _widget = new ListBoxText();
-        for (FrameworkNode node : masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
-            {
-            }
-            else if (node.getNodeName().equalsIgnoreCase("#comment"))
-            {
             }
         }
         return _widget;

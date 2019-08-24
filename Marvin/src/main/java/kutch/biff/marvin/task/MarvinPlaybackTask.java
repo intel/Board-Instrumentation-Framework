@@ -86,6 +86,21 @@ public class MarvinPlaybackTask extends BaseTask
 	_fileName = null;
     }
     
+    public String get_fileName()
+    {
+	return _fileName;
+    }
+    
+    public Double get_Speed()
+    {
+	return _Speed;
+    }
+    
+    public boolean is_Loop()
+    {
+	return _Loop;
+    }
+    
     @Override
     public void PerformTask()
     {
@@ -153,36 +168,6 @@ public class MarvinPlaybackTask extends BaseTask
 	
     }
     
-    public Double get_Speed()
-    {
-	return _Speed;
-    }
-    
-    public void set_Speed(Double _Speed)
-    {
-	if (_Speed <= 0)
-	{
-	    throw new IllegalArgumentException("must be positive");
-	}
-	this._Speed = _Speed;
-    }
-    
-    public boolean is_Loop()
-    {
-	return _Loop;
-    }
-    
-    public void set_Loop(boolean _Loop)
-    {
-	this._LoopSet = true;
-	this._Loop = _Loop;
-    }
-    
-    public String get_fileName()
-    {
-	return _fileName;
-    }
-    
     public boolean set_fileName(String _fileName)
     {
 	String fName = BaseWidget.convertToFileOSSpecific(_fileName);
@@ -199,6 +184,21 @@ public class MarvinPlaybackTask extends BaseTask
 	}
 	this._fileName = fName;
 	return true;
+    }
+    
+    public void set_Loop(boolean _Loop)
+    {
+	this._LoopSet = true;
+	this._Loop = _Loop;
+    }
+    
+    public void set_Speed(Double _Speed)
+    {
+	if (_Speed <= 0)
+	{
+	    throw new IllegalArgumentException("must be positive");
+	}
+	this._Speed = _Speed;
     }
     
 }

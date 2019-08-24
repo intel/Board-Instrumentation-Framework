@@ -85,6 +85,28 @@ public class WalkDataListTask extends BaseTask
         }
     }
 
+    private String calcFluxValue(String dataPoint)
+    {
+        try
+        {
+            double dVal = Double.parseDouble(dataPoint);
+            double modifier = _rndObj.doubles(_fluxRangeLower, _fluxRangeUpper).iterator().next();
+            dVal += modifier;
+            if (dVal < _rangeMin || dVal > _rangeMax )
+            {
+                // modified value falls outside of data range, so don't modify
+            }
+            else
+            {
+                return Double.toString(dVal);
+            }
+        }
+        catch (NumberFormatException ex)
+        {
+        }
+        return dataPoint;
+    }
+
     @Override
     public void PerformTask()
     {
@@ -112,27 +134,5 @@ public class WalkDataListTask extends BaseTask
         }
         // call this task again in interval time
         TASKMAN.AddPostponedTask(this, _interval);
-    }
-
-    private String calcFluxValue(String dataPoint)
-    {
-        try
-        {
-            double dVal = Double.parseDouble(dataPoint);
-            double modifier = _rndObj.doubles(_fluxRangeLower, _fluxRangeUpper).iterator().next();
-            dVal += modifier;
-            if (dVal < _rangeMin || dVal > _rangeMax )
-            {
-                // modified value falls outside of data range, so don't modify
-            }
-            else
-            {
-                return Double.toString(dVal);
-            }
-        }
-        catch (NumberFormatException ex)
-        {
-        }
-        return dataPoint;
     }
 }

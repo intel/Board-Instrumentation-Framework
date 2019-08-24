@@ -41,12 +41,6 @@ public class DynamicGrid extends GridWidget
         _objTransition = new DynamicTransition(DynamicTransition.Transition.NONE);
     }
 
-    public DynamicTransition ReadTransitionInformation(FrameworkNode baseNode)
-    {
-        _objTransition = DynamicTransition.ReadTransitionInformation(baseNode);
-        return _objTransition;
-    }
-    
     public Color getBackgroundColorForTransition()
     {
         return _objTransition.getSnapshotColor();
@@ -55,6 +49,12 @@ public class DynamicGrid extends GridWidget
     public DynamicTransition getTransition(DynamicGrid objFrom, GridPane parent)
     {
         _objTransition.Transition(objFrom, this, parent);
+        return _objTransition;
+    }
+    
+    public DynamicTransition ReadTransitionInformation(FrameworkNode baseNode)
+    {
+        _objTransition = DynamicTransition.ReadTransitionInformation(baseNode);
         return _objTransition;
     }
 }

@@ -27,8 +27,8 @@ package kutch.biff.marvin.task;
  */
 public interface ITask
 {
-     void PerformTask();
-     public long getPostponePeriod();
-     public void setPostponePeriod(long Period);
      public boolean getMustBeInGUIThread();
+     public long getPostponePeriod();
+     void PerformTask();
+     public void setPostponePeriod(long Period);
 }

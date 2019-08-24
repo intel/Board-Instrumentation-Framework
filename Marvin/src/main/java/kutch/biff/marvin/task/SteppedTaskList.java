@@ -39,11 +39,6 @@ public class SteppedTaskList extends TaskList
         _Looped = true;
     }
 
-    public void setLooped(boolean fValue)
-    {
-        _Looped = fValue;
-    }
-
     @Override
     public boolean PerformTasks()
     {
@@ -89,6 +84,11 @@ public class SteppedTaskList extends TaskList
         
 
         return true;
+    }
+
+    public void setLooped(boolean fValue)
+    {
+        _Looped = fValue;
     }
 
 }

@@ -49,20 +49,25 @@ public class Client
         _Socket = null;
         
     }
-    private boolean SetupSocket()
+    public void Close()
     {
-        try
+        if (null != _Socket)
         {
-           _IPAddress = InetAddress.getByName(_Address); 
-           _Socket = new DatagramSocket();
+            _Socket.close();
+            _Socket = null;
         }
-        catch (Exception ex)
-        {
-            return false;
-        }
-        return true;
     }
     
+    public String getAddress()
+    {
+        return _Address;
+    }
+    
+    public int getPort()
+    {
+        return _Port;
+    }
+
     public boolean send(byte[] sendData)
     {
         if (null == _Socket)
@@ -82,24 +87,19 @@ public class Client
         
         return true;
     }
-    
-    public void Close()
+
+    private boolean SetupSocket()
     {
-        if (null != _Socket)
+        try
         {
-            _Socket.close();
-            _Socket = null;
+           _IPAddress = InetAddress.getByName(_Address); 
+           _Socket = new DatagramSocket();
         }
-    }
-
-    public String getAddress()
-    {
-        return _Address;
-    }
-
-    public int getPort()
-    {
-        return _Port;
+        catch (Exception ex)
+        {
+            return false;
+        }
+        return true;
     }
     
 }

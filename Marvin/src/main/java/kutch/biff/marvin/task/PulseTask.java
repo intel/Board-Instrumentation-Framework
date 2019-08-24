@@ -38,17 +38,11 @@ public class PulseTask extends BaseTask
         _Namespace = null;
     }
     
-    public void SetNamespaceAndID(String ns, String ID)
-    {
-        _ID = ID;
-        _Namespace = ns;
-    }
-    
     public boolean isValid()
     {
         return (_ID != null && _Namespace != null);
     }
-
+    
     @Override
     public void PerformTask()
     {
@@ -72,5 +66,11 @@ public class PulseTask extends BaseTask
         {
             TASKMAN.getDataMgr().ChangeValue(_ID, _Namespace, currValue);
         }
+    }
+
+    public void SetNamespaceAndID(String ns, String ID)
+    {
+        _ID = ID;
+        _Namespace = ns;
     }
 }

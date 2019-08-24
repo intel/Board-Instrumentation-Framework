@@ -29,14 +29,14 @@ import java.util.ArrayList;
  */
 public class RandomTask extends BaseTask
 {
-    private final TaskManager TASKMAN = TaskManager.getTaskManager();
-
     class RandomSet
     {
 
         public String TaskID;
         public double Weight;
     }
+
+    private final TaskManager TASKMAN = TaskManager.getTaskManager();
 
     private ArrayList<RandomSet> _TaskList;
     private boolean _WieghtAdjusted;
@@ -45,6 +45,14 @@ public class RandomTask extends BaseTask
     {
         _TaskList = new ArrayList<>();
         _WieghtAdjusted = false;
+    }
+
+    public void AddTask(String strTaskID, double weight)
+    {
+        RandomSet objSet = new RandomSet();
+        objSet.TaskID = strTaskID;
+        objSet.Weight = weight;
+        _TaskList.add(objSet);
     }
 
     private void AdjustWeight()
@@ -80,14 +88,6 @@ public class RandomTask extends BaseTask
             }
         }
 
-    }
-
-    public void AddTask(String strTaskID, double weight)
-    {
-        RandomSet objSet = new RandomSet();
-        objSet.TaskID = strTaskID;
-        objSet.Weight = weight;
-        _TaskList.add(objSet);
     }
 
     @Override

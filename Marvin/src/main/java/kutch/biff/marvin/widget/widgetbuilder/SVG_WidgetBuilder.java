@@ -21,9 +21,6 @@
  */
 package kutch.biff.marvin.widget.widgetbuilder;
 
-import java.util.logging.Logger;
-
-import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.SVG_Widget;
@@ -34,8 +31,6 @@ import kutch.biff.marvin.widget.SVG_Widget;
  */
 public class SVG_WidgetBuilder
 {
-    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
     public static SVG_Widget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
         SVG_Widget _widget = new SVG_Widget();

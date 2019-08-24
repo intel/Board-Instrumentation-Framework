@@ -136,126 +136,7 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort
         return true;
     }
 
-//    @Override
-//    public ObservableList<String> getStylesheets()
-//    {
-//        return _GridWidget.getStylesheets();
-//    }
-//
-//    @Override
-//    public Node getStylableObject()
-//    {
-//        return _GridWidget.getStylableObject();
-//    }
-    public int getRowWidth()
-    {
-        return _RowWidth;
-    }
-
-    public void setRowWidth(int _RowWidth)
-    {
-        this._RowWidth = _RowWidth;
-    }
-
-    public String getEvenBackgroundStyle()
-    {
-        return _EvenBackgroundStyle;
-    }
-
-    public void setEvenBackgroundStyle(String _EvenBackgroundStyle)
-    {
-        this._EvenBackgroundStyle = _EvenBackgroundStyle;
-    }
-
-    public String getEvenIDStyle()
-    {
-        return _EvenIDStyle;
-    }
-
-    public void setEvenIDStyle(String _EvenIDStyle)
-    {
-        this._EvenIDStyle = _EvenIDStyle;
-    }
-
-    public String getEvenDataStyle()
-    {
-        return _EvenDataStyle;
-    }
-
-    public void setEvenDataStyle(String _EvenDataStyle)
-    {
-        this._EvenDataStyle = _EvenDataStyle;
-    }
-
-    public String getOddEvenBackgroundStyle()
-    {
-        return _OddBackgroundStyle;
-    }
-
-    public void setOddBackgroundStyle(String _OddEvenBackgroundStyle)
-    {
-        this._OddBackgroundStyle = _OddEvenBackgroundStyle;
-    }
-
-    public String getOddIDStyle()
-    {
-        return _OddIDStyle;
-    }
-
-    public void setOddIDStyle(String _OddIDStyle)
-    {
-        this._OddIDStyle = _OddIDStyle;
-    }
-
-    public String getOddDataStyle()
-    {
-        return _OddDataStyle;
-    }
-
-    public void setOddDataStyle(String _OddDataStyle)
-    {
-        this._OddDataStyle = _OddDataStyle;
-    }
-
-    public SortMode getSortMode()
-    {
-        return _SortMode;
-    }
-
-    public void setSortMode(SortMode _SortMode)
-    {
-        this._SortMode = _SortMode;
-    }
-
-    private void SetStyle(boolean Odd, GridWidget objGrid, TextWidget objIDWidget, TextWidget objValueWidget)
-    {
-        if (Odd)
-        {
-            objGrid.setStyleOverride(Arrays.asList(_OddBackgroundStyle));
-            if (null != objIDWidget)
-            {
-                objIDWidget.setStyleOverride(Arrays.asList(_OddIDStyle));
-            }
-            objValueWidget.setStyleOverride(Arrays.asList(_OddDataStyle));
-        }
-        else
-        {
-            objGrid.setStyleOverride(Arrays.asList(_EvenBackgroundStyle));
-            if (null != objIDWidget)
-            {
-                objIDWidget.setStyleOverride(Arrays.asList(_EvenIDStyle));
-            }
-            objValueWidget.setStyleOverride(Arrays.asList(_EvenDataStyle));
-        }
-        objGrid.ApplyOverrides();
-        if (null != objIDWidget)
-        {
-            objIDWidget.ApplyOverrides();
-        }
-        objValueWidget.ApplyOverrides();
-    }
-
-    private GridWidget CreateDataWidget(String ID, String initialVal)
+private GridWidget CreateDataWidget(String ID, String initialVal)
     {
         GridWidget objGrid = new GridWidget();
         TextWidget objValueWidget = new TextWidget();
@@ -292,64 +173,78 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort
         return objGrid;
     }
 
-    /**
-     * Go through and sort the goodies alphabetically
-     */
-    private void Sort()
+    @Override
+    public String[] GetCustomAttributes()
     {
-        if (getSortMode() == SortMode.Ascending)
+        String[] Attributes =
         {
-            Collections.sort(_DataPoint, new Comparator<Pair<String, List<Object>>>()
-            {
-                @Override
-                public int compare(Pair<String, List<Object>> s1, Pair<String, List<Object>> s2) // do alphabetical sort
-                {
-                    NaturalComparator naturalCompare = new NaturalComparator();
-                    return naturalCompare.compare(s1.getKey(),s2.getKey());
-                }
-            });
-        }
-        else if (getSortMode() == SortMode.Descending)
+            "hgap", "vgap"
+        };
+        return Attributes;
+    }
+
+    public String getEvenBackgroundStyle()
+    {
+        return _EvenBackgroundStyle;
+    }
+
+    public String getEvenDataStyle()
+    {
+        return _EvenDataStyle;
+    }
+
+    public String getEvenIDStyle()
+    {
+        return _EvenIDStyle;
+    }
+
+    public String getOddDataStyle()
+    {
+        return _OddDataStyle;
+    }
+
+    public String getOddEvenBackgroundStyle()
+    {
+        return _OddBackgroundStyle;
+    }
+
+    public String getOddIDStyle()
+    {
+        return _OddIDStyle;
+    }
+
+    //    @Override
+//    public ObservableList<String> getStylesheets()
+//    {
+//        return _GridWidget.getStylesheets();
+//    }
+//
+//    @Override
+//    public Node getStylableObject()
+//    {
+//        return _GridWidget.getStylableObject();
+//    }
+    public int getRowWidth()
+    {
+        return _RowWidth;
+    }
+
+    public boolean getShowTitle()
+    {
+        return _ShowTitle;
+    }
+
+    public int getSortCount()
+    {
+        synchronized(this)
         {
-            Collections.sort(_DataPoint, new Comparator<Pair<String, List<Object>>>()
-            {
-                @Override
-                public int compare(Pair<String, List<Object>> s1, Pair<String, List<Object>> s2) // do alphabetical sort
-                {
-                    NaturalComparator naturalCompare = new NaturalComparator();
-                    return naturalCompare.compare(s2.getKey(),s1.getKey());
-                }
-            });
+            return _SortCount.get();
         }
+    }
 
-        int row = 0;
-        int column = 0;
-        boolean odd = true;
-
-        getGridPane().getChildren().clear();
-
-        for (Pair<String, List<Object>> pair : _DataPoint)
-        {
-            GridWidget objGrid = (GridWidget) pair.getValue().get(0);
-            TextWidget objID = (TextWidget) pair.getValue().get(1);
-            TextWidget objValue = (TextWidget) pair.getValue().get(2);
-
-            objGrid.setRow(row);
-            objGrid.setColumn(column);
-
-            //it's not getting added to the right place, its not the right grid...'
-            getGridPane().add(objGrid.getStylableObject(), column, row);
-            objGrid.getStylableObject().setVisible(true);
-
-            SetStyle(odd, objGrid, objID, objValue);
-            odd = !odd;
-
-            if (++column >= getRowWidth())
-            {
-                row++;
-                column = 0;
-            }
-        }
+    public SortMode getSortMode()
+    {
+        return _SortMode;
     }
 
     @Override
@@ -385,16 +280,6 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort
             setAlignment(str);
         }
 
-    }
-
-    @Override
-    public String[] GetCustomAttributes()
-    {
-        String[] Attributes =
-        {
-            "hgap", "vgap"
-        };
-        return Attributes;
     }
 
     @Override
@@ -491,24 +376,6 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort
         return false;
     }
 
-    public boolean getShowTitle()
-    {
-        return _ShowTitle;
-    }
-
-    public void setShowTitle(boolean _ShowTitle)
-    {
-        this._ShowTitle = _ShowTitle;
-    }
-
-    public int getSortCount()
-    {
-        synchronized(this)
-        {
-            return _SortCount.get();
-        }
-    }
-
     private int incrementSortCount()
     {
         synchronized(this)
@@ -516,12 +383,95 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort
             return _SortCount.incrementAndGet();
         }
     }
+
+    @Override
+    public void PerformSort()
+    {
+        if (getSortCount()>0)
+        {
+            setIncrementSortCount(0); 
+            Sort();
+        }
+    }
+
+    public void setEvenBackgroundStyle(String _EvenBackgroundStyle)
+    {
+        this._EvenBackgroundStyle = _EvenBackgroundStyle;
+    }
+
+    public void setEvenDataStyle(String _EvenDataStyle)
+    {
+        this._EvenDataStyle = _EvenDataStyle;
+    }
+
+    public void setEvenIDStyle(String _EvenIDStyle)
+    {
+        this._EvenIDStyle = _EvenIDStyle;
+    }
+
     private void setIncrementSortCount(int newVal)
     {
         synchronized(this)
         {
             _SortCount.set(newVal);
         }
+    }
+
+    public void setOddBackgroundStyle(String _OddEvenBackgroundStyle)
+    {
+        this._OddBackgroundStyle = _OddEvenBackgroundStyle;
+    }
+
+    public void setOddDataStyle(String _OddDataStyle)
+    {
+        this._OddDataStyle = _OddDataStyle;
+    }
+
+    public void setOddIDStyle(String _OddIDStyle)
+    {
+        this._OddIDStyle = _OddIDStyle;
+    }
+
+    public void setRowWidth(int _RowWidth)
+    {
+        this._RowWidth = _RowWidth;
+    }
+
+    public void setShowTitle(boolean _ShowTitle)
+    {
+        this._ShowTitle = _ShowTitle;
+    }
+
+    public void setSortMode(SortMode _SortMode)
+    {
+        this._SortMode = _SortMode;
+    }
+    private void SetStyle(boolean Odd, GridWidget objGrid, TextWidget objIDWidget, TextWidget objValueWidget)
+    {
+        if (Odd)
+        {
+            objGrid.setStyleOverride(Arrays.asList(_OddBackgroundStyle));
+            if (null != objIDWidget)
+            {
+                objIDWidget.setStyleOverride(Arrays.asList(_OddIDStyle));
+            }
+            objValueWidget.setStyleOverride(Arrays.asList(_OddDataStyle));
+        }
+        else
+        {
+            objGrid.setStyleOverride(Arrays.asList(_EvenBackgroundStyle));
+            if (null != objIDWidget)
+            {
+                objIDWidget.setStyleOverride(Arrays.asList(_EvenIDStyle));
+            }
+            objValueWidget.setStyleOverride(Arrays.asList(_EvenDataStyle));
+        }
+        objGrid.ApplyOverrides();
+        if (null != objIDWidget)
+        {
+            objIDWidget.ApplyOverrides();
+        }
+        objValueWidget.ApplyOverrides();
     }
 
     private void SetupSort() // create a deferred task to do the actual sorting, otherwise when you have 5000 datapoints it overlaods the gui
@@ -533,13 +483,63 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort
         }
     }
 
-    @Override
-    public void PerformSort()
+    /**
+     * Go through and sort the goodies alphabetically
+     */
+    private void Sort()
     {
-        if (getSortCount()>0)
+        if (getSortMode() == SortMode.Ascending)
         {
-            setIncrementSortCount(0); 
-            Sort();
+            Collections.sort(_DataPoint, new Comparator<Pair<String, List<Object>>>()
+            {
+                @Override
+                public int compare(Pair<String, List<Object>> s1, Pair<String, List<Object>> s2) // do alphabetical sort
+                {
+                    NaturalComparator naturalCompare = new NaturalComparator();
+                    return naturalCompare.compare(s1.getKey(),s2.getKey());
+                }
+            });
+        }
+        else if (getSortMode() == SortMode.Descending)
+        {
+            Collections.sort(_DataPoint, new Comparator<Pair<String, List<Object>>>()
+            {
+                @Override
+                public int compare(Pair<String, List<Object>> s1, Pair<String, List<Object>> s2) // do alphabetical sort
+                {
+                    NaturalComparator naturalCompare = new NaturalComparator();
+                    return naturalCompare.compare(s2.getKey(),s1.getKey());
+                }
+            });
+        }
+
+        int row = 0;
+        int column = 0;
+        boolean odd = true;
+
+        getGridPane().getChildren().clear();
+
+        for (Pair<String, List<Object>> pair : _DataPoint)
+        {
+            GridWidget objGrid = (GridWidget) pair.getValue().get(0);
+            TextWidget objID = (TextWidget) pair.getValue().get(1);
+            TextWidget objValue = (TextWidget) pair.getValue().get(2);
+
+            objGrid.setRow(row);
+            objGrid.setColumn(column);
+
+            //it's not getting added to the right place, its not the right grid...'
+            getGridPane().add(objGrid.getStylableObject(), column, row);
+            objGrid.getStylableObject().setVisible(true);
+
+            SetStyle(odd, objGrid, objID, objValue);
+            odd = !odd;
+
+            if (++column >= getRowWidth())
+            {
+                row++;
+                column = 0;
+            }
         }
     }
 }

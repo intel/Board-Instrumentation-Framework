@@ -21,9 +21,6 @@
  */
 package kutch.biff.marvin.widget.widgetbuilder;
 
-import java.util.logging.Logger;
-
-import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.SpacerWidget;
 
@@ -33,8 +30,6 @@ import kutch.biff.marvin.widget.SpacerWidget;
  */
 public class SpacerWidgetBuilder
 {
-    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
     public static SpacerWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
         return new SpacerWidget();
