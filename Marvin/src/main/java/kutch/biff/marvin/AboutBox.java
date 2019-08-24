@@ -24,6 +24,7 @@ package kutch.biff.marvin;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Locale;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;

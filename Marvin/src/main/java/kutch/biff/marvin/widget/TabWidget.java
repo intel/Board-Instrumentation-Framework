@@ -21,13 +21,13 @@
  */
 package kutch.biff.marvin.widget;
 
+import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.HandlePeekaboo;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+
 import javafx.collections.ObservableList;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SingleSelectionModel;
@@ -41,7 +41,6 @@ import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.TranslationCalculator;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
-import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.HandlePeekaboo;
 
 /**
  *

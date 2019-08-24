@@ -64,6 +64,7 @@ public class GenerateDatapointInfo
     private double __Scale;
     private String __ProxyID;
     private int __csvEntry;
+    private boolean __useCSV;
     private String __splitToken;
     private Map<String, String> __mapOfListData;
     private ListSortMethod _sortMethod;
@@ -114,6 +115,7 @@ public class GenerateDatapointInfo
 	__mapOfListData = new HashMap<>();
 	__dataIndexRange = valRange;
 	__dataIndexToken = tokenCharForValue;
+	__useCSV = false;
 	if (__dataIndexRange.getMinimum() > -1)
 	{
 	    __ProcessRanges = true;
@@ -132,11 +134,13 @@ public class GenerateDatapointInfo
     
     public boolean setListEntry(int newVal)
     {
-	if (newVal < 0)
+	/*if (newVal < 0)
 	{
 	    return false;
 	}
+	*/
 	__csvEntry = newVal;
+	__useCSV = true;
 	return true;
     }
     
@@ -746,7 +750,7 @@ public class GenerateDatapointInfo
 	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
 	    // public void onChanged(String newVal)
 	    {
-		if (__csvEntry > -1)
+		if (__useCSV && __csvEntry > -1)
 		{
 		    String parts[] = newVal.toString().split(__splitToken);
 		    if (parts.length < __csvEntry)
@@ -757,6 +761,10 @@ public class GenerateDatapointInfo
 			return;
 		    }
 		    newVal = parts[__csvEntry]; // make newVal then let the rest parse it
+		}
+		else if (__useCSV)
+		{
+		   return;
 		}
 		try
 		{

@@ -23,6 +23,7 @@ package kutch.biff.marvin.configuration;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;

@@ -29,6 +29,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.util.Pair;
 import kutch.biff.marvin.configuration.Configuration;
@@ -105,7 +106,7 @@ public class DataManager
     {
 	if (!_ProxyIDMap.containsKey(proxyID.toUpperCase()))
 	{
-	    LOGGER.warning("Unknown ProxyID:" + proxyID);
+	    LOGGER.warning("Unknown ProxyID: " + proxyID);
 	    return;
 	}
 	

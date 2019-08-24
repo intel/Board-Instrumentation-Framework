@@ -21,12 +21,9 @@
  */package kutch.biff.marvin.widget;
 
 import javafx.scene.control.ButtonBase;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
-import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.utility.FrameworkNode;
-import static kutch.biff.marvin.widget.BaseWidget.CONFIG;
 
 /**
  *

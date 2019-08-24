@@ -21,14 +21,28 @@
  */
 package kutch.biff.marvin.configuration;
 
+import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
+import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.OpenDefinitionFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
@@ -41,10 +55,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.util.Pair;
-import java.util.Random;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.PromptManager;
@@ -58,17 +68,11 @@ import kutch.biff.marvin.utility.GenerateDatapointInfo;
 import kutch.biff.marvin.utility.GenerateDatapointInfo.ListSortMethod;
 import kutch.biff.marvin.utility.Utility;
 import kutch.biff.marvin.widget.BaseWidget;
-import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
 import kutch.biff.marvin.widget.DynamicTabWidget;
 import kutch.biff.marvin.widget.TabWidget;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandTabBuilder;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 import kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder;
-import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.OpenDefinitionFile;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -2168,7 +2172,7 @@ public class ConfigurationReader
 	return true;
     }
     
-    public MenuItem ReadMenuItem(FrameworkNode menuNode)
+    public MenuItem ReadMenuItem(FrameworkNode menuNode, int itemIndex)
     {
 	if (menuNode.getNodeName().equalsIgnoreCase("MenuItem"))
 	{
@@ -2194,7 +2198,7 @@ public class ConfigurationReader
 		    String strTask = menuNode.getAttribute("Task");
 		    if (menuNode.hasAttribute("CreateDataPoint"))
 		    {
-			dataPoints.addAll(ReadDataPointsForTask(menuNode.getAttribute("CreateDataPoint"),
+			dataPoints.addAll(ReadDataPointsForTask(itemIndex,menuNode.getAttribute("CreateDataPoint"),
 				menuNode.getAttribute("Text"), menuNode.getAttribute("Task")));
 			if (dataPoints.size() == 0)
 			{
@@ -2227,7 +2231,7 @@ public class ConfigurationReader
 	{
 	    if (node.getNodeName().equalsIgnoreCase("MenuItem"))
 	    {
-		MenuItem objItem = ReadMenuItem(node);
+		MenuItem objItem = ReadMenuItem(node,retList.size());
 		if (null != objItem)
 		{
 		    retList.add(objItem);
@@ -2256,7 +2260,7 @@ public class ConfigurationReader
 	return objMenu;
     }
     
-    public static List<DataPointGenerator> ReadDataPointsForTask(String strInput, String strTaskText, String strTask)
+    public static List<DataPointGenerator> ReadDataPointsForTask(int itemIndex, String strInput, String strTaskText, String strTask)
     {
 	List<DataPointGenerator> retList = new ArrayList<>();
 	if (strInput.contains("^")) // might be replacement of ^Text or ^Task
@@ -2268,6 +2272,11 @@ public class ConfigurationReader
 	    if (strInput.contains("^Task"))
 	    {
 		strInput = strInput.replace("^Task", strTask);
+	    }
+	    if (strInput.contains("^Index"))
+	    {
+		String strIndex = Integer.toString(itemIndex);
+		strInput = strInput.replace("^Index", strIndex);
 	    }
 	}
 	String[] points = strInput.split("\\]");

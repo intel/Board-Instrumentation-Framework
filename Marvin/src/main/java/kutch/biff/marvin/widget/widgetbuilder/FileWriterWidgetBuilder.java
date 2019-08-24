@@ -20,8 +20,6 @@
  * ##############################################################################
  */package kutch.biff.marvin.widget.widgetbuilder;
 
-import java.util.logging.Logger;
-import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.FileWriterWidget;
 
@@ -31,8 +29,6 @@ import kutch.biff.marvin.widget.FileWriterWidget;
  */
 public class FileWriterWidgetBuilder
 {
-    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
     public static FileWriterWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
         return new FileWriterWidget();

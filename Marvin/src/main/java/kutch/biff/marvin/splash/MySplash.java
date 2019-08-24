@@ -21,9 +21,12 @@
  */
 package kutch.biff.marvin.splash;
 
+import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
+
 import java.io.File;
 import java.net.URL;
 import java.util.logging.Logger;
+
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -40,7 +43,6 @@ import javafx.stage.StageStyle;
 import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.version.Version;
-import static kutch.biff.marvin.widget.BaseWidget.convertToFileOSSpecific;
 
 /**
  *

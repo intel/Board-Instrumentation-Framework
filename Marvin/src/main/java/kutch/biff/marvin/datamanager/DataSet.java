@@ -22,6 +22,7 @@
 package kutch.biff.marvin.datamanager;
 
 import java.util.ArrayList;
+
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 

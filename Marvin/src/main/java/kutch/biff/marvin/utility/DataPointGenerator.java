@@ -21,10 +21,7 @@
  */
 package kutch.biff.marvin.utility;
 
-import java.util.logging.Logger;
-
 import kutch.biff.marvin.datamanager.DataManager;
-import kutch.biff.marvin.logger.MarvinLogger;
 
 /**
  *

@@ -25,7 +25,6 @@ import static java.lang.Math.abs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

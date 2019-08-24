@@ -23,6 +23,7 @@
 package kutch.biff.marvin.task;
 
 import java.util.logging.Logger;
+
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;

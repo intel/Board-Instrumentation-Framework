@@ -22,6 +22,7 @@
 package kutch.biff.marvin.utility;
 
 import java.util.logging.Logger;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

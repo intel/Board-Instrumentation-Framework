@@ -21,8 +21,9 @@
  */
 package kutch.biff.marvin.widget.widgetbuilder;
 
-import eu.hansolo.enzo.gauge.RadialGauge.TickLabelOrientation;
 import java.util.logging.Logger;
+
+import eu.hansolo.enzo.gauge.RadialGauge.TickLabelOrientation;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.BaseWidget;

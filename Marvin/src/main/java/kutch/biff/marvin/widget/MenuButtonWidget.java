@@ -94,7 +94,7 @@ public class MenuButtonWidget extends ButtonWidget
 	{
 	    ConfigurationReader rdr = ConfigurationReader.GetConfigReader();
 	    
-	    MenuItem objItem = rdr.ReadMenuItem(widgetNode);
+	    MenuItem objItem = rdr.ReadMenuItem(widgetNode,_Button.getItems().size());
 	    if (null != objItem)
 	    {
 		_Button.getItems().add(objItem);
@@ -167,6 +167,7 @@ public class MenuButtonWidget extends ButtonWidget
 	_Button.getItems().clear();
 	String[] newEntries = newVal.toString().split(",");
 	ConfigurationReader rdr = ConfigurationReader.GetConfigReader();
+
 	for (String entry : newEntries)
 	{
 	    FrameworkNode menuNode = new FrameworkNode(__CommonTaskNode);
@@ -175,7 +176,7 @@ public class MenuButtonWidget extends ButtonWidget
 	    MenuItem objItem = null;
 	    try
 	    {
-		objItem = rdr.ReadMenuItem(menuNode);
+		objItem = rdr.ReadMenuItem(menuNode, _Button.getItems().size());
 		setupChangeTitleListener(objItem);
 	    }
 	    catch(Exception ex)

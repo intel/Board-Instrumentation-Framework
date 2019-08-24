@@ -21,9 +21,10 @@
  */
 package kutch.biff.marvin.widget;
 
+import static java.lang.Math.abs;
+
 import eu.hansolo.enzo.gauge.RadialGauge;
 import eu.hansolo.enzo.gauge.RadialGauge.TickLabelOrientation;
-import static java.lang.Math.abs;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;

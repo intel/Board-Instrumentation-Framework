@@ -24,6 +24,7 @@ package kutch.biff.marvin.widget.widgetbuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
 import javafx.scene.control.TabPane;
 import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.configuration.ConfigurationReader;

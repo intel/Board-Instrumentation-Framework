@@ -21,9 +21,11 @@
  */
 package kutch.biff.marvin.task;
 
+import static kutch.biff.marvin.configuration.ConfigurationReader.GetConfigReader;
+
 import java.util.Random;
 import java.util.logging.Logger;
-import static kutch.biff.marvin.configuration.ConfigurationReader.GetConfigReader;
+
 import kutch.biff.marvin.logger.MarvinLogger;
 
 /**

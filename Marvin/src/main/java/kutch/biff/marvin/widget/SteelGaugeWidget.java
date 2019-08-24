@@ -21,12 +21,14 @@
  */
 package kutch.biff.marvin.widget;
 
+import static java.lang.Math.abs;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.gauge.Gauge;
 import eu.hansolo.enzo.gauge.Gauge.TickLabelOrientation;
-import static java.lang.Math.abs;
-import java.util.ArrayList;
-import java.util.List;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;

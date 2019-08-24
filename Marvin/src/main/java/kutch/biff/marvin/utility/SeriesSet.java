@@ -23,6 +23,7 @@ package kutch.biff.marvin.utility;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
+
 import javafx.scene.chart.XYChart;
 import kutch.biff.marvin.logger.MarvinLogger;
 

@@ -24,9 +24,11 @@ package kutch.biff.marvin.utility;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Logger;
-import kutch.biff.marvin.logger.MarvinLogger;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
+
+import kutch.biff.marvin.logger.MarvinLogger;
 
 /**
  *

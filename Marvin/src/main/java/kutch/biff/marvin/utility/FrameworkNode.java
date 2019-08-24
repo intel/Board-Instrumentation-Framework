@@ -21,16 +21,15 @@
  */
 package kutch.biff.marvin.utility;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,14 +46,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import kutch.biff.marvin.logger.MarvinLogger;
-import kutch.biff.marvin.widget.BaseWidget;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import kutch.biff.marvin.logger.MarvinLogger;
+import kutch.biff.marvin.widget.BaseWidget;
 
 /**
  * This is a wrapper class for the XML Node object. It allows case non-sensitve

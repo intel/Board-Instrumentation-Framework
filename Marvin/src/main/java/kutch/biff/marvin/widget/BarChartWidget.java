@@ -21,9 +21,6 @@
  */
 package kutch.biff.marvin.widget;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -42,7 +39,6 @@ import javafx.scene.text.Text;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.datamanager.MarvinChangeListener;
 import kutch.biff.marvin.utility.FrameworkNode;
-import kutch.biff.marvin.utility.SeriesDataSet;
 
 /**
  *

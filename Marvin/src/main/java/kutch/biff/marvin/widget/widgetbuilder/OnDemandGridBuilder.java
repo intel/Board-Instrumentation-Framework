@@ -6,7 +6,7 @@
 package kutch.biff.marvin.widget.widgetbuilder;
 
 import java.util.logging.Logger;
-import kutch.biff.marvin.configuration.Configuration;
+
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.task.TaskManager;
 import kutch.biff.marvin.utility.AliasMgr;
@@ -21,8 +21,6 @@ import kutch.biff.marvin.widget.Widget;
 public class OnDemandGridBuilder implements OnDemandWidgetBuilder
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    private static Configuration CONFIG = Configuration.getConfig();
-    private static TaskManager TASKMAN = TaskManager.getTaskManager();
     private OnDemandGridWidget __containerGrid;
     private int __builtCount = 0;
     

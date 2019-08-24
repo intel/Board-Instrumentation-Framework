@@ -21,10 +21,12 @@
  */
 package kutch.biff.marvin.task;
 
+import static kutch.biff.marvin.task.Parameter.CheckForDataSrcParameter;
+
 import java.util.ArrayList;
 import java.util.logging.Logger;
+
 import kutch.biff.marvin.logger.MarvinLogger;
-import static kutch.biff.marvin.task.Parameter.CheckForDataSrcParameter;
 
 /**
  *

@@ -24,6 +24,7 @@ package kutch.biff.marvin.task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -37,7 +38,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import kutch.biff.marvin.configuration.Configuration;
-import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.DataPointGenerator;
 import kutch.biff.marvin.utility.FrameworkNode;

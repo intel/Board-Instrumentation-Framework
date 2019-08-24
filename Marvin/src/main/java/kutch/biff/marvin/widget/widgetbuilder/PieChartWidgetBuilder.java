@@ -21,8 +21,6 @@
  */
 package kutch.biff.marvin.widget.widgetbuilder;
 
-import java.util.logging.Logger;
-import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.PieChartWidget;
 
@@ -32,8 +30,6 @@ import kutch.biff.marvin.widget.PieChartWidget;
  */
 public class PieChartWidgetBuilder
 {
-    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    
     public final static PieChartWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
         return new PieChartWidget();

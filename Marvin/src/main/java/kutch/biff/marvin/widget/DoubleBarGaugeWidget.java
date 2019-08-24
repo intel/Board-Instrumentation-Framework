@@ -21,8 +21,9 @@
  */
 package kutch.biff.marvin.widget;
 
-import eu.hansolo.enzo.gauge.AvGauge;
 import java.util.logging.Logger;
+
+import eu.hansolo.enzo.gauge.AvGauge;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;

@@ -21,11 +21,13 @@
  */
 package kutch.biff.marvin.widget;
 
-import eu.hansolo.enzo.common.Section;
-import eu.hansolo.enzo.gauge.SimpleGauge;
 import static java.lang.Math.abs;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import eu.hansolo.enzo.common.Section;
+import eu.hansolo.enzo.gauge.SimpleGauge;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;

@@ -31,7 +31,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
-import static kutch.biff.marvin.widget.BaseWidget.CONFIG;
 
 /**
  *

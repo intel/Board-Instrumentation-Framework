@@ -22,6 +22,7 @@
 package kutch.biff.marvin.utility;
 
 import java.util.logging.Logger;
+
 import javafx.geometry.Pos;
 import kutch.biff.marvin.logger.MarvinLogger;
 

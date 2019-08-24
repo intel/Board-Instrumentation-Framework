@@ -21,12 +21,14 @@
  */
 package kutch.biff.marvin.task;
 
-import java.util.List;
-import java.util.logging.Logger;
-import javafx.scene.control.SingleSelectionModel;
-import javafx.scene.control.Tab;
 import static kutch.biff.marvin.configuration.Configuration.getConfig;
 import static kutch.biff.marvin.configuration.ConfigurationReader.GetConfigReader;
+
+import java.util.List;
+import java.util.logging.Logger;
+
+import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.Tab;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.widget.TabWidget;
 

@@ -21,10 +21,11 @@
  */
 package kutch.biff.marvin.widget.widgetbuilder;
 
-import eu.hansolo.enzo.common.Section;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import eu.hansolo.enzo.common.Section;
 import javafx.util.Pair;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;

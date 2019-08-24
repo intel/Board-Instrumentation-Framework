@@ -21,8 +21,9 @@
  */
 package kutch.biff.marvin.widget.widgetbuilder;
 
-import eu.hansolo.enzo.led.Led.LedType;
 import java.util.logging.Logger;
+
+import eu.hansolo.enzo.led.Led.LedType;
 import javafx.geometry.Orientation;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;

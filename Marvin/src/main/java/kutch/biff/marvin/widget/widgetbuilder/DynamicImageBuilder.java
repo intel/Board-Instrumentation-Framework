@@ -21,11 +21,10 @@
  */
 package kutch.biff.marvin.widget.widgetbuilder;
 
-import java.util.logging.Logger;
-import kutch.biff.marvin.logger.MarvinLogger;
+import static kutch.biff.marvin.widget.widgetbuilder.StaticImageBuilder.ParseXML;
+
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.widget.DynamicImageWidget;
-import static kutch.biff.marvin.widget.widgetbuilder.StaticImageBuilder.ParseXML;
 
 /**
  *
@@ -33,8 +32,6 @@ import static kutch.biff.marvin.widget.widgetbuilder.StaticImageBuilder.ParseXML
  */
 public class DynamicImageBuilder
 {
-    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
     public static DynamicImageWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
         DynamicImageWidget _widget = new DynamicImageWidget();
