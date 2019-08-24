@@ -33,72 +33,73 @@ import kutch.biff.marvin.datamanager.DataManager;
  */
 public class ProgressIndicatorWidget extends BaseWidget
 {
-
+    
     private javafx.scene.control.ProgressIndicator _Indicator;
-
+    
     public ProgressIndicatorWidget()
     {
-        _Indicator = new javafx.scene.control.ProgressIndicator();
-        _Indicator.setProgress(0);
+	_Indicator = new javafx.scene.control.ProgressIndicator();
+	_Indicator.setProgress(0);
     }
-
+    
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
-        SetParent(pane);
-        ConfigureDimentions();
-        ConfigureAlignment();
-        SetupPeekaboo(dataMgr);
-        pane.add(_Indicator, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
-        {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
-            {
-                if (IsPaused())
-                {
-                    return;
-                }
-                double newDialValue = 0;
-                String strVal = newVal.toString();
-                try
-                {
-                    newDialValue = Double.parseDouble(strVal);
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Invalid data for Progress Indicator received: " + strVal);
-                    return;
-                }
-                if (newDialValue != 100.0)
-                {
-                    while (newDialValue >= 10)
-                    {
-                        newDialValue /= 10.0;
-                    }
-                }
-                _Indicator.setProgress(newDialValue / 10);
-            }
-        });
-        SetupTaskAction();
-        return ApplyCSS();
+	SetParent(pane);
+	ConfigureDimentions();
+	ConfigureAlignment();
+	SetupPeekaboo(dataMgr);
+	pane.add(_Indicator, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+	dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
+	{
+	    @Override
+	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
+	    {
+		if (IsPaused())
+		{
+		    return;
+		}
+		double newDialValue = 0;
+		String strVal = newVal.toString();
+		try
+		{
+		    newDialValue = Double.parseDouble(strVal);
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Invalid data for Progress Indicator received: " + strVal);
+		    return;
+		}
+		if (newDialValue != 100.0)
+		{
+		    while (newDialValue >= 10)
+		    {
+			newDialValue /= 10.0;
+		    }
+		}
+		_Indicator.setProgress(newDialValue / 10);
+	    }
+	});
+	SetupTaskAction();
+	return ApplyCSS();
     }
-
+    
     @Override
     public javafx.scene.Node getStylableObject()
     {
-        return _Indicator;
+	return _Indicator;
     }
-
+    
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return _Indicator.getStylesheets();
+	return _Indicator.getStylesheets();
     }
+    
     @Override
     public void UpdateTitle(String strTitle)
     {
-        LOGGER.warning("Tried to update Title of a Progress Indicator to " + strTitle);
+	LOGGER.warning("Tried to update Title of a Progress Indicator to " + strTitle);
     }
-
+    
 }

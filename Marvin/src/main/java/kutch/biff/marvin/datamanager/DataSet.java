@@ -36,76 +36,78 @@ public class DataSet
     ArrayList<DataObject> _DataUpdates;
     String _LatestValue;
     String _LatestValueForMath;
-
+    
     public DataSet()
     {
-        _ObjectProperty = new SimpleObjectProperty<>();
-        _DataUpdates = new ArrayList<>();  // is an arraylist because could receive back 2 back updates, before 1st update handled, 2nd one overwrites 
-        _LatestValue = "";
-        _LatestValueForMath = "";
+	_ObjectProperty = new SimpleObjectProperty<>();
+	_DataUpdates = new ArrayList<>(); // is an arraylist because could receive back 2 back updates, before 1st
+					  // update handled, 2nd one overwrites
+	_LatestValue = "";
+	_LatestValueForMath = "";
     }
     
-    @SuppressWarnings({ "unchecked", "rawtypes" })    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void addListener(ChangeListener listener)
     {
-        if (null != listener && null != _ObjectProperty)
-        {
-            _ObjectProperty.addListener(listener);
-        }
+	if (null != listener && null != _ObjectProperty)
+	{
+	    _ObjectProperty.addListener(listener);
+	}
     }
-
+    
     public String getLatestValue()
     {
-        synchronized(this)
-        {
-            return _LatestValue;
-        }
+	synchronized (this)
+	{
+	    return _LatestValue;
+	}
     }
-            
+    
     public String getLatestValueForMath()
     {
-        synchronized(this)
-        {
-            return _LatestValueForMath;
-        }
+	synchronized (this)
+	{
+	    return _LatestValueForMath;
+	}
     }
+    
     public int getSize()
     {
-        return _DataUpdates.size();
+	return _DataUpdates.size();
     }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })    
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void removeListener(ChangeListener listener)
     {
-        if (null != listener && null != _ObjectProperty)
-        {
-            _ObjectProperty.removeListener(listener);
-        }
+	if (null != listener && null != _ObjectProperty)
+	{
+	    _ObjectProperty.removeListener(listener);
+	}
     }
     
     public void setLatestValue(String newValue)
     {
-        DataObject newObj = new DataObject(newValue);
-        synchronized(this)
-        {
-            _DataUpdates.add(newObj);
-            _LatestValueForMath = newValue;
-        }
+	DataObject newObj = new DataObject(newValue);
+	synchronized (this)
+	{
+	    _DataUpdates.add(newObj);
+	    _LatestValueForMath = newValue;
+	}
     }
-
+    
     public int Update()
     {
-        int retVal;
-        synchronized (this)
-        {
-            retVal = _DataUpdates.size();
-            for (DataObject newValue : _DataUpdates)
-            {
-                _ObjectProperty.setValue(newValue);
-                _LatestValue = newValue.getData();
-            }
-            _DataUpdates.clear();
-        }
-        return retVal;
+	int retVal;
+	synchronized (this)
+	{
+	    retVal = _DataUpdates.size();
+	    for (DataObject newValue : _DataUpdates)
+	    {
+		_ObjectProperty.setValue(newValue);
+		_LatestValue = newValue.getData();
+	    }
+	    _DataUpdates.clear();
+	}
+	return retVal;
     }
 }

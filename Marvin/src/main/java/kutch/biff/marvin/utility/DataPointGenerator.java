@@ -28,7 +28,6 @@ import kutch.biff.marvin.datamanager.DataManager;
  * @author Patrick.Kutch@gmail.com
  */
 
-
 public class DataPointGenerator
 {
     private String __Namespace;
@@ -37,9 +36,9 @@ public class DataPointGenerator
     
     public DataPointGenerator(String Namesace, String ID, String Value)
     {
-	    __Namespace = Namesace;
-	    __ID = ID;
-	    __Value = Value;
+	__Namespace = Namesace;
+	__ID = ID;
+	__Value = Value;
     }
     
     public void generate()

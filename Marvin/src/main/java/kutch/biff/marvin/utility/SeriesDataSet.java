@@ -27,7 +27,7 @@ import javafx.scene.chart.XYChart;
  *
  * @author Patrick Kutch
  */
-public class SeriesDataSet 
+public class SeriesDataSet
 {
     private String ID;
     private String Title;
@@ -38,56 +38,57 @@ public class SeriesDataSet
     
     public SeriesDataSet(String title, String id, String namespace)
     {
-        Title = title;
-        ID = id;
-        Namespace = namespace;
-        _Series = new XYChart.Series<>();
-        _Series.setName(Title);
-        _ScaleValue = 1.0;
+	Title = title;
+	ID = id;
+	Namespace = namespace;
+	_Series = new XYChart.Series<>();
+	_Series.setName(Title);
+	_ScaleValue = 1.0;
     }
-
+    
     public String getHashKey()
     {
-        return Namespace.toUpperCase() + ID.toUpperCase();
+	return Namespace.toUpperCase() + ID.toUpperCase();
     }
     
     public String getID()
     {
-        return ID;
+	return ID;
     }
     
     public String getNamespace()
     {
-        return Namespace;
+	return Namespace;
     }
-
+    
     public double getScaleValue()
     {
-        return _ScaleValue;
+	return _ScaleValue;
     }
-
+    
     @SuppressWarnings("rawtypes")
     public XYChart.Series getSeries()
     {
-        return _Series;
+	return _Series;
     }
-
+    
     public String getTitle()
     {
-        return Title;
+	return Title;
     }
+    
     public void setID(String ID)
     {
-        this.ID = ID;
+	this.ID = ID;
     }
-
+    
     public void setNamespace(String Namespace)
     {
-        this.Namespace = Namespace;
+	this.Namespace = Namespace;
     }
     
     public void setScaleValue(double dVal)
     {
-        _ScaleValue = dVal;
+	_ScaleValue = dVal;
     }
 }

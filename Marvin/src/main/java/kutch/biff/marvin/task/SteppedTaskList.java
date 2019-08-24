@@ -29,66 +29,65 @@ import java.util.Iterator;
  */
 public class SteppedTaskList extends TaskList
 {
-
+    
     private boolean _Looped;
     Iterator<BaseTask> iter = null;
-
+    
     public SteppedTaskList()
     {
-        super();
-        _Looped = true;
+	super();
+	_Looped = true;
     }
-
+    
     @Override
     public boolean PerformTasks()
     {
-        if (null == _TaskItems)
-        {
-            LOGGER.severe("Attempted to perform a task with no items!");
-            return false;
-        }
-
-        if (null == iter)
-        {
-            iter = _TaskItems.iterator();
-        }
-
-        if (iter.hasNext())
-        {
-            ITask task = iter.next();
-
-            if (null != task)
-            {
-                if (task.getPostponePeriod() > 0)
-                {
-                    TaskManager.getTaskManager().AddPostponedTaskThreaded(task, task.getPostponePeriod());
-                }
-                else if (task.getMustBeInGUIThread())
-                {
-                    TASKMAN.AddDeferredTaskObject(task); // some tasks manipulate the GUI and must be done in GUI thread
-                }
-                else
-                {
-                    task.PerformTask();
-                }
-            }
-            else
-            {
-                LOGGER.severe("Tried to perform a NULL task");
-            }
-        }
-        if (!iter.hasNext() && _Looped)
-        {
-            iter = null;  // reset
-        }
-        
-
-        return true;
+	if (null == _TaskItems)
+	{
+	    LOGGER.severe("Attempted to perform a task with no items!");
+	    return false;
+	}
+	
+	if (null == iter)
+	{
+	    iter = _TaskItems.iterator();
+	}
+	
+	if (iter.hasNext())
+	{
+	    ITask task = iter.next();
+	    
+	    if (null != task)
+	    {
+		if (task.getPostponePeriod() > 0)
+		{
+		    TaskManager.getTaskManager().AddPostponedTaskThreaded(task, task.getPostponePeriod());
+		}
+		else if (task.getMustBeInGUIThread())
+		{
+		    TASKMAN.AddDeferredTaskObject(task); // some tasks manipulate the GUI and must be done in GUI thread
+		}
+		else
+		{
+		    task.PerformTask();
+		}
+	    }
+	    else
+	    {
+		LOGGER.severe("Tried to perform a NULL task");
+	    }
+	}
+	if (!iter.hasNext() && _Looped)
+	{
+	    iter = null; // reset
+	}
+	
+	return true;
     }
-
+    
     public void setLooped(boolean fValue)
     {
-        _Looped = fValue;
+	_Looped = fValue;
     }
-
+    
 }

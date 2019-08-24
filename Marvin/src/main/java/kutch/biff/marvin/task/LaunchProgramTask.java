@@ -30,43 +30,45 @@ public class LaunchProgramTask extends BaseTask
     
     public LaunchProgramTask()
     {
-        _Application = null;
+	_Application = null;
     }
+    
     public boolean isValid()
     {
-        return null != _Application;
+	return null != _Application;
     }
+    
     @Override
     public void PerformTask()
     {
-        Runtime rt = Runtime.getRuntime();
-        String [] execString = new String[getParams().size() +1 ];
-        execString[0] = _Application;
-        for (int iLoop = 0; iLoop < getParams().size(); iLoop++)
-        {
-            execString[iLoop+1] = getParams().get(iLoop).toString();
-        }
-        
-        try
-        {
-            rt.exec(execString);
-        }
-        catch (Exception ex)
-        {
-            LOGGER.severe("Error trying to launch program: " + execString);
-        }
-        
+	Runtime rt = Runtime.getRuntime();
+	String[] execString = new String[getParams().size() + 1];
+	execString[0] = _Application;
+	for (int iLoop = 0; iLoop < getParams().size(); iLoop++)
+	{
+	    execString[iLoop + 1] = getParams().get(iLoop).toString();
+	}
+	
+	try
+	{
+	    rt.exec(execString);
+	}
+	catch(Exception ex)
+	{
+	    LOGGER.severe("Error trying to launch program: " + execString);
+	}
+	
     }
     
     public boolean SetApplication(String strApplication)
     {
-        if (null != _Application)
-        {
-            LOGGER.severe("Application already defined for RunProgram Task");
-            return false;
-        }
-        _Application = strApplication;
-        return true;
+	if (null != _Application)
+	{
+	    LOGGER.severe("Application already defined for RunProgram Task");
+	    return false;
+	}
+	_Application = strApplication;
+	return true;
     }
     
 }

@@ -26,10 +26,11 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import kutch.biff.marvin.logger.MarvinLogger;
+
 /**
-*
-* @author Patrick.Kutch@gmail.com
-*/
+ *
+ * @author Patrick.Kutch@gmail.com
+ */
 public class MarvinPlaybackManager
 {
     @SuppressWarnings("unused")
@@ -45,11 +46,12 @@ public class MarvinPlaybackManager
 	}
 	return _inst._PlaybackInstancesMap.get(strName.toUpperCase());
     }
-    private Map<String,MarvinPlayback> _PlaybackInstancesMap;
+    
+    private Map<String, MarvinPlayback> _PlaybackInstancesMap;
     
     private MarvinPlaybackManager()
     {
-	_PlaybackInstancesMap = new HashMap<String,MarvinPlayback>();
+	_PlaybackInstancesMap = new HashMap<String, MarvinPlayback>();
     }
     
     public int getCount()

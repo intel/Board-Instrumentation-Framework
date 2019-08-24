@@ -36,68 +36,66 @@ public class BarGaugeWidgetBuilder
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     
-    public static BarGaugeWidget Build(FrameworkNode masterNode, String widgetDefFilename)  
+    public static BarGaugeWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        BarGaugeWidget gauge = new BarGaugeWidget();
-        for (FrameworkNode node :masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(gauge, node))
-            {
-                continue;
-            }
-            else if (node.getNodeName().equalsIgnoreCase("MinValue"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    gauge.setMinValue(Double.parseDouble(str));
-                }
-                catch (NumberFormatException ex)
-                {
-                    LOGGER.severe("Invalid MinValue in BarGauge Widget Definition File");
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("MaxValue"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    gauge.setMaxValue(Double.parseDouble(str));
-                }
-                catch (NumberFormatException ex)
-                {
-                    LOGGER.severe("Invalid MaxValue in BarGauge Widget Definition File");
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("Decimals"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    gauge.setDecimalPlaces(Integer.parseInt(str));
-                }
-                catch (NumberFormatException ex)
-                {
-                    LOGGER.severe("Invalid Decimals in Bareauge Widget Definition File");
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("UnitText"))
-            {
-                String str = node.getTextContent();
-                gauge.setUnitText(str);
-            }
-            else 
-            {
-               LOGGER.severe("Invalid BarGauge Widget Definition File.  Unknown Tag: " + node.getNodeName());
-               return null;                
-            }
-            
-        }
-        return gauge;        
+	BarGaugeWidget gauge = new BarGaugeWidget();
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(gauge, node))
+	    {
+		continue;
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("MinValue"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    gauge.setMinValue(Double.parseDouble(str));
+		}
+		catch(NumberFormatException ex)
+		{
+		    LOGGER.severe("Invalid MinValue in BarGauge Widget Definition File");
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("MaxValue"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    gauge.setMaxValue(Double.parseDouble(str));
+		}
+		catch(NumberFormatException ex)
+		{
+		    LOGGER.severe("Invalid MaxValue in BarGauge Widget Definition File");
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("Decimals"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    gauge.setDecimalPlaces(Integer.parseInt(str));
+		}
+		catch(NumberFormatException ex)
+		{
+		    LOGGER.severe("Invalid Decimals in Bareauge Widget Definition File");
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("UnitText"))
+	    {
+		String str = node.getTextContent();
+		gauge.setUnitText(str);
+	    }
+	    else
+	    {
+		LOGGER.severe("Invalid BarGauge Widget Definition File.  Unknown Tag: " + node.getNodeName());
+		return null;
+	    }
+	    
+	}
+	return gauge;
     }
 }
-    
-

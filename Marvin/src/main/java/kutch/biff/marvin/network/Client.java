@@ -43,63 +43,64 @@ public class Client
     
     public Client(String Address, int Port)
     {
-        _Address = Address;
-        _Port = Port;
-        _IPAddress = null;
-        _Socket = null;
-        
+	_Address = Address;
+	_Port = Port;
+	_IPAddress = null;
+	_Socket = null;
+	
     }
+    
     public void Close()
     {
-        if (null != _Socket)
-        {
-            _Socket.close();
-            _Socket = null;
-        }
+	if (null != _Socket)
+	{
+	    _Socket.close();
+	    _Socket = null;
+	}
     }
     
     public String getAddress()
     {
-        return _Address;
+	return _Address;
     }
     
     public int getPort()
     {
-        return _Port;
+	return _Port;
     }
-
+    
     public boolean send(byte[] sendData)
     {
-        if (null == _Socket)
-        {
-            SetupSocket(); // if it fails, will get caught in next try/catch block when tries to use
-        }
-        try
-        {
-           DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, _IPAddress, _Port);
-           _Socket.send(sendPacket);
-        }
-        catch (Exception ex)
-        {
-            LOGGER.severe("Unable to send data to Oscar at [" + getAddress() +":"+Integer.toString(_Port)+"]");
-            return false;
-        }
-        
-        return true;
+	if (null == _Socket)
+	{
+	    SetupSocket(); // if it fails, will get caught in next try/catch block when tries to use
+	}
+	try
+	{
+	    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, _IPAddress, _Port);
+	    _Socket.send(sendPacket);
+	}
+	catch(Exception ex)
+	{
+	    LOGGER.severe("Unable to send data to Oscar at [" + getAddress() + ":" + Integer.toString(_Port) + "]");
+	    return false;
+	}
+	
+	return true;
     }
-
+    
     private boolean SetupSocket()
     {
-        try
-        {
-           _IPAddress = InetAddress.getByName(_Address); 
-           _Socket = new DatagramSocket();
-        }
-        catch (Exception ex)
-        {
-            return false;
-        }
-        return true;
+	try
+	{
+	    _IPAddress = InetAddress.getByName(_Address);
+	    _Socket = new DatagramSocket();
+	}
+	catch(Exception ex)
+	{
+	    return false;
+	}
+	return true;
     }
     
 }

@@ -55,14 +55,17 @@ public class GenerateDatapointInfo
 	ADD, AVERAGE, PROXY, SPLIT_LIST, MAKE_LIST, MAKE_NAMESPACE_LIST, MAKE_ID_LIST, GET_LIST_SIZE, MAKE_INDEX_LIST,
 	INVALID
     }
+    
     public enum ListSortMethod
     {
 	ASCENDING, DESCENDING, NONE;
     }
+    
     public enum RefreshPolicy
     {
 	REMOVE, REUSE, ZERO_OUT, INVALD
     }
+    
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final List<Pair<String, String>> __includeCriterea;
     private final List<Pair<String, String>> __excludeCriterea;
@@ -124,7 +127,7 @@ public class GenerateDatapointInfo
 	{
 	    __ProcessRanges = false;
 	}
-	__cachedValue="";
+	__cachedValue = "";
     }
     
     public void BuildDatapoint(String inputNamespace, String inputID)
@@ -153,7 +156,7 @@ public class GenerateDatapointInfo
 		}
 		else if (__useCSV)
 		{
-		   return;
+		    return;
 		}
 		try
 		{
@@ -413,9 +416,9 @@ public class GenerateDatapointInfo
 	    }
 	    __cachedValue = strData;
 	}
-	    MarvinTask mt = new MarvinTask();
-	    mt.AddDataset(__ID, __Namespace, __cachedValue);
-	    TaskManager.getTaskManager().AddDeferredTaskObject(mt);
+	MarvinTask mt = new MarvinTask();
+	mt.AddDataset(__ID, __Namespace, __cachedValue);
+	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
     }
     
     private void HandleMakeList(String NS, String ID, String strInpValue)
@@ -472,10 +475,10 @@ public class GenerateDatapointInfo
 	
 	for (int iIndex = 0; iIndex < len; iIndex++)
 	{
-
+	    
 	    if (null == strData)
 	    {
-		strData = Integer.toString(iIndex); 
+		strData = Integer.toString(iIndex);
 	    }
 	    else
 	    {
@@ -539,7 +542,7 @@ public class GenerateDatapointInfo
     {
 	MarvinTask mt = new MarvinTask();
 	String dataStr;
-
+	
 	try
 	{
 	    float value;
@@ -762,11 +765,9 @@ public class GenerateDatapointInfo
     
     public boolean setListEntry(int newVal)
     {
-	/*if (newVal < 0)
-	{
-	    return false;
-	}
-	*/
+	/*
+	 * if (newVal < 0) { return false; }
+	 */
 	__csvEntry = newVal;
 	__useCSV = true;
 	return true;

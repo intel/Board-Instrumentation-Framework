@@ -27,28 +27,39 @@ import javafx.scene.layout.Region;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 
-
 /**
  *
  * @author Patrick Kutch
  */
 public interface Widget
 {
-    public boolean Create(GridPane pane,DataManager dataMgr);
+    public boolean Create(GridPane pane, DataManager dataMgr);
+    
     public Region getRegionObject();
+    
     public javafx.scene.Node getStylableObject();
+    
     public ObservableList<String> getStylesheets();
+    
     public void HandleCustomStyleOverride(FrameworkNode styleNode);
+    
     public void OnPaused();
+    
     public void OnResumed();
-    public boolean PerformPostCreateActions(GridWidget objParentGrid,boolean flag);
+    
+    public boolean PerformPostCreateActions(GridWidget objParentGrid, boolean flag);
+    
     public void PrepareForAppShutdown();
+    
     public void resetState(String strParam);
+    
     public void SetClickThroughTransparentRegion(boolean _CanClickOnTransparent);
+    
     public boolean SupportsEnableDisable();
+    
     public boolean SupportsSteppedRanges();
+    
     public void UpdateTitle(String newTitle);
+    
     public void UpdateValueRange();
 }
-
-

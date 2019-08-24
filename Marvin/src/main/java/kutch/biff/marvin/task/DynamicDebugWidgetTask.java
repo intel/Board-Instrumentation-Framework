@@ -36,20 +36,21 @@ public class DynamicDebugWidgetTask extends BaseTask
     
     public DynamicDebugWidgetTask(String Namespace, String ID, String Value)
     {
-        this.Namespace = Namespace;
-        this.ID = ID;
-        this.Value = Value;
+	this.Namespace = Namespace;
+	this.ID = ID;
+	this.Value = Value;
     }
     
     @Override
     public boolean getMustBeInGUIThread()
     {
-        return true;
-    }    
+	return true;
+    }
+    
     @Override
     public void PerformTask()
     {
-        DynamicTabWidget objWidget = DynamicTabWidget.getTab(Namespace,TASKMAN.getDataMgr());
-        objWidget.AddWidget(TASKMAN.getDataMgr(), ID, Value);
+	DynamicTabWidget objWidget = DynamicTabWidget.getTab(Namespace, TASKMAN.getDataMgr());
+	objWidget.AddWidget(TASKMAN.getDataMgr(), ID, Value);
     }
 }

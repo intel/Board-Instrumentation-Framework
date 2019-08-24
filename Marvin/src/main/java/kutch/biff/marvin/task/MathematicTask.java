@@ -29,89 +29,91 @@ public class MathematicTask extends PulseTask
     private double _Value;
     private boolean validVal = false;
     private String _Operation = null;
-
+    
     public MathematicTask()
     {
-
+	
     }
-
+    
     @Override
     public boolean isValid()
     {
-        return (super.isValid() && validVal && _Operation != null);
+	return (super.isValid() && validVal && _Operation != null);
     }
-
+    
     @Override
     public void PerformTask()
     {
-        String currValueStr;
-        double doubleVal;
-
-        synchronized (TASKMAN.getDataMgr())
-        {
-            currValueStr = TASKMAN.getDataMgr().GetValueForMath(_ID, _Namespace);
-
-            if (null == currValueStr)
-            {
-                LOGGER.warning("Mathematic Task failed [" + getTaskID() + "] beause the data point does not exist (yet).");
-                return;
-            }
-
-            try
-            {
-                doubleVal = Double.parseDouble(currValueStr);
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.warning("Attempted Mathematic Task on Non numrice Data point: [" + _Namespace + ":" + _ID + "] = " + currValueStr);
-                return;
-            }
-            double newVal = 0.0;
-            if (_Operation.equalsIgnoreCase("Add"))
-            {
-                newVal = doubleVal + _Value;
-            }
-            else if (_Operation.equalsIgnoreCase("Subtract"))
-            {
-                newVal = doubleVal - _Value;
-            }
-            else if (_Operation.equalsIgnoreCase("Multiply"))
-            {
-                newVal = doubleVal * _Value;
-            }
-            else
-            {
-                LOGGER.warning("Unknown Error processing Mathematic Task on Non numrice Data point: [" + _Namespace + ":" + _ID + "]");
-                return;
-            }
-            int intVal = (int) newVal;
-            TASKMAN.getDataMgr().ChangeValue(_ID, _Namespace, Integer.toString(intVal));
-        }
+	String currValueStr;
+	double doubleVal;
+	
+	synchronized (TASKMAN.getDataMgr())
+	{
+	    currValueStr = TASKMAN.getDataMgr().GetValueForMath(_ID, _Namespace);
+	    
+	    if (null == currValueStr)
+	    {
+		LOGGER.warning(
+			"Mathematic Task failed [" + getTaskID() + "] beause the data point does not exist (yet).");
+		return;
+	    }
+	    
+	    try
+	    {
+		doubleVal = Double.parseDouble(currValueStr);
+	    }
+	    catch(NumberFormatException ex)
+	    {
+		LOGGER.warning("Attempted Mathematic Task on Non numrice Data point: [" + _Namespace + ":" + _ID
+			+ "] = " + currValueStr);
+		return;
+	    }
+	    double newVal = 0.0;
+	    if (_Operation.equalsIgnoreCase("Add"))
+	    {
+		newVal = doubleVal + _Value;
+	    }
+	    else if (_Operation.equalsIgnoreCase("Subtract"))
+	    {
+		newVal = doubleVal - _Value;
+	    }
+	    else if (_Operation.equalsIgnoreCase("Multiply"))
+	    {
+		newVal = doubleVal * _Value;
+	    }
+	    else
+	    {
+		LOGGER.warning("Unknown Error processing Mathematic Task on Non numrice Data point: [" + _Namespace
+			+ ":" + _ID + "]");
+		return;
+	    }
+	    int intVal = (int) newVal;
+	    TASKMAN.getDataMgr().ChangeValue(_ID, _Namespace, Integer.toString(intVal));
+	}
     }
-
+    
     public boolean SetOperation(String strOper)
     {
-        if (strOper.equalsIgnoreCase("Add")
-            || strOper.equalsIgnoreCase("Subtract")
-            || strOper.equalsIgnoreCase("Multipley"))
-        {
-            _Operation = strOper;
-        }
-
-        return (null != _Operation);
+	if (strOper.equalsIgnoreCase("Add") || strOper.equalsIgnoreCase("Subtract")
+		|| strOper.equalsIgnoreCase("Multipley"))
+	{
+	    _Operation = strOper;
+	}
+	
+	return (null != _Operation);
     }
-
+    
     public boolean setValue(String strValue)
     {
-        try
-        {
-            _Value = Double.parseDouble(strValue);
-            validVal = true;
-        }
-        catch (NumberFormatException ex)
-        {
-
-        }
-        return validVal;
+	try
+	{
+	    _Value = Double.parseDouble(strValue);
+	    validVal = true;
+	}
+	catch(NumberFormatException ex)
+	{
+	    
+	}
+	return validVal;
     }
 }

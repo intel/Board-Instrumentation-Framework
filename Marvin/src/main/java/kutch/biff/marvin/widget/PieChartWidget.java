@@ -39,123 +39,125 @@ import kutch.biff.marvin.utility.FrameworkNode;
  */
 public class PieChartWidget extends BaseWidget
 {
-
+    
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private PieChart _Chart;
     private ArrayList<String> _Slices;
-
+    
     public PieChartWidget()
     {
-        _Chart = new PieChart();
-        _Slices = new ArrayList<>();
+	_Chart = new PieChart();
+	_Slices = new ArrayList<>();
     }
-
+    
     public void AddSlide(String slice)
     {
-
-        _Slices.add(slice);
+	
+	_Slices.add(slice);
     }
-
+    
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
-        SetParent(pane);
-        SetupPieChart();
-        ConfigureDimentions();
-        ConfigureAlignment();
-        SetupPeekaboo(dataMgr);
-
-        pane.add(_Chart, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
-        {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
-            {
-                if (IsPaused())  
-                {
-                    return;
-                }
-                String[] strList = newVal.toString().split(","); // expecting comma separated data
-                int iIndex = 0;
-                for (String strValue : strList)
-                {
-                    double newValue;
-                    try
-                    {
-                        newValue = Double.parseDouble(strValue);
-                    }
-                    catch (NumberFormatException ex)
-                    {
-                        LOGGER.severe("Invalid data for Line Chart received: " + strValue);
-                        return;
-                    }
-
-                    if (iIndex < _Slices.size())
-                    {
-                        _Chart.getData().get(iIndex).setPieValue(newValue);
-                    }
-                    else
-                    {
-                        LOGGER.severe("Received More datapoints for Pie Chart than was defined in application definition file");
-                        return;
-                    }
-                    iIndex++;
-                }
-            }
-        });
-
-        SetupTaskAction();
-        return ApplyCSS();
+	SetParent(pane);
+	SetupPieChart();
+	ConfigureDimentions();
+	ConfigureAlignment();
+	SetupPeekaboo(dataMgr);
+	
+	pane.add(_Chart, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+	dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
+	{
+	    @Override
+	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
+	    {
+		if (IsPaused())
+		{
+		    return;
+		}
+		String[] strList = newVal.toString().split(","); // expecting comma separated data
+		int iIndex = 0;
+		for (String strValue : strList)
+		{
+		    double newValue;
+		    try
+		    {
+			newValue = Double.parseDouble(strValue);
+		    }
+		    catch(NumberFormatException ex)
+		    {
+			LOGGER.severe("Invalid data for Line Chart received: " + strValue);
+			return;
+		    }
+		    
+		    if (iIndex < _Slices.size())
+		    {
+			_Chart.getData().get(iIndex).setPieValue(newValue);
+		    }
+		    else
+		    {
+			LOGGER.severe(
+				"Received More datapoints for Pie Chart than was defined in application definition file");
+			return;
+		    }
+		    iIndex++;
+		}
+	    }
+	});
+	
+	SetupTaskAction();
+	return ApplyCSS();
     }
-
+    
     @Override
     public javafx.scene.Node getStylableObject()
     {
-        return _Chart;
+	return _Chart;
     }
-
+    
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return _Chart.getStylesheets();
+	return _Chart.getStylesheets();
     }
-
+    
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode node)
     {
-        if (node.getNodeName().equalsIgnoreCase("Slice"))
-        {
-            if (node.hasAttribute("Label"))
-            {
-                AddSlide(node.getAttribute("Label"));
-            }
-            else
-            {
-                LOGGER.severe("Pie Chart Widget has a slice with to 'Label' attribute.");
-            }
-            return true;
-        }
-
-        return false;
+	if (node.getNodeName().equalsIgnoreCase("Slice"))
+	{
+	    if (node.hasAttribute("Label"))
+	    {
+		AddSlide(node.getAttribute("Label"));
+	    }
+	    else
+	    {
+		LOGGER.severe("Pie Chart Widget has a slice with to 'Label' attribute.");
+	    }
+	    return true;
+	}
+	
+	return false;
     }
-
+    
     private void SetupPieChart()
     {
-        for (String slice : _Slices)
-        {
-            _Chart.getData().add(new PieChart.Data(slice, 100.0 / _Slices.size()));
-        }
-        _Chart.setTitle(getTitle());
-    }   
+	for (String slice : _Slices)
+	{
+	    _Chart.getData().add(new PieChart.Data(slice, 100.0 / _Slices.size()));
+	}
+	_Chart.setTitle(getTitle());
+    }
+    
     @Override
     public boolean SupportsSteppedRanges()
     {
-        return false;
+	return false;
     }
-
+    
     @Override
     public void UpdateTitle(String strTitle)
     {
-        _Chart.setTitle(strTitle);
+	_Chart.setTitle(strTitle);
     }
 }

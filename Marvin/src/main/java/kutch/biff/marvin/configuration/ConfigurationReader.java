@@ -84,6 +84,7 @@ public class ConfigurationReader
     private static ConfigurationReader _ConfigReader;
     private static HashMap<Conditional, Conditional> _conditionalMap = new HashMap<>();
     private static List<String> _OnDemandID_List = new ArrayList<>();
+    
     private static Document _OpenXMLFile(String filename, boolean fReport)
     {
 	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -133,6 +134,7 @@ public class ConfigurationReader
 	}
 	return null;
     }
+    
     public static ConfigurationReader GetConfigReader()
     {
 	return _ConfigReader;
@@ -342,7 +344,8 @@ public class ConfigurationReader
 	return retVal;
     }
     
-    public static List<DataPointGenerator> ReadDataPointsForTask(int itemIndex, String strInput, String strTaskText, String strTask)
+    public static List<DataPointGenerator> ReadDataPointsForTask(int itemIndex, String strInput, String strTaskText,
+	    String strTask)
     {
 	List<DataPointGenerator> retList = new ArrayList<>();
 	if (strInput.contains("^")) // might be replacement of ^Text or ^Task
@@ -375,7 +378,7 @@ public class ConfigurationReader
 	    if (point.charAt(0) == '[')
 	    {
 		point = point.substring(1);
-		String[] parts = point.split(",",3);
+		String[] parts = point.split(",", 3);
 		if (parts.length != 3)
 		{
 		    retList.clear();
@@ -384,15 +387,14 @@ public class ConfigurationReader
 		String Namespace = parts[0];
 		String ID = parts[1];
 		String val = parts[2];
-		retList.add(new DataPointGenerator(Namespace,ID,val));
+		retList.add(new DataPointGenerator(Namespace, ID, val));
 	    }
 	    else
 	    {
-		    retList.clear();
-		    return retList;
+		retList.clear();
+		return retList;
 	    }
 	}
-	
 	
 	return retList;
     }
@@ -413,11 +415,12 @@ public class ConfigurationReader
 	    return null;
 	}
 	
-	boolean IsGenerateNamespaceList = inputNode.getAttribute("Method").equalsIgnoreCase("MakeNamespaceList") || inputNode.getAttribute("Method").equalsIgnoreCase("MakeIDList");
+	boolean IsGenerateNamespaceList = inputNode.getAttribute("Method").equalsIgnoreCase("MakeNamespaceList")
+		|| inputNode.getAttribute("Method").equalsIgnoreCase("MakeIDList");
 	String strMethod = inputNode.getAttribute("Method");
 	
 	Pair<String, String> genDPInfo = getNamespaceAndIdPattern(inputNode, false);
-	Pair<ValueRange,String> rangeInfo = WidgetBuilder.ReadMinionSrcIndexInfo(inputNode);
+	Pair<ValueRange, String> rangeInfo = WidgetBuilder.ReadMinionSrcIndexInfo(inputNode);
 	if (null == genDPInfo)
 	{
 	    LOGGER.severe("Invalid GenerateDatapoint.");
@@ -479,8 +482,8 @@ public class ConfigurationReader
 	    }
 	    else if (node.getNodeName().equalsIgnoreCase("Sort"))
 	    {
-		if (strMethod.equalsIgnoreCase("MakeList") || strMethod.equalsIgnoreCase("MakeNamespaceList") || 
-			strMethod.equalsIgnoreCase("MakeIDList") )
+		if (strMethod.equalsIgnoreCase("MakeList") || strMethod.equalsIgnoreCase("MakeNamespaceList")
+			|| strMethod.equalsIgnoreCase("MakeIDList"))
 		{
 		    String strSort = node.getTextContent();
 		    if (strSort.equalsIgnoreCase("Ascending"))
@@ -503,7 +506,8 @@ public class ConfigurationReader
 		}
 		else
 		{
-			LOGGER.warning("Specified Sort Method for Generate Datapoint, however " + strMethod + " does not support sorting.  Ignoring.");
+		    LOGGER.warning("Specified Sort Method for Generate Datapoint, however " + strMethod
+			    + " does not support sorting.  Ignoring.");
 		}
 	    }
 	    else
@@ -513,7 +517,7 @@ public class ConfigurationReader
 	    }
 	}
 	GenerateDatapointInfo info = new GenerateDatapointInfo(genDPInfo.getKey(), genDPInfo.getValue(), maskList,
-		excludeList,rangeInfo.getKey(),rangeInfo.getValue());
+		excludeList, rangeInfo.getKey(), rangeInfo.getValue());
 	
 	if (hasListEntry)
 	{
@@ -1804,7 +1808,7 @@ public class ConfigurationReader
 		    String strTask = menuNode.getAttribute("Task");
 		    if (menuNode.hasAttribute("CreateDataPoint"))
 		    {
-			dataPoints.addAll(ReadDataPointsForTask(itemIndex,menuNode.getAttribute("CreateDataPoint"),
+			dataPoints.addAll(ReadDataPointsForTask(itemIndex, menuNode.getAttribute("CreateDataPoint"),
 				menuNode.getAttribute("Text"), menuNode.getAttribute("Task")));
 			if (dataPoints.size() == 0)
 			{
@@ -1837,7 +1841,7 @@ public class ConfigurationReader
 	{
 	    if (node.getNodeName().equalsIgnoreCase("MenuItem"))
 	    {
-		MenuItem objItem = ReadMenuItem(node,retList.size());
+		MenuItem objItem = ReadMenuItem(node, retList.size());
 		if (null != objItem)
 		{
 		    retList.add(objItem);
@@ -2314,5 +2318,5 @@ public class ConfigurationReader
 	    }
 	}
 	return RetVal;
-    }    
+    }
 }

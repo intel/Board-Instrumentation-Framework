@@ -33,59 +33,59 @@ public class ToggleButtonWidget extends ButtonWidget
 {
     private ToggleButton _Button;
     private String _UnToggleTask = null;
+    
     public ToggleButtonWidget()
     {
-        _Button = new ToggleButton();
+	_Button = new ToggleButton();
     }
     
     @Override
     protected ButtonBase getButton()
     {
-        return _Button;
-    }    
+	return _Button;
+    }
     
     @Override
     public void HandleWidgetSpecificAttributes(FrameworkNode widgetNode)
     {
-        if (widgetNode.hasAttribute("ToggleTask"))
-        {
-            _UnToggleTask = widgetNode.getAttribute("ToggleTask");
-        }
-        
+	if (widgetNode.hasAttribute("ToggleTask"))
+	{
+	    _UnToggleTask = widgetNode.getAttribute("ToggleTask");
+	}
+	
     }
     
     @Override
     public void mouseHandler(MouseEvent event)
     {
-        BaseWidget objWidget = this;
-
-        if (CONFIG.isDebugMode() && event.isShiftDown())
-        {
-            LOGGER.info(objWidget.toString(true));
-        }
-        else if (CONFIG.isDebugMode() && event.isControlDown())
-        {
-            if (null != getStylableObject())
-            {
-                AddAdditionalStyleOverride(DebugStyles.GetNext());
-                ApplyCSS();
-            }
-        }
-        else if (null != getTaskID() && true == CONFIG.getAllowTasks())
-        {
-            if (_Button.isSelected())
-            {
-                TASKMAN.PerformTask(getTaskID());
-            }
-            else
-            {
-                if (null != _UnToggleTask)
-                {
-                    TASKMAN.PerformTask(_UnToggleTask);
-                }
-            }
-        }
+	BaseWidget objWidget = this;
+	
+	if (CONFIG.isDebugMode() && event.isShiftDown())
+	{
+	    LOGGER.info(objWidget.toString(true));
+	}
+	else if (CONFIG.isDebugMode() && event.isControlDown())
+	{
+	    if (null != getStylableObject())
+	    {
+		AddAdditionalStyleOverride(DebugStyles.GetNext());
+		ApplyCSS();
+	    }
+	}
+	else if (null != getTaskID() && true == CONFIG.getAllowTasks())
+	{
+	    if (_Button.isSelected())
+	    {
+		TASKMAN.PerformTask(getTaskID());
+	    }
+	    else
+	    {
+		if (null != _UnToggleTask)
+		{
+		    TASKMAN.PerformTask(_UnToggleTask);
+		}
+	    }
+	}
     }
-
     
 }

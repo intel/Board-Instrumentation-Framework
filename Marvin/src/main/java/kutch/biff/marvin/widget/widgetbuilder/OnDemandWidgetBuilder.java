@@ -27,5 +27,5 @@ package kutch.biff.marvin.widget.widgetbuilder;
  */
 public interface OnDemandWidgetBuilder
 {
-    public boolean Build(String Namespace, String ID,String Value, String sortStr);
+    public boolean Build(String Namespace, String ID, String Value, String sortStr);
 }

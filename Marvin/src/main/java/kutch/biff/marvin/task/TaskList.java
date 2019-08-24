@@ -33,59 +33,59 @@ import kutch.biff.marvin.logger.MarvinLogger;
 public class TaskList
 {
     protected final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    protected  ArrayList<BaseTask> _TaskItems;
-    protected  TaskManager TASKMAN = TaskManager.getTaskManager();
+    protected ArrayList<BaseTask> _TaskItems;
+    protected TaskManager TASKMAN = TaskManager.getTaskManager();
     
     public TaskList()
     {
-        _TaskItems = null;
+	_TaskItems = null;
     }
-
+    
     public void AddTaskItem(BaseTask objTask)
     {
-        if (null == _TaskItems)
-        {
-            _TaskItems = new ArrayList<>();
-        }
-
-        _TaskItems.add(objTask);
+	if (null == _TaskItems)
+	{
+	    _TaskItems = new ArrayList<>();
+	}
+	
+	_TaskItems.add(objTask);
     }
     
     public ArrayList<BaseTask> GetTasks()
     {
-        return _TaskItems;
+	return _TaskItems;
     }
-
+    
     public boolean PerformTasks()
     {
-        if (null == _TaskItems)
-        {
-            LOGGER.severe("Attempted to perform a task with no items!");
-            return false;
-        }
-        
-        for (ITask task : _TaskItems)
-        {
-            if (null != task)
-            {
-                if (task.getPostponePeriod() > 0)
-                {
-                    TaskManager.getTaskManager().AddPostponedTaskThreaded(task, task.getPostponePeriod());
-                }
-                else if (task.getMustBeInGUIThread())
-                {
-                    TASKMAN.AddDeferredTaskObject(task); // some tasks manipulate the GUI and must be done in GUI thread
-                }
-                else
-                {
-                    task.PerformTask();
-                }
-            }
-            else
-            {
-                LOGGER.severe("Tried to perform a NULL task");
-            }
-        }
-        return true;
+	if (null == _TaskItems)
+	{
+	    LOGGER.severe("Attempted to perform a task with no items!");
+	    return false;
+	}
+	
+	for (ITask task : _TaskItems)
+	{
+	    if (null != task)
+	    {
+		if (task.getPostponePeriod() > 0)
+		{
+		    TaskManager.getTaskManager().AddPostponedTaskThreaded(task, task.getPostponePeriod());
+		}
+		else if (task.getMustBeInGUIThread())
+		{
+		    TASKMAN.AddDeferredTaskObject(task); // some tasks manipulate the GUI and must be done in GUI thread
+		}
+		else
+		{
+		    task.PerformTask();
+		}
+	    }
+	    else
+	    {
+		LOGGER.severe("Tried to perform a NULL task");
+	    }
+	}
+	return true;
     }
 }

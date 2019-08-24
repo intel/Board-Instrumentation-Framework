@@ -43,12 +43,12 @@ public class SeriesSet
     @SuppressWarnings("rawtypes")
     public SeriesSet(String strTitle)
     {
-        _MinionSrcList = new ArrayList<>();
-
-        _Series = new XYChart.Series();
-        _Series.setName(strTitle);
-                
-        _Title = strTitle;
+	_MinionSrcList = new ArrayList<>();
+	
+	_Series = new XYChart.Series();
+	_Series.setName(strTitle);
+	
+	_Title = strTitle;
     }
     
     /**
@@ -58,24 +58,24 @@ public class SeriesSet
     @SuppressWarnings("unchecked")
     public void AddSeries(SeriesDataSet objSeries)
     {
-        _MinionSrcList.add(objSeries);
-        _Series.getData().add(new XYChart.Data<>(objSeries.getTitle(),110000.0));
+	_MinionSrcList.add(objSeries);
+	_Series.getData().add(new XYChart.Data<>(objSeries.getTitle(), 110000.0));
     }
-
+    
     @SuppressWarnings("rawtypes")
     public XYChart.Series getSeries()
     {
-        return _Series;
+	return _Series;
     }
-
+    
     public ArrayList<SeriesDataSet> getSeriesList()
     {
-        return _MinionSrcList;
+	return _MinionSrcList;
     }
-
+    
     public String getTitle()
     {
-        return _Title;
+	return _Title;
     }
-   
+    
 }

@@ -36,38 +36,36 @@ public class SVG_Widget extends TextWidget
     
     public SVG_Widget()
     {
-        
+	
     }
-
-
+    
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
-        if (null == _strShape)
-        {
-            LOGGER.severe("No shape defined for SVG Shape Widget");
-            return false;
-        }
-        String strShape = "-fx-shape:\"" + _strShape +"\"";
-        AddAdditionalStyleOverride(strShape);
-        
-        return super.Create(pane, dataMgr);
-    }   
+	if (null == _strShape)
+	{
+	    LOGGER.severe("No shape defined for SVG Shape Widget");
+	    return false;
+	}
+	String strShape = "-fx-shape:\"" + _strShape + "\"";
+	AddAdditionalStyleOverride(strShape);
+	
+	return super.Create(pane, dataMgr);
+    }
     
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode node)
     {
-        if (node.getNodeName().equalsIgnoreCase("Shape"))
-        {
-            SetShape(node.getTextContent());
-            return true;
-        }
-        return false;
+	if (node.getNodeName().equalsIgnoreCase("Shape"))
+	{
+	    SetShape(node.getTextContent());
+	    return true;
+	}
+	return false;
     }
-    
     
     public void SetShape(String strShape)
     {
-        _strShape = strShape;
+	_strShape = strShape;
     }
 }

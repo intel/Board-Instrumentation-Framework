@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 import javafx.geometry.Pos;
 import kutch.biff.marvin.logger.MarvinLogger;
 
-
 /**
  *
  * @author Patrick Kutch
@@ -40,90 +39,93 @@ public class PanelSideInfo
     private Pos Position;
     private boolean ButtonOnTop;
     
-    public PanelSideInfo(String loc, String text,String ID, String file)
+    public PanelSideInfo(String loc, String text, String ID, String file)
     {
-        ButtonText = text;
-        StyleID = ID;
-        CSSFile = file;
-        ButtonOnTop = true;
-        Position = setButtonAlignment(loc);
+	ButtonText = text;
+	StyleID = ID;
+	CSSFile = file;
+	ButtonOnTop = true;
+	Position = setButtonAlignment(loc);
     }
-
+    
     public Pos GetButtonAlignment()
     {
-        return this.Position;
+	return this.Position;
     }
-
+    
     public String getButtonText()
     {
-        if (null == ButtonText)
-        {
-            return "";
-        }
-        return ButtonText;
+	if (null == ButtonText)
+	{
+	    return "";
+	}
+	return ButtonText;
     }
-
+    
     public String getCSSFile()
     {
-        if (null == CSSFile)
-        {
-            return "";
-        }
-        return CSSFile;
+	if (null == CSSFile)
+	{
+	    return "";
+	}
+	return CSSFile;
     }
+    
     public String getStyleID()
     {
-        return StyleID;
+	return StyleID;
     }
+    
     public boolean IsButtonOnTop()
     {
-        return ButtonOnTop;
+	return ButtonOnTop;
     }
+    
     private Pos setButtonAlignment(String alignString)
     {
-        if (0 == alignString.compareToIgnoreCase("Center"))
-        {
-            return (Pos.CENTER);
-        }
-        else if (0 == alignString.compareToIgnoreCase("N"))
-        {
-            return (Pos.TOP_CENTER);
-        }
-        else if (0 == alignString.compareToIgnoreCase("NE"))
-        {
-            return (Pos.TOP_RIGHT);
-        }
-        else if (0 == alignString.compareToIgnoreCase("E"))
-        {
-            return (Pos.CENTER_RIGHT);
-        }
-        else if (0 == alignString.compareToIgnoreCase("SE"))
-        {
-            ButtonOnTop = false;
-            return (Pos.BOTTOM_RIGHT);
-        }
-        else if (0 == alignString.compareToIgnoreCase("S"))
-        {
-            ButtonOnTop = false;
-            return (Pos.BOTTOM_CENTER);
-        }
-        else if (0 == alignString.compareToIgnoreCase("SW"))
-        {
-            ButtonOnTop = false;
-            return (Pos.BOTTOM_LEFT);
-        }
-        else if (0 == alignString.compareToIgnoreCase("W"))
-        {
-            return (Pos.CENTER_LEFT);
-        }
-        else if (0 == alignString.compareToIgnoreCase("NW"))
-        {
-            return (Pos.TOP_LEFT);
-        }
-        else
-        {
-            LOGGER.severe("Invalid FlipPanel Button in config file: " +alignString + ". Ignoring.");
-            return (Pos.CENTER_LEFT);
-        }
-    }    
+	if (0 == alignString.compareToIgnoreCase("Center"))
+	{
+	    return (Pos.CENTER);
+	}
+	else if (0 == alignString.compareToIgnoreCase("N"))
+	{
+	    return (Pos.TOP_CENTER);
+	}
+	else if (0 == alignString.compareToIgnoreCase("NE"))
+	{
+	    return (Pos.TOP_RIGHT);
+	}
+	else if (0 == alignString.compareToIgnoreCase("E"))
+	{
+	    return (Pos.CENTER_RIGHT);
+	}
+	else if (0 == alignString.compareToIgnoreCase("SE"))
+	{
+	    ButtonOnTop = false;
+	    return (Pos.BOTTOM_RIGHT);
+	}
+	else if (0 == alignString.compareToIgnoreCase("S"))
+	{
+	    ButtonOnTop = false;
+	    return (Pos.BOTTOM_CENTER);
+	}
+	else if (0 == alignString.compareToIgnoreCase("SW"))
+	{
+	    ButtonOnTop = false;
+	    return (Pos.BOTTOM_LEFT);
+	}
+	else if (0 == alignString.compareToIgnoreCase("W"))
+	{
+	    return (Pos.CENTER_LEFT);
+	}
+	else if (0 == alignString.compareToIgnoreCase("NW"))
+	{
+	    return (Pos.TOP_LEFT);
+	}
+	else
+	{
+	    LOGGER.severe("Invalid FlipPanel Button in config file: " + alignString + ". Ignoring.");
+	    return (Pos.CENTER_LEFT);
+	}
+    }
 }

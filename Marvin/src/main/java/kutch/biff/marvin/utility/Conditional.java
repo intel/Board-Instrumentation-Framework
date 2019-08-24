@@ -47,6 +47,7 @@ public class Conditional
     }
     
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    
     public static Conditional BuildConditional(Type type, FrameworkNode condNode, boolean usesThen)
     {
 	Conditional objCond = null;
@@ -134,6 +135,7 @@ public class Conditional
 	}
 	return Type.Invalid;
     }
+    
     protected static boolean PerformString(String Val1, String Val2, Type testType, boolean isCaseSensitive)
     {
 	if (!isCaseSensitive)
@@ -171,6 +173,7 @@ public class Conditional
 	}
 	return false;
     }
+    
     protected static boolean PerformValue(double Val1, double Val2, Type testType)
     {
 	switch (testType)
@@ -197,6 +200,7 @@ public class Conditional
 	}
 	return false;
     }
+    
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
     private String _Value1_ID;
     private String _Value1_Namespace;
@@ -212,9 +216,9 @@ public class Conditional
     protected boolean _UsesThen;
     
     @SuppressWarnings("unused")
-    private ValueRange 	__dataIndexRange;
+    private ValueRange __dataIndexRange;
     @SuppressWarnings("unused")
-    private String 	__dataIndexToken;
+    private String __dataIndexToken;
     
     /*
      * public Conditional(Conditional.Type type) { _type = type; _Value1_ID = null;
@@ -233,7 +237,7 @@ public class Conditional
 	_Else_Task = null;
 	_UsesThen = usesThen;
 	__dataIndexRange = ValueRange.of(-1, -1);
-	__dataIndexToken = ",";	
+	__dataIndexToken = ",";
 	
     }
     
@@ -500,7 +504,6 @@ public class Conditional
     protected boolean ReadMinionSrc(FrameworkNode condNode)
     {
 	String ID = null, Namespace = null;
-
 	
 	for (FrameworkNode node : condNode.getChildNodes())
 	{
@@ -528,7 +531,7 @@ public class Conditional
 		    LOGGER.severe("Conditional defined with invalid MinionSrc, no Namespace");
 		    return false;
 		}
-		Pair<ValueRange,String> indexInfo = WidgetBuilder.ReadMinionSrcIndexInfo(node);
+		Pair<ValueRange, String> indexInfo = WidgetBuilder.ReadMinionSrcIndexInfo(node);
 		__dataIndexRange = indexInfo.getKey();
 		__dataIndexToken = indexInfo.getValue();
 	    }

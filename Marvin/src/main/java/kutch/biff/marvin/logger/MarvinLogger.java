@@ -32,43 +32,44 @@ public class MarvinLogger
 {
     static private FileHandler _marvinLogFile;
     static private Formatter _marvinLogFormatObj;
-    //private static ConsoleHandler _
-
+    // private static ConsoleHandler _
+    
     static public void setDebugLevel(Level newLevel)
     {
-        Logger logger =  Logger.getLogger(MarvinLogger.class.getName());
-        logger.setLevel(newLevel);
-        for (Handler hdl :logger.getHandlers())
-        {
-            hdl.setLevel(newLevel);
-        }
+	Logger logger = Logger.getLogger(MarvinLogger.class.getName());
+	logger.setLevel(newLevel);
+	for (Handler hdl : logger.getHandlers())
+	{
+	    hdl.setLevel(newLevel);
+	}
     }
+    
     static public void setup(String fileName) throws IOException
     {
-        try
-        {
-            Logger logger =  Logger.getLogger(MarvinLogger.class.getName());
-
+	try
+	{
+	    Logger logger = Logger.getLogger(MarvinLogger.class.getName());
+	    
 //            logger.setLevel(Level.ALL);
-                          
-             int limit = 1024000 * 10; // 10 Mb maximum, then cut off
-            _marvinLogFile = new FileHandler(fileName,limit,1);
-
-            _marvinLogFormatObj = new MarvinHtmlLoggerFormatter();
-            _marvinLogFile.setFormatter(_marvinLogFormatObj);
-            
-            logger.addHandler(_marvinLogFile);
-
-            /*
-            ConsoleHandler consoleHandler = new ConsoleHandler();
-            consoleHandler.setFormatter(new SimpleFormatter());
-            logger.addHandler(consoleHandler);
-            */
-            setDebugLevel(Level.WARNING);
-        }
-        catch (Exception ex)
-        {
-            System.out.println(ex.toString());
-        }
+	    
+	    int limit = 1024000 * 10; // 10 Mb maximum, then cut off
+	    _marvinLogFile = new FileHandler(fileName, limit, 1);
+	    
+	    _marvinLogFormatObj = new MarvinHtmlLoggerFormatter();
+	    _marvinLogFile.setFormatter(_marvinLogFormatObj);
+	    
+	    logger.addHandler(_marvinLogFile);
+	    
+	    /*
+	     * ConsoleHandler consoleHandler = new ConsoleHandler();
+	     * consoleHandler.setFormatter(new SimpleFormatter());
+	     * logger.addHandler(consoleHandler);
+	     */
+	    setDebugLevel(Level.WARNING);
+	}
+	catch(Exception ex)
+	{
+	    System.out.println(ex.toString());
+	}
     }
 }

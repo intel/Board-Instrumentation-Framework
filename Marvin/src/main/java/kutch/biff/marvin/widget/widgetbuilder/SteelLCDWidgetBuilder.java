@@ -35,125 +35,130 @@ import kutch.biff.marvin.widget.SteelLCDWidget;
 public class SteelLCDWidgetBuilder
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     public static SteelLCDWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        SteelLCDWidget lcd = new SteelLCDWidget();
-        
-        for (FrameworkNode node :masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(lcd, node))
-            {
-                continue;
-            }
-            else if (node.getNodeName().equalsIgnoreCase("MinValue"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    lcd.setMinValue(Double.parseDouble(str));
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Invalid MinValue in Widget Definition File");
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("MaxValue"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    lcd.setMaxValue(Double.parseDouble(str));
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Invalid MaxValue in SteelSimpleGauge Widget Definition File");
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("Decimals"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    lcd.setDecimalPlaces(Integer.parseInt(str));
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Invalid Decimals in SteelSimpleGauge Widget Definition File");
-                    return null;
-                }
-            }
-
-            else if (node.getNodeName().equalsIgnoreCase("UnitText"))
-            {
-                String str = node.getTextContent();
-                lcd.setUnitText(str);
-            }
-            else if (node.getNodeName().equalsIgnoreCase("UnitText"))
-            {
-                String str = node.getTextContent();
-                lcd.setUnitText(str);
-            }
-            else if (node.getNodeName().equalsIgnoreCase("KeepAspectRatio"))
-            {
-                String str = node.getTextContent();
-                if (0 == str.compareToIgnoreCase("False"))
-                {
-                    lcd.setKeepAspectRatio(false);
-                }
-                else if (0 == str.compareToIgnoreCase("True"))
-                {
-                    lcd.setKeepAspectRatio(true);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid LCD Widget Definition File.  KeepAspectRation should be True or False, not:" + str);
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("ShowMaxMeasuredValue"))
-            {
-                String str = node.getTextContent();
-                if (0 == str.compareToIgnoreCase("True"))
-                {
-                    lcd.setShowMeasuredMax(true);
-                }
-                else if (0 == str.compareToIgnoreCase("False"))
-                {
-                    lcd.setShowMeasuredMax(false);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid LCD Widget Definition File.  ShowMaxMeasuredValue should be True or False, not:" + str);
-                    return null;                
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("ShowMinMeasuredValue"))
-            {
-                String str = node.getTextContent();
-                if (0 == str.compareToIgnoreCase("True"))
-                {
-                    lcd.setShowMeasuredMin(true);
-                }
-                else if (0 == str.compareToIgnoreCase("False"))
-                {
-                    lcd.setShowMeasuredMin(false);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid LCD Widget Definition File.  ShowMaxMeasuredValue should be True or False, not:" + str);
-                    return null;                
-                }
-            }
-            
-            else 
-            {
-               LOGGER.severe("Invalid LCD Widget Definition File.  Unknown Tag: " + node.getNodeName());
-               return null;                
-            }
-        }
-        return lcd;
-    }   
+	SteelLCDWidget lcd = new SteelLCDWidget();
+	
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(lcd, node))
+	    {
+		continue;
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("MinValue"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    lcd.setMinValue(Double.parseDouble(str));
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Invalid MinValue in Widget Definition File");
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("MaxValue"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    lcd.setMaxValue(Double.parseDouble(str));
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Invalid MaxValue in SteelSimpleGauge Widget Definition File");
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("Decimals"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    lcd.setDecimalPlaces(Integer.parseInt(str));
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Invalid Decimals in SteelSimpleGauge Widget Definition File");
+		    return null;
+		}
+	    }
+	    
+	    else if (node.getNodeName().equalsIgnoreCase("UnitText"))
+	    {
+		String str = node.getTextContent();
+		lcd.setUnitText(str);
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("UnitText"))
+	    {
+		String str = node.getTextContent();
+		lcd.setUnitText(str);
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("KeepAspectRatio"))
+	    {
+		String str = node.getTextContent();
+		if (0 == str.compareToIgnoreCase("False"))
+		{
+		    lcd.setKeepAspectRatio(false);
+		}
+		else if (0 == str.compareToIgnoreCase("True"))
+		{
+		    lcd.setKeepAspectRatio(true);
+		}
+		else
+		{
+		    LOGGER.severe("Invalid LCD Widget Definition File.  KeepAspectRation should be True or False, not:"
+			    + str);
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("ShowMaxMeasuredValue"))
+	    {
+		String str = node.getTextContent();
+		if (0 == str.compareToIgnoreCase("True"))
+		{
+		    lcd.setShowMeasuredMax(true);
+		}
+		else if (0 == str.compareToIgnoreCase("False"))
+		{
+		    lcd.setShowMeasuredMax(false);
+		}
+		else
+		{
+		    LOGGER.severe(
+			    "Invalid LCD Widget Definition File.  ShowMaxMeasuredValue should be True or False, not:"
+				    + str);
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("ShowMinMeasuredValue"))
+	    {
+		String str = node.getTextContent();
+		if (0 == str.compareToIgnoreCase("True"))
+		{
+		    lcd.setShowMeasuredMin(true);
+		}
+		else if (0 == str.compareToIgnoreCase("False"))
+		{
+		    lcd.setShowMeasuredMin(false);
+		}
+		else
+		{
+		    LOGGER.severe(
+			    "Invalid LCD Widget Definition File.  ShowMaxMeasuredValue should be True or False, not:"
+				    + str);
+		    return null;
+		}
+	    }
+	    
+	    else
+	    {
+		LOGGER.severe("Invalid LCD Widget Definition File.  Unknown Tag: " + node.getNodeName());
+		return null;
+	    }
+	}
+	return lcd;
+    }
 }

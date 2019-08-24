@@ -39,77 +39,80 @@ public class LineChartWidget extends LineChartWidget_MS
     @SuppressWarnings("unchecked")
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
-        SetParent(pane);
-        if (getSeries().isEmpty())
-        {
-            if (getyAxisMaxCount() > 0)
-            {
-                for (int iLoop = 0; iLoop < getyAxisMaxCount(); iLoop++)
-                {
-                    SeriesDataSet objDS = new SeriesDataSet(Integer.toString(iLoop), "", "");
-                    getSeries().add(objDS);
-                }
-            }
-            else
-            {
-                LOGGER.severe("Chart created with no series defined and no count defined for yAxis");
-                return false;
-            }
-        }
-
-        _CreateChart();
-        ConfigureDimentions();
-        ConfigureAlignment();
-        SetupPeekaboo(dataMgr);
-
-        pane.add(getChart(), getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        //hmm, only get called if different, that could be a problem for a chart
-
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
-        {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
-            {
-                if (IsPaused())
-                {
-                    return;
-                }
-
-                String[] strList = newVal.toString().split(",");
-                int iIndex = 0;
-                for (String strValue : strList)
-                {
-                    double newValue;
-                    try
-                    {
-                        newValue = Double.parseDouble(strValue);
-                        HandleSteppedRange(newValue);
-                    }
-                    catch (NumberFormatException ex)
-                    {
-                        LOGGER.severe("Invalid data for Line Chart received: " + strValue);
-                        return;
-                    }
-
-                    if (iIndex < getSeries().size())
-                    {
-                        SeriesDataSet ds = getSeries().get(iIndex++);
-                        ShiftSeries(ds.getSeries(), getxAxisMaxCount());
-                        ds.getSeries().getData().add(new XYChart.Data<>(ds.getSeries().getData().size(), newValue));
-                    }
-                    else
-                    {
-                        LOGGER.severe("Received More datapoints for Line Chart than was defined in application definition file. Received " + Integer.toString(strList.length) + " expecting " + Integer.toString(getSeries().size()));
-                        return;
-                    }
-                }
-            }
-        });
-
-        SetupTaskAction();
-        return ApplyCSS();
+	SetParent(pane);
+	if (getSeries().isEmpty())
+	{
+	    if (getyAxisMaxCount() > 0)
+	    {
+		for (int iLoop = 0; iLoop < getyAxisMaxCount(); iLoop++)
+		{
+		    SeriesDataSet objDS = new SeriesDataSet(Integer.toString(iLoop), "", "");
+		    getSeries().add(objDS);
+		}
+	    }
+	    else
+	    {
+		LOGGER.severe("Chart created with no series defined and no count defined for yAxis");
+		return false;
+	    }
+	}
+	
+	_CreateChart();
+	ConfigureDimentions();
+	ConfigureAlignment();
+	SetupPeekaboo(dataMgr);
+	
+	pane.add(getChart(), getColumn(), getRow(), getColumnSpan(), getRowSpan());
+	// hmm, only get called if different, that could be a problem for a chart
+	
+	dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
+	{
+	    @Override
+	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
+	    {
+		if (IsPaused())
+		{
+		    return;
+		}
+		
+		String[] strList = newVal.toString().split(",");
+		int iIndex = 0;
+		for (String strValue : strList)
+		{
+		    double newValue;
+		    try
+		    {
+			newValue = Double.parseDouble(strValue);
+			HandleSteppedRange(newValue);
+		    }
+		    catch(NumberFormatException ex)
+		    {
+			LOGGER.severe("Invalid data for Line Chart received: " + strValue);
+			return;
+		    }
+		    
+		    if (iIndex < getSeries().size())
+		    {
+			SeriesDataSet ds = getSeries().get(iIndex++);
+			ShiftSeries(ds.getSeries(), getxAxisMaxCount());
+			ds.getSeries().getData().add(new XYChart.Data<>(ds.getSeries().getData().size(), newValue));
+		    }
+		    else
+		    {
+			LOGGER.severe(
+				"Received More datapoints for Line Chart than was defined in application definition file. Received "
+					+ Integer.toString(strList.length) + " expecting "
+					+ Integer.toString(getSeries().size()));
+			return;
+		    }
+		}
+	    }
+	});
+	
+	SetupTaskAction();
+	return ApplyCSS();
     }
-
+    
     /**
      *
      * @param node
@@ -118,28 +121,28 @@ public class LineChartWidget extends LineChartWidget_MS
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode node)
     {
-        if (true == HandleChartSpecificAppSettings(node))
-        {
-            return true;
-        }
-
-        if (node.getNodeName().equalsIgnoreCase("Series"))
-        {
-            String Label;
-            if (node.hasAttribute("Label"))
-            {
-                Label = node.getAttribute("Label");
-            }
-            else
-            {
-                Label = "";
-            }
-            SeriesDataSet objDS = new SeriesDataSet(Label, "", "");
-            getSeries().add(objDS);
-            return true;
-        }
-
-        return false;
+	if (true == HandleChartSpecificAppSettings(node))
+	{
+	    return true;
+	}
+	
+	if (node.getNodeName().equalsIgnoreCase("Series"))
+	{
+	    String Label;
+	    if (node.hasAttribute("Label"))
+	    {
+		Label = node.getAttribute("Label");
+	    }
+	    else
+	    {
+		Label = "";
+	    }
+	    SeriesDataSet objDS = new SeriesDataSet(Label, "", "");
+	    getSeries().add(objDS);
+	    return true;
+	}
+	
+	return false;
     }
-
+    
 }

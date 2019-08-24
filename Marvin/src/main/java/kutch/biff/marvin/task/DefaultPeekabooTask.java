@@ -29,24 +29,24 @@ import kutch.biff.marvin.widget.BaseWidget;
  */
 public class DefaultPeekabooTask extends BaseTask
 {
-
+    
     private BaseWidget _objWidget;
-
+    
     public DefaultPeekabooTask(BaseWidget objWidget)
     {
-        _objWidget = objWidget;
+	_objWidget = objWidget;
     }
-
+    
     @Override
     public boolean getMustBeInGUIThread()
     {
-        return true;
+	return true;
     }
-
+    
     @Override
     public void PerformTask()
     {
-        _objWidget.HandleDefaultPeekaboo();
+	_objWidget.HandleDefaultPeekaboo();
     }
-
+    
 }

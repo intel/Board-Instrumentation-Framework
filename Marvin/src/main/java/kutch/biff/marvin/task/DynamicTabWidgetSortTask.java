@@ -23,8 +23,6 @@ package kutch.biff.marvin.task;
 
 import kutch.biff.marvin.widget.DynamicTabWidget;
 
-
-
 /**
  *
  * @author Patrick Kutch
@@ -32,20 +30,22 @@ import kutch.biff.marvin.widget.DynamicTabWidget;
 public class DynamicTabWidgetSortTask extends BaseTask
 {
     private DynamicTabWidget _objWidget;
+    
     public DynamicTabWidgetSortTask(DynamicTabWidget objWidget)
     {
-        this._objWidget = objWidget;
+	this._objWidget = objWidget;
     }
     
-        @Override
+    @Override
     public boolean getMustBeInGUIThread()
     {
-        return true;
+	return true;
     }
+    
     @Override
     public void PerformTask()
     {
-        _objWidget.PerformSort();
+	_objWidget.PerformSort();
     }
     
 }

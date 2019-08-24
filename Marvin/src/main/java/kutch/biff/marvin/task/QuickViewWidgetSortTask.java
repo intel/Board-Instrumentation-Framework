@@ -28,14 +28,16 @@ package kutch.biff.marvin.task;
 public class QuickViewWidgetSortTask extends BaseTask
 {
     private IQuickViewSort _objWidget;
+    
     public QuickViewWidgetSortTask(IQuickViewSort objWidget)
     {
-        this._objWidget = objWidget;
+	this._objWidget = objWidget;
     }
+    
     @Override
     public void PerformTask()
     {
-        _objWidget.PerformSort();
+	_objWidget.PerformSort();
     }
     
 }

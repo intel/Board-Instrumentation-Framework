@@ -21,9 +21,11 @@
  */
 package kutch.biff.marvin;
 
-public class Launcher {
+public class Launcher
+{
     
-    public static void main(String[] args) {
-        Marvin.main(args);
+    public static void main(String[] args)
+    {
+	Marvin.main(args);
     }
 }

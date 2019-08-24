@@ -57,10 +57,11 @@ public class DataManager
     {
 	return _DataManager;
     }
+    
     private ConcurrentHashMap<String, DataSet> _DataMap;
     private Map<String, List<GenerateDatapointInfo>> _ProxyIDMap;
     private ConcurrentHashMap<String, List<WildcardListItem>> _WildcardDataMap;
-											       private final Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> _OnDemandQueue; // a queue solves some of
+    private final Queue<Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder>> _OnDemandQueue; // a queue solves some of
     // my concurency issues
     private final Queue<GenerateDatapointInfo> __GenerateDatapointList;
     private long _UpdateCount;
@@ -414,7 +415,8 @@ public class DataManager
 	}
     }
     
-    public void UpdateGenerateDatapointProxy(String proxyID, String newNamespaceCriteria, String newIDCriterea, String newListEntry)
+    public void UpdateGenerateDatapointProxy(String proxyID, String newNamespaceCriteria, String newIDCriterea,
+	    String newListEntry)
     {
 	if (!_ProxyIDMap.containsKey(proxyID.toUpperCase()))
 	{
@@ -425,7 +427,7 @@ public class DataManager
 	LOGGER.info("Updating proxy [" + proxyID + "] to [" + newNamespaceCriteria + ":" + newIDCriterea + "]");
 	for (GenerateDatapointInfo genInfo : _ProxyIDMap.get(proxyID.toUpperCase()))
 	{
-	    genInfo.ProxyReset(newNamespaceCriteria, newIDCriterea,newListEntry);
+	    genInfo.ProxyReset(newNamespaceCriteria, newIDCriterea, newListEntry);
 	}
     }
 }

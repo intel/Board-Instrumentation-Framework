@@ -35,60 +35,61 @@ import kutch.biff.marvin.widget.TextWidget;
  */
 public class TextBuilder
 {
-
+    
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     public static TextWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        TextWidget _widget = new TextWidget();
-
-        return ReadTextWidgetInfo(_widget, masterNode, widgetDefFilename);
+	TextWidget _widget = new TextWidget();
+	
+	return ReadTextWidgetInfo(_widget, masterNode, widgetDefFilename);
     }
-
+    
     public static ListBoxText ListBoxText_Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        ListBoxText _widget = new ListBoxText();
-        for (FrameworkNode node : masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
-            {
-            }
-            else if (node.getNodeName().equalsIgnoreCase("#comment"))
-            {
-            }
-        }
-        return _widget;
+	ListBoxText _widget = new ListBoxText();
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
+	    {
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("#comment"))
+	    {
+	    }
+	}
+	return _widget;
     }
-
+    
     public static TextWidget ReadTextWidgetInfo(TextWidget _widget, FrameworkNode masterNode, String widgetDefFilename)
     {
-        for (FrameworkNode node : masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
-            {
-            }
-            else if (node.getNodeName().equalsIgnoreCase("#comment"))
-            {
-            }
-            else if (node.getNodeName().equalsIgnoreCase("ScaleToShape"))
-            {
-                String str = node.getTextContent();
-                if (0 == str.compareToIgnoreCase("True"))
-                {
-                    _widget.setScaleToFitBounderies(true);
-                }
-                else if (0 == str.compareToIgnoreCase("False"))
-                {
-                    _widget.setScaleToFitBounderies(false);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid Text Widget Definition File.  ScaleToShape should be True or False, not:" + str);
-                    return null;
-                }
-            }
-        }
-        return _widget;
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
+	    {
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("#comment"))
+	    {
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("ScaleToShape"))
+	    {
+		String str = node.getTextContent();
+		if (0 == str.compareToIgnoreCase("True"))
+		{
+		    _widget.setScaleToFitBounderies(true);
+		}
+		else if (0 == str.compareToIgnoreCase("False"))
+		{
+		    _widget.setScaleToFitBounderies(false);
+		}
+		else
+		{
+		    LOGGER.severe(
+			    "Invalid Text Widget Definition File.  ScaleToShape should be True or False, not:" + str);
+		    return null;
+		}
+	    }
+	}
+	return _widget;
     }
-
+    
 }

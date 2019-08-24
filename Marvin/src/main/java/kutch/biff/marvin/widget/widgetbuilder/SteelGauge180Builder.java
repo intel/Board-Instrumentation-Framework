@@ -38,53 +38,53 @@ public class SteelGauge180Builder
     
     public static SteelGauge180Widget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        SteelGauge180Widget sg = new SteelGauge180Widget();
-        
-        for (FrameworkNode node : masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(sg, node))
-            {
-                continue;
-            }
-            else if (node.getNodeName().equalsIgnoreCase("MinValue"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    sg.setMinValue(Double.parseDouble(str));
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Invalid MinValue in Widget Definition File");
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("MaxValue"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    sg.setMaxValue(Double.parseDouble(str));
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Invalid MaxValue in SteelGauge180 Widget Definition File");
-                    return null;
-                }
-            }
-
-            else if (node.getNodeName().equalsIgnoreCase("UnitText"))
-            {
-                String str = node.getTextContent();
-                sg.setUnitText(str);
-            }
-            else 
-            {
-               LOGGER.severe("Invalid SteelGauge180 Widget Definition File.  Unknown Tag: " + node.getNodeName());
-               return null;                
-            }
-        }
-        return sg;
+	SteelGauge180Widget sg = new SteelGauge180Widget();
+	
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(sg, node))
+	    {
+		continue;
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("MinValue"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    sg.setMinValue(Double.parseDouble(str));
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Invalid MinValue in Widget Definition File");
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("MaxValue"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    sg.setMaxValue(Double.parseDouble(str));
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Invalid MaxValue in SteelGauge180 Widget Definition File");
+		    return null;
+		}
+	    }
+	    
+	    else if (node.getNodeName().equalsIgnoreCase("UnitText"))
+	    {
+		String str = node.getTextContent();
+		sg.setUnitText(str);
+	    }
+	    else
+	    {
+		LOGGER.severe("Invalid SteelGauge180 Widget Definition File.  Unknown Tag: " + node.getNodeName());
+		return null;
+	    }
+	}
+	return sg;
     }
-   
+    
 }

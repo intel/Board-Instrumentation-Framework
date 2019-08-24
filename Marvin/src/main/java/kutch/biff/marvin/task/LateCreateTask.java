@@ -20,6 +20,7 @@
  * ##############################################################################
  */
 package kutch.biff.marvin.task;
+
 import kutch.biff.marvin.configuration.Configuration;
 import kutch.biff.marvin.widget.widgetbuilder.OnDemandWidgetBuilder;
 
@@ -34,27 +35,27 @@ public class LateCreateTask extends BaseTask
     private final String __ID;
     private final String __Value;
     private final String __SortStr;
-
-    public LateCreateTask(OnDemandWidgetBuilder objBuilder, String Namespace, String ID,String Value, String strSortBy)
+    
+    public LateCreateTask(OnDemandWidgetBuilder objBuilder, String Namespace, String ID, String Value, String strSortBy)
     {
-        __builder = objBuilder;
-        __Namespace = Namespace;
-        __ID = ID;
-        __Value = Value;
-        __SortStr = strSortBy;
+	__builder = objBuilder;
+	__Namespace = Namespace;
+	__ID = ID;
+	__Value = Value;
+	__SortStr = strSortBy;
     }
     
     @Override
-    public  void PerformTask()
+    public void PerformTask()
     {
-        if (null != __builder) // is null when a Tab
-        {
-            __builder.Build(__Namespace, __ID,__Value,__SortStr);
-            Configuration.getConfig().restoreCursor();
-        }
-        else
-        {
-            LOGGER.severe("LateCreateTask called, but builder was NULL");
-        }
+	if (null != __builder) // is null when a Tab
+	{
+	    __builder.Build(__Namespace, __ID, __Value, __SortStr);
+	    Configuration.getConfig().restoreCursor();
+	}
+	else
+	{
+	    LOGGER.severe("LateCreateTask called, but builder was NULL");
+	}
     }
 }

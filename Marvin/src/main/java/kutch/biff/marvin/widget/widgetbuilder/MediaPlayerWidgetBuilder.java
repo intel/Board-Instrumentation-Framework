@@ -36,69 +36,73 @@ import kutch.biff.marvin.widget.MediaPlayerWidget;
 public class MediaPlayerWidgetBuilder
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    
     public static boolean ParseDefinitionFile(MediaPlayerWidget objWidget, FrameworkNode node)
     {
-        if (BaseWidget.HandleCommonDefinitionFileConfig(objWidget,node))
-        {
-            
-        }
-        else if (node.getNodeName().equalsIgnoreCase("#comment"))
-        {
-            
-        }
-        else if (node.getNodeName().equalsIgnoreCase("AutoStart"))
-        {
-            objWidget.setAutoStart(node.getBooleanValue());
-            
-        }
-        else if (node.getNodeName().equalsIgnoreCase("Repeat"))
-        {
-            boolean bVal = node.getBooleanValue();
-
-            if (bVal)
-            {
-                if (node.hasAttribute("Mode"))
-                {
-                    if (node.getAttribute("Mode").equalsIgnoreCase("LoopList"))
-                    {
-                        objWidget.setRepeatList(true);
-                        objWidget.setRepeatSingleMedia(false);
-                    }
-                    else if (node.getAttribute("Mode").equalsIgnoreCase("Single"))
-                    {
-                        objWidget.setRepeatList(false);
-                        objWidget.setRepeatSingleMedia(true);
-                    }
-                    else
-                    {
-                        LOGGER.severe(objWidget.getWidgetType() + " definition file has tag invalid <Repeat> Mide Attribute tag, expecting either LoopList or Single, got " + node.getAttribute("Mode"));
-                        return false;
-                    }
-                }
-            }            
-            return true;
-        }
-        else if (node.getNodeName().equalsIgnoreCase("InitialVolume"))
-        {
-            String strVal = node.getTextContent();
-            try
-            {
-                objWidget.setVolumeLevel(Double.parseDouble(strVal));
-            }
-            catch (NumberFormatException ex)
-            {
-                LOGGER.severe(objWidget.getWidgetType() + " definition file has tag invalid <InitialVolume> tag, got " + node.getTextContent());
-                return false;
-            }
-            return true;
-        }
-
-        else
-        {
-            return false;
-        }
-        
-        return true;
+	if (BaseWidget.HandleCommonDefinitionFileConfig(objWidget, node))
+	{
+	    
+	}
+	else if (node.getNodeName().equalsIgnoreCase("#comment"))
+	{
+	    
+	}
+	else if (node.getNodeName().equalsIgnoreCase("AutoStart"))
+	{
+	    objWidget.setAutoStart(node.getBooleanValue());
+	    
+	}
+	else if (node.getNodeName().equalsIgnoreCase("Repeat"))
+	{
+	    boolean bVal = node.getBooleanValue();
+	    
+	    if (bVal)
+	    {
+		if (node.hasAttribute("Mode"))
+		{
+		    if (node.getAttribute("Mode").equalsIgnoreCase("LoopList"))
+		    {
+			objWidget.setRepeatList(true);
+			objWidget.setRepeatSingleMedia(false);
+		    }
+		    else if (node.getAttribute("Mode").equalsIgnoreCase("Single"))
+		    {
+			objWidget.setRepeatList(false);
+			objWidget.setRepeatSingleMedia(true);
+		    }
+		    else
+		    {
+			LOGGER.severe(objWidget.getWidgetType()
+				+ " definition file has tag invalid <Repeat> Mide Attribute tag, expecting either LoopList or Single, got "
+				+ node.getAttribute("Mode"));
+			return false;
+		    }
+		}
+	    }
+	    return true;
+	}
+	else if (node.getNodeName().equalsIgnoreCase("InitialVolume"))
+	{
+	    String strVal = node.getTextContent();
+	    try
+	    {
+		objWidget.setVolumeLevel(Double.parseDouble(strVal));
+	    }
+	    catch(NumberFormatException ex)
+	    {
+		LOGGER.severe(objWidget.getWidgetType() + " definition file has tag invalid <InitialVolume> tag, got "
+			+ node.getTextContent());
+		return false;
+	    }
+	    return true;
+	}
+	
+	else
+	{
+	    return false;
+	}
+	
+	return true;
     }
     
 }

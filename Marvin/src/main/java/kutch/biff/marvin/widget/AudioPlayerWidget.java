@@ -40,71 +40,72 @@ public class AudioPlayerWidget extends MediaPlayerWidget
     private static boolean _IsValid = true;
     private Button _objDummyButton;
     
-
     public AudioPlayerWidget()
     {
-        super("AudioPlayerWidget");
-        _objDummyButton = new Button();
-        _objDummyButton.setVisible(false);
+	super("AudioPlayerWidget");
+	_objDummyButton = new Button();
+	_objDummyButton.setVisible(false);
     }
-
+    
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
-        SetParent(pane);
-        return Create(dataMgr);
+	SetParent(pane);
+	return Create(dataMgr);
     }
-
+    
     @Override
     public Node getStylableObject()
     {
-        return _objDummyButton;
+	return _objDummyButton;
     }
     
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return _objDummyButton.getStylesheets();
+	return _objDummyButton.getStylesheets();
     }
     
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode node)
     {
-        return HandleWidgetSpecificSettings(node,"Audio");
+	return HandleWidgetSpecificSettings(node, "Audio");
     }
     
     @Override
     public boolean HasBeenVerified()
     {
-        return AudioPlayerWidget._HasBeenVerified;
+	return AudioPlayerWidget._HasBeenVerified;
     }
     
     @Override
     public boolean IsValid()
     {
-        return _IsValid;
+	return _IsValid;
     }
+    
     @Override
     protected boolean OnNewMedia(MediaPlayer objMediaPlayer)
     {
-        return true;
+	return true;
     }
+    
     @Override
     public void setHasBeenVerified(boolean _HasBeenVerified)
     {
-        AudioPlayerWidget._HasBeenVerified = _HasBeenVerified;
+	AudioPlayerWidget._HasBeenVerified = _HasBeenVerified;
     }
     
     @Override
     public void SetIsValid(boolean flag)
     {
-        _IsValid = flag;
+	_IsValid = flag;
     }
-
+    
     @Override
     protected boolean VerifyMedia(Media objMedia)
     {
-        return true;
+	return true;
     }
-   
+    
 }

@@ -41,75 +41,77 @@ public class MinionTask extends BaseTask
     
     public MinionTask()
     {
-        _Namespace = null;
-        _ID = null;
+	_Namespace = null;
+	_ID = null;
     }
-
+    
     public String getID()
     {
-        return _ID;
+	return _ID;
     }
+    
     @Override
     public boolean getMustBeInGUIThread()
     {
-        return false;
+	return false;
     }
-
+    
     public String getNamespace()
     {
-        return _Namespace;
+	return _Namespace;
     }
-
+    
     @Override
-    public  void PerformTask()
+    public void PerformTask()
     {
-        String strNamespace = getDataValue(getNamespace());
-        String strID = getDataValue(getID());
-        String strParamList = "";
-        if (strID == null || strNamespace== null)
-        {
-            return;
-        }
-        String sendBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-        sendBuffer += "<Marvin Type=\"MinionTask\">";
-        sendBuffer += "<Version>1.0</Version>";
-        sendBuffer += "<UniqueID>" + Integer.toString(rnd.nextInt()) + "</UniqueID>";
-        sendBuffer += "<Task Namespace=\""+ strNamespace+"\" ";
-        sendBuffer += "ID=\""+ strID+"\"/>";
-        if (null != getParams())
-        {
-            for (Parameter param : getParams())
-            {
-                String strParam = param.toString();
-                if (null == strParam)
-                {
-                    return;
-                }
-                
-                sendBuffer+="<Param>" + strParam + "</Param>";
-                if (strParamList.length()==0)
-                {
-                    strParamList = strParam;
-                }
-                else
-                {
-                    strParamList += "," + strParam;
-                }
-            }        
-        }
-
-        sendBuffer += "</Marvin>";
-        
-        TASKMAN.SendToAllOscars(sendBuffer.getBytes());
-        LOGGER.info("Sending Minion Task [" + getNamespace() + ":"+getID()+"] Params: " + strParamList);
+	String strNamespace = getDataValue(getNamespace());
+	String strID = getDataValue(getID());
+	String strParamList = "";
+	if (strID == null || strNamespace == null)
+	{
+	    return;
+	}
+	String sendBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+	sendBuffer += "<Marvin Type=\"MinionTask\">";
+	sendBuffer += "<Version>1.0</Version>";
+	sendBuffer += "<UniqueID>" + Integer.toString(rnd.nextInt()) + "</UniqueID>";
+	sendBuffer += "<Task Namespace=\"" + strNamespace + "\" ";
+	sendBuffer += "ID=\"" + strID + "\"/>";
+	if (null != getParams())
+	{
+	    for (Parameter param : getParams())
+	    {
+		String strParam = param.toString();
+		if (null == strParam)
+		{
+		    return;
+		}
+		
+		sendBuffer += "<Param>" + strParam + "</Param>";
+		if (strParamList.length() == 0)
+		{
+		    strParamList = strParam;
+		}
+		else
+		{
+		    strParamList += "," + strParam;
+		}
+	    }
+	}
+	
+	sendBuffer += "</Marvin>";
+	
+	TASKMAN.SendToAllOscars(sendBuffer.getBytes());
+	LOGGER.info("Sending Minion Task [" + getNamespace() + ":" + getID() + "] Params: " + strParamList);
     }
-
+    
     public void setID(String _ID)
     {
-        this._ID = _ID;
+	this._ID = _ID;
     }
+    
     public void setNamespace(String _Namespace)
     {
-        this._Namespace = _Namespace;
+	this._Namespace = _Namespace;
     }
 }

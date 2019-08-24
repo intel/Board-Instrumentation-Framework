@@ -50,6 +50,7 @@ public class TaskManager
     private static ArrayList<String> _OnConnectedList = null;
     
     private static boolean _WarningAboutManyTasksSent = false;
+    
     public static TaskManager getTaskManager()
     {
 	if (null == _TaskManager)
@@ -58,6 +59,7 @@ public class TaskManager
 	}
 	return _TaskManager;
     }
+    
     private ConcurrentHashMap<String, TaskList> _TaskMap;
     private ConcurrentHashMap<String, Client> _ClientMap;
     private DataManager _DataMgr;
@@ -999,7 +1001,7 @@ public class TaskManager
 	{
 	    if (node.getNodeName().equalsIgnoreCase("Proxy"))
 	    {
-		Utility.ValidateAttributes(new String[] { "Namespace", "ID", "ProxyID","ListEntry" }, node);
+		Utility.ValidateAttributes(new String[] { "Namespace", "ID", "ProxyID", "ListEntry" }, node);
 		if (!node.hasAttribute("ProxyID"))
 		{
 		    LOGGER.severe("ProxyTask requires ProxyID");

@@ -36,105 +36,110 @@ abstract public class BaseTask implements ITask
 {
     private static int _TaskCount = 0;
     protected final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    
     public static int getTaskCount()
     {
-        return _TaskCount;
+	return _TaskCount;
     }
+    
     private ArrayList<Parameter> _Params;
     
     private long _PostponePeriod;
     protected String _ID;
     
-    
     protected final TaskManager TASKMAN = TaskManager.getTaskManager();
+    
     public BaseTask()
     {
-        _ID = null;
-        _TaskCount++;
+	_ID = null;
+	_TaskCount++;
     }
     
     public BaseTask(String taskID)
     {
-        _Params = null;
-        _PostponePeriod = 0;
-        _TaskCount++;
-        _ID=taskID;
+	_Params = null;
+	_PostponePeriod = 0;
+	_TaskCount++;
+	_ID = taskID;
     }
     
     /**
      * Helper routine to see if there is a prompt associated with the piece of data
+     * 
      * @param strData
-     * @return 
+     * @return
      */
     public String getDataValue(String strData)
     {
-        if (strData==null || strData.length()<1)
-        {
-            return strData;
-        }
-        
-        if (strData.charAt(0) == '@') // could be a prompt
-        {
-            BasePrompt objPrompt = PromptManager.getPromptManager().getPrompt(strData.substring(1));
-            if (null != objPrompt)
-            {
-                if (objPrompt.PerformPrompt())
-                {
-                    strData = objPrompt.GetPromptedValue();
-                }
-                else
-                {
-                    strData = null; // was cancelled
-                }
-            }
-        }
-        
-        return CheckForDataSrcParameter(strData);
+	if (strData == null || strData.length() < 1)
+	{
+	    return strData;
+	}
+	
+	if (strData.charAt(0) == '@') // could be a prompt
+	{
+	    BasePrompt objPrompt = PromptManager.getPromptManager().getPrompt(strData.substring(1));
+	    if (null != objPrompt)
+	    {
+		if (objPrompt.PerformPrompt())
+		{
+		    strData = objPrompt.GetPromptedValue();
+		}
+		else
+		{
+		    strData = null; // was cancelled
+		}
+	    }
+	}
+	
+	return CheckForDataSrcParameter(strData);
     }
     
     @Override
     public boolean getMustBeInGUIThread()
     {
-        return true;
+	return true;
     }
+    
     public ArrayList<Parameter> getParams()
     {
-        return _Params;
+	return _Params;
     }
+    
     @Override
     public long getPostponePeriod()
     {
-        return _PostponePeriod;
+	return _PostponePeriod;
     }
-
+    
     public String getTaskID()
     {
-        if (null == _ID)
-        {
-            return this.toString();
-        }
-        return _ID;
+	if (null == _ID)
+	{
+	    return this.toString();
+	}
+	return _ID;
     }
-
+    
     public String getTaskID_ForVerification()
     {
-        return _ID;
+	return _ID;
     }
     
     public void setParams(ArrayList<Parameter> _Params)
     {
-        this._Params = _Params;
+	this._Params = _Params;
     }
-
+    
     @Override
     public void setPostponePeriod(long _PostponePeriod)
     {
-        this._PostponePeriod = _PostponePeriod;
+	this._PostponePeriod = _PostponePeriod;
     }
-
+    
     public void setTaskID(String taskID)
     {
-        _ID = taskID;
+	_ID = taskID;
     }
     
 }

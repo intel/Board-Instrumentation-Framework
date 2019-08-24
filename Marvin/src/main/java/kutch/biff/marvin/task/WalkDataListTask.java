@@ -29,7 +29,7 @@ import java.util.Random;
  */
 public class WalkDataListTask extends BaseTask
 {
-
+    
     private int _interval;
     private int _RepeatCount;
     private int _currLoopCount;
@@ -40,99 +40,99 @@ public class WalkDataListTask extends BaseTask
     private String _Namespace, _ID;
     private Random _rndObj = null;
     
-
-    public WalkDataListTask(String Namespace, String ID, String[] dataset, int interval, int RepeatCount, double lowerFlux, double upperFlux)
+    public WalkDataListTask(String Namespace, String ID, String[] dataset, int interval, int RepeatCount,
+	    double lowerFlux, double upperFlux)
     {
-        _Namespace = Namespace;
-        _ID = ID;
-        _dataSet = dataset;
-        _interval = interval;
-        _RepeatCount = RepeatCount;
-        _currLoopCount = 1;
-        _currIndex = 0;
-        _fluxRangeLower = lowerFlux;
-        _fluxRangeUpper = upperFlux;
-
-        boolean first = true;
-
-        if (_fluxRangeLower != _fluxRangeUpper)
-        {
-            try
-            {
-                for (String val : _dataSet)
-                {
-                    double dVal = Double.parseDouble(val);
-                    if (first)
-                    {
-                        first = false;
-                        _rangeMin = dVal;
-                        _rangeMax = dVal;
-                    }
-                    else if (dVal < _rangeMin)
-                    {
-                        _rangeMin = dVal;
-                    }
-                    else if (dVal > _rangeMax)
-                    {
-                        _rangeMax = dVal;
-                    }
-                }
-                _rndObj = new Random();
-            }
-            catch (NumberFormatException ex)
-            {
-            }
-        }
+	_Namespace = Namespace;
+	_ID = ID;
+	_dataSet = dataset;
+	_interval = interval;
+	_RepeatCount = RepeatCount;
+	_currLoopCount = 1;
+	_currIndex = 0;
+	_fluxRangeLower = lowerFlux;
+	_fluxRangeUpper = upperFlux;
+	
+	boolean first = true;
+	
+	if (_fluxRangeLower != _fluxRangeUpper)
+	{
+	    try
+	    {
+		for (String val : _dataSet)
+		{
+		    double dVal = Double.parseDouble(val);
+		    if (first)
+		    {
+			first = false;
+			_rangeMin = dVal;
+			_rangeMax = dVal;
+		    }
+		    else if (dVal < _rangeMin)
+		    {
+			_rangeMin = dVal;
+		    }
+		    else if (dVal > _rangeMax)
+		    {
+			_rangeMax = dVal;
+		    }
+		}
+		_rndObj = new Random();
+	    }
+	    catch(NumberFormatException ex)
+	    {
+	    }
+	}
     }
-
+    
     private String calcFluxValue(String dataPoint)
     {
-        try
-        {
-            double dVal = Double.parseDouble(dataPoint);
-            double modifier = _rndObj.doubles(_fluxRangeLower, _fluxRangeUpper).iterator().next();
-            dVal += modifier;
-            if (dVal < _rangeMin || dVal > _rangeMax )
-            {
-                // modified value falls outside of data range, so don't modify
-            }
-            else
-            {
-                return Double.toString(dVal);
-            }
-        }
-        catch (NumberFormatException ex)
-        {
-        }
-        return dataPoint;
+	try
+	{
+	    double dVal = Double.parseDouble(dataPoint);
+	    double modifier = _rndObj.doubles(_fluxRangeLower, _fluxRangeUpper).iterator().next();
+	    dVal += modifier;
+	    if (dVal < _rangeMin || dVal > _rangeMax)
+	    {
+		// modified value falls outside of data range, so don't modify
+	    }
+	    else
+	    {
+		return Double.toString(dVal);
+	    }
+	}
+	catch(NumberFormatException ex)
+	{
+	}
+	return dataPoint;
     }
-
+    
     @Override
     public void PerformTask()
     {
-        MarvinTask mt = new MarvinTask();
-        String dataPoint = _dataSet[_currIndex];
-        if (null != _rndObj)
-        {
-            dataPoint = calcFluxValue(dataPoint);
-        }
-        mt.AddDataset(_ID, _Namespace, dataPoint);
-        TaskManager.getTaskManager().AddDeferredTaskObject(mt);
-        _currIndex++;
-        if (_currIndex >= _dataSet.length) // went through them all
-        {
-            _currLoopCount++;
-            _currIndex = 0;
-            if (_RepeatCount == 0 || _currLoopCount <= _RepeatCount)
-            {
-                // let fall through
-            }
-            else
-            {
-                return; // no more
-            }
-        }
-        // call this task again in interval time
-        TASKMAN.AddPostponedTask(this, _interval);
+	MarvinTask mt = new MarvinTask();
+	String dataPoint = _dataSet[_currIndex];
+	if (null != _rndObj)
+	{
+	    dataPoint = calcFluxValue(dataPoint);
+	}
+	mt.AddDataset(_ID, _Namespace, dataPoint);
+	TaskManager.getTaskManager().AddDeferredTaskObject(mt);
+	_currIndex++;
+	if (_currIndex >= _dataSet.length) // went through them all
+	{
+	    _currLoopCount++;
+	    _currIndex = 0;
+	    if (_RepeatCount == 0 || _currLoopCount <= _RepeatCount)
+	    {
+		// let fall through
+	    }
+	    else
+	    {
+		return; // no more
+	    }
+	}
+	// call this task again in interval time
+	TASKMAN.AddPostponedTask(this, _interval);
     }
 }

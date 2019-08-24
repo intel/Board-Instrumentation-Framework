@@ -32,6 +32,6 @@ public class SpacerWidgetBuilder
 {
     public static SpacerWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        return new SpacerWidget();
+	return new SpacerWidget();
     }
 }

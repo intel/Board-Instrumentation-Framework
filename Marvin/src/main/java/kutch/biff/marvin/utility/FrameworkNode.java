@@ -66,6 +66,7 @@ public class FrameworkNode
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private static final AliasMgr ALIASMANAGER = AliasMgr.getAliasMgr();
+    
     public static String DumpRawAttributes(FrameworkNode node)
     {
 	String strRet = "";
@@ -84,6 +85,7 @@ public class FrameworkNode
 	}
 	return strRet;
     }
+    
     public static void dumpTree(FrameworkNode doc)
     {
 	dumpTree(doc.GetNode(), "");

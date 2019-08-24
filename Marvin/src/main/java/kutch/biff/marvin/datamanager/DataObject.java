@@ -23,31 +23,34 @@
 package kutch.biff.marvin.datamanager;
 
 /**
- * Had to create my own class so I could overwrite equals(), otherwise 
- * sending same value twice would not result in change listeners getting called
- * for 2nd value
+ * Had to create my own class so I could overwrite equals(), otherwise sending
+ * same value twice would not result in change listeners getting called for 2nd
+ * value
+ * 
  * @author Patrick Kutch
  */
 public class DataObject extends Object
 {
     private final String _Data;
+    
     public DataObject(String data)
     {
-        _Data = data;
+	_Data = data;
     }
     
     public boolean equals(Object obj)
     {
-        return false;
+	return false;
     }
+    
     public String getData()
     {
-        return _Data;
+	return _Data;
     }
     
     @Override
     public String toString()
     {
-        return _Data;
+	return _Data;
     }
 }

@@ -42,40 +42,43 @@ public class RemoteMarvinTask extends BaseTask
     
     public RemoteMarvinTask(String ID, String TaskID)
     {
-        _MarvinID = ID;
-        _TaskID = TaskID;
-        if (RemoteMarvinTask._RequestNumber == 0)
-        {
-            Random R = new Random(TaskManager.getTaskManager().getNumberOfTasks()); // use # of tasks for a random seed
-            RemoteMarvinTask._RequestNumber = R.nextInt(1000) +1;
-        }
+	_MarvinID = ID;
+	_TaskID = TaskID;
+	if (RemoteMarvinTask._RequestNumber == 0)
+	{
+	    Random R = new Random(TaskManager.getTaskManager().getNumberOfTasks()); // use # of tasks for a random seed
+	    RemoteMarvinTask._RequestNumber = R.nextInt(1000) + 1;
+	}
     }
-        @Override
+    
+    @Override
     public boolean getMustBeInGUIThread()
     {
-        return false;
+	return false;
     }
+    
     @Override
-    public  void PerformTask()
+    public void PerformTask()
     {
-        String strTask = getDataValue(_TaskID);
-        if (null == strTask)
-        {
-            return;
-        }
-        String sendBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-        sendBuffer += "<Marvin Type=\"RemoteMarvinTask\">";
-        sendBuffer += "<Version>1.0</Version>";
-        sendBuffer += "<Requester>" +  GetConfigReader().getConfiguration().GetApplicationID() +" :" +GetConfigReader().getConfiguration().getAddress() + "</Requester>";
-        sendBuffer += "<RequestNumber>" + Integer.toString(_RequestNumber) + "</RequestNumber>";
-        sendBuffer += "<MarvinID>" + _MarvinID + "</MarvinID>";
-        sendBuffer += "<Task>"+strTask+"</Task>";
-        sendBuffer += "</Marvin>";
-        
-        RemoteMarvinTask._RequestNumber += 1;
-        
-        LOGGER.info("Sending RemoteMarvinAdminTask :" + strTask);
-        TASKMAN.SendToAllOscars(sendBuffer.getBytes());
+	String strTask = getDataValue(_TaskID);
+	if (null == strTask)
+	{
+	    return;
+	}
+	String sendBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+	sendBuffer += "<Marvin Type=\"RemoteMarvinTask\">";
+	sendBuffer += "<Version>1.0</Version>";
+	sendBuffer += "<Requester>" + GetConfigReader().getConfiguration().GetApplicationID() + " :"
+		+ GetConfigReader().getConfiguration().getAddress() + "</Requester>";
+	sendBuffer += "<RequestNumber>" + Integer.toString(_RequestNumber) + "</RequestNumber>";
+	sendBuffer += "<MarvinID>" + _MarvinID + "</MarvinID>";
+	sendBuffer += "<Task>" + strTask + "</Task>";
+	sendBuffer += "</Marvin>";
+	
+	RemoteMarvinTask._RequestNumber += 1;
+	
+	LOGGER.info("Sending RemoteMarvinAdminTask :" + strTask);
+	TASKMAN.SendToAllOscars(sendBuffer.getBytes());
     }
     
 }

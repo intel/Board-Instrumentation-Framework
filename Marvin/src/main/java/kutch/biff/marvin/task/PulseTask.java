@@ -31,46 +31,48 @@ public class PulseTask extends BaseTask
 {
     protected String _ID;
     protected String _Namespace;
-
+    
     public PulseTask()
     {
-        _ID = null;
-        _Namespace = null;
+	_ID = null;
+	_Namespace = null;
     }
     
     public boolean isValid()
     {
-        return (_ID != null && _Namespace != null);
+	return (_ID != null && _Namespace != null);
     }
     
     @Override
     public void PerformTask()
     {
-        String currValue;
-        currValue = TASKMAN.getDataMgr().GetValue(_ID, _Namespace);
-        if (null == currValue)
-        {
-            int pulseCount = DataManager.getDataManager().PulseDataPoint(_Namespace, _ID);
-            if (pulseCount > 0)
-            {
-                LOGGER.info(String.format("Pulsed %d datapoints with criterea of: [%s:%s]",pulseCount,_Namespace,_ID));
-                return;
-            }
-        }
-
-        if (null == currValue)
-        {
-            LOGGER.warning("Pulse Task failed [" + getTaskID() +"] beause the data point [" + _Namespace +":"+_ID+"] does not exist (yet).");
-        }
-        else
-        {
-            TASKMAN.getDataMgr().ChangeValue(_ID, _Namespace, currValue);
-        }
+	String currValue;
+	currValue = TASKMAN.getDataMgr().GetValue(_ID, _Namespace);
+	if (null == currValue)
+	{
+	    int pulseCount = DataManager.getDataManager().PulseDataPoint(_Namespace, _ID);
+	    if (pulseCount > 0)
+	    {
+		LOGGER.info(
+			String.format("Pulsed %d datapoints with criterea of: [%s:%s]", pulseCount, _Namespace, _ID));
+		return;
+	    }
+	}
+	
+	if (null == currValue)
+	{
+	    LOGGER.warning("Pulse Task failed [" + getTaskID() + "] beause the data point [" + _Namespace + ":" + _ID
+		    + "] does not exist (yet).");
+	}
+	else
+	{
+	    TASKMAN.getDataMgr().ChangeValue(_ID, _Namespace, currValue);
+	}
     }
-
+    
     public void SetNamespaceAndID(String ns, String ID)
     {
-        _ID = ID;
-        _Namespace = ns;
+	_ID = ID;
+	_Namespace = ns;
     }
 }

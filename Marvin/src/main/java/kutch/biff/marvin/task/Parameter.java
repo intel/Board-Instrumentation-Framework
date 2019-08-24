@@ -33,6 +33,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
 public class Parameter
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    
     public static String CheckForDataSrcParameter(String strCheck)
     {
 	return Parameter.HandleDataSrc(strCheck);
@@ -120,30 +121,30 @@ public class Parameter
 	}
 	
 	int OutterIndex = strData.lastIndexOf("%(");
-	int CloseParenIndex = findClosingParen(strData,OutterIndex+1);
+	int CloseParenIndex = findClosingParen(strData, OutterIndex + 1);
 	
 	if (CloseParenIndex > 0)
 	{
 	    String pair = strData.substring(OutterIndex + 2, CloseParenIndex);
 	    String strVal = GetDataSrcVal(pair);
 	    
-	    //= strData.substring(0, OutterIndex);
+	    // = strData.substring(0, OutterIndex);
 	    if (null != strVal)
 	    {
-		retString = strData.replace(strData.substring(OutterIndex, CloseParenIndex+1),strVal);
-
+		retString = strData.replace(strData.substring(OutterIndex, CloseParenIndex + 1), strVal);
+		
 		String nextLoop = HandleDataSrc(retString);
 		while (!nextLoop.equals(retString))
 		{
 		    retString = nextLoop;
-		    nextLoop =  HandleDataSrc(retString);
+		    nextLoop = HandleDataSrc(retString);
 		}
 	    }
 	    else // didn't find a match, so skip and move to next
 	    {
-		//retString = strData.substring(0, CloseParenIndex + 1);
-		//retString += HandleDataSrc(strData.substring(CloseParenIndex + 1));
-		//return retString;
+		// retString = strData.substring(0, CloseParenIndex + 1);
+		// retString += HandleDataSrc(strData.substring(CloseParenIndex + 1));
+		// return retString;
 	    }
 	}
 	else

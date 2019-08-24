@@ -32,7 +32,7 @@ public class PieChartWidgetBuilder
 {
     public final static PieChartWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        return new PieChartWidget();
+	return new PieChartWidget();
     }
     
 }

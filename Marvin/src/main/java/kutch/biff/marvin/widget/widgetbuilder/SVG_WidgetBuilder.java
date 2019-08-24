@@ -33,20 +33,19 @@ public class SVG_WidgetBuilder
 {
     public static SVG_Widget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        SVG_Widget _widget = new SVG_Widget();
-        
-        _widget = (SVG_Widget) TextBuilder.ReadTextWidgetInfo(_widget,masterNode,widgetDefFilename);
-        
-        
-        for (FrameworkNode node :masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget,node))
-            {
-            }
-            else if (node.getNodeName().equalsIgnoreCase("#comment"))
-            {
-            }
-        }
-        return _widget;
-    }    
+	SVG_Widget _widget = new SVG_Widget();
+	
+	_widget = (SVG_Widget) TextBuilder.ReadTextWidgetInfo(_widget, masterNode, widgetDefFilename);
+	
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
+	    {
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("#comment"))
+	    {
+	    }
+	}
+	return _widget;
+    }
 }

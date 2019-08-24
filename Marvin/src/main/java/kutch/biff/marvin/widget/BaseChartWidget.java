@@ -617,7 +617,6 @@ abstract public class BaseChartWidget extends BaseWidget
 	// setyAxisMinValue(yAxisMinValue_Initial);
 	initialSteppedRangeSetup(yAxisMinValue, yAxisMaxValue);
 	UpdateValueRange();
-
 	
 	// now go and set all to zero or the specified value
 	@SuppressWarnings("unchecked")

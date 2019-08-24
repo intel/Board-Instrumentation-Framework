@@ -1,4 +1,5 @@
-module kutch.biff.marvin {
+module kutch.biff.marvin
+{
     requires javafx.controls;
     requires javafx.web;
     requires javafx.media;
@@ -9,6 +10,6 @@ module kutch.biff.marvin {
     requires eu.hansolo.enzo;
     requires javafx.graphics;
     requires java.xml;
-
+    
     exports kutch.biff.marvin;
 }

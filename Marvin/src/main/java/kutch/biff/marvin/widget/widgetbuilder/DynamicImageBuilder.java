@@ -34,7 +34,7 @@ public class DynamicImageBuilder
 {
     public static DynamicImageWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        DynamicImageWidget _widget = new DynamicImageWidget();
-        return (DynamicImageWidget)ParseXML(_widget,masterNode);
+	DynamicImageWidget _widget = new DynamicImageWidget();
+	return (DynamicImageWidget) ParseXML(_widget, masterNode);
     }
 }

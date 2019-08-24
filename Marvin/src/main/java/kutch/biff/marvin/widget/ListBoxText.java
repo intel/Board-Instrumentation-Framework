@@ -30,7 +30,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.datamanager.DataManager;
 
-
 /**
  *
  * @author Patrick.Kutch@gmail.com
@@ -39,70 +38,71 @@ public class ListBoxText extends BaseWidget
 {
     private ListView<String> _listView;
     ObservableList<String> _list;
+    
     public ListBoxText()
     {
-        setDefaultIsSquare(false);
-        
-      _list = FXCollections.observableArrayList();
-      _listView = new ListView<>(_list);
+	setDefaultIsSquare(false);
+	
+	_list = FXCollections.observableArrayList();
+	_listView = new ListView<>(_list);
     }
     
     public void addEntry(String strNewEntry)
     {
-        _list.add(strNewEntry);
+	_list.add(strNewEntry);
     }
     
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
-        SetParent(pane);
-        ConfigureDimentions();
-        ConfigureAlignment();
-        SetupPeekaboo(dataMgr);
-
-        pane.add(_listView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
-                    {
-                        @Override
-                        public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
-                        {
-                            if (IsPaused())
-                            {
-                                return;
-                            }
-
-                            String TextString = newVal.toString();
-                            addEntry(TextString);
-                        }
-                    });
-
-        SetupTaskAction();
-        return ApplyCSS();        
-
+	SetParent(pane);
+	ConfigureDimentions();
+	ConfigureAlignment();
+	SetupPeekaboo(dataMgr);
+	
+	pane.add(_listView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+	dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>()
+	{
+	    @Override
+	    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
+	    {
+		if (IsPaused())
+		{
+		    return;
+		}
+		
+		String TextString = newVal.toString();
+		addEntry(TextString);
+	    }
+	});
+	
+	SetupTaskAction();
+	return ApplyCSS();
+	
     }
     
-
     @Override
     public Node getStylableObject()
     {
-        return _listView;
+	return _listView;
     }
-
+    
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return _listView.getStylesheets();
+	return _listView.getStylesheets();
     }
-
+    
     @Override
     public void SetInitialValue(String value)
     {
-        addEntry(value);
+	addEntry(value);
     }
+    
     @Override
     public void UpdateTitle(String newTitle)
     {
-        
+	
     }
-
+    
 }

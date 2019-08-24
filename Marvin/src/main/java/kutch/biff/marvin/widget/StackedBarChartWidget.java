@@ -40,129 +40,129 @@ import kutch.biff.marvin.utility.SeriesSet;
  */
 public class StackedBarChartWidget extends BarChartWidget
 {
-
+    
     public StackedBarChartWidget()
     {
-        super(false);
-        _isStackedChart = true;
+	super(false);
+	_isStackedChart = true;
     }
-
+    
     @SuppressWarnings("unchecked")
     @Override
     protected Chart CreateChartObject()
     {
-        ArrayList<String> list = new ArrayList<>();
-
-        for (String key : _SeriesOrder)
-        {
-            if (null == _SeriesMap.get(key))
-            {
-                LOGGER.severe("Unexpected probelm in CreateChartObject");
-                break;
-            }
-            
-            ArrayList<SeriesDataSet> setList = _SeriesMap.get(key).getSeriesList();
-            if (null == setList)
-            {
-                LOGGER.severe("Unexpected probelm in CreateChartObject");
-                break;
-            }
-            
-            for (SeriesDataSet set : setList)
-            {
-                list.add(set.getTitle());
-            }
-            break; 
-        }
-
-        getAxis_X().setCategories(FXCollections.observableArrayList(list));
-        return new StackedBarChart<String, Number>(getAxis_X(), getyAxis());
+	ArrayList<String> list = new ArrayList<>();
+	
+	for (String key : _SeriesOrder)
+	{
+	    if (null == _SeriesMap.get(key))
+	    {
+		LOGGER.severe("Unexpected probelm in CreateChartObject");
+		break;
+	    }
+	    
+	    ArrayList<SeriesDataSet> setList = _SeriesMap.get(key).getSeriesList();
+	    if (null == setList)
+	    {
+		LOGGER.severe("Unexpected probelm in CreateChartObject");
+		break;
+	    }
+	    
+	    for (SeriesDataSet set : setList)
+	    {
+		list.add(set.getTitle());
+	    }
+	    break;
+	}
+	
+	getAxis_X().setCategories(FXCollections.observableArrayList(list));
+	return new StackedBarChart<String, Number>(getAxis_X(), getyAxis());
     }
-
+    
     @Override
     public javafx.scene.Node getStylableObject()
     {
-        return ((getChart()));
+	return ((getChart()));
     }
-
+    
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return ((StackedBarChart<?, ?>) (getChart())).getStylesheets();
+	return ((StackedBarChart<?, ?>) (getChart())).getStylesheets();
     }
-
+    
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void setupListeners(DataManager dataMgr)
     {
-        for (String key : _SeriesOrder)
-        {
-            SeriesSet objSeriesSet = _SeriesMap.get(key);
-            if (null == objSeriesSet)
-            {
-                LOGGER.severe("Invalid Key in setupListeners");
-                return;
-            }
-            XYChart.Series objSeries = new XYChart.Series<>();
-            String strTitle = objSeriesSet.getTitle();
-            if (null == strTitle)
-            {
-                strTitle="untitled";
-            }
-            
-            objSeries.setName(strTitle);
-            
-            for (SeriesDataSet objDs : objSeriesSet.getSeriesList())
-            {
-                XYChart.Data objData;
-                if (isHorizontal())
-                {
-                    objData = new XYChart.Data(0, objDs.getTitle());
-                }
-                else
-                {
-                    objData = new XYChart.Data(objDs.getTitle(), 0);
-                }
-
-                objSeries.getData().add(objData);
-
-                dataMgr.AddListener(objDs.getID(), objDs.getNamespace(), new ChangeListener<Object>()
-                {
-
-                    @Override
-                    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
-                    {
-                        if (IsPaused())
-                        {
-                            return;
-                        }
-                        String strVal = newVal.toString();
-                        double newValue;
-                        try
-                        {
-                            newValue = Double.parseDouble(strVal);
-                            HandleSteppedRange(newValue);
-                        }
-                        catch (Exception ex)
-                        {
-                            LOGGER.severe("Invalid data for Line Chart received: " + strVal);
-                            return;
-                        }
-                        if (isHorizontal())
-                        {
-                            objData.XValueProperty().set(newValue);
-                        }
-                        else
-                        {
-                            objData.YValueProperty().set(newValue);
-                        }
-                    }
-                });
-
-            }
-            ((StackedBarChart) getChart()).getData().add(objSeries);
-
-        }
+	for (String key : _SeriesOrder)
+	{
+	    SeriesSet objSeriesSet = _SeriesMap.get(key);
+	    if (null == objSeriesSet)
+	    {
+		LOGGER.severe("Invalid Key in setupListeners");
+		return;
+	    }
+	    XYChart.Series objSeries = new XYChart.Series<>();
+	    String strTitle = objSeriesSet.getTitle();
+	    if (null == strTitle)
+	    {
+		strTitle = "untitled";
+	    }
+	    
+	    objSeries.setName(strTitle);
+	    
+	    for (SeriesDataSet objDs : objSeriesSet.getSeriesList())
+	    {
+		XYChart.Data objData;
+		if (isHorizontal())
+		{
+		    objData = new XYChart.Data(0, objDs.getTitle());
+		}
+		else
+		{
+		    objData = new XYChart.Data(objDs.getTitle(), 0);
+		}
+		
+		objSeries.getData().add(objData);
+		
+		dataMgr.AddListener(objDs.getID(), objDs.getNamespace(), new ChangeListener<Object>()
+		{
+		    
+		    @Override
+		    public void changed(ObservableValue<?> o, Object oldVal, Object newVal)
+		    {
+			if (IsPaused())
+			{
+			    return;
+			}
+			String strVal = newVal.toString();
+			double newValue;
+			try
+			{
+			    newValue = Double.parseDouble(strVal);
+			    HandleSteppedRange(newValue);
+			}
+			catch(Exception ex)
+			{
+			    LOGGER.severe("Invalid data for Line Chart received: " + strVal);
+			    return;
+			}
+			if (isHorizontal())
+			{
+			    objData.XValueProperty().set(newValue);
+			}
+			else
+			{
+			    objData.YValueProperty().set(newValue);
+			}
+		    }
+		});
+		
+	    }
+	    ((StackedBarChart) getChart()).getData().add(objSeries);
+	    
+	}
     }
-
+    
 }

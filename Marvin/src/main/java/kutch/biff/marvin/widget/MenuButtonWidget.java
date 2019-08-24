@@ -60,7 +60,7 @@ public class MenuButtonWidget extends ButtonWidget
 	_Button.getStyleClass().add("kutch");
 	__CommonTaskNode = null;
 	__UpdateTitleFromSelection = true; // can turn off laster
-	__LastValue="";
+	__LastValue = "";
     }
     
     @Override
@@ -89,7 +89,7 @@ public class MenuButtonWidget extends ButtonWidget
 	
 	if (widgetNode.hasChild("Title") && widgetNode.getChild("Title").hasAttribute("UpdateTitleFromSelection"))
 	{
-	    __UpdateTitleFromSelection= widgetNode.getChild("Title").getBooleanAttribute("UpdateTitleFromSelection");
+	    __UpdateTitleFromSelection = widgetNode.getChild("Title").getBooleanAttribute("UpdateTitleFromSelection");
 	}
 	else
 	{
@@ -111,7 +111,7 @@ public class MenuButtonWidget extends ButtonWidget
 	{
 	    ConfigurationReader rdr = ConfigurationReader.GetConfigReader();
 	    
-	    MenuItem objItem = rdr.ReadMenuItem(widgetNode,_Button.getItems().size());
+	    MenuItem objItem = rdr.ReadMenuItem(widgetNode, _Button.getItems().size());
 	    if (null != objItem)
 	    {
 		_Button.getItems().add(objItem);
@@ -135,7 +135,7 @@ public class MenuButtonWidget extends ButtonWidget
 	_Button.getItems().clear();
 	String[] newEntries = newVal.toString().split(",");
 	ConfigurationReader rdr = ConfigurationReader.GetConfigReader();
-
+	
 	for (String entry : newEntries)
 	{
 	    FrameworkNode menuNode = new FrameworkNode(__CommonTaskNode);
@@ -168,8 +168,8 @@ public class MenuButtonWidget extends ButtonWidget
     
     public void setCommonTaskNode(FrameworkNode commonTask)
     {
-	__CommonTaskNode = new FrameworkNode(commonTask);  // make new instance, to get alias resolved now
-	//__CommonTaskNode.ResolveAlias();
+	__CommonTaskNode = new FrameworkNode(commonTask); // make new instance, to get alias resolved now
+	// __CommonTaskNode.ResolveAlias();
     }
     
     private void setupChangeTitleListener(MenuItem objItem)

@@ -74,6 +74,7 @@ abstract public class BaseWidget implements Widget
     protected final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     protected static Configuration CONFIG = Configuration.getConfig();
     protected static CircularList<String> DebugStyles = null;
+    
     static public boolean ApplyStyleOverrides(javafx.scene.Node widget, List<String> Styles)
     {
 	// return true;
@@ -92,6 +93,7 @@ abstract public class BaseWidget implements Widget
 	
 	return true;
     }
+    
     public static String convertToFileOSSpecific(String filename)
     {
 	String path = filename;
@@ -110,6 +112,7 @@ abstract public class BaseWidget implements Widget
 	}
 	return path;
     }
+    
     public static String convertToFileURL(String filename)
     {
 	String path = filename;
@@ -129,14 +132,17 @@ abstract public class BaseWidget implements Widget
 	
 	return retVal;
     }
+    
     public static int getWidgetCount()
     {
 	return _WidgetCount;
     }
+    
     public static ArrayList<BaseWidget> getWidgetList()
     {
 	return _WidgetList;
     }
+    
     public static boolean HandleCommonDefinitionFileConfig(BaseWidget widget, FrameworkNode node)
     {
 	if (null == widget)
@@ -194,6 +200,7 @@ abstract public class BaseWidget implements Widget
 	}
 	return false;
     }
+    
     public static int parsePercentWidth(FrameworkNode widgetNode)
     {
 	String str = widgetNode.getAttribute("Width");
@@ -223,6 +230,7 @@ abstract public class BaseWidget implements Widget
 	}
 	return 0;
     }
+    
     public static int parsePercentWidth(FrameworkNode widgetNode, String strAttribute)
     {
 	String str = widgetNode.getAttribute(strAttribute);
@@ -252,12 +260,13 @@ abstract public class BaseWidget implements Widget
 	}
 	return 0;
     }
+    
     public static String ProcessIndexDataRequest(ValueRange valueRange, String splitToken, String strValue)
     {
 	String[] parts = strValue.split(splitToken);
 	if (parts.length == 1)
 	{
-	    return null;	// wasn't split
+	    return null; // wasn't split
 	}
 	if (valueRange.getMinimum() < parts.length && valueRange.getMaximum() < parts.length)
 	{
@@ -282,6 +291,7 @@ abstract public class BaseWidget implements Widget
 	}
 	return null;
     }
+    
     protected TaskManager TASKMAN = TaskManager.getTaskManager();
     private final int _WidgetNumber;
     private double _Height;
@@ -420,6 +430,7 @@ abstract public class BaseWidget implements Widget
 	    }
 	}
     }
+    
     public void AddAdditionalStyleOverride(String newOverride)
     {
 	if (false == StyleUpdatesFromConfigFinished)
@@ -1125,7 +1136,8 @@ abstract public class BaseWidget implements Widget
 		&& strPeek.substring(0, "Reset".length()).equalsIgnoreCase("Reset"))
 	{
 	    String strParam = null;
-	    if (strPeek.length() > "Reset:".length() && strPeek.substring(0,"Reset:".length()).equalsIgnoreCase("Reset:"))
+	    if (strPeek.length() > "Reset:".length()
+		    && strPeek.substring(0, "Reset:".length()).equalsIgnoreCase("Reset:"))
 	    {
 		strParam = strPeek.substring("Reset:".length());
 	    }

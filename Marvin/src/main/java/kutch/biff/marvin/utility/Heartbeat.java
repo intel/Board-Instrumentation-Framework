@@ -30,7 +30,7 @@ import kutch.biff.marvin.task.TaskManager;
  *
  * @author Patrick Kutch
  */
-public class Heartbeat extends TimerTask 
+public class Heartbeat extends TimerTask
 {
 //    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final TaskManager TASKMAN = TaskManager.getTaskManager();
@@ -39,32 +39,32 @@ public class Heartbeat extends TimerTask
     private final String _HeartbeatTaskID;
     private boolean _ThreadNameSet;
     
-    public Heartbeat(int interval) 
+    public Heartbeat(int interval)
     {
-        _HeartbeatTaskID =  TASKMAN.CreateWatchdogTask();
-        _interval = interval*1000;
-        _heartbeatTimer = new Timer();
-        _ThreadNameSet = false;
+	_HeartbeatTaskID = TASKMAN.CreateWatchdogTask();
+	_interval = interval * 1000;
+	_heartbeatTimer = new Timer();
+	_ThreadNameSet = false;
     }
     
     @Override
     public void run()
     {
-        if (false == _ThreadNameSet)
-        {
-            _ThreadNameSet = true;
-            Thread.currentThread().setName("Heartbeat Thread");
-        }
-        TaskManager.getTaskManager().PerformTask(_HeartbeatTaskID);
+	if (false == _ThreadNameSet)
+	{
+	    _ThreadNameSet = true;
+	    Thread.currentThread().setName("Heartbeat Thread");
+	}
+	TaskManager.getTaskManager().PerformTask(_HeartbeatTaskID);
     }
     
     public void Start()
     {
-        _heartbeatTimer.scheduleAtFixedRate(this, 100, _interval);
+	_heartbeatTimer.scheduleAtFixedRate(this, 100, _interval);
     }
     
     public void Stop()
     {
-        _heartbeatTimer.cancel();
+	_heartbeatTimer.cancel();
     }
 }

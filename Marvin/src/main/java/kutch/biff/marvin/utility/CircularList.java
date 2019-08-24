@@ -34,50 +34,50 @@ public class CircularList<T> extends ArrayList<T>
      * 
      */
     private static final long serialVersionUID = -6542607529993640355L;
-    private int _LastUsedIndex=0;
+    private int _LastUsedIndex = 0;
     
     @Override
     public T get(int index)
     {
-        if (index <0)
-        {
-            _LastUsedIndex = size()-1;
-        }
-
-        else if (index >= size())
-        {
-            _LastUsedIndex = 0;
-        }
-        else if (index < size())
-        {
-            _LastUsedIndex = index;
-        }
-
-        return super.get(_LastUsedIndex);
+	if (index < 0)
+	{
+	    _LastUsedIndex = size() - 1;
+	}
+	
+	else if (index >= size())
+	{
+	    _LastUsedIndex = 0;
+	}
+	else if (index < size())
+	{
+	    _LastUsedIndex = index;
+	}
+	
+	return super.get(_LastUsedIndex);
     }
     
     public T get(String ID)
     {
-        ID = ID.toLowerCase();
-        if (contains(ID))
-        {
-            _LastUsedIndex = lastIndexOf(ID);
-        }
-        return get(_LastUsedIndex);
+	ID = ID.toLowerCase();
+	if (contains(ID))
+	{
+	    _LastUsedIndex = lastIndexOf(ID);
+	}
+	return get(_LastUsedIndex);
     }
     
     public T GetNext()
     {
-        return get(_LastUsedIndex+1);
+	return get(_LastUsedIndex + 1);
     }
+    
     public T GetPrevious()
     {
-        return get(_LastUsedIndex-1);
+	return get(_LastUsedIndex - 1);
     }
-
+    
     public boolean IsLast(String ID)
     {
-        return ID.equalsIgnoreCase((String)super.get(super.size()-1));
+	return ID.equalsIgnoreCase((String) super.get(super.size() - 1));
     }
 }
-

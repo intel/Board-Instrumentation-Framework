@@ -34,24 +34,24 @@ import kutch.biff.marvin.widget.PDF_ReaderWidget;
  */
 public class PDF_ReaderWidgetBuilder
 {
-
+    
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     public static PDF_ReaderWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        PDF_ReaderWidget _widget = new PDF_ReaderWidget();
-
-        for (FrameworkNode node : masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
-            {
-            }
-
-            else
-            {
-                LOGGER.severe("Unknown PDF_ReaderWidget Config file item: " + node.getNodeName());
-            }
-        }
-        return _widget;
+	PDF_ReaderWidget _widget = new PDF_ReaderWidget();
+	
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
+	    {
+	    }
+	    
+	    else
+	    {
+		LOGGER.severe("Unknown PDF_ReaderWidget Config file item: " + node.getNodeName());
+	    }
+	}
+	return _widget;
     }
 }

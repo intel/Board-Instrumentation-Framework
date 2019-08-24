@@ -36,14 +36,15 @@ public class ApplyOnDemandTabStyle extends BaseTask
     @Override
     public void PerformTask()
     {
-        for (Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder> entry : DataManager.getDataManager().getOnDemandList())
-        {
-            if (entry.getValue() instanceof OnDemandTabBuilder)
-            {
-                OnDemandTabBuilder tabBuilder = (OnDemandTabBuilder) entry.getValue();
-                tabBuilder.ApplyOddEvenStyle();
-            }
-        }
-
+	for (Pair<DynamicItemInfoContainer, OnDemandWidgetBuilder> entry : DataManager.getDataManager()
+		.getOnDemandList())
+	{
+	    if (entry.getValue() instanceof OnDemandTabBuilder)
+	    {
+		OnDemandTabBuilder tabBuilder = (OnDemandTabBuilder) entry.getValue();
+		tabBuilder.ApplyOddEvenStyle();
+	    }
+	}
+	
     }
 }

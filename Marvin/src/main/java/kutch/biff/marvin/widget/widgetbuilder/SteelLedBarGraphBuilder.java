@@ -40,108 +40,114 @@ public class SteelLedBarGraphBuilder
     
     public static SteelLedBarGraphWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        SteelLedBarGraphWidget led = new SteelLedBarGraphWidget();
-        
-        for (FrameworkNode node :masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(led, node))
-            {
-                continue;
-            }
-         
-            else if (node.getNodeName().equalsIgnoreCase("NumberOfLeds"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    led.setNumberOfLeds(Integer.parseInt(str));
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Invalid NumberOfLeds in LedBarGraph Widget Definition File : " + str);
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("SizeOfLeds"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    led.setLedSize(Integer.parseInt(str));
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.severe("Invalid SizeOfLeds in LedBarGraph Widget Definition File : " + str);
-                    return null;
-                }
-            }            
-            
-            else if (node.getNodeName().equalsIgnoreCase("Orientation"))
-            {
-                String str = node.getTextContent();
-                if (0 == str.compareToIgnoreCase("Horizontal"))
-                {
-                    led.setOrientation(Orientation.HORIZONTAL);
-                }
-                else if (0==str.compareToIgnoreCase("Vertical"))
-                {
-                    led.setOrientation(Orientation.VERTICAL);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid Orientation in LedBarGraph Widget Definition File. Should be Horizontal or Vertical, not : " + str);
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("LedType"))
-            {
-                String str = node.getTextContent();
-                
-                if (0 == str.compareToIgnoreCase("Horizontal"))
-                {
-                    led.setLedType(LedType.HORIZONTAL);
-                }
-                else if (0==str.compareToIgnoreCase("Vertical"))
-                {
-                    led.setLedType(LedType.VERTICAL);
-                }
-                else if (0==str.compareToIgnoreCase("Round"))
-                {
-                    led.setLedType(LedType.ROUND);
-                }
-                else if (0==str.compareToIgnoreCase("Square"))
-                {
-                    led.setLedType(LedType.SQUARE);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid Orientation in LedBarGraph Widget Definition File. Should be Horizontal or Vertical, not : " + str);
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("ShowPeakValue"))
-            {
-                String str = node.getTextContent();
-                if (0 == str.compareToIgnoreCase("True"))
-                {
-                    led.setShowPeakValue(true);
-                }
-                else if (0==str.compareToIgnoreCase("False"))
-                {
-                    led.setShowPeakValue(false);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid ShowPeakValue in LedBarGraph  Definition File.  Should be true or false, not " + str);
-                    return null;
-                }
-            }
-            else 
-            {
-               LOGGER.severe("Invalid LedBarGraph Widget Definition File.  Unknown Tag: " + node.getNodeName());
-               return null;                
-            }
-        }
-        return led;
+	SteelLedBarGraphWidget led = new SteelLedBarGraphWidget();
+	
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(led, node))
+	    {
+		continue;
+	    }
+	    
+	    else if (node.getNodeName().equalsIgnoreCase("NumberOfLeds"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    led.setNumberOfLeds(Integer.parseInt(str));
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Invalid NumberOfLeds in LedBarGraph Widget Definition File : " + str);
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("SizeOfLeds"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    led.setLedSize(Integer.parseInt(str));
+		}
+		catch(Exception ex)
+		{
+		    LOGGER.severe("Invalid SizeOfLeds in LedBarGraph Widget Definition File : " + str);
+		    return null;
+		}
+	    }
+	    
+	    else if (node.getNodeName().equalsIgnoreCase("Orientation"))
+	    {
+		String str = node.getTextContent();
+		if (0 == str.compareToIgnoreCase("Horizontal"))
+		{
+		    led.setOrientation(Orientation.HORIZONTAL);
+		}
+		else if (0 == str.compareToIgnoreCase("Vertical"))
+		{
+		    led.setOrientation(Orientation.VERTICAL);
+		}
+		else
+		{
+		    LOGGER.severe(
+			    "Invalid Orientation in LedBarGraph Widget Definition File. Should be Horizontal or Vertical, not : "
+				    + str);
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("LedType"))
+	    {
+		String str = node.getTextContent();
+		
+		if (0 == str.compareToIgnoreCase("Horizontal"))
+		{
+		    led.setLedType(LedType.HORIZONTAL);
+		}
+		else if (0 == str.compareToIgnoreCase("Vertical"))
+		{
+		    led.setLedType(LedType.VERTICAL);
+		}
+		else if (0 == str.compareToIgnoreCase("Round"))
+		{
+		    led.setLedType(LedType.ROUND);
+		}
+		else if (0 == str.compareToIgnoreCase("Square"))
+		{
+		    led.setLedType(LedType.SQUARE);
+		}
+		else
+		{
+		    LOGGER.severe(
+			    "Invalid Orientation in LedBarGraph Widget Definition File. Should be Horizontal or Vertical, not : "
+				    + str);
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("ShowPeakValue"))
+	    {
+		String str = node.getTextContent();
+		if (0 == str.compareToIgnoreCase("True"))
+		{
+		    led.setShowPeakValue(true);
+		}
+		else if (0 == str.compareToIgnoreCase("False"))
+		{
+		    led.setShowPeakValue(false);
+		}
+		else
+		{
+		    LOGGER.severe(
+			    "Invalid ShowPeakValue in LedBarGraph  Definition File.  Should be true or false, not "
+				    + str);
+		    return null;
+		}
+	    }
+	    else
+	    {
+		LOGGER.severe("Invalid LedBarGraph Widget Definition File.  Unknown Tag: " + node.getNodeName());
+		return null;
+	    }
+	}
+	return led;
     }
 }

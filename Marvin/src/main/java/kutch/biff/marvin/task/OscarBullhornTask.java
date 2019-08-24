@@ -19,10 +19,9 @@
  * ##############################################################################
  */
 
-
 package kutch.biff.marvin.task;
-import kutch.biff.marvin.configuration.Configuration;
 
+import kutch.biff.marvin.configuration.Configuration;
 
 /**
  *
@@ -32,15 +31,15 @@ public class OscarBullhornTask extends BaseTask
 {
     public OscarBullhornTask()
     {
-        
+	
     }
     
     @Override
-    public  void PerformTask()
+    public void PerformTask()
     {
-        Configuration.getConfig().getOscarBullhornList().stream().forEach((objBullhorn) ->
-        {
-           objBullhorn.SendNotification();
-        });
+	Configuration.getConfig().getOscarBullhornList().stream().forEach((objBullhorn) ->
+	{
+	    objBullhorn.SendNotification();
+	});
     }
 }

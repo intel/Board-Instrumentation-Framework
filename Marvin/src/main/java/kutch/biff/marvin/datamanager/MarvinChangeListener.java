@@ -42,7 +42,6 @@ public abstract class MarvinChangeListener implements ChangeListener<Object>
     private boolean __ProcessRanges;
     private String __tokenChar;
     
-    
     public MarvinChangeListener(ValueRange objRange, String tokenChar)
     {
 	__valueRange = objRange;
@@ -66,7 +65,7 @@ public abstract class MarvinChangeListener implements ChangeListener<Object>
 	}
 	else
 	{
-	    String retStr = BaseWidget.ProcessIndexDataRequest(__valueRange,__tokenChar, arg2.toString());
+	    String retStr = BaseWidget.ProcessIndexDataRequest(__valueRange, __tokenChar, arg2.toString());
 	    if (null != retStr)
 	    {
 		onChanged(retStr);
@@ -74,7 +73,7 @@ public abstract class MarvinChangeListener implements ChangeListener<Object>
 	    else
 	    {
 		// send it anyway?
-		//onChanged(arg2.toString());
+		// onChanged(arg2.toString());
 	    }
 	}
     }

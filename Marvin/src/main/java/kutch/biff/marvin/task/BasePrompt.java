@@ -46,181 +46,188 @@ abstract public class BasePrompt
     private String _Prompt;
     private String _PromptedValue;
     private String _ID;
-    private double _Width,_Height;
+    private double _Width, _Height;
     private String _StyleOverride;
-    private String _CssFile;    
+    private String _CssFile;
     
     public BasePrompt(String ID)
     {
-        _dlgTitle = null;
-        _Message = null;
-        _Prompt = null;    
-        _PromptedValue = null;
-        _ID = ID;
-        _Width = 0; 
-        _Height=0;
-        _CssFile = null;
-        _StyleOverride = null;
+	_dlgTitle = null;
+	_Message = null;
+	_Prompt = null;
+	_PromptedValue = null;
+	_ID = ID;
+	_Width = 0;
+	_Height = 0;
+	_CssFile = null;
+	_StyleOverride = null;
     }
-
+    
     private Stage CreateDialog()
     {
-        Stage dialog = new Stage();
-        dialog.setTitle(getDlgTitle());
-        dialog.initStyle(StageStyle.UTILITY);
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        Pane dlgPane = SetupDialog(dialog);
-        Scene objScene = new Scene(dlgPane);
-        
-        String cssFile = Configuration.getConfig().getCSSFile();
-        if (null != getCssFile() )
-        {
-            cssFile = getCssFile();
-        }
-       
-        if (null != cssFile)
-        {
-            String osIndepFN = BaseWidget.convertToFileOSSpecific(cssFile);
-
-            if (null == osIndepFN)
-            {
-                
-            }
-            String strCSS = BaseWidget.convertToFileURL(osIndepFN);
-
-            if (null != strCSS)
-            {
-                try
-                {
-                    if (false == objScene.getStylesheets().add(strCSS))
-                    {
-                        //LOGGER.severe("Problems with application stylesheet: " + Configuration.getConfig().getConfiguration().getCSSFile());
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //LOGGER.severe("Problems with application stylesheet: " + Configuration.getConfig().getConfiguration().getCSSFile());
-                }
-            }
-        }
-        if (null != getStyleOverride())
-        {
-            dlgPane.setStyle(getStyleOverride());
-        }
-        
-        if (null == dlgPane)
-        {
-            return null;
-        }
-        
-        dialog.setScene(objScene);
-
-        return dialog;
+	Stage dialog = new Stage();
+	dialog.setTitle(getDlgTitle());
+	dialog.initStyle(StageStyle.UTILITY);
+	dialog.initModality(Modality.APPLICATION_MODAL);
+	Pane dlgPane = SetupDialog(dialog);
+	Scene objScene = new Scene(dlgPane);
+	
+	String cssFile = Configuration.getConfig().getCSSFile();
+	if (null != getCssFile())
+	{
+	    cssFile = getCssFile();
+	}
+	
+	if (null != cssFile)
+	{
+	    String osIndepFN = BaseWidget.convertToFileOSSpecific(cssFile);
+	    
+	    if (null == osIndepFN)
+	    {
+		
+	    }
+	    String strCSS = BaseWidget.convertToFileURL(osIndepFN);
+	    
+	    if (null != strCSS)
+	    {
+		try
+		{
+		    if (false == objScene.getStylesheets().add(strCSS))
+		    {
+			// LOGGER.severe("Problems with application stylesheet: " +
+			// Configuration.getConfig().getConfiguration().getCSSFile());
+		    }
+		}
+		catch(Exception ex)
+		{
+		    // LOGGER.severe("Problems with application stylesheet: " +
+		    // Configuration.getConfig().getConfiguration().getCSSFile());
+		}
+	    }
+	}
+	if (null != getStyleOverride())
+	{
+	    dlgPane.setStyle(getStyleOverride());
+	}
+	
+	if (null == dlgPane)
+	{
+	    return null;
+	}
+	
+	dialog.setScene(objScene);
+	
+	return dialog;
     }
-
+    
     public String getCssFile()
     {
-        return _CssFile;
+	return _CssFile;
     }
-
+    
     public String getDlgTitle()
     {
-        return _dlgTitle;
+	return _dlgTitle;
     }
-
+    
     public double getHeight()
     {
-        return _Height;
+	return _Height;
     }
-
+    
     public String getMessage()
     {
-        return _Message;
+	return _Message;
     }
-
+    
     public String getPrompt()
     {
-        return _Prompt;
+	return _Prompt;
     }
-
+    
     public String GetPromptedValue()
     {
-        return _PromptedValue;
+	return _PromptedValue;
     }
-
+    
     public String getStyleOverride()
     {
-        return _StyleOverride;
+	return _StyleOverride;
     }
+    
     public double getWidth()
     {
-        return _Width;
+	return _Width;
     }
-    public boolean HandlePromptSpecificConfig(FrameworkNode baseNode) 
+    
+    public boolean HandlePromptSpecificConfig(FrameworkNode baseNode)
     {
-        return false;
+	return false;
     }
-
+    
     public boolean PerformPrompt()
     {
-        _PromptedValue = null;
-        Stage objStage = CreateDialog();
-        if (null == objStage)
-        {
-            return false;
-        }
-        
-       
-        CreateDialog().showAndWait();  
-        
-        return null != GetPromptedValue();
+	_PromptedValue = null;
+	Stage objStage = CreateDialog();
+	if (null == objStage)
+	{
+	    return false;
+	}
+	
+	CreateDialog().showAndWait();
+	
+	return null != GetPromptedValue();
     }
-
+    
     public void setCssFile(String _CssFile)
     {
-        this._CssFile = _CssFile;
+	this._CssFile = _CssFile;
     }
-
+    
     public void setDlgTitle(String _dlgTitle)
     {
-        this._dlgTitle = _dlgTitle;
+	this._dlgTitle = _dlgTitle;
     }
-
+    
     public void setHeight(double _Height)
     {
-        this._Height = _Height;
+	this._Height = _Height;
     }
-
+    
     public void setMessage(String _Message)
     {
-        this._Message = _Message;
+	this._Message = _Message;
     }
+    
     public void setPrompt(String _Prompt)
     {
-        this._Prompt = _Prompt;
+	this._Prompt = _Prompt;
     }
+    
     protected void SetPromptedValue(String newValue)
     {
-        _PromptedValue = newValue;
+	_PromptedValue = newValue;
     }
     
     public void setStyleOverride(String _StyleOverride)
     {
-        this._StyleOverride = _StyleOverride;
-    }    
+	this._StyleOverride = _StyleOverride;
+    }
+    
     protected Pane SetupDialog(Stage dialog)
     {
-        return null;
+	return null;
     }
-
+    
     public void setWidth(double _Width)
     {
-        this._Width = _Width;
+	this._Width = _Width;
     }
+    
     @Override
     public String toString()
     {
-        return _ID;
+	return _ID;
     }
     
 }

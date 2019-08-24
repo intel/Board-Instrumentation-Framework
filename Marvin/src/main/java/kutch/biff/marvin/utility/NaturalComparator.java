@@ -21,7 +21,6 @@
  */
 package kutch.biff.marvin.utility;
 
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -30,64 +29,64 @@ import java.util.Scanner;
 public class NaturalComparator implements Comparator<String>
 {
     private static String _MatchPattern = "(\\-?\\d+\\.\\d+)|(\\-?\\.\\d+)|(\\-?\\d+)";
-
+    
     @Override
     public int compare(String strFirstString, String strSecondString)
     {
-        if (strFirstString == null || strSecondString == null)
-        {
-            return 0;
-        }
-
-        List<String> parts1 = tokenizeString(strFirstString);
-        List<String> parts2 = tokenizeString(strSecondString);
-        int delta = 0;
-
-        for (int index = 0; delta == 0 && index < parts1.size() && index < parts2.size(); index++)
-        {
-            String token1 = parts1.get(index);
-            String token2 = parts2.get(index);
-
-            if (token1.matches(_MatchPattern) && token2.matches(_MatchPattern))
-            {
-                delta = (int) Math.signum(Double.parseDouble(token1) - Double.parseDouble(token2));
-            }
-            else
-            {
-                delta = token1.compareToIgnoreCase(token2);
-            }
-        }
-        if (delta != 0)
-        {
-            return delta;
-        }
-        else
-        {
-            return parts1.size() - parts2.size();
-        }
+	if (strFirstString == null || strSecondString == null)
+	{
+	    return 0;
+	}
+	
+	List<String> parts1 = tokenizeString(strFirstString);
+	List<String> parts2 = tokenizeString(strSecondString);
+	int delta = 0;
+	
+	for (int index = 0; delta == 0 && index < parts1.size() && index < parts2.size(); index++)
+	{
+	    String token1 = parts1.get(index);
+	    String token2 = parts2.get(index);
+	    
+	    if (token1.matches(_MatchPattern) && token2.matches(_MatchPattern))
+	    {
+		delta = (int) Math.signum(Double.parseDouble(token1) - Double.parseDouble(token2));
+	    }
+	    else
+	    {
+		delta = token1.compareToIgnoreCase(token2);
+	    }
+	}
+	if (delta != 0)
+	{
+	    return delta;
+	}
+	else
+	{
+	    return parts1.size() - parts2.size();
+	}
     }
-
+    
     private List<String> tokenizeString(String strString)
     {
-        List<String> tokenList = new ArrayList<>();
-        Scanner scanner = new Scanner(strString);
-        int index = 0;
-        String number = null;
-        while ((number = scanner.findInLine(_MatchPattern)) != null)
-        {
-            int indexOfNumber = strString.indexOf(number, index);
-            if (indexOfNumber > index)
-            {
-                tokenList.add(strString.substring(index, indexOfNumber));
-            }
-            tokenList.add(number);
-            index = indexOfNumber + number.length();
-        }
-        if (index < strString.length())
-        {
-            tokenList.add(strString.substring(index));
-        }
-        scanner.close();
-        return tokenList;
+	List<String> tokenList = new ArrayList<>();
+	Scanner scanner = new Scanner(strString);
+	int index = 0;
+	String number = null;
+	while ((number = scanner.findInLine(_MatchPattern)) != null)
+	{
+	    int indexOfNumber = strString.indexOf(number, index);
+	    if (indexOfNumber > index)
+	    {
+		tokenList.add(strString.substring(index, indexOfNumber));
+	    }
+	    tokenList.add(number);
+	    index = indexOfNumber + number.length();
+	}
+	if (index < strString.length())
+	{
+	    tokenList.add(strString.substring(index));
+	}
+	scanner.close();
+	return tokenList;
     }
 }

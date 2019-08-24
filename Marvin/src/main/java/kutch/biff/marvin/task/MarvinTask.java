@@ -31,60 +31,65 @@ public class MarvinTask extends BaseTask
 {
     class DataSet
     {
-        public String ID;
-        public String Namespace;
-        public String Data;
+	public String ID;
+	public String Namespace;
+	public String Data;
     }
+    
     private ArrayList<DataSet> _Dataset;
-    public MarvinTask( )
+    
+    public MarvinTask()
     {
-        _Dataset = null;
+	_Dataset = null;
     }
+    
     public void AddDataset(String ID, String Namespace, String Data)
     {
-        DataSet objSet = new DataSet();
-        objSet.Data = Data;
-        objSet.ID = ID;
-        objSet.Namespace = Namespace;
-        if (null == _Dataset)
-        {
-            _Dataset = new ArrayList<>();
-        }
-        _Dataset.add(objSet);
+	DataSet objSet = new DataSet();
+	objSet.Data = Data;
+	objSet.ID = ID;
+	objSet.Namespace = Namespace;
+	if (null == _Dataset)
+	{
+	    _Dataset = new ArrayList<>();
+	}
+	_Dataset.add(objSet);
     }
     
     @Override
     public boolean getMustBeInGUIThread()
     {
-        return true;
+	return true;
     }
     
     public boolean isValid()
     {
-        return null != _Dataset;
+	return null != _Dataset;
     }
+    
     @Override
-    public  void PerformTask()
+    public void PerformTask()
     {
-        if (null == TASKMAN.getDataMgr())
-        {
-            return;
-        }
-        if (null == _Dataset)
-        {
-            LOGGER.severe("Encounted null Dataset while performing a task - Did you declare a Marvin task but not add Data?");
-            return;
-        }
-        for (DataSet data : _Dataset)
-        {
-            String strID = getDataValue(data.ID);
-            String strNamespace = getDataValue(data.Namespace);
-            String strData = getDataValue(data.Data);
-            
-            if (null != strID && null != strNamespace && null != strData)
-            {
-                TASKMAN.getDataMgr().ChangeValue(strID, strNamespace, strData);
-            }
-        }
+	if (null == TASKMAN.getDataMgr())
+	{
+	    return;
+	}
+	if (null == _Dataset)
+	{
+	    LOGGER.severe(
+		    "Encounted null Dataset while performing a task - Did you declare a Marvin task but not add Data?");
+	    return;
+	}
+	for (DataSet data : _Dataset)
+	{
+	    String strID = getDataValue(data.ID);
+	    String strNamespace = getDataValue(data.Namespace);
+	    String strData = getDataValue(data.Data);
+	    
+	    if (null != strID && null != strNamespace && null != strData)
+	    {
+		TASKMAN.getDataMgr().ChangeValue(strID, strNamespace, strData);
+	    }
+	}
     }
 }

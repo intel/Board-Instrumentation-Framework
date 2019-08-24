@@ -32,19 +32,19 @@ public class OscarBindTask extends BaseTask
     private String Address;
     private int Port;
     private String Key;
-
+    
     public OscarBindTask(String address, int port, String hashStr)
     {
-        Address = address;
-        Port = port;
-        Key = hashStr;
+	Address = address;
+	Port = port;
+	Key = hashStr;
     }
-
+    
     @Override
     public void PerformTask()
     {
-        OscarBullhorn objBH = new OscarBullhorn(Address, Port, Key);
-        objBH.SendNotification();
-        LOGGER.info("Sending OscarBind to " + Address + ":" + Integer.toString(Port) + " Key:" + Key);
+	OscarBullhorn objBH = new OscarBullhorn(Address, Port, Key);
+	objBH.SendNotification();
+	LOGGER.info("Sending OscarBind to " + Address + ":" + Integer.toString(Port) + " Key:" + Key);
     }
 }

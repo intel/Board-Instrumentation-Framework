@@ -42,78 +42,81 @@ import kutch.biff.marvin.configuration.Configuration;
  */
 public class Prompt_InputBox extends BasePrompt
 {
-
+    
     private String _PrevVal = null;
+    
     public Prompt_InputBox(String ID)
     {
-        super(ID);
+	super(ID);
     }
-
+    
     @Override
     protected Pane SetupDialog(Stage dialog)
     {
-        GridPane root = new GridPane();
-        root.setHgap(5.0);
-        root.setVgap(5.0);
-        root.setPadding(new Insets(5, 5, 2, 5));
-        Button btn = new Button();
-        btn.setText("OK");
-        Label lblMessage = new Label(getMessage());
-        Label lblSpacer = new Label("  ");
-        lblMessage.setWrapText(true);
-        TextField objPrompt = new TextField();
-        if (null != _PrevVal)
-        {
-            objPrompt.setText(_PrevVal);
-        }
-        root.setAlignment(Pos.CENTER_LEFT);
-
-        GridPane.setColumnSpan(lblMessage, 2);
-        GridPane.setHalignment(btn, HPos.CENTER);
-        
-        if (getWidth()>0)
-        {
-            objPrompt.setPrefWidth(getWidth());
-        }
-        if (getHeight()>0)
-        {
-            root.setPrefHeight(getHeight());
-        }        
-
-        root.add(lblMessage, 0, 0);
-        root.add(objPrompt, 0, 2);
-        root.add(btn, 0, 3);
-        root.add(lblSpacer,0,4);
-        
-        // place on correct screen and center
-        int xPos = (int) (Configuration.getConfig().getPrimaryScreen().getVisualBounds().getMinX());
-        int yPos = (int) (Configuration.getConfig().getPrimaryScreen().getVisualBounds().getMinY());
-        dialog.setX(xPos);
-        dialog.setY(yPos);        
-        
-        dialog.centerOnScreen();
-        
-        objPrompt.setOnKeyPressed(new EventHandler<KeyEvent>() {
-        @Override
-        public void handle(KeyEvent ke) {
-            KeyCode kc = ke.getCode();
-            if (kc.equals(KeyCode.ENTER) ) 
-            {
-                SetPromptedValue(objPrompt.getText());
-                _PrevVal = objPrompt.getText();
-                dialog.close();
-            }
-        }
-    });
-
-        btn.setOnAction((ActionEvent event) ->
-        {
-            SetPromptedValue(objPrompt.getText());
-            _PrevVal = objPrompt.getText();
-            dialog.close();
-        });
-
-        return root;
+	GridPane root = new GridPane();
+	root.setHgap(5.0);
+	root.setVgap(5.0);
+	root.setPadding(new Insets(5, 5, 2, 5));
+	Button btn = new Button();
+	btn.setText("OK");
+	Label lblMessage = new Label(getMessage());
+	Label lblSpacer = new Label("  ");
+	lblMessage.setWrapText(true);
+	TextField objPrompt = new TextField();
+	if (null != _PrevVal)
+	{
+	    objPrompt.setText(_PrevVal);
+	}
+	root.setAlignment(Pos.CENTER_LEFT);
+	
+	GridPane.setColumnSpan(lblMessage, 2);
+	GridPane.setHalignment(btn, HPos.CENTER);
+	
+	if (getWidth() > 0)
+	{
+	    objPrompt.setPrefWidth(getWidth());
+	}
+	if (getHeight() > 0)
+	{
+	    root.setPrefHeight(getHeight());
+	}
+	
+	root.add(lblMessage, 0, 0);
+	root.add(objPrompt, 0, 2);
+	root.add(btn, 0, 3);
+	root.add(lblSpacer, 0, 4);
+	
+	// place on correct screen and center
+	int xPos = (int) (Configuration.getConfig().getPrimaryScreen().getVisualBounds().getMinX());
+	int yPos = (int) (Configuration.getConfig().getPrimaryScreen().getVisualBounds().getMinY());
+	dialog.setX(xPos);
+	dialog.setY(yPos);
+	
+	dialog.centerOnScreen();
+	
+	objPrompt.setOnKeyPressed(new EventHandler<KeyEvent>()
+	{
+	    @Override
+	    public void handle(KeyEvent ke)
+	    {
+		KeyCode kc = ke.getCode();
+		if (kc.equals(KeyCode.ENTER))
+		{
+		    SetPromptedValue(objPrompt.getText());
+		    _PrevVal = objPrompt.getText();
+		    dialog.close();
+		}
+	    }
+	});
+	
+	btn.setOnAction((ActionEvent event) ->
+	{
+	    SetPromptedValue(objPrompt.getText());
+	    _PrevVal = objPrompt.getText();
+	    dialog.close();
+	});
+	
+	return root;
     }
-
+    
 }

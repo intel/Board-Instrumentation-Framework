@@ -37,55 +37,58 @@ public class WatchdogTask extends BaseTask
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private static WatchdogTask objSingleton = null;
+    
     public static void ForceRefresh()
     {
-        if (null != WatchdogTask.objSingleton)
-        {
-            WatchdogTask.objSingleton.FirstWatchdogMessage = true;
-            WatchdogTask.objSingleton.PerformTask();
-        }
+	if (null != WatchdogTask.objSingleton)
+	{
+	    WatchdogTask.objSingleton.FirstWatchdogMessage = true;
+	    WatchdogTask.objSingleton.PerformTask();
+	}
     }
+    
     // Backdoor kludge to improve initial startup time
     public static void OnInitialOscarConnection()
     {
-        if (null != WatchdogTask.objSingleton)
-        {
-            WatchdogTask.objSingleton.PerformTask();
-        }
+	if (null != WatchdogTask.objSingleton)
+	{
+	    WatchdogTask.objSingleton.PerformTask();
+	}
     }
     
     private TaskManager TASKMAN = TaskManager.getTaskManager();
     
     private boolean FirstWatchdogMessage;
-
+    
     private Random rnd = new Random();
+    
     public WatchdogTask()
     {
-        FirstWatchdogMessage = true; // tells Oscar to send a refresh to Minions
-        WatchdogTask.objSingleton = this;
+	FirstWatchdogMessage = true; // tells Oscar to send a refresh to Minions
+	WatchdogTask.objSingleton = this;
     }
-
+    
     @Override
     public void PerformTask()
     {
-        String sendBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-        sendBuffer += "<Marvin Type=\"WatchdogTimer\">";
-        sendBuffer += "<Version>1.0</Version>";
-        sendBuffer += "<MarvinVersion>" + Version.getVersion() + "</MarvinVersion>";
-        sendBuffer += "<UniqueID>" + Integer.toString(rnd.nextInt()) + "</UniqueID>"; 
-        sendBuffer += "<Port>" + Integer.toString(getConfig().getPort()) + "</Port>";
-        if (true == FirstWatchdogMessage)
-        {
-            sendBuffer += "<RefreshRequested>True</RefreshRequested>";
-        }
-        sendBuffer += "</Marvin>";
-        LOGGER.info("Sending Watchdog re-arm (Heartbeat)");
-        boolean retVal = TASKMAN.SendToAllOscars(sendBuffer.getBytes());
-
-        if (true == FirstWatchdogMessage && true == retVal)  
-        {
-            FirstWatchdogMessage = false;  // only reset flag after successful transmit
-            LOGGER.info("Sent Request Refresh message");
-        }
+	String sendBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+	sendBuffer += "<Marvin Type=\"WatchdogTimer\">";
+	sendBuffer += "<Version>1.0</Version>";
+	sendBuffer += "<MarvinVersion>" + Version.getVersion() + "</MarvinVersion>";
+	sendBuffer += "<UniqueID>" + Integer.toString(rnd.nextInt()) + "</UniqueID>";
+	sendBuffer += "<Port>" + Integer.toString(getConfig().getPort()) + "</Port>";
+	if (true == FirstWatchdogMessage)
+	{
+	    sendBuffer += "<RefreshRequested>True</RefreshRequested>";
+	}
+	sendBuffer += "</Marvin>";
+	LOGGER.info("Sending Watchdog re-arm (Heartbeat)");
+	boolean retVal = TASKMAN.SendToAllOscars(sendBuffer.getBytes());
+	
+	if (true == FirstWatchdogMessage && true == retVal)
+	{
+	    FirstWatchdogMessage = false; // only reset flag after successful transmit
+	    LOGGER.info("Sent Request Refresh message");
+	}
     }
 }

@@ -35,86 +35,85 @@ import kutch.biff.marvin.widget.QuickViewWidget;
 public class QuickViewWidgetBuilder
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     public static QuickViewWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        QuickViewWidget _widget = new QuickViewWidget();
-        for (FrameworkNode node :masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget,node))
-            {
-            }
-            else if (node.getNodeName().equalsIgnoreCase("#comment"))
-            {
-            }
-            else if (node.getNodeName().equalsIgnoreCase("RowWidth"))
-            {
-                String str = node.getTextContent();
-                try
-                {
-                    _widget.setRowWidth(Integer.parseInt(str));
-                }
-                catch (NumberFormatException ex)
-                {
-                    LOGGER.severe("Invalid <RowWidth> in QuickViewWidget Widget Definition File : " + str);
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("EvenBackgroundStyle"))
-            {
-                _widget.setEvenBackgroundStyle(node.getTextContent());
-            }
-            else if (node.getNodeName().equalsIgnoreCase("EvenIDStyle"))
-            {
-                _widget.setEvenIDStyle(node.getTextContent());
-            }
-            else if (node.getNodeName().equalsIgnoreCase("EvenDataStyle"))
-            {
-                _widget.setEvenDataStyle(node.getTextContent());
-            }
-                
-            else if (node.getNodeName().equalsIgnoreCase("OddBackgroundStyle"))
-            {
-                _widget.setOddBackgroundStyle(node.getTextContent());
-            }
-            else if (node.getNodeName().equalsIgnoreCase("OddIDStyle"))
-            {
-                _widget.setOddIDStyle(node.getTextContent());
-            }
-            else if (node.getNodeName().equalsIgnoreCase("OddDataStyle"))
-            {
-                _widget.setOddDataStyle(node.getTextContent());
-            }
-            else if (node.getNodeName().equalsIgnoreCase("Order"))
-            {
-                String strVal = node.getTextContent();
-                if (strVal.equalsIgnoreCase(QuickViewWidget.SortMode.Ascending.toString()))
-                {
-                    _widget.setSortMode(QuickViewWidget.SortMode.Ascending);
-                }
-                else if (strVal.equalsIgnoreCase(QuickViewWidget.SortMode.Descending.toString()))
-                {
-                    _widget.setSortMode(QuickViewWidget.SortMode.Descending);
-                }
-                else if (strVal.equalsIgnoreCase(QuickViewWidget.SortMode.None.toString()))
-                {
-                    _widget.setSortMode(QuickViewWidget.SortMode.None);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid <Order> Tag in QuickViewWidget Widget Definition File. " + strVal);
-                    return null;
-                }
-            }
-            else 
-            {
-               LOGGER.severe("Invalid QuickViewWidget Widget Definition File.  Unknown Tag: " + node.getNodeName());
-               return null;                
-            }
-            
-        }
-        return _widget;
+	QuickViewWidget _widget = new QuickViewWidget();
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
+	    {
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("#comment"))
+	    {
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("RowWidth"))
+	    {
+		String str = node.getTextContent();
+		try
+		{
+		    _widget.setRowWidth(Integer.parseInt(str));
+		}
+		catch(NumberFormatException ex)
+		{
+		    LOGGER.severe("Invalid <RowWidth> in QuickViewWidget Widget Definition File : " + str);
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("EvenBackgroundStyle"))
+	    {
+		_widget.setEvenBackgroundStyle(node.getTextContent());
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("EvenIDStyle"))
+	    {
+		_widget.setEvenIDStyle(node.getTextContent());
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("EvenDataStyle"))
+	    {
+		_widget.setEvenDataStyle(node.getTextContent());
+	    }
+	    
+	    else if (node.getNodeName().equalsIgnoreCase("OddBackgroundStyle"))
+	    {
+		_widget.setOddBackgroundStyle(node.getTextContent());
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("OddIDStyle"))
+	    {
+		_widget.setOddIDStyle(node.getTextContent());
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("OddDataStyle"))
+	    {
+		_widget.setOddDataStyle(node.getTextContent());
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("Order"))
+	    {
+		String strVal = node.getTextContent();
+		if (strVal.equalsIgnoreCase(QuickViewWidget.SortMode.Ascending.toString()))
+		{
+		    _widget.setSortMode(QuickViewWidget.SortMode.Ascending);
+		}
+		else if (strVal.equalsIgnoreCase(QuickViewWidget.SortMode.Descending.toString()))
+		{
+		    _widget.setSortMode(QuickViewWidget.SortMode.Descending);
+		}
+		else if (strVal.equalsIgnoreCase(QuickViewWidget.SortMode.None.toString()))
+		{
+		    _widget.setSortMode(QuickViewWidget.SortMode.None);
+		}
+		else
+		{
+		    LOGGER.severe("Invalid <Order> Tag in QuickViewWidget Widget Definition File. " + strVal);
+		    return null;
+		}
+	    }
+	    else
+	    {
+		LOGGER.severe("Invalid QuickViewWidget Widget Definition File.  Unknown Tag: " + node.getNodeName());
+		return null;
+	    }
+	    
+	}
+	return _widget;
     }
-        
     
 }

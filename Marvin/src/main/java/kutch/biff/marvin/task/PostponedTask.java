@@ -32,38 +32,38 @@ import kutch.biff.marvin.logger.MarvinLogger;
 public class PostponedTask
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     private ITask _objTask;
     private double _PerformTime;
-
+    
     public PostponedTask(ITask objTask, long Period)
     {
-        if (null == objTask)
-        {
-            LOGGER.severe("Invalid Task Object");
-            return;
-        }
-        _objTask = objTask;
-        _PerformTime = System.currentTimeMillis() + Period;
+	if (null == objTask)
+	{
+	    LOGGER.severe("Invalid Task Object");
+	    return;
+	}
+	_objTask = objTask;
+	_PerformTime = System.currentTimeMillis() + Period;
     }
-
+    
     public void Perform()
     {
-        if (null == _objTask)
-        {
-            LOGGER.severe("Invalid Task Object");
-            return;
-        }
-        _objTask.PerformTask();
+	if (null == _objTask)
+	{
+	    LOGGER.severe("Invalid Task Object");
+	    return;
+	}
+	_objTask.PerformTask();
     }
-
+    
     public boolean ReadyToPerform()
     {
-        if (System.currentTimeMillis() >= _PerformTime)
-        {
-            return true;
-        }
-        return false;
+	if (System.currentTimeMillis() >= _PerformTime)
+	{
+	    return true;
+	}
+	return false;
     }
-
+    
 }

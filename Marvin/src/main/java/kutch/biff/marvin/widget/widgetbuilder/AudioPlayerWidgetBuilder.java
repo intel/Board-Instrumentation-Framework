@@ -34,21 +34,22 @@ import kutch.biff.marvin.widget.AudioPlayerWidget;
 public class AudioPlayerWidgetBuilder
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    public static AudioPlayerWidget Build(FrameworkNode masterNode, String widgetDefFilename )
+    
+    public static AudioPlayerWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        AudioPlayerWidget objWidget =  new AudioPlayerWidget();
-        for (FrameworkNode node :masterNode.getChildNodes())
-        {
-            if (MediaPlayerWidgetBuilder.ParseDefinitionFile(objWidget, node))
-            {
-                
-            }
-            else
-            {
-                LOGGER.severe("Unknown Tag <" +node.GetNode()+"> in Video Player Widget definition file");
-                return null;
-            }
-        }
-        return objWidget;     
+	AudioPlayerWidget objWidget = new AudioPlayerWidget();
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (MediaPlayerWidgetBuilder.ParseDefinitionFile(objWidget, node))
+	    {
+		
+	    }
+	    else
+	    {
+		LOGGER.severe("Unknown Tag <" + node.GetNode() + "> in Video Player Widget definition file");
+		return null;
+	    }
+	}
+	return objWidget;
     }
 }

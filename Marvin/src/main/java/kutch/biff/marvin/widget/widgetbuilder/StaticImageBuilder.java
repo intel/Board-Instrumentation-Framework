@@ -34,9 +34,9 @@ import kutch.biff.marvin.widget.StaticImageWidget;
  */
 public class StaticImageBuilder
 {
-
+    
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     /**
      *
      * @param masterNode
@@ -44,10 +44,10 @@ public class StaticImageBuilder
      */
     public static StaticImageWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        StaticImageWidget _widget = new StaticImageWidget();
-        return ParseXML(_widget, masterNode);
+	StaticImageWidget _widget = new StaticImageWidget();
+	return ParseXML(_widget, masterNode);
     }
-
+    
     /**
      *
      * @param _widget
@@ -56,50 +56,51 @@ public class StaticImageBuilder
      */
     protected static StaticImageWidget ParseXML(StaticImageWidget _widget, FrameworkNode masterNode)
     {
-
-        for (FrameworkNode node : masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
-            {
-            }
-
-            else if (node.getNodeName().equalsIgnoreCase("PreserveRatio"))
-            {
-                String str = node.getTextContent();
-                if (0 == str.compareToIgnoreCase("True"))
-                {
-                    _widget.setPreserveRatio(true);
-                }
-
-                else if (0 == str.compareToIgnoreCase("False"))
-                {
-                    _widget.setPreserveRatio(false);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid PreserveRatio in Image  Definition File.  Should be true or false, not " + str);
-                    return null;
-                }
-            }
-            else if (node.getNodeName().equalsIgnoreCase("ScaleToFit"))
-            {
-                String str = node.getTextContent();
-                if (0 == str.compareToIgnoreCase("True"))
-                {
-                    _widget.setScaleToFit(true);
-                }
-
-                else if (0 == str.compareToIgnoreCase("False"))
-                {
-                    _widget.setScaleToFit(false);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid ScaleToFit in Image  Definition File.  Should be true or false, not " + str);
-                    return null;
-                }
-            }
-        }
-        return _widget;
+	
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
+	    {
+	    }
+	    
+	    else if (node.getNodeName().equalsIgnoreCase("PreserveRatio"))
+	    {
+		String str = node.getTextContent();
+		if (0 == str.compareToIgnoreCase("True"))
+		{
+		    _widget.setPreserveRatio(true);
+		}
+		
+		else if (0 == str.compareToIgnoreCase("False"))
+		{
+		    _widget.setPreserveRatio(false);
+		}
+		else
+		{
+		    LOGGER.severe(
+			    "Invalid PreserveRatio in Image  Definition File.  Should be true or false, not " + str);
+		    return null;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("ScaleToFit"))
+	    {
+		String str = node.getTextContent();
+		if (0 == str.compareToIgnoreCase("True"))
+		{
+		    _widget.setScaleToFit(true);
+		}
+		
+		else if (0 == str.compareToIgnoreCase("False"))
+		{
+		    _widget.setScaleToFit(false);
+		}
+		else
+		{
+		    LOGGER.severe("Invalid ScaleToFit in Image  Definition File.  Should be true or false, not " + str);
+		    return null;
+		}
+	    }
+	}
+	return _widget;
     }
 }

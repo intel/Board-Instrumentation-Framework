@@ -33,47 +33,48 @@ import kutch.biff.marvin.logger.MarvinLogger;
  */
 public class DataSrcParameter extends Parameter
 {
-   private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-   private final String _Namespace, _ID;
-   private final DataManager _DataMgr;    
-
-   public DataSrcParameter(String Namespace, String ID, DataManager DataMgr)
-   {
-      _Namespace = Namespace;
-      _ID = ID;
-      _DataMgr = DataMgr;
-       if (null == _ID)
-       {
-          LOGGER.severe("Task <Param> using Namespace and ID does not have an ID");
-       }
-       if (null == _Namespace)
-       {
-          LOGGER.severe("Task <Param> using Namespace and ID does not have a Namespace");
-       }
-       if (null == _DataMgr)
-       {
-          LOGGER.severe("Null DataManager passed");
-       }
-   }
-   
+    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    private final String _Namespace, _ID;
+    private final DataManager _DataMgr;
+    
+    public DataSrcParameter(String Namespace, String ID, DataManager DataMgr)
+    {
+	_Namespace = Namespace;
+	_ID = ID;
+	_DataMgr = DataMgr;
+	if (null == _ID)
+	{
+	    LOGGER.severe("Task <Param> using Namespace and ID does not have an ID");
+	}
+	if (null == _Namespace)
+	{
+	    LOGGER.severe("Task <Param> using Namespace and ID does not have a Namespace");
+	}
+	if (null == _DataMgr)
+	{
+	    LOGGER.severe("Null DataManager passed");
+	}
+    }
+    
     @Override
     public String toString()
     {
-       if (null == _ID)
-       {
-          LOGGER.severe("Task <Param> using Namespace and ID does not have an ID");
-          return null; 
-       }
-       if (null == _Namespace)
-       {
-          LOGGER.severe("Task <Param> using Namespace and ID does not have a Namespace");
-          return null; 
-       }
-       String data = _DataMgr.GetValue(_ID, _Namespace);
-       if (null == data)
-       {
-          LOGGER.severe("Task <Param> with Namespace:ID of " + _Namespace +":" + _ID + " is still unknown (has not been received from datasrc yet.");
-       }
-       return data;
-    }   
+	if (null == _ID)
+	{
+	    LOGGER.severe("Task <Param> using Namespace and ID does not have an ID");
+	    return null;
+	}
+	if (null == _Namespace)
+	{
+	    LOGGER.severe("Task <Param> using Namespace and ID does not have a Namespace");
+	    return null;
+	}
+	String data = _DataMgr.GetValue(_ID, _Namespace);
+	if (null == data)
+	{
+	    LOGGER.severe("Task <Param> with Namespace:ID of " + _Namespace + ":" + _ID
+		    + " is still unknown (has not been received from datasrc yet.");
+	}
+	return data;
+    }
 }

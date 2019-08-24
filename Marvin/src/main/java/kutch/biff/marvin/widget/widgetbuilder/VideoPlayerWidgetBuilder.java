@@ -34,27 +34,27 @@ import kutch.biff.marvin.widget.VideoPlayerWidget;
 public class VideoPlayerWidgetBuilder
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     public static VideoPlayerWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        VideoPlayerWidget objWidget = new VideoPlayerWidget();
-        for (FrameworkNode node :masterNode.getChildNodes())
-        {
-            if (MediaPlayerWidgetBuilder.ParseDefinitionFile(objWidget, node))
-            {
-                
-            }
-            else if (node.getNodeName().equalsIgnoreCase("PreserveRatio"))
-            {
-                objWidget.setRetainAspectRatio(node.getBooleanValue());
-            }
-            else
-            {
-                LOGGER.severe("Unknown Tag <" +node.GetNode()+"> in Video Player Widget definition file");
-                return null;
-            }
-        }
-        return objWidget;     
+	VideoPlayerWidget objWidget = new VideoPlayerWidget();
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (MediaPlayerWidgetBuilder.ParseDefinitionFile(objWidget, node))
+	    {
+		
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("PreserveRatio"))
+	    {
+		objWidget.setRetainAspectRatio(node.getBooleanValue());
+	    }
+	    else
+	    {
+		LOGGER.severe("Unknown Tag <" + node.GetNode() + "> in Video Player Widget definition file");
+		return null;
+	    }
+	}
+	return objWidget;
     }
-   
+    
 }

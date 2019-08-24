@@ -37,8 +37,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
 public class Utility
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-    private static String __KeyConjunction="MarvinKeyJoinerString";
-
+    private static String __KeyConjunction = "MarvinKeyJoinerString";
     
     public static String combineWildcards(String s1, String s2)
     {
@@ -60,54 +59,57 @@ public class Utility
 	return parts;
     }
     
-    public static boolean ValidateAttributes(String ValidAttributes[],FrameworkNode node)
+    public static boolean ValidateAttributes(String ValidAttributes[], FrameworkNode node)
     {
-        boolean retVal = true;
-        
-        if (node.hasAttributes())
-        {
-            NamedNodeMap attrs = node.GetNode().getAttributes();  
-
-            for (int oLoop = 0; oLoop<attrs.getLength();oLoop++)
-            {
-                boolean found = false;
-                Attr attribute = (Attr)attrs.item(oLoop); 
-                for (int iLoop = 0; iLoop < ValidAttributes.length;iLoop++) // compare to list of valid
-                {
-                    if (0 == ValidAttributes[iLoop].compareToIgnoreCase(attribute.getName()) ) // 1st check case independent just for fun
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (false == found )
-                {
-                    if (attribute.getName().equalsIgnoreCase("CurrentValueAlias") || attribute.getName().equalsIgnoreCase("CurrentCountAlias"))
-                    {
-                        
-                    }
-                    else
-                    {
-                        LOGGER.warning("Unknown XML Attribute for " + node.getNodeName() +" found: " + attribute.getName() + ". Ignoring.");
-                    }
-                }
-            }
-        }
-        
-        return retVal;
+	boolean retVal = true;
+	
+	if (node.hasAttributes())
+	{
+	    NamedNodeMap attrs = node.GetNode().getAttributes();
+	    
+	    for (int oLoop = 0; oLoop < attrs.getLength(); oLoop++)
+	    {
+		boolean found = false;
+		Attr attribute = (Attr) attrs.item(oLoop);
+		for (int iLoop = 0; iLoop < ValidAttributes.length; iLoop++) // compare to list of valid
+		{
+		    if (0 == ValidAttributes[iLoop].compareToIgnoreCase(attribute.getName())) // 1st check case
+											      // independent just for
+											      // fun
+		    {
+			found = true;
+			break;
+		    }
+		}
+		if (false == found)
+		{
+		    if (attribute.getName().equalsIgnoreCase("CurrentValueAlias")
+			    || attribute.getName().equalsIgnoreCase("CurrentCountAlias"))
+		    {
+			
+		    }
+		    else
+		    {
+			LOGGER.warning("Unknown XML Attribute for " + node.getNodeName() + " found: "
+				+ attribute.getName() + ". Ignoring.");
+		    }
+		}
+	    }
+	}
+	
+	return retVal;
     }
     
-    public static boolean ValidateAttributes(String ValidAttributes[],String[] MoreAttributes, FrameworkNode node)
+    public static boolean ValidateAttributes(String ValidAttributes[], String[] MoreAttributes, FrameworkNode node)
     {
-        if (null == MoreAttributes)
-        {
-            return ValidateAttributes(ValidAttributes,node);
-        }
-        ArrayList<String> Attributes = new ArrayList<>(Arrays.asList(ValidAttributes));
-        Attributes.addAll(Arrays.asList(MoreAttributes));
-        
-        return ValidateAttributes(Attributes.toArray(new String[Attributes.size()]),node);
+	if (null == MoreAttributes)
+	{
+	    return ValidateAttributes(ValidAttributes, node);
+	}
+	ArrayList<String> Attributes = new ArrayList<>(Arrays.asList(ValidAttributes));
+	Attributes.addAll(Arrays.asList(MoreAttributes));
+	
+	return ValidateAttributes(Attributes.toArray(new String[Attributes.size()]), node);
     }
-
     
 }

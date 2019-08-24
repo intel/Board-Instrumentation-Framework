@@ -20,6 +20,7 @@
  * ##############################################################################
  */
 package kutch.biff.marvin.version;
+
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -40,83 +41,86 @@ public class Version
      */
     public static void Display()
     {
-        System.out.println(Version.getVersion());
+	System.out.println(Version.getVersion());
     }
+    
     public static String getBuildNumber()
     {
-        if (null != Version.getProperties())
-        {
-            return Version.getProperties().getProperty("Build_Version");
-        }
-        return "1";
+	if (null != Version.getProperties())
+	{
+	    return Version.getProperties().getProperty("Build_Version");
+	}
+	return "1";
     }
+    
     public static String getDayVersion()
     {
-        if (null != Version.getProperties())
-        {
-            return Version.getProperties().getProperty("Day_Version");
-        }
-        return "9";
+	if (null != Version.getProperties())
+	{
+	    return Version.getProperties().getProperty("Day_Version");
+	}
+	return "9";
     }
     
     public static String getMonthVersion()
     {
-        if (null != Version.getProperties())
-        {
-            return Version.getProperties().getProperty("Month_Version");
-        }
-        return "9";
+	if (null != Version.getProperties())
+	{
+	    return Version.getProperties().getProperty("Month_Version");
+	}
+	return "9";
     }
-
     
-    private static Properties getProperties() 
+    private static Properties getProperties()
     {
-        if (null != Version._Props)
-        {
-            return Version._Props;
-        }
-        InputStream in = Version.class.getResourceAsStream("Marvin.version.properties");
-        Properties props = new Properties();
-        if (in != null)
-        {
-            try
-            {
-                props.load(in);
-                Version._Props = props;
-                in.close();
-                return props;
-            }
-            catch (Exception ex)
-            {
-                LOGGER.severe(ex.toString());
-            }
-        }
-        else
-        {
-            LOGGER.severe("Unable to load version properties file");
-        }
-        return null;
+	if (null != Version._Props)
+	{
+	    return Version._Props;
+	}
+	InputStream in = Version.class.getResourceAsStream("Marvin.version.properties");
+	Properties props = new Properties();
+	if (in != null)
+	{
+	    try
+	    {
+		props.load(in);
+		Version._Props = props;
+		in.close();
+		return props;
+	    }
+	    catch(Exception ex)
+	    {
+		LOGGER.severe(ex.toString());
+	    }
+	}
+	else
+	{
+	    LOGGER.severe("Unable to load version properties file");
+	}
+	return null;
     }
+    
     public static String getRelease()
     {
-        if (null != Version.getProperties())
-        {
-            return Version.getProperties().getProperty("Release");
-        }
-        return "[Undefined]";
+	if (null != Version.getProperties())
+	{
+	    return Version.getProperties().getProperty("Release");
+	}
+	return "[Undefined]";
     }
     
     public static String getVersion()
     {
-        return  Version.getRelease() + " - " + Version.getYearVersion() +"." + Version.getMonthVersion() +"." + Version.getDayVersion() + " build " + Version.getBuildNumber();
+	return Version.getRelease() + " - " + Version.getYearVersion() + "." + Version.getMonthVersion() + "."
+		+ Version.getDayVersion() + " build " + Version.getBuildNumber();
     }
     
     public static String getYearVersion()
     {
-        if (null != Version.getProperties())
-        {
-            return Version.getProperties().getProperty("Year_Version");
-        }
-        return "0";
+	if (null != Version.getProperties())
+	{
+	    return Version.getProperties().getProperty("Year_Version");
+	}
+	return "0";
     }
 }

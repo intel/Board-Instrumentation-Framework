@@ -37,26 +37,26 @@ import kutch.biff.marvin.logger.MarvinLogger;
 public class Glob
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     public static boolean check(String globPattern, String stringToCheck)
     {
-        if (null == globPattern || null == stringToCheck)
-        {
-            return false;
-        }
-        globPattern=globPattern.toUpperCase();
-        stringToCheck=stringToCheck.toUpperCase();
-        PathMatcher matcher = ("*".equals(globPattern)) ? null
-                              : FileSystems.getDefault().getPathMatcher("glob:" + globPattern);
-
-        try
-        {
-            return "*".equals(globPattern) || matcher.matches(Paths.get(stringToCheck));
-        }
-        catch(Exception ex)
-        {	
-            LOGGER.severe("Check function had exception on [" + globPattern + "] and [" + stringToCheck +"]");
-            return false;
-        }
+	if (null == globPattern || null == stringToCheck)
+	{
+	    return false;
+	}
+	globPattern = globPattern.toUpperCase();
+	stringToCheck = stringToCheck.toUpperCase();
+	PathMatcher matcher = ("*".equals(globPattern)) ? null
+		: FileSystems.getDefault().getPathMatcher("glob:" + globPattern);
+	
+	try
+	{
+	    return "*".equals(globPattern) || matcher.matches(Paths.get(stringToCheck));
+	}
+	catch(Exception ex)
+	{
+	    LOGGER.severe("Check function had exception on [" + globPattern + "] and [" + stringToCheck + "]");
+	    return false;
+	}
     }
 }

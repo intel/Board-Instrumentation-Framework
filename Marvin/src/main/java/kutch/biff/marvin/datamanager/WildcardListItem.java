@@ -19,7 +19,7 @@
  * #
  * ##############################################################################
  */
- 
+
 package kutch.biff.marvin.datamanager;
 
 import java.util.logging.Logger;
@@ -33,39 +33,39 @@ import kutch.biff.marvin.logger.MarvinLogger;
 public class WildcardListItem
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     private String _WildCard;
     private DataSet _DataSet;
-
+    
     public WildcardListItem(String _WildCard)
     {
-        this._WildCard = _WildCard;
-        this._DataSet = new DataSet();
+	this._WildCard = _WildCard;
+	this._DataSet = new DataSet();
     }
     
     public DataSet getDataSet()
     {
-        return _DataSet;
+	return _DataSet;
     }
-
+    
     public String getWildCard()
     {
-        return _WildCard;
+	return _WildCard;
     }
-
+    
     public boolean Matches(String Wildcard)
     {
-        try
-        {
-            return Wildcard.toUpperCase().matches(_WildCard.toUpperCase()); // does the RegEx match
-            
-        }
-        catch (Exception ex)
-        {
-            LOGGER.severe("Invalid RegEx wildcard pattern: " + _WildCard);
-        }
-        
-        return false;
+	try
+	{
+	    return Wildcard.toUpperCase().matches(_WildCard.toUpperCase()); // does the RegEx match
+	    
+	}
+	catch(Exception ex)
+	{
+	    LOGGER.severe("Invalid RegEx wildcard pattern: " + _WildCard);
+	}
+	
+	return false;
     }
     
 }

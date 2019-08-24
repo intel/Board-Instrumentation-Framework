@@ -35,21 +35,20 @@ public class ChainedTask extends BaseTask
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private TaskManager TASKMAN = TaskManager.getTaskManager();
     
-    
     public ChainedTask(String TaskID)
     {
-        super(TaskID);
+	super(TaskID);
     }
     
     @Override
-    public  void PerformTask()
+    public void PerformTask()
     {
-        String strID = getDataValue(getTaskID());
-        if (null == strID)
-        {
-            return;
-        }
-        TASKMAN.PerformTask(strID);
-    }    
+	String strID = getDataValue(getTaskID());
+	if (null == strID)
+	{
+	    return;
+	}
+	TASKMAN.PerformTask(strID);
+    }
     
 }

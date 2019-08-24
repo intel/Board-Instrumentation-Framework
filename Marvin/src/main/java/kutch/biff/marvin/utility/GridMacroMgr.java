@@ -36,9 +36,10 @@ public class GridMacroMgr
 {
     private final static GridMacroMgr _Mgr = new GridMacroMgr();
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
+    
     public static GridMacroMgr getGridMacroMgr()
     {
-        return _Mgr;
+	return _Mgr;
     }
     
     @SuppressWarnings("rawtypes")
@@ -46,63 +47,63 @@ public class GridMacroMgr
     
     private GridMacroMgr()
     {
-        _GridMacroList = new ArrayList<>();
+	_GridMacroList = new ArrayList<>();
     }
     
     public boolean AddGridMacro(String nameMacro, FrameworkNode macroNode)
     {
-        if (null == nameMacro)
-        {
-            LOGGER.severe("Tried to add GridMacro that has null name.");
-            return false;
-        }
-        if (null == macroNode)
-        {
-            LOGGER.severe("Tried to add GridMacro that is null.");
-            return false;
-        }
-        @SuppressWarnings("unchecked")
+	if (null == nameMacro)
+	{
+	    LOGGER.severe("Tried to add GridMacro that has null name.");
+	    return false;
+	}
+	if (null == macroNode)
+	{
+	    LOGGER.severe("Tried to add GridMacro that is null.");
+	    return false;
+	}
+	@SuppressWarnings("unchecked")
 	Map<String, FrameworkNode> map = _GridMacroList.get(0);
-        map.put(nameMacro.toUpperCase(), macroNode);
-            
-        return true;
+	map.put(nameMacro.toUpperCase(), macroNode);
+	
+	return true;
     }
     
     public FrameworkNode getGridMacro(String strMacro)
     {
-        String strName = strMacro.toUpperCase();
-        for (Map<?, ?> map : _GridMacroList)
-        {
-            if (map.containsKey(strName))
-            {
-                return (FrameworkNode)map.get(strName);
-            }
-        }
-        
-        return null;
+	String strName = strMacro.toUpperCase();
+	for (Map<?, ?> map : _GridMacroList)
+	{
+	    if (map.containsKey(strName))
+	    {
+		return (FrameworkNode) map.get(strName);
+	    }
+	}
+	
+	return null;
     }
     
     public boolean macroExists(String strMacro)
     {
-        String strName = strMacro.toUpperCase();
-        for (Map<?, ?> map : _GridMacroList)
-        {
-            if (map.containsKey(strName))
-            {
-                return true;
-            }
-        }
-        return false;
+	String strName = strMacro.toUpperCase();
+	for (Map<?, ?> map : _GridMacroList)
+	{
+	    if (map.containsKey(strName))
+	    {
+		return true;
+	    }
+	}
+	return false;
     }
     
     public void PopGridMacroList()
     {
-        _GridMacroList.remove(0);
+	_GridMacroList.remove(0);
     }
     
     public void PushGridMacroList()
     {
-        _GridMacroList.add(0, new HashMap<>()); // put in position 0 
-        
+	_GridMacroList.add(0, new HashMap<>()); // put in position 0
+	
     }
 }

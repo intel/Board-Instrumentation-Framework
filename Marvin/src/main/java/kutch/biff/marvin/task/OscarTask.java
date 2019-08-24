@@ -22,6 +22,7 @@
 package kutch.biff.marvin.task;
 
 import java.util.Random;
+
 /**
  *
  * @author Patrick Kutch
@@ -34,73 +35,74 @@ public class OscarTask extends BaseTask
     
     public OscarTask()
     {
-        _OscarID = null;
+	_OscarID = null;
     }
-
+    
     public String getOscarID()
     {
-        return _OscarID;
+	return _OscarID;
     }
-
+    
     @Override
     public String getTaskID()
     {
-        return _TaskID;
+	return _TaskID;
     }
-
+    
     @Override
-    public  void PerformTask()
+    public void PerformTask()
     {
-        String strOscarID = getDataValue(_OscarID);
-        String strTaskID = getDataValue(getTaskID());
-        String logParams = "";
-        
-        if (null == strOscarID || null == strTaskID)
-        {
-            return;
-        }
-        String sendBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-        sendBuffer += "<Marvin Type=\"OscarTask\">";
-        sendBuffer += "<Version>1.0</Version>";
-        sendBuffer += "<OscarID>" + strOscarID + "</OscarID>";
-        sendBuffer += "<UniqueID>" + Integer.toString(rnd.nextInt()) + "</UniqueID>";
-        sendBuffer += "<Task>"+strTaskID+"</Task>";
-
-        if (null != getParams())
-        {
-            for (Parameter param : getParams())
-            {
-                String strParam = param.toString();
-                if (null == strParam)
-                {
-                    return;
-                }
-                        
-                sendBuffer+="<Param>" + strParam + "</Param>";
-                logParams += strParam +" ";
-            }        
-        }
-        sendBuffer += "</Marvin>";
-        
-        if (strOscarID.equalsIgnoreCase("Broadcast"))
-        {
-            TASKMAN.SendToAllOscars(sendBuffer.getBytes());
-            LOGGER.info("Sending broadcast Oscar Task to Oscar");
-        }
-        else
-        {
-            TASKMAN.SendToOscar(getDataValue(strOscarID),sendBuffer.getBytes());
-            LOGGER.info("Sending Oscar Task to Oscar[" + _OscarID+ ":"+getTaskID()+"] " + logParams);
-        }
+	String strOscarID = getDataValue(_OscarID);
+	String strTaskID = getDataValue(getTaskID());
+	String logParams = "";
+	
+	if (null == strOscarID || null == strTaskID)
+	{
+	    return;
+	}
+	String sendBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+	sendBuffer += "<Marvin Type=\"OscarTask\">";
+	sendBuffer += "<Version>1.0</Version>";
+	sendBuffer += "<OscarID>" + strOscarID + "</OscarID>";
+	sendBuffer += "<UniqueID>" + Integer.toString(rnd.nextInt()) + "</UniqueID>";
+	sendBuffer += "<Task>" + strTaskID + "</Task>";
+	
+	if (null != getParams())
+	{
+	    for (Parameter param : getParams())
+	    {
+		String strParam = param.toString();
+		if (null == strParam)
+		{
+		    return;
+		}
+		
+		sendBuffer += "<Param>" + strParam + "</Param>";
+		logParams += strParam + " ";
+	    }
+	}
+	sendBuffer += "</Marvin>";
+	
+	if (strOscarID.equalsIgnoreCase("Broadcast"))
+	{
+	    TASKMAN.SendToAllOscars(sendBuffer.getBytes());
+	    LOGGER.info("Sending broadcast Oscar Task to Oscar");
+	}
+	else
+	{
+	    TASKMAN.SendToOscar(getDataValue(strOscarID), sendBuffer.getBytes());
+	    LOGGER.info("Sending Oscar Task to Oscar[" + _OscarID + ":" + getTaskID() + "] " + logParams);
+	}
     }
-
+    
     public void setOscarID(String _OscarID)
     {
-        this._OscarID = _OscarID;
+	this._OscarID = _OscarID;
     }
+    
     @Override
     public void setTaskID(String _TaskID)
     {
-        this._TaskID = _TaskID;
+	this._TaskID = _TaskID;
     }
 }

@@ -31,7 +31,7 @@ public class FileWriterWidgetBuilder
 {
     public static FileWriterWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        return new FileWriterWidget();
+	return new FileWriterWidget();
     }
     
 }

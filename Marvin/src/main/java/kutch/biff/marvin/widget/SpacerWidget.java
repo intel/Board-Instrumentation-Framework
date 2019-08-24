@@ -33,66 +33,69 @@ import kutch.biff.marvin.datamanager.DataManager;
  */
 public class SpacerWidget extends BaseWidget
 {
-    //private final Rectangle _panel;
+    // private final Rectangle _panel;
     private final Label _panel;
     
     public SpacerWidget()
     {
-        //_panel = new Rectangle();
-        _panel = new Label();
-        if (CONFIG.isDebugMode())
-        {
-            AddAdditionalStyleOverride("-fx-background-color:red;");
-        }
+	// _panel = new Rectangle();
+	_panel = new Label();
+	if (CONFIG.isDebugMode())
+	{
+	    AddAdditionalStyleOverride("-fx-background-color:red;");
+	}
     }
     
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr)
     {
-        if ((getWidth()== 0 && getWidthPercentOfParentGrid() == 0)|| (getHeight() == 0 && getHeightPercentOfParentGrid() == 0))
-        {
-            return true; // if it's got no height or width, just skip
-        }
-        SetParent(pane);
-        ConfigureDimentions();
-        ConfigureAlignment();
-
-        pane.add(_panel,  getColumn(), getRow(),getColumnSpan(),getRowSpan());
-        SetupTaskAction();   
-        return ApplyCSS();
+	if ((getWidth() == 0 && getWidthPercentOfParentGrid() == 0)
+		|| (getHeight() == 0 && getHeightPercentOfParentGrid() == 0))
+	{
+	    return true; // if it's got no height or width, just skip
+	}
+	SetParent(pane);
+	ConfigureDimentions();
+	ConfigureAlignment();
+	
+	pane.add(_panel, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+	SetupTaskAction();
+	return ApplyCSS();
     }
-    
     
     protected Label GetPanel()
     {
-        return _panel;
-    }
-@Override
-    public Region getRegionObject()
-    {
-       return _panel;
+	return _panel;
     }
     
     @Override
-        public javafx.scene.Node getStylableObject()
-        {
-            return _panel;
-        }        
-@Override
-public ObservableList<String> getStylesheets()
-{
-    return _panel.getStylesheets();
-}    
+    public Region getRegionObject()
+    {
+	return _panel;
+    }
+    
+    @Override
+    public javafx.scene.Node getStylableObject()
+    {
+	return _panel;
+    }
+    
+    @Override
+    public ObservableList<String> getStylesheets()
+    {
+	return _panel.getStylesheets();
+    }
+    
     @Override
     public void UpdateTitle(String strTitle)
     {
-        LOGGER.warning("Tried to update Title of a Spacer to " + strTitle);
+	LOGGER.warning("Tried to update Title of a Spacer to " + strTitle);
     }
     
     @Override
     public boolean ZeroDimensionOK()
     {
-        return true;
+	return true;
     }
     
 }

@@ -63,10 +63,12 @@ public class AliasMgr
     private final static String strNextColumnAlias = "NextColumnAlias";
     private final static String strPrevColumnAlias = "PrevColumnAlias";
     private final static String strPrevRowAlias = "PrevRowAlias";
+    
     public static AliasMgr getAliasMgr()
     {
 	return _Mgr;
     }
+    
     /**
      * Looks for <AliasList> aliases and processes them
      *
@@ -182,6 +184,7 @@ public class AliasMgr
 	}
 	return true;
     }
+    
     public static boolean ReadAliasFromExternalFile(String FileName)
     {
 	Document doc = OpenXMLFile(FileName);

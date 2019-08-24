@@ -34,39 +34,39 @@ public class AreaChartWidget extends LineChartWidget
 {
     public AreaChartWidget()
     {
-
+	
     }
-
+    
     @Override
     @SuppressWarnings("unchecked")
     protected void _CreateChart()
     {
-        CreateChart();
-
-        for (SeriesDataSet ds : getSeries())
-        {
-            ((AreaChart<?, ?>) (getChart())).getData().add(ds.getSeries());
-        }
+	CreateChart();
+	
+	for (SeriesDataSet ds : getSeries())
+	{
+	    ((AreaChart<?, ?>) (getChart())).getData().add(ds.getSeries());
+	}
     }
-
+    
     @SuppressWarnings("unchecked")
     @Override
     protected Chart CreateChartObject()
     {
-        return new AreaChart<>(getxAxis(), getyAxis());
+	return new AreaChart<>(getxAxis(), getyAxis());
     }
-
+    
     @SuppressWarnings("rawtypes")
     @Override
     public javafx.scene.Node getStylableObject()
     {
-        return ((AreaChart) (getChart()));
+	return ((AreaChart) (getChart()));
     }
-
+    
     @SuppressWarnings("rawtypes")
     @Override
     public ObservableList<String> getStylesheets()
     {
-        return ((AreaChart) (getChart())).getStylesheets();
+	return ((AreaChart) (getChart())).getStylesheets();
     }
 }

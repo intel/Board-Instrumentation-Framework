@@ -35,37 +35,38 @@ import kutch.biff.marvin.widget.WebWidget;
 public class WebWidgetBuilder
 {
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
-
+    
     public static WebWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-        WebWidget _widget = new WebWidget();
-        
-        for (FrameworkNode node :masterNode.getChildNodes())
-        {
-            if (BaseWidget.HandleCommonDefinitionFileConfig(_widget,node))
-            {
-            }
-            else if (node.getNodeName().equalsIgnoreCase("#comment"))
-            {
-            }
-            else if (node.getNodeName().equalsIgnoreCase("ReverseContent"))
-            {
-                String str = node.getTextContent();
-                if (0 == str.compareToIgnoreCase("True"))
-                {
-                    _widget.SetReverseContent(true);
-                }
-                else if (0 == str.compareToIgnoreCase("False"))
-                {
-                    _widget.SetReverseContent(false);
-                }
-                else
-                {
-                    LOGGER.severe("Invalid Web Widget Definition File.  ReverseContent should be True or False, not:" + str);
-                    return null;                
-                }
-            }
-        }
-        return _widget;
+	WebWidget _widget = new WebWidget();
+	
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node))
+	    {
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("#comment"))
+	    {
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("ReverseContent"))
+	    {
+		String str = node.getTextContent();
+		if (0 == str.compareToIgnoreCase("True"))
+		{
+		    _widget.SetReverseContent(true);
+		}
+		else if (0 == str.compareToIgnoreCase("False"))
+		{
+		    _widget.SetReverseContent(false);
+		}
+		else
+		{
+		    LOGGER.severe(
+			    "Invalid Web Widget Definition File.  ReverseContent should be True or False, not:" + str);
+		    return null;
+		}
+	    }
+	}
+	return _widget;
     }
 }
