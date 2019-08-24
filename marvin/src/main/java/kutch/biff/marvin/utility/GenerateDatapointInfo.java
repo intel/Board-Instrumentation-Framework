@@ -475,7 +475,6 @@ public class GenerateDatapointInfo
 	
 	for (int iIndex = 0; iIndex < len; iIndex++)
 	{
-	    
 	    if (null == strData)
 	    {
 		strData = Integer.toString(iIndex);

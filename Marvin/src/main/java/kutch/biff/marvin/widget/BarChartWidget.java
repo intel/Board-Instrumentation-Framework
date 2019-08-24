@@ -148,6 +148,43 @@ public class BarChartWidget extends LineChartWidget
 	return false;
     }
     
+    @SuppressWarnings("rawtypes")
+    public void resetState(String param)
+    {
+	int val = 0;
+	if (null != param)
+	{
+	    try
+	    {
+		val = Integer.parseInt(param);
+	    }
+	    catch(NumberFormatException ex)
+	    {
+	    }
+	}
+	yAxisMaxValue = yAxisMaxValue_Initial;
+	yAxisMinValue = yAxisMinValue_Initial;
+	resetSteppedRange();
+	setyAxisMaxValue(yAxisMaxValue_Initial);
+	// setyAxisMinValue(yAxisMinValue_Initial);
+	initialSteppedRangeSetup(yAxisMinValue, yAxisMaxValue);
+	UpdateValueRange();
+	
+	// now go and set all to zero or the specified value
+	@SuppressWarnings("unchecked")
+	ObservableList<XYChart.Series<String, Number>> dList = ((XYChart) getChart()).getData();
+	
+	for (XYChart.Series<String, Number> objSeriesEntry : dList)
+	{
+	    for (Data<String, Number> objSeries : objSeriesEntry.getData())
+	    {
+		objSeries.setYValue(val);
+	    }
+	    
+	}
+	
+    }
+    
     protected void resizeAxis(int newSize)
     {
 	int currSize = _objSeries.getData().size();
@@ -248,4 +285,5 @@ public class BarChartWidget extends LineChartWidget
 	((NumberAxis) (_yAxis)).setMinorTickCount(yAxisMinorTick + 1);
 	// xAxis is not a number axis
     }
+        
 }

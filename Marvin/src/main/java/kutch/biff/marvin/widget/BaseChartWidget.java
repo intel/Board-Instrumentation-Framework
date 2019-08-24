@@ -33,7 +33,6 @@ import javafx.scene.chart.Axis;
 import javafx.scene.chart.Chart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.chart.XYChart.Data;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 import kutch.biff.marvin.utility.SeriesDataSet;
@@ -62,7 +61,7 @@ abstract public class BaseChartWidget extends BaseWidget
     protected double xAxisMajorTick, yAxisMajorTick;
     protected boolean xAxisTickVisible, yAxisTickVisible;
     protected HashMap<SeriesDataSet, String> SyncronizeDataSetsMap;
-    protected boolean SynchronizeMulitSourceData;
+    protected boolean _SynchronizeMulitSourceData;
     protected int MaxSynchronizeMulitSoureDataWait;
     protected long MaxSynchronizeMultiSourceLastUpdate;
     protected HashMap<String, SeriesSet> _SeriesMap;
@@ -96,7 +95,7 @@ abstract public class BaseChartWidget extends BaseWidget
 	_chart = null;
 	setDefaultIsSquare(false);
 	SyncronizeDataSetsMap = null;
-	SynchronizeMulitSourceData = true;
+	_SynchronizeMulitSourceData = true;
 	MaxSynchronizeMulitSoureDataWait = 0;
 	MaxSynchronizeMultiSourceLastUpdate = 0;
 	_SeriesMap = new HashMap<>();
@@ -145,7 +144,7 @@ abstract public class BaseChartWidget extends BaseWidget
     
     protected void ConfigureSynchronizationForMultiSource()
     {
-	if (true == SynchronizeMulitSourceData)
+	if (true == _SynchronizeMulitSourceData)
 	{
 	    SyncronizeDataSetsMap = new HashMap<>();
 	    ClearSynchronizationForMultiSource();
@@ -511,11 +510,14 @@ abstract public class BaseChartWidget extends BaseWidget
 	for (SeriesDataSet ds : getSeries()) // create an entry for all
 	{
 	    strVal = SyncronizeDataSetsMap.put(ds, null);
-	    AddNewData(ds, strVal);
-	    if (_isStackedChart = true)
-	    { // for stacked charts, stepped range must use the aggregate value, not an
-	      // individual
-		tVal += Double.parseDouble(strVal);
+	    if (null != strVal)
+	    {
+		AddNewData(ds, strVal);
+		if (_isStackedChart = true)
+		{ // for stacked charts, stepped range must use the aggregate value, not an
+		  // individual
+		    tVal += Double.parseDouble(strVal);
+		}
 	    }
 	}
 	if (_isStackedChart = true)
@@ -599,6 +601,7 @@ abstract public class BaseChartWidget extends BaseWidget
     @SuppressWarnings("rawtypes")
     public void resetState(String param)
     {
+	@SuppressWarnings("unused")
 	int val = 0;
 	if (null != param)
 	{
@@ -624,11 +627,7 @@ abstract public class BaseChartWidget extends BaseWidget
 	
 	for (XYChart.Series<String, Number> objSeriesEntry : dList)
 	{
-	    for (Data<String, Number> objSeries : objSeriesEntry.getData())
-	    {
-		objSeries.setYValue(val);
-	    }
-	    
+	    objSeriesEntry.getData().clear();
 	}
 	
     }
@@ -640,7 +639,7 @@ abstract public class BaseChartWidget extends BaseWidget
     
     public void SetSynchronizeInformation(boolean flag, int timeout)
     {
-	SynchronizeMulitSourceData = flag;
+	_SynchronizeMulitSourceData = flag;
 	MaxSynchronizeMulitSoureDataWait = timeout;
     }
     
