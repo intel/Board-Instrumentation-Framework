@@ -280,6 +280,7 @@ public class GenerateDatapointInfo
 		    return; // not all of them had been updated
 		}
 	    }
+	    
 	    if (_Method == GenerateMethod.ADD || Total == 0.0)
 	    {
 	    }
@@ -314,6 +315,10 @@ public class GenerateDatapointInfo
 	if (-1 == precision)
 	{ // use precision of value received
 	    precision = sourcePrecision;
+	    if (0 == precision && Total < 1)
+	    {
+		precision = 2;
+	    }
 	}
 	
 	df.setMaximumFractionDigits(precision);

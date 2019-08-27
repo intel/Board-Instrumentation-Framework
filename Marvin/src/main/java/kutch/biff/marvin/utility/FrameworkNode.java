@@ -634,7 +634,7 @@ public class FrameworkNode
     
     public String getTextContent()
     {
-	return HandleAlias(_node.getTextContent().strip());
+	return HandleAlias(_node.getTextContent());
     }
     
     /**
