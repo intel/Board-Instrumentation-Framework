@@ -22,11 +22,30 @@ import subprocess
 import time
 import socket
 import glob
+import array
+import fcntl
+import struct
 from pprint import pprint as pprint
 
 VersionStr="v19.01.15"
 lscpiDataMap=None
 netdevInfoDir="/sys/class/net"
+
+
+SIOCETHTOOL = 0x8946
+ETHTOOL_GSTRINGS = 0x0000001b
+ETHTOOL_GSSET_INFO = 0x00000037
+ETHTOOL_GSTATS = 0x0000001d
+ETH_SS_STATS = 0x01
+ETH_SS_PRIV_FLAGS = 0x02
+ETH_GSTRING_LEN = 32
+ETHTOOL_GDRVINFO = 0x00000003
+ETHTOOL_GCOALESCE =	0x0000000e 
+
+ETHTOOL_FWVERS_LEN	= 32
+ETHTOOL_BUSINFO_LEN	= 32
+ETHTOOL_EROMVERS_LEN = 32
+
 
 def ReadFromFile(Filename):
     try:
@@ -51,31 +70,29 @@ def ParseListStr(listStr):
     return [5,3,5]
 
 
-# The main function that checks if two given strings match. 
-# The first string may contain wildcard characters 
-def match(first, second): 
+def match(strValue_1, strValue_2): 
   
     # If we reach at the end of both strings, we are done 
-    if len(first) == 0 and len(second) == 0: 
+    if len(strValue_1) == 0 and len(strValue_2) == 0: 
         return True
   
     # Make sure that the characters after '*' are present 
-    # in second string. This function assumes that the first 
+    # in strValue_2 string. This function assumes that the strValue_1 
     # string will not contain two consecutive '*' 
-    if len(first) > 1 and first[0] == '*' and  len(second) == 0: 
+    if len(strValue_1) > 1 and strValue_1[0] == '*' and  len(strValue_2) == 0: 
         return False
   
-    # If the first string contains '?', or current characters 
+    # If the strValue_1 string contains '?', or current characters 
     # of both strings match 
-    if (len(first) > 1 and first[0] == '?') or (len(first) != 0
-        and len(second) !=0 and first[0] == second[0]): 
-        return match(first[1:],second[1:]); 
+    if (len(strValue_1) > 0 and strValue_1[0] == '?') or (len(strValue_1) != 0
+        and len(strValue_2) !=0 and strValue_1[0] == strValue_2[0]): 
+        return match(strValue_1[1:],strValue_2[1:]) 
   
     # If there is *, then there are two possibilities 
-    # a) We consider current character of second string 
-    # b) We ignore current character of second string. 
-    if len(first) !=0 and first[0] == '*': 
-        return match(first[1:],second) or match(first,second[1:]) 
+    # a) We consider current character of strValue_2 string 
+    # b) We ignore current character of strValue_2 string. 
+    if len(strValue_1) !=0 and strValue_1[0] == '*': 
+        return match(strValue_1[1:],strValue_2) or match(strValue_1,strValue_2[1:]) 
   
     return False    
 
@@ -84,6 +101,7 @@ class NetworkInfo:
         self.__frameworkInterface = frameworkInterface
         self.__args = kwargs
         self.__LOGGER = self.__frameworkInterface.Logger
+        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0) #for ioctl
 
         if False == self.__validateArgs():
             raise ValueError("Invalid Configuration for LinuxNetwork plugin")
@@ -164,20 +182,88 @@ class NetworkInfo:
         return retList
 
 
-    def GetStatisticsFromSysFS(self):
+    def GetStatistics(self):
+        if self.__usingDriver:
+            return self.__GetStatisticsFromDriver()
+
+        return self.__GetStatisticsFromSysFS()
+
+    def __GetStatisticsFromSysFS(self):
         retMap = {}
         for ethDev in self.__devList:
             nextDir = GetBaseDir() + "/"  + ethDev + "/statistics"
-            baseName='netdev.'
+            baseName='netdev.' + ethDev
             for statRoot, statDirs, statFiles in os.walk(nextDir):
                 for fname in statFiles:
                     sFileName = nextDir + "/" + fname
                     dataVal = ReadFromFile(sFileName)
-                    retMap[baseName+ethDev + "." + fname] = dataVal
+                    retMap[baseName + "." + fname] = dataVal
+
+            if baseName+".rx_bytes" in retMap: # should ALWAYS be there
+                retMap[baseName+".rx_gbps"] = retMap[baseName+".rx_bytes"]
+                retMap[baseName+".tx_gbps"] = retMap[baseName+".tx_bytes"]
+                retMap[baseName+".bx_gbps"] = str(float(retMap[baseName+".tx_bytes"]) + float(retMap[baseName+".rx_bytes"]))
+                retMap[baseName+".rx_mbps"] = retMap[baseName+".rx_bytes"]
+                retMap[baseName+".tx_mbps"] = retMap[baseName+".tx_bytes"]
+                retMap[baseName+".bx_mbps"] = str(float(retMap[baseName+".tx_bytes"]) + float(retMap[baseName+".rx_bytes"]))
+
+            if baseName+".tx_packets" in retMap:
+                retMap[baseName+".tx_pps"] = retMap[baseName+".tx_packets"]
+                retMap[baseName+".rx_pps"] = retMap[baseName+".rx_packets"]
+                retMap[baseName+".bx_pps"] = str(float(retMap[baseName+".rx_packets"]) + float(retMap[baseName+".tx_packets"]))
+                retMap[baseName+".tx_mpps"] = retMap[baseName+".tx_packets"]
+                retMap[baseName+".rx_mpps"] = retMap[baseName+".rx_packets"]
+                retMap[baseName+".bx_mpps"] = str(float(retMap[baseName+".rx_packets"]) + float(retMap[baseName+".tx_packets"]))
+
 
         return retMap
 
+    def __GetStatisticsFromDriver(self):
+        retMap = {}
+        for ethDev in self.__devList:
+            # go get the set strings
+            baseName='netdev.' + ethDev
 
+            # read the stat strings (differs from dev to dev :-( )
+            strings = list(self.__getDriverStringSet(ethDev,ETH_SS_STATS))
+            n_stats = len(strings)
+
+            #go get the actual stats
+            ethtool_stats_struct = array.array("B", struct.pack("II", ETHTOOL_GSTATS, n_stats))
+            ethtool_stats_struct.extend(bytearray(struct.pack('Q', 0) * n_stats))
+            self._send_ioctl(ethDev,ethtool_stats_struct)
+            for i in range(n_stats):
+                offset = 8 + 8 * i
+                value = struct.unpack('Q', ethtool_stats_struct[offset:offset+8])[0]
+                retMap[baseName + "." + strings[i]] = value
+
+        return retMap
+
+    def _send_ioctl(self, devName,data):
+        sendData = struct.pack('16sP', devName.encode("utf-8"), data.buffer_info()[0])
+        return fcntl.ioctl(self._sock.fileno(), SIOCETHTOOL, sendData)
+
+    def __getDriverStringSet(self, devName,set_id):
+        ## Get how many strings in this set
+        ethtool_sset_info_struct = array.array('B', struct.pack("IIQI", ETHTOOL_GSSET_INFO, 0, 1 << set_id, 0))
+        self._send_ioctl(devName,ethtool_sset_info_struct)
+
+        set_mask, set_len = struct.unpack("8xQI", ethtool_sset_info_struct)
+        if set_mask == 0:
+            set_len = 0
+
+        # Go get the strings for this set
+
+        ethtool_gstrings_struct = array.array("B", struct.pack("III", ETHTOOL_GSTRINGS, set_id, set_len))
+
+        #ethtool_gstrings_struct.extend(c'\x00' * int(set_len) * int(ETH_GSTRING_LEN))
+        ethtool_gstrings_struct.extend(bytearray(int(set_len) * int(ETH_GSTRING_LEN)))
+        self._send_ioctl(devName,ethtool_gstrings_struct)
+        
+        for index in range(set_len):
+            offset = 12 + ETH_GSTRING_LEN * index
+            statString = bytearray(ethtool_gstrings_struct[offset:offset+ETH_GSTRING_LEN]).partition(b'\x00')[0].decode("utf-8")
+            yield statString
     def __GetLSPCIData(self):
         global lscpiDataMap
         if None != lscpiDataMap:
@@ -228,52 +314,52 @@ class NetworkInfo:
                 for fname in statFiles:
                     sFileName = nextDir + "/" + fname
                     dataVal = ReadFromFile(sFileName)
-                    retMap[baseName+ethDev + "." + fname] = dataVal
+                    retMap[baseName + "." + fname] = dataVal
 
             verFile = GetBaseDir() + "/"  + ethDev + "/device/driver/module/version"
-            retMap[baseName+ethDev + ".version"] = ReadFromFile(verFile)
+            retMap[baseName + ".version"] = ReadFromFile(verFile)
             numaFile = GetBaseDir() + "/"  + ethDev + "/device/numa_node"
-            retMap[baseName+ethDev + ".numa_node"] = ReadFromFile(numaFile)
-            retMap[baseName+ethDev + ".vendor_info"] = self.__GetDeviceVendorInfo(ethDev)
+            retMap[baseName + ".numa_node"] = ReadFromFile(numaFile)
+            retMap[baseName + ".vendor_info"] = self.__GetDeviceVendorInfo(ethDev)
             mtuFile = GetBaseDir() + "/"  + ethDev + "/mtu"
-            retMap[baseName+ethDev + ".mtu"] = ReadFromFile(mtuFile)
+            retMap[baseName + ".mtu"] = ReadFromFile(mtuFile)
             operStateFile = GetBaseDir() + "/"  + ethDev + "/operstate"
-            retMap[baseName+ethDev + ".state"] = ReadFromFile(operStateFile)
+            retMap[baseName + ".state"] = ReadFromFile(operStateFile)
             macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
-            retMap[baseName+ethDev + ".macaddress"] = ReadFromFile(macAddrFile)
-            retMap[baseName+ethDev + ".driver"] = self.__GetDriver(ethDev)
+            retMap[baseName + ".macaddress"] = ReadFromFile(macAddrFile)
+            retMap[baseName + ".driver"] = self.__GetDriver(ethDev)
             speedFile = GetBaseDir() + "/"  + ethDev + "/speed"
             try:
-                retMap[baseName+ethDev + ".speed"] = ReadFromFile(speedFile)
+                retMap[baseName + ".speed"] = ReadFromFile(speedFile)
             except:
-                retMap[baseName+ethDev + ".speed"] = "Unknown"
+                retMap[baseName + ".speed"] = "Unknown"
                             
             sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sckt.connect(("8.8.8.8", 80))
             ipAddr =  sckt.getsockname()[0]
-            retMap[baseName+ethDev + ".ipaddress"] = str(ipAddr)
+            retMap[baseName + ".ipaddress"] = str(ipAddr)
 
         else: # slim dataset, just to bytes and packets
             for fname in ['rx_bytes','tx_bytes','tx_packets','rx_packets']:
                 sFileName = nextDir + "/" + fname
                 dataVal = ReadFromFile(sFileName)
-                retMap[baseName+ethDev + "." + fname] = dataVal
+                retMap[baseName + "." + fname] = dataVal
 
-        if baseName+ethDev+".rx_bytes" in retMap: # should ALWAYS be there
-            retMap[baseName+ethDev+".rx_gbps"] = retMap[baseName+ethDev+".rx_bytes"]
-            retMap[baseName+ethDev+".tx_gbps"] = retMap[baseName+ethDev+".tx_bytes"]
-            retMap[baseName+ethDev+".bx_gbps"] = str(float(retMap[baseName+ethDev+".tx_bytes"]) + float(retMap[baseName+ethDev+".rx_bytes"]))
-            retMap[baseName+ethDev+".rx_mbps"] = retMap[baseName+ethDev+".rx_bytes"]
-            retMap[baseName+ethDev+".tx_mbps"] = retMap[baseName+ethDev+".tx_bytes"]
-            retMap[baseName+ethDev+".bx_mbps"] = str(float(retMap[baseName+ethDev+".tx_bytes"]) + float(retMap[baseName+ethDev+".rx_bytes"]))
+        if baseName+".rx_bytes" in retMap: # should ALWAYS be there
+            retMap[baseName+".rx_gbps"] = retMap[baseName+".rx_bytes"]
+            retMap[baseName+".tx_gbps"] = retMap[baseName+".tx_bytes"]
+            retMap[baseName+".bx_gbps"] = str(float(retMap[baseName+".tx_bytes"]) + float(retMap[baseName+".rx_bytes"]))
+            retMap[baseName+".rx_mbps"] = retMap[baseName+".rx_bytes"]
+            retMap[baseName+".tx_mbps"] = retMap[baseName+".tx_bytes"]
+            retMap[baseName+".bx_mbps"] = str(float(retMap[baseName+".tx_bytes"]) + float(retMap[baseName+".rx_bytes"]))
 
-        if baseName+ethDev+".tx_packets" in retMap:
-            retMap[baseName+ethDev+".tx_pps"] = retMap[baseName+ethDev+".tx_packets"]
-            retMap[baseName+ethDev+".rx_pps"] = retMap[baseName+ethDev+".rx_packets"]
-            retMap[baseName+ethDev+".bx_pps"] = str(float(retMap[baseName+ethDev+".rx_packets"]) + float(retMap[baseName+ethDev+".tx_packets"]))
-            retMap[baseName+ethDev+".tx_mpps"] = retMap[baseName+ethDev+".tx_packets"]
-            retMap[baseName+ethDev+".rx_mpps"] = retMap[baseName+ethDev+".rx_packets"]
-            retMap[baseName+ethDev+".bx_mpps"] = str(float(retMap[baseName+ethDev+".rx_packets"]) + float(retMap[baseName+ethDev+".tx_packets"]))
+        if baseName+".tx_packets" in retMap:
+            retMap[baseName+".tx_pps"] = retMap[baseName+".tx_packets"]
+            retMap[baseName+".rx_pps"] = retMap[baseName+".rx_packets"]
+            retMap[baseName+".bx_pps"] = str(float(retMap[baseName+".rx_packets"]) + float(retMap[baseName+".tx_packets"]))
+            retMap[baseName+".tx_mpps"] = retMap[baseName+".tx_packets"]
+            retMap[baseName+".rx_mpps"] = retMap[baseName+".rx_packets"]
+            retMap[baseName+".bx_mpps"] = str(float(retMap[baseName+".rx_packets"]) + float(retMap[baseName+".tx_packets"]))
             
 
         return retMap
@@ -401,9 +487,11 @@ def CollectDevice(frameworkInterface,DeviceName,slimDataSetParam):
 
 
 def CollectDeviceStatistics(frameworkInterface,**kwargs): 
+
     objNetInfo = NetworkInfo(frameworkInterface,**kwargs)
-    dataMap=objNetInfo.GetStatisticsFromSysFS()
-    InitialRun = True
+    #dataMap=objNetInfo.GetStatisticsFromSysFS()
+
+    dataMap = objNetInfo.GetStatistics()
 
     for entry in dataMap:
         if not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
@@ -424,14 +512,15 @@ def CollectDeviceStatistics(frameworkInterface,**kwargs):
 
     SleepTime = float(frameworkInterface.Interval)/1000.0
 
-    while not frameworkInterface.KillThreadSignalled():
+    try:
+        while not frameworkInterface.KillThreadSignalled():
+            time.sleep(SleepTime)
+            dataMap = objNetInfo.GetStatistics()
 
-        dataMap=objNetInfo.GetStatisticsFromSysFS()
+            for entry in dataMap:
+                frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
 
-        for entry in dataMap:
-            frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
-
-        time.sleep(SleepTime)
-
+    except Exception as ex:
+        frameworkInterface.Logger.error("Unrecoverable error in LinuxNetwork Collector plugin: " + str(ex))
             
 
