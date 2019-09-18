@@ -99,21 +99,14 @@ public class SteelLedBarGraphWidget extends BaseWidget
 		    return;
 		}
 		
-		if (newDialValue == 0)
+		if (0.0 == newDialValue)
 		{
 		    _BarGraph.setValue(newDialValue);
-		    return;
 		}
-		if (newDialValue != 100.0)
+		else
 		{
-		    while (newDialValue >= 100)
-		    {
-			newDialValue /= 10.0;
-		    }
+		    _BarGraph.setValue(newDialValue / 100);
 		}
-		newDialValue /= 100.0001;
-		
-		_BarGraph.setValue(newDialValue);
 	    }
 	});
 	SetupTaskAction();

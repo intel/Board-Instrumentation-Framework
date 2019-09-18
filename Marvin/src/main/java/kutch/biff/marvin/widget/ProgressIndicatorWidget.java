@@ -70,14 +70,15 @@ public class ProgressIndicatorWidget extends BaseWidget
 		    LOGGER.severe("Invalid data for Progress Indicator received: " + strVal);
 		    return;
 		}
-		if (newDialValue != 100.0)
+
+		if (0.0 == newDialValue)
 		{
-		    while (newDialValue >= 10)
-		    {
-			newDialValue /= 10.0;
-		    }
+		    _Indicator.setProgress(newDialValue);
 		}
-		_Indicator.setProgress(newDialValue / 10);
+		else
+		{
+		    _Indicator.setProgress(newDialValue / 100);
+		}
 	    }
 	});
 	SetupTaskAction();

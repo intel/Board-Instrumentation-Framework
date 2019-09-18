@@ -70,14 +70,15 @@ public class ProgressBarWidget extends BaseWidget
 		    LOGGER.severe("Invalid data for Progress Bar received: " + strVal);
 		    return;
 		}
-		if (newValue != 100.0)
+		if (0.0 == newValue)
 		{
-		    while (newValue >= 10)
-		    {
-			newValue /= 10.0;
-		    }
+		    _ProgressBar.setProgress(newValue);
 		}
-		_ProgressBar.setProgress(newValue / 10);
+		else
+		{
+		    _ProgressBar.setProgress(newValue / 100);
+		}
+
 	    }
 	});
 	
