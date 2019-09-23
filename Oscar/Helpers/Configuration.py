@@ -55,6 +55,8 @@ class Configuration():
     def __initialize(self):
         self.__FromUpstreamConnection = ConnectionPoint.ConnectionPoint() #comes from Minions and other Oscars, primary data channel, going towards Marvin
         self.__FromDownstreamConnection =  ConnectionPoint.ConnectionPoint() # comes from Marvins and Oscars - things like heartbeats and tasks
+        self.__IncomingProxyConnection = None
+        self.__TargetProxyConnection = None
         self.__OutgoingDownstreamConnections = []   # Target Marvins and chained Oscars
         self.__ID = "Undefined Oscar ID" # ID of this Oscar Instance
         self.__HasBeenRead = False
@@ -213,6 +215,12 @@ class Configuration():
     def GetTimeoutPeriod(self):
         return self.__HeartbeatTimeoutPeriod
 
+    def GetProxyConnection(self):
+        return self.__IncomingProxyConnection
+
+    def GetProxyServerConnection(self):
+        return self.__TargetProxyConnection
+
     def GetDownstreamConnection(self):
         return self.__FromDownstreamConnection
 
@@ -360,10 +368,69 @@ class Configuration():
         if False == self.__ReadBumpInTheWireInfo(domDoc):
             return False
 
-        self.Valid = True
+        if False == self.ReadProxyConnection(domDoc):
+            return False
+
+        if False == self.ReadProxyTargetConnection(domDoc):
+            return False
+
+        if None != self.__IncomingProxyConnection and None != self.__TargetProxyConnection:
+            Log.getLogger().error("An instance of Oscar for PROXY use can either be a server or client, but not both.")
+            return False
         
         return True
 
+    def ReadProxyConnection(self, domDoc):
+        nodeList = domDoc.getElementsByTagName("IncomingProxyConnection")
+        if None != nodeList and len(nodeList) > 0:
+            attributes = nodeList[0].attributes
+            self.__IncomingProxyConnection = ConnectionPoint.ConnectionPoint()
+            if "IP" in attributes:
+                self.__IncomingProxyConnection.IP = Alias.Alias(attributes["IP"].nodeValue)
+
+            else:
+                self.__IncomingProxyConnection.IP="0.0.0.0" #listen on all interfaces
+                Log.getLogger().info("No IncomingProxyConnection IP specified, listening on all interfaces")
+                
+            if "PORT" in attributes:
+                try:
+                   self.__IncomingProxyConnection.Port = int(Alias.Alias(attributes["PORT"].nodeValue))
+                except Exception as Ex:
+                    Log.getLogger().error(str(Ex))
+                    Log.getLogger().error("Invalid Port set for IncomingProxyConnection ")
+                    return  False
+            else:
+                Log.getLogger().error("No IncomingProxyConnection Port specified")
+                return False
+
+            self.__IncomingProxyConnection.IsTCP = True  #don't think I need shis...
+
+        return True
+            
+    def ReadProxyTargetConnection(self, domDoc):
+        nodeList = domDoc.getElementsByTagName("ProxyOscarServer")
+        if None != nodeList and len(nodeList) > 0:
+            self.__TargetProxyConnection = ConnectionPoint.ConnectionPoint() 
+            attributes = nodeList[0].attributes
+            if "IP" in attributes:
+                self.__TargetProxyConnection.IP = Alias.Alias(attributes["IP"].nodeValue)
+
+            else:
+                Log.getLogger().Error("No ProxyOscarServer IP specified")
+                return False
+                
+            if "PORT" in attributes:
+                try:
+                   self.__TargetProxyConnection.Port = int(Alias.Alias(attributes["PORT"].nodeValue))
+                except Exception as Ex:
+                    Log.getLogger().error(str(Ex))
+                    Log.getLogger().error("Invalid Port set for ProxyOscarServer ")
+                    return  False
+            else:
+                Log.getLogger().error("No ProxyOscarServer Port specified")
+                return False
+
+        return True
 
     def SendBullHorn(self,IP,Port,Key):
         #<Marvin Type="Bullhorn">
@@ -455,7 +522,9 @@ class Configuration():
                     Log.getLogger().error("No Target IP specified")
                     return False
 
-                objTarget = Target.Target(IP,Port,ConnectionType.Unknown,True)# could be Marvin or another Oscar
+                connType = ConnectionType.Unknown
+
+                objTarget = Target.Target(IP,Port,connType,True)# could be Marvin or another Oscar
                 
                 #Key = socket.gethostbyname(IP) + ":" +str(Port)
                 Key = IP + ":" +str(Port)
@@ -488,8 +557,11 @@ class Configuration():
                     Log.getLogger().error("No Target IP specified")
                     return False
 
-                objTarget = Target.Target(IP,Port,ConnectionType.Unknown,True)# could be Marvin or another Oscar
-                
+                connType = ConnectionType.Unknown
+
+                objTarget = Target.Target(IP,Port,connType,True)# could be Marvin or another Oscar
+
+               
                 Key = IP + ":" +str(Port)
                 TargetManager.GetTargetManager().AddDownstreamTarget(objTarget,Key)
                 
@@ -574,14 +646,14 @@ class Configuration():
                         return False
 
                     try:
-                        INP_NS_Comp = re.compile(key)
+                        _ = re.compile(key)
                                     
                     except Exception as Ex:
                         Log.getLogger().error("Invalid <BITW> regEx expression for Namespace: " + inputNS)
                         return False
 
                     try:
-                        NS_Comp = re.compile(outputNS.upper())
+                        _ = re.compile(outputNS.upper())
                                     
                     except Exception as Ex:
                         Log.getLogger().error("Invalid <BITW> regEx expression for Namespace: " + outputNS)
@@ -634,14 +706,14 @@ class Configuration():
                 try:
                     ID_Comp = re.compile(IDKey)
                                     
-                except Exception as Ex:
+                except Exception:
                     Log.getLogger().error("Invalid Shunt regEx expression for ID: " + ID)
                     return False
 
                 try:
-                    NS_Comp = re.compile(NamespaceKey)
+                    _ = re.compile(NamespaceKey)
                                     
-                except Exception as Ex:
+                except Exception:
                     Log.getLogger().error("Invalid Shunt regEx expression for Namespace: " + Namespace)
                     return False
 
@@ -672,7 +744,7 @@ class Configuration():
                 try:
                     with open(ShuntFile,"w") as sf:
                         sf.write("##### Generated by Oscar Shunt #####\n")
-                except Exception as Ex:
+                except Exception as _:
                     Log.getLogger().error("Invalid Shunt filename specified: " + ShuntFile)
                     return False                    
 

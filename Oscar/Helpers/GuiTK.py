@@ -19,7 +19,7 @@
 ##############################################################################
 from tkinter import ttk
 from tkinter import Tk
-from tkinter import *
+from tkinter import *  # pylint: disable=W0611
 from Helpers import GuiMgr
 from Helpers import TargetManager
 from Helpers import Configuration
@@ -276,7 +276,6 @@ class TargetView():
         return self.root
 
     def updateGui(self):
-        index = 0
         targets = TargetManager.GetTargetManager().GetDownstreamTargets()
         
         # was a channge in number (maybe a dynamci marvin went away) so just clear the tree and re-poplualte

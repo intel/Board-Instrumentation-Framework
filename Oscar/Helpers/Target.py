@@ -57,7 +57,7 @@ class Target(ConnectionPoint.ConnectionPoint):
             self.m_socket.setblocking(True)
             self.m_socket.settimeout(0.001)
 
-        except Exception as ex:
+        except Exception as _:
                 Log.getLogger().error("Error setting up Target Socket -->" + str(super.m_Connection))
 
         self.threadName = "Target:" + self.getIP() + "[" + str(self.getPort()) +"]"
@@ -173,7 +173,7 @@ class Target(ConnectionPoint.ConnectionPoint):
                     self.m_LastDNSResolution = Time.GetCurrMS()
                     self.m_IP_InUse = socket.gethostbyname(self.ConfigurationDefinedTarget)  #use this for looking at heartbeats
 
-                except Exception as ex:
+                except Exception as _:
                     self.m_IP_InUse = self.ConfigurationDefinedTarget
 
             try:
@@ -201,6 +201,5 @@ class Target(ConnectionPoint.ConnectionPoint):
             self.Type +=1 
 
         return dataToProcess
-
 
 

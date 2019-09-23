@@ -28,7 +28,7 @@ def getLogToConsole():
     return Logger.LogToConsole
 
 def setLevel(level):
-    Logger.getLogger();
+    Logger.getLogger()
 
     if Logger._console != None:
         Logger._console.setLevel(level)
@@ -68,7 +68,13 @@ class Logger():
                 Logger._logger.addHandler(console)
                 Logger._console = console
 
+            #Logger._errorFn = Logger._logger.error
+            #Logger._logger.error = Logger.myFn
+
         return Logger._logger
+    @staticmethod
+    def myFn(strErr):
+        Logger._errorFn(strErr)
 
 
 

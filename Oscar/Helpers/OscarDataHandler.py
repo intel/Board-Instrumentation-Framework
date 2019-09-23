@@ -56,7 +56,7 @@ class OscarDataHandler(object):
 
         try:
             packetType = node.attributes["Type"].nodeValue  #All should have a Type attribute
-        except Exception as ex:
+        except Exception as _:
             Statistics.GetStatistics().OnMalformedPacketReceived("Malformed Oscar Packet: " + rawData)
             return
 
@@ -85,7 +85,7 @@ class OscarDataHandler(object):
             value = node.getElementsByTagName('Value')[0].firstChild.nodeValue
             ID = node.getElementsByTagName('ID')[0].firstChild.nodeValue
             
-        except Exception as Ex:
+        except Exception as _:
             Statistics.GetStatistics().OnMalformedPacketReceived("Received Chained Oscar Packet:" + rawData)
             return None
 
@@ -145,11 +145,11 @@ class OscarDataHandler(object):
         #</Oscar>
 
         try:
-            version = node.getElementsByTagName('Version')[0].firstChild.nodeValue 
+            _ = node.getElementsByTagName('Version')[0].firstChild.nodeValue 
             ID = node.getElementsByTagName('ID')[0].firstChild.nodeValue
             Port = int(node.getElementsByTagName('Port')[0].firstChild.nodeValue)
 
-        except Exception as Ex:
+        except Exception as _:
             Statistics.GetStatistics().OnMalformedPacketReceived("Received invalid Oscar Connection Information Packet : " + rawData)
             return
 
@@ -188,11 +188,11 @@ class OscarDataHandler(object):
 
         Statistics.GetStatistics().OnPacketReceivedFromDownstream(rawData)
         try:
-            version = node.getElementsByTagName('Version')[0].firstChild.nodeValue 
+            _ = node.getElementsByTagName('Version')[0].firstChild.nodeValue 
             IP = fromAddress[0].lower()
             Port = node.getElementsByTagName('Port')[0].firstChild.nodeValue
 
-        except Exception as Ex:
+        except Exception as _:
             Statistics.GetStatistics().OnMalformedPacketReceived("Received invalid Oscar WatchdogTimer  Packet : " + rawData)
             return
 
@@ -203,7 +203,8 @@ class OscarDataHandler(object):
             objTarget = TargetManager.GetTargetManager().GetDownstreamTargetEx(IP,Port)  # Chained Oscar, used resolved IP
 
         if None == objTarget:
-            Log.getLogger().warning("Received Oscar Watchdog for unknown downstream Target: ",IP+":"+Port)
+            #commenting this out because of Proxy work
+#            Log.getLogger().warning("Received Oscar Watchdog for unknown downstream Target: [{}:{}]".format(IP,Port))
             return
         
         if objTarget.getType() != ConnectionType.DownstreamOscar and objTarget.getType() != ConnectionType.DynamicOscar : # would not know what this is until you hear back

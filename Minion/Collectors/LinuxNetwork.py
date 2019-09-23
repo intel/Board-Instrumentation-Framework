@@ -264,6 +264,7 @@ class NetworkInfo:
             offset = 12 + ETH_GSTRING_LEN * index
             statString = bytearray(ethtool_gstrings_struct[offset:offset+ETH_GSTRING_LEN]).partition(b'\x00')[0].decode("utf-8")
             yield statString
+            
     def __GetLSPCIData(self):
         global lscpiDataMap
         if None != lscpiDataMap:

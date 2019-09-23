@@ -147,24 +147,24 @@ class DataHandler(object):
             Log.getLogger().warning("Received unknown Packet Type: " + node.nodeName)
 
 
-def HandleForhornPacket(self,node,rawData,fromAddr):
-        #<?xml version="1.0" encoding="utf-8"?>
-        #<Foghorn>
-        #    <Version>1.0</Version>
-        #    <ConfigAddress>Kutch.system.foo.com</ConfigAddress>
-        #    <NewIPAddress>129.234.1.22</NewIPAddress>
-        #    <Port>Port</Port>
-        #</Foghorn>
-        try:
-            version = node.getElementsByTagName('Version')[0].firstChild.nodeValue 
-            ConfigAddr = node.getElementsByTagName('ConfigAddress')[0].firstChild.nodeValue
-            NewAddr= node.getElementsByTagName('NewIPAddress')[0].firstChild.nodeValue
+    def HandleFoghornPacket(self,node,rawData,fromAddr):
+            #<?xml version="1.0" encoding="utf-8"?>
+            #<Foghorn>
+            #    <Version>1.0</Version>
+            #    <ConfigAddress>Kutch.system.foo.com</ConfigAddress>
+            #    <NewIPAddress>129.234.1.22</NewIPAddress>
+            #    <Port>Port</Port>
+            #</Foghorn>
+            try:
+                _ = node.getElementsByTagName('Version')[0].firstChild.nodeValue 
+                ConfigAddr = node.getElementsByTagName('ConfigAddress')[0].firstChild.nodeValue
+                NewAddr= node.getElementsByTagName('NewIPAddress')[0].firstChild.nodeValue
 
-        except Exception as Ex:
-            Statistics.GetStatistics().OnMalformedPacketReceived("Received invalid Oscar Connection Information Packet : " + rawData)
-            return
+            except Exception as _:
+                Statistics.GetStatistics().OnMalformedPacketReceived("Received invalid Oscar Connection Information Packet : " + rawData)
+                return
 
-        TargetManager.GetTargetManager().UpdateDownstreamTarget(ConfigAddr,NewAddr)
+            TargetManager.GetTargetManager().UpdateDownstreamTarget(ConfigAddr,NewAddr)
 
 def GetDataHandler():
     if DataHandler._instance == None:
