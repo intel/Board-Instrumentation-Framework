@@ -29,7 +29,7 @@ else:
     from Helpers import Configuration
     from Data.ConnectionPoint import ConnectionType
     from Helpers.Playback import RepeatMode
-    from Helpers import ServerUDP
+    from Helpers import Server
     from Helpers import ThreadManager
     from Util import Sleep
     from Util import Time
@@ -39,7 +39,6 @@ else:
     from Helpers import GuiMgr
     from Helpers import VersionMgr
     from Helpers import Playback
-
 
 def existFile(filename):
     if not os.path.exists(filename):
@@ -61,7 +60,7 @@ def performBatchConvert(filematch):
         if fnmatch.fnmatch(file, filename):
             inputFilename = os.path.join(rel_path,file)
             if Playback.get().ReadFromFile(inputFilename):
-                baseName,ext = os.path.splitext(inputFilename)
+                baseName,_ = os.path.splitext(inputFilename)
                 csvFilename = baseName+".csv"
                 Playback.get().WriteCSVFile(csvFilename,1)
                 print("{0} --> {1}".format(inputFilename,csvFilename))
@@ -143,7 +142,7 @@ def HandleCommandlineArguments():
         Configuration.get().SetAutorunTime(args.time)
         if None == args.playback and None == args.record:
             print("time option only valid when doing a playback or a recording")
-            return false
+            return False
         
     if None != args.record:
         Configuration.get().SetRecordFilename(args.record)
@@ -175,8 +174,8 @@ def StartupWorkerProc(fnKillSignalled,userData):
     upstreamServer.DropPackets(True)
     upstreamServer.Start()
 
-    cut = Watchdog.ConnectionUpdateTimer()
-    wdt = Watchdog.WatchdogTimer()
+    Watchdog.ConnectionUpdateTimer()
+    Watchdog.WatchdogTimer()
 
     conf = Configuration.get()
     if None != conf.GetAutorunFilename():
@@ -213,7 +212,6 @@ def StartupWorkerProc(fnKillSignalled,userData):
 
         GuiMgr.Quit()
 
-
 def PrintVersion():
     print("Oscar - Version: " + VersionMgr.ReadVer())
 
@@ -228,10 +226,14 @@ def main():
     downstreamConnInfo = Configuration.get().GetDownstreamConnection()
     upstreamConnInfo = Configuration.get().GetUpstreamConnection()
 
-    downstreamServer = ServerUDP.ServerUDP(downstreamConnInfo,ConnectionType.DownstreamServer)
-    upstreamServer = ServerUDP.ServerUDP(upstreamConnInfo,ConnectionType.UpstreamServer)
+    
+    downstreamServer = Server.ServerUDP(downstreamConnInfo,ConnectionType.DownstreamServer)
+    upstreamServer = Server.ServerUDP(upstreamConnInfo,ConnectionType.UpstreamServer)
 
-#    if None == Configuration.get().GetAutorunFilename() or 1==1:
+    proxyServer = None
+    proxyClient = None
+    goodToGo = True
+
     if upstreamServer.Start():
         if None == downstreamConnInfo:
             return
@@ -250,9 +252,23 @@ def main():
                 print(str(Ex))
                 GuiMgr.Initialize(GuiMgr.UI.NONE,downstreamServer,upstreamServer)
 
-        ThreadManager.GetThreadManager().StartThread("StartupStuff")
+        if None !=  Configuration.get().GetProxyConnection():
+            proxyConnInfo_server = Configuration.get().GetProxyConnection()
 
-        GuiMgr.Start()
+            proxyServer = Server.ServerTCP(proxyConnInfo_server,ConnectionType.ProxyConnection_Server,downstreamServer,upstreamServer)
+            if False == proxyServer.Start():
+                goodToGo = False
+
+        elif None != Configuration.get().GetProxyServerConnection():
+            proxyConnInfo_Client = Configuration.get().GetProxyServerConnection()
+            proxyClient = Server.ClientTCP(proxyConnInfo_Client,ConnectionType.ProxyConnection_Client,downstreamServer,upstreamServer)
+            if False == proxyClient.Start():
+                goodToGo = False
+
+
+        if True == goodToGo:
+            ThreadManager.GetThreadManager().StartThread("StartupStuff")
+            GuiMgr.Start()
 
     ThreadManager.GetThreadManager().StopAllThreads()
 
