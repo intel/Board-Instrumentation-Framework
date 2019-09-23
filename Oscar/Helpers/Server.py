@@ -149,7 +149,7 @@ class ServerTCP(ServerUDP):
         self.__clients=[]   
         # Get messages to send towards Marvin
         self.m_Name = "ProxyTCP Server:"+str(self)
-        TargetManager.GetTargetManager().AddDownstreamTarget(self,self.m_Name)
+        #TargetManager.GetTargetManager().AddDownstreamTarget(self,self.m_Name)
 
 
     def Start(self):
@@ -248,13 +248,13 @@ class ServerTCP(ServerUDP):
 
                         elif dataByte == TCP_PACKET_DELIMITER_END:
                             self.m_rxPackets +=1
-                            self.__processIncomingData(currPacket,clientAddr)
+                            self._processIncomingData(currPacket,clientAddr)
                             currPacket = None
 
                         else:
                             currPacket += dataByte
 
-                except:# socket.error:
+                except Exception as Ex:# socket.error:
                     time.sleep(.01) #no data, so sleep for 10ms
                     continue
 
@@ -265,11 +265,11 @@ class ServerTCP(ServerUDP):
         except Exception as ex:
             Log.getLogger().debug("Thread Error: " + str(ex) + " --> " + traceback.format_exc())
 
-        def __processIncomingData(self,buffer,clientAddr):
-            # for Server packets, the data is coming from direction of Marvin 
-            DataHandler.GetDataHandler().HandleLiveData(buffer,clientAddr)
+    def _processIncomingData(self,buffer,clientAddr):
+        # for Server packets, the data is coming from direction of Marvin 
+        DataHandler.GetDataHandler().HandleLiveData(buffer,clientAddr)
 
-            pass
+        pass
 #            dataHandler.HandleLiveData(currPacket,clientAddr)
 
 
@@ -282,10 +282,10 @@ class ClientTCP(ServerTCP):
         self.__clients=[]
         # Get messages to send towards Minion
         self.m_Name = "ProxyTCP Client:"+str(self)
+        TargetManager.GetTargetManager().AddDownstreamTarget(self,self.m_Name)
+        #TargetManager.GetTargetManager().AddUpstreamTarget(self,self.m_Name)
 
-        TargetManager.GetTargetManager().AddUpstreamTarget(self,self.m_Name)
-
-    def __processIncomingData(self,buffer,clientAddr):
+    def _processIncomingData(self,buffer,clientAddr):
         DataHandler.GetDataHandler().HandleLiveData(buffer,(self.getIP(),self.getPort()))
         pass
 
@@ -298,6 +298,7 @@ class ClientTCP(ServerTCP):
 
         except Exception as _:
             self.m_socket = None
+            Log.getLogger().info("Unable to connect to Oscar Proxy Server {}:{}".format(self.getIP(),self.getPort()))
             return False
 
         return True
@@ -357,7 +358,8 @@ class ClientTCP(ServerTCP):
                     pass
 
                 except Exception as _:# socket.error:
-                    #print(str(Ex))
+                    self.m_socket.close()                    
+                    self.m_socket = None
                     pass
 
                     continue
