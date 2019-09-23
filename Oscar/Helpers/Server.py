@@ -150,6 +150,7 @@ class ServerTCP(ServerUDP):
         # Get messages to send towards Marvin
         self.m_Name = "ProxyTCP Server:"+str(self)
         #TargetManager.GetTargetManager().AddDownstreamTarget(self,self.m_Name)
+        TargetManager.GetTargetManager().AddUpstreamTarget(self,self.m_Name)
 
 
     def Start(self):
@@ -230,7 +231,7 @@ class ServerTCP(ServerUDP):
         try:
             while not fnKillSignalled(): # run until signalled to end - call passed function to check for the signal
                 try:
-                    rawData = clientSock.recv(buffSize).strip().decode("utf-8")
+                    rawData = clientSock.recv(buffSize).decode("utf-8")
                     if not rawData:  # other end disconnected
                         Log.getLogger().debug("Client Disconnected " + str(userData))
                         clientSock.close()
@@ -242,19 +243,20 @@ class ServerTCP(ServerUDP):
                         if dataByte == TCP_PACKET_DELIMITER_START:
                             if None != currPacket:
                                 #print("Received Start of Packet before an End Of Packet Delimeter")
-                                currPacket = None
-                            else:
-                                currPacket =""
+                                pass
+                            
+                            currPacket =""
 
                         elif dataByte == TCP_PACKET_DELIMITER_END:
                             self.m_rxPackets +=1
                             self._processIncomingData(currPacket,clientAddr)
+
                             currPacket = None
 
                         else:
                             currPacket += dataByte
 
-                except Exception as Ex:# socket.error:
+                except Exception as _:# socket.error:
                     time.sleep(.01) #no data, so sleep for 10ms
                     continue
 
@@ -328,7 +330,7 @@ class ClientTCP(ServerTCP):
                     continue
 
                 try:
-                    rawData = self.m_socket.recv(buffSize).strip().decode("utf-8")
+                    rawData = self.m_socket.recv(buffSize).decode("utf-8")
                     if len(rawData) == 0:  # other end disconnected
                         time.sleep(.5)    
                         self.m_socket.close()                    
@@ -342,13 +344,13 @@ class ClientTCP(ServerTCP):
                         if dataByte == TCP_PACKET_DELIMITER_START:
                             if None != currPacket:
 #                                print("Received Start of Packet before an End Of Packet Delimeter")
-                                currPacket = None
-                            else:
-                                currPacket =""
+                                pass
+
+                            currPacket =""
 
                         elif dataByte == TCP_PACKET_DELIMITER_END:
                             self.m_rxPackets +=1
-                            self.__processIncomingData(currPacket,None)
+                            self._processIncomingData(currPacket,None)
                             currPacket = None
 
                         else:
