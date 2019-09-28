@@ -220,7 +220,7 @@ public class ChartWidgetBuilder
 		    if (node.hasAttribute("MajorTickCount"))
 		    {
 			LOGGER.severe(
-				"Chart Widget definition has MajorTickInterval and MajorTickCount.  Ignoeing MajorTickInterval");
+				"Chart Widget definition has MajorTickInterval and MajorTickCount.  Ignoring MajorTickInterval");
 		    }
 		    else
 		    {
