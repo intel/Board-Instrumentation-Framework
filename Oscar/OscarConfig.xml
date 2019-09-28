@@ -25,15 +25,8 @@
        <!-- <Oscar IP="OtherOscar.MyNet.com" Port="6200" Key="MarvinAutoConnectKey"/> -->
   </IncomingMinionConnection>
 
+   <!-- Points towards Marvin -->
   <TargetConnection IP="localhost" PORT="5200"/>
-  <TargetConnection IP="localhost" PORT="5333"/>
-  <MarvinAutoConnect Key="Identifying Key"/> <!-- Marvin can attach to <IncomingMnionConnection>, with this key and be added as a TargetConnection -->
-    <!--
-    <BITW>
-        <Input Namespace="(.*)"/>
-        <Output Namespace=".newNamespace"/>
-        <Mode>Append</Mode>
-    </BITW>
-    -->
-</Oscar>
+  <TargetConnection IP="localhost" PORT="5300"/>
+  </Oscar>
  

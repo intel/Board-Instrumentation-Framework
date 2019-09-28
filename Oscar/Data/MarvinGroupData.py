@@ -29,8 +29,6 @@ class MarvinDataGroup(MarvinData.MarvinData):
         self._DataList.append(packet)
 
     def ToXML(self,destIsFile=False): 
-        startCDATA="<![CDATA["
-        endCDATA="]]>"
         if False == destIsFile:
             buffer = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
         else:

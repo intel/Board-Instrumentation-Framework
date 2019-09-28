@@ -20,7 +20,7 @@
 
 class ConnectionType(object):
     UpstreamServer = 0
-    DownstreamServer = 1
+    DownstreamServer = 1 # Minion towards Marvin
     Marvin = 2
     Minion = 3
     UpstreamOscar = 4
@@ -29,6 +29,8 @@ class ConnectionType(object):
     DynamicMarvin_To_Remove = 7
     DynamicOscar = 8
     DynamicOscar_To_Remove = 9
+    ProxyConnection_Server = 10
+    ProxyConnection_Client = 10
 
     Unknown = 20
     @staticmethod
@@ -41,6 +43,12 @@ class ConnectionType(object):
 
         if val == ConnectionType.Marvin:
             return "Marvin"
+
+        if val == ConnectionType.ProxyConnection_Server:
+            return "TCP Proxy - Server"
+
+        if val == ConnectionType.ProxyConnection_Client:
+            return "TCP Proxy - Client"
 
         if val == ConnectionType.Minion:
             return "Minion"

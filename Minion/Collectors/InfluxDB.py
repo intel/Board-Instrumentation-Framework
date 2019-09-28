@@ -62,7 +62,7 @@ import time
 from operator import itemgetter
 #from Util import Time
 from pprint import pprint as pprint
-
+import traceback
 
 VersionStr="19.02.24 Build 1"
 
@@ -286,7 +286,7 @@ class Measurement:
 
         retStr = keys[0]
         for colInfo in keys[1:]:
-            colName, valueStr = colInfo.split("=")
+            _, valueStr = colInfo.split("=")
             try:
                 float(valueStr)
 
@@ -454,7 +454,7 @@ class Measurement:
         for index in range(len(resultList)):
             entry = resultList[index]
             # if getting last, the keys are in a different place then if getting another way
-            if True == queryLast:
+            if True == queryLast and index < len(keyList):
                 keys = keyList[index][1]
             else:
                 keys = entry
@@ -532,7 +532,7 @@ class Measurement:
         if self._makeList: # Made lists, now let's add to the returning data map
             for Namespace in mapsUpdatedThisLoop:  # But only the ones changed in this loop
                 for listName in mapsUpdatedThisLoop[Namespace]:
-                    sz = str(len(self._listMap[Namespace][listName]))
+                    #sz = str(len(self._listMap[Namespace][listName]))
                     retMap[Namespace][listName + self._separator + "size"] = str(len(self._listMap[Namespace][listName]))
                     retMap[Namespace][listName] = ",".join(self._listMap[Namespace][listName])
 
@@ -641,6 +641,7 @@ def _CollectFunction(useLastMethod,frameworkInterface,target,username,password,d
             except Exception as Ex: #influxDB does NOT have a robust Exception system :-(
                 logger.info("InfluxDB Collector:  {}".format(Ex))
                 client.close()
+                traceback.print_exc()
                 continue
 
             client.close()

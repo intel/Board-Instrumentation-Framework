@@ -53,8 +53,8 @@ class MarvinDataHandler(object):
         Statistics.GetStatistics().OnPacketReceivedFromDownstream(rawData)
         try:
             packetType = node.attributes["Type"].nodeValue  #All should have a Type attribute
-            version  = node.getElementsByTagName('Version')
-        except Exception as ex:
+            _  = node.getElementsByTagName('Version')
+        except Exception as _:
             Statistics.GetStatistics().OnMalformedPacketReceived("Malformed Marvin Packet: " + rawData)
             return
         
@@ -98,7 +98,7 @@ class MarvinDataHandler(object):
             for param in node.getElementsByTagName('Param'): # Make an array of the params for the script
                 strParam = param.firstChild.nodeValue
                 Params.append(strParam)
-        except Exception as ex:
+        except Exception as _:
             Statistics.GetStatistics().OnMalformedPacketReceived("Received bad Oscar Task: " + rawData)
 
         if OscarID.lower() != Configuration.get().GetID().lower(): # Oscar packet, but probably not destined for this Oscar
@@ -412,12 +412,12 @@ class MarvinDataHandler(object):
 
         Statistics.GetStatistics().OnPacketReceivedFromDownstream(rawData)
         try:
-            version = node.getElementsByTagName('Version')[0].firstChild.nodeValue 
+            _ = node.getElementsByTagName('Version')[0].firstChild.nodeValue 
             IP = fromAddr[0].lower()
             Port = node.getElementsByTagName('Port')[0].firstChild.nodeValue
             UniqueID = node.getElementsByTagName('UniqueID')[0].firstChild.nodeValue
 
-        except Exception as Ex:
+        except Exception as _:
             Statistics.GetStatistics().OnMalformedPacketReceived("Received invalid Marvin WatchdogTimer  Packet : " + rawData)
             return
 
@@ -446,10 +446,10 @@ class MarvinDataHandler(object):
             Log.getLogger().info("Connection established with Marvin Target: "+ IP + ":" + Port + " Version: " + marvinVersion)
 
         try:
-            Initial = node.getElementsByTagName('RefreshRequested')[0].firstChild.nodeValue 
+            _ = node.getElementsByTagName('RefreshRequested')[0].firstChild.nodeValue 
             objTarget.ReArmRefreshRequest(UniqueID)  # Asked to refresh!
 
-        except Exception as Ex:
+        except Exception as _:
             pass
 
         objTarget.StrokeWatchdogTimer()
@@ -472,7 +472,7 @@ class MarvinDataHandler(object):
             IP = fromAddr[0].lower()
             Hostname = node.getElementsByTagName('Hostname')[0].firstChild.nodeValue
 
-        except Exception as Ex:
+        except Exception as _:
             Statistics.GetStatistics().OnMalformedPacketReceived("Received invalid Marvin Bullhorn  Packet : " + rawData)
             return
 
