@@ -301,6 +301,33 @@ public class ConfigurationReader
 	return objConditional;
     }
     
+    public boolean ReadConditionals(FrameworkNode parentNode)
+    {
+	for (FrameworkNode condNode : parentNode.getChildNodes("Conditional"))
+	{
+	    Conditional objCond = ReadConditional(condNode);
+	    if (null == objCond)
+	    {
+		return false;
+	    }
+	    else
+	    {
+		if (_conditionalMap.containsKey(objCond))
+		{
+		    LOGGER.config(
+			    "Duplicate conditional found.  Might want to check for multiple inclusions of same conditional. Conditional Information: "
+				    + objCond.toString());
+		}
+		else
+		{
+		    _conditionalMap.put(objCond, objCond);
+		}
+		objCond.Enable();	 
+	    }
+	}
+	return true;
+    }
+    
     private static boolean ReadConditionals(Document doc)
     {
 	/*
@@ -312,14 +339,16 @@ public class ConfigurationReader
 	 */
 	boolean retVal = true;
 	
-	NodeList conditionals = doc.getElementsByTagName("Conditional");
-	if (conditionals.getLength() < 1)
+	// NodeList conditionals = doc.getElementsByTagName("Conditional");
+	List<FrameworkNode> conditionals = FrameworkNode.GetChildNodes(doc, "Conditional");
+	
+	if (conditionals.size() < 1)
 	{
 	    return true;
 	}
-	for (int iLoop = 0; iLoop < conditionals.getLength(); iLoop++)
+	for (FrameworkNode condNode : conditionals)// int iLoop = 0; iLoop < conditionals.getLength(); iLoop++)
 	{
-	    FrameworkNode condNode = new FrameworkNode(conditionals.item(iLoop));
+	    // FrameworkNode condNode = new FrameworkNode(conditionals.item(iLoop));
 	    Conditional objCond = ReadConditional(condNode);
 	    if (null == objCond)
 	    {
@@ -951,6 +980,12 @@ public class ConfigurationReader
 	return tab;
     }
     
+    /***
+     * Reads at outtermost level of file
+     * 
+     * @param doc
+     * @return
+     */
     private static boolean ReadTaskAndConditionals(Document doc)
     {
 	boolean retVal = true;
@@ -1974,6 +2009,11 @@ public class ConfigurationReader
 	    if (node.getNodeName().equalsIgnoreCase("Tab"))
 	    {
 		TabWidget tab = null;
+		if (false == ReadConditionals(node))
+		{
+		    return null;
+		}
+		
 		if (node.hasAttributes())
 		{
 		    if (node.hasAttribute("ID"))
@@ -2115,7 +2155,7 @@ public class ConfigurationReader
 	    }
 	    else if (node.getNodeName().equalsIgnoreCase("Conditional"))
 	    {
-		
+		// taken care of elsewhere
 	    }
 	    else
 	    {

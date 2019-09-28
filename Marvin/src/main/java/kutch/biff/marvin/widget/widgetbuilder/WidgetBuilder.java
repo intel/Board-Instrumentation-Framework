@@ -1379,6 +1379,10 @@ public class WidgetBuilder
 	{
 	    return retWidget;
 	}
+	if (!ConfigurationReader.GetConfigReader().ReadConditionals(gridNode))
+	{
+	    return null;
+	}
 	for (FrameworkNode node : gridNode.getChildNodes(true))
 	{
 	    if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#comment"))
@@ -1460,6 +1464,10 @@ public class WidgetBuilder
 		    retWidget.setExplicitPropagate(true);
 		}
 	    }
+	    else if (node.getNodeName().contentEquals("Conditional"))
+	    {
+		// already taken care of
+	    }
 	    
 	    else if (!retWidget.HandleWidgetSpecificSettings(node))
 	    {
@@ -1484,6 +1492,10 @@ public class WidgetBuilder
 	if (null != filename)
 	{
 	    LOGGER.config("Processing file [" + filename + "]");
+	}
+	if (!ConfigurationReader.GetConfigReader().ReadConditionals(gridNode))
+	{
+	    return null;
 	}
 	
 	for (FrameworkNode node : gridNode.getChildNodes())
@@ -1628,6 +1640,10 @@ public class WidgetBuilder
 	    else if (node.getNodeName().equalsIgnoreCase("ClickThroughTransparent"))
 	    {
 		retWidget.SetClickThroughTransparentRegion(node.getBooleanValue());
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("Conditional"))
+	    {
+		
 	    }
 	    
 	    else
