@@ -220,7 +220,7 @@ public class ChartWidgetBuilder
 		    if (node.hasAttribute("MajorTickCount"))
 		    {
 			LOGGER.severe(
-				"Chart Widget definition has MajorTickInterval and MajorTickCount.  Ignoreing MajorTickInterval");
+				"Chart Widget definition has MajorTickInterval and MajorTickCount.  Ignoeing MajorTickInterval");
 		    }
 		    else
 		    {
@@ -254,7 +254,7 @@ public class ChartWidgetBuilder
 		    if (node.hasAttribute("MinortTickCount"))
 		    {
 			LOGGER.severe(
-				"Chart Widget definition has MinorTickInterval and MinorTickCount.  Ignoreing MinorTickInterval");
+				"Chart Widget definition has MinorTickInterval and MinorTickCount.  Ignoring MinorTickInterval");
 		    }
 		    else
 		    {
@@ -312,7 +312,7 @@ public class ChartWidgetBuilder
 		    if (node.hasAttribute("MajorTickCount"))
 		    {
 			LOGGER.severe(
-				"Chart Widget definition has MajorTickInterval and MajorTickCount.  Ignoreing MajorTickInterval");
+				"Chart Widget definition has MajorTickInterval and MajorTickCount.  Ignoring MajorTickInterval");
 		    }
 		    else
 		    {
@@ -346,7 +346,7 @@ public class ChartWidgetBuilder
 		    if (node.hasAttribute("MinortTickCount"))
 		    {
 			LOGGER.severe(
-				"Chart Widget definition has MinorTickInterval and MinorTickCount.  Ignoreing MinorTickInterval");
+				"Chart Widget definition has MinorTickInterval and MinorTickCount.  Ignoring MinorTickInterval");
 		    }
 		    else
 		    {
