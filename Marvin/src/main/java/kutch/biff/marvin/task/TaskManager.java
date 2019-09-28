@@ -22,8 +22,10 @@
 package kutch.biff.marvin.task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -1272,6 +1274,24 @@ public class TaskManager
 		    Params.clear(); // return an empty, but non-null list to know there was a problem.
 		    LOGGER.severe("Empty <Param> in task");
 		    break;
+		}
+	    }
+	    else
+	    {
+		List<String> validTags = Arrays.asList("TASK", "DATATOINSERT", "ACTOR", "ConnectionInfo");
+		String strTag = node.getNodeName();
+		boolean invalidTag = true;
+		for (String validTag : validTags)
+		{
+		    if (validTag.equalsIgnoreCase(strTag))
+		    {
+			invalidTag = false;
+			break;
+		    }
+		}
+		if (invalidTag)
+		{
+		    LOGGER.warning("Possible unknown tag in task: " + strTag);
 		}
 	    }
 	}
