@@ -1282,6 +1282,10 @@ public class WidgetBuilder
 	    {
 		retWidget = TextBuilder.ListBoxText_Build(baseNode, Filename);
 	    }
+	    else if (strWidget.equalsIgnoreCase("TableChart"))
+	    {
+		retWidget = TableChartBuilder.Build(baseNode, Filename);
+	    }
 	    
 	    else
 	    {
