@@ -13,7 +13,7 @@
     -fx-base: #000000;
     -fx-background: derive(-fx-base,25%);
     -fx-control-inner-background: derive(-fx-base,80%);
-    -fx-control-inner-background-alt: derive(-fx-control-inner-background,-2%);
+    -fx-control-inner-background-alt: derive(-fx-control-inner-background,-20%);
     -fx-dark-text-color: black;
     -fx-mid-text-color: #a09898;
     -fx-light-text-color: white;

@@ -1,6 +1,10 @@
 package kutch.biff.marvin.widget.widgetbuilder;
 
+import java.util.logging.Logger;
+
+import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.FrameworkNode;
+import kutch.biff.marvin.widget.BaseWidget;
 import kutch.biff.marvin.widget.TableChartWidget;
 
 /*
@@ -30,9 +34,22 @@ import kutch.biff.marvin.widget.TableChartWidget;
 */
 public class TableChartBuilder
 {
+    private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     public final static TableChartWidget Build(FrameworkNode masterNode, String widgetDefFilename)
     {
-	return new TableChartWidget();
+	TableChartWidget objTableChart =  new TableChartWidget();
+	for (FrameworkNode node : masterNode.getChildNodes())
+	{
+	    if (BaseWidget.HandleCommonDefinitionFileConfig(objTableChart, node))
+	    {
+		continue;
+	    }
+	    else
+	    {
+		LOGGER.warning("Unknown section in " + widgetDefFilename +": " + node.getNodeName());
+	    }
+	}
+	return objTableChart;
     }
 }

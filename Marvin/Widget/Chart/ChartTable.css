@@ -1,0 +1,64 @@
+/**** CSS file for tableview ****/
+
+.table-view .column-header .label{
+   -fx-text-fill: white;
+   -fx-font-weight: bold; 
+   -fx-alignment: CENTER;
+}
+.table-view .cell {
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-table-cell-border-color, -fx-background;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0;
+    -fx-text-fill: -fx-text-background-color;
+    -fx-alignment: CENTER_LEFT;
+}
+.table-view .cell:odd {
+    -fx-background: -fx-control-inner-background-alt;
+    /*
+    -fx-text-fill: blue;
+    -fx-alignment: CENTER_RIGHT;
+    */
+}
+
+}
+/*
+.table-row-cell:selected {
+   -fx-background-color: whitesmoke; 
+   -fx-text-background-color:  #6622CC;
+   
+       
+}
+*/
+/* scroll bar starts here */
+
+/* The increment and decrement button CSS class of scrollbar */
+/*
+.table-view .increment-button ,.table-view .decrement-button {
+    -fx-background-color:transparent;
+	-fx-background-radius: 2em;
+}
+*/
+
+/* The main scrollbar **track** CSS class  */
+/*
+.table-view .scroll-bar:horizontal .track,
+.table-view .scroll-bar:vertical .track{
+	-fx-background-color: transparent;
+	-fx-border-color:derive( #6622CC,80%);
+
+	-fx-background-radius: 2em;
+	-fx-border-radius:2em;
+}
+*/
+
+/* The main scrollbar **thumb** CSS class which we drag every time (movable) */
+/*
+.table-view .scroll-bar:horizontal .thumb,
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color:derive( #6622CC,90%);
+	-fx-background-insets: 2, 0, 0;
+	-fx-background-radius: 2em;
+}
+*/
+

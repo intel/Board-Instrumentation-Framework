@@ -28,7 +28,6 @@ import java.util.List;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -55,13 +54,17 @@ public class TableChartWidget extends BaseWidget
     {
 	private String _text;
 	private int _Width;
+	private double _PercentWidth;
 	private List<TableColumnClass> _subColumn;
+	private TableColumn<ObservableList<StringProperty>, String> _objColumn;
 	
 	public TableColumnClass(String text)
 	{
 	    _text = text;
 	    _subColumn = new ArrayList<TableColumnClass>();
 	    _Width = -1;
+	    _PercentWidth = -1;
+	    _objColumn = null;
 	}
 	
 	public void addSubColumn(TableColumnClass subCol)
@@ -79,6 +82,11 @@ public class TableChartWidget extends BaseWidget
 	    return _subColumn;
 	}
 	
+	public void setPercentWidth(double newVal)
+	{
+	    _PercentWidth = newVal;
+	}
+	
 	public int getWidth()
 	{
 	    return _Width;
@@ -87,6 +95,20 @@ public class TableChartWidget extends BaseWidget
 	public void setWidth(int newWidth)
 	{
 	    _Width = newWidth;
+	}
+	
+	public void setTableColumnObject(TableColumn<ObservableList<StringProperty>, String> objColumn)
+	{
+	    _objColumn = objColumn;
+	}
+	
+	public void updateWidthBasedOnParent(double parentWidth)
+	{
+	    if (_PercentWidth > 0.0)
+	    {
+		double newWidth = (_PercentWidth / 100.0) * parentWidth;
+		_objColumn.setMinWidth(newWidth);
+	    }
 	}
     }
     
@@ -147,20 +169,33 @@ public class TableChartWidget extends BaseWidget
 	    return __dataIndexRange;
 	}
 	
-	public void setupListener(DataManager dataMgr)
+	public void setupListener(DataManager dataMgr, int decimals)
 	{
 	    if (null == _ID || null == _Namespace)
 	    {
 		return;
 	    }
-	    // dataMgr.AddListener(_ID, _Namespace, new ChangeListener<Object>()
+	    
 	    dataMgr.AddListener(_ID, _Namespace, new MarvinChangeListener(get__dataIndex(), get__dataIndexToken())
 	    {
 		@Override
 		public void onChanged(String newValue)
 		{
-		    _cellData.set(newValue);
+		    if (decimals >= 0)
+		    {
+			try
+			{
+			    String fmtString = "%." + Integer.toString(decimals) + "f";
+			    float fVal = Float.parseFloat(newValue);
+			    newValue = String.format(fmtString, fVal);
+			}
+			catch(Exception ex)
+			{
+			    
+			}
+		    }
 		    
+		    _cellData.set(newValue);
 		}
 	    });
 	    
@@ -171,6 +206,7 @@ public class TableChartWidget extends BaseWidget
     private TableColumnClass _columns;
     private String columnSrcID, columnSrcNamespace;
     private List<List<TableCellClass>> _rows;
+    private List<Integer> _decimals;
     
     public TableChartWidget()
     {
@@ -179,6 +215,7 @@ public class TableChartWidget extends BaseWidget
 	_rows = new ArrayList<>();
 	columnSrcID = null;
 	columnSrcNamespace = null;
+	_decimals = new ArrayList<>();
     }
     
     @Override
@@ -188,6 +225,7 @@ public class TableChartWidget extends BaseWidget
 	{
 	    return false;
 	}
+
 	ConfigureDimentions();
 	
 	ConfigureAlignment();
@@ -209,25 +247,25 @@ public class TableChartWidget extends BaseWidget
     @Override
     public Node getStylableObject()
     {
-	// TODO Auto-generated method stub
 	return _table;
     }
     
     @Override
     public ObservableList<String> getStylesheets()
     {
-	// TODO Auto-generated method stub
 	return _table.getStylesheets();
-    }
-    
-    @Override
-    public void UpdateTitle(String newTitle)
-    {
-	// TODO Auto-generated method stub
     }
     
     protected boolean SetupTable(DataManager dataMgr)
     {
+	// in case widget <Decimals> is definend after the <Columns> 
+	for (int index = 0; index < _decimals.size(); index++)
+	{
+	    if (_decimals.get(index)== -2)
+	    {
+		_decimals.set(index, getDecimalPlaces());
+	    }
+	}
 	if (_columns.getSubColumns().size() < 1)
 	{
 	    if (columnSrcID == null && null == columnSrcNamespace)
@@ -241,6 +279,10 @@ public class TableChartWidget extends BaseWidget
 	{
 	    TableColumn<ObservableList<StringProperty>, String> objCol;
 	    objCol = createColumn(index, col.getText());
+	    if (col.getSubColumns().size()==0)
+	    {
+		col.setTableColumnObject(objCol);
+	    }
 	    if (col.getWidth() > 0)
 	    {
 		objCol.setMinWidth(col.getWidth());
@@ -249,6 +291,7 @@ public class TableChartWidget extends BaseWidget
 	    {
 		TableColumn<ObservableList<StringProperty>, String> subSubCol;
 		subSubCol = createColumn(index++, subCol.getText());
+		subCol.setTableColumnObject(subSubCol);
 		if (subCol.getWidth() > 0)
 		{
 		    subSubCol.setMinWidth(subCol.getWidth());
@@ -261,7 +304,7 @@ public class TableChartWidget extends BaseWidget
 	    
 	    index += 1;
 	}
-	
+
 	for (List<TableCellClass> row : _rows)
 	{
 	    if (row.size() != index)
@@ -283,7 +326,7 @@ public class TableChartWidget extends BaseWidget
     private TableColumnClass readColumn(FrameworkNode colNode)
     {
 	TableColumnClass objColumn = null;
-	Utility.ValidateAttributes(new String[] { "Text", "Width" }, colNode);
+	Utility.ValidateAttributes(new String[] { "Text", "Width", "Decimals" }, colNode);
 	
 	if (colNode.hasAttribute("Text"))
 	{
@@ -304,9 +347,55 @@ public class TableChartWidget extends BaseWidget
 		}
 	    }
 	}
+	else
+	{
+	    LOGGER.severe("TableChart Widget <Column> requires 'Text' attribute");
+	    return null;
+	}
+	if (colNode.hasAttribute("Decimals"))
+	{
+	    _decimals.add(colNode.getIntegerAttribute("Decimals", -1));
+	}
+	else
+	{
+	    _decimals.add(-2);
+	}
+	    
 	if (colNode.hasAttribute("Width"))
 	{
-	    int width = colNode.getIntegerAttribute("Width", -1);
+	    int width = -1;
+	    if (!colNode.getAttribute("Width").contains("%"))
+	    {
+		width = colNode.getIntegerAttribute("Width", -1);
+	    }
+	    
+	    if (-1 == width)
+	    {
+		if (colNode.getAttribute("Width").contains("%"))
+		{
+		    String[] parts = colNode.getAttribute("Width").split("%");
+		    if (parts.length == 1)
+		    {
+			try
+			{
+			    double dVal = Double.parseDouble(parts[0]);
+			    objColumn.setPercentWidth(dVal);
+			}
+			catch(Exception ex)
+			{
+			    LOGGER.severe("Width of TableChart column is invalid: " + colNode.getAttribute("Width"));
+			}
+		    }
+		    else
+		    {
+			LOGGER.severe("Width of TableChart column is invalid: " + colNode.getAttribute("Width"));
+		    }
+		}
+		else
+		{
+		    LOGGER.severe("Width of TableChart column is invalid: " + colNode.getAttribute("Width"));
+		}
+	    }
 	    objColumn.setWidth(width);
 	}
 	
@@ -339,9 +428,11 @@ public class TableChartWidget extends BaseWidget
     {
 	for (List<TableCellClass> row : _rows)
 	{
+	    int column = 0;
 	    for (TableCellClass cell : row)
 	    {
-		cell.setupListener(dataMgr);
+		cell.setupListener(dataMgr, _decimals.get(column));
+		column++;
 	    }
 	}
     }
@@ -356,17 +447,19 @@ public class TableChartWidget extends BaseWidget
 		_rows.add(columnsInRow);
 		for (FrameworkNode columnNode : rowNode.getChildNodes())
 		{
-		    
-		    Utility.ValidateAttributes(new String[] { "ID", "Namespace","DataIndex","Separator" }, columnNode);
+		    Utility.ValidateAttributes(new String[] { "ID", "Namespace", "DataIndex", "Separator" },
+			    columnNode);
 		    try
 		    {
 			TableCellClass cell = new TableCellClass(columnNode.getAttribute("ID"),
 				columnNode.getAttribute("Namespace"), columnNode.getTextContent());
+			
 			columnsInRow.add(cell);
 			Pair<ValueRange, String> indexInfo = WidgetBuilder.ReadMinionSrcIndexInfo(columnNode);
 			cell.set__dataIndex(indexInfo.getKey());
 			cell.set__dataIndexToken(indexInfo.getValue());
 		    }
+		    
 		    catch(IllegalArgumentException ex)
 		    {
 			return false;
@@ -378,38 +471,21 @@ public class TableChartWidget extends BaseWidget
 	return true;
     }
     
-    private TableColumn<ObservableList<StringProperty>, String> createColumn(final int columnIndex, String columnTitle)
+    private TableColumn<ObservableList<StringProperty>, String> createColumn(int columnIndex, String columnTitle)
     {
-	TableColumn<ObservableList<StringProperty>, String> column = new TableColumn<>();
-	String title;
-	if (columnTitle == null || columnTitle.trim().length() == 0)
-	{
-	    title = "Column " + (columnIndex + 1);
-	}
-	else
-	{
-	    title = columnTitle;
-	}
-	column.setText(title);
-	column.setCellValueFactory(
+	TableColumn<ObservableList<StringProperty>, String> objColumn = new TableColumn<>();
+	objColumn.setText(columnTitle);
+	objColumn.setCellValueFactory(
 		new Callback<TableColumn.CellDataFeatures<ObservableList<StringProperty>, String>, ObservableValue<String>>()
 		{
 		    @Override
 		    public ObservableValue<String> call(
 			    CellDataFeatures<ObservableList<StringProperty>, String> cellDataFeatures)
 		    {
-			ObservableList<StringProperty> values = cellDataFeatures.getValue();
-			if (columnIndex >= values.size())
-			{
-			    return new SimpleStringProperty("");
-			}
-			else
-			{
 			    return cellDataFeatures.getValue().get(columnIndex);
-			}
 		    }
 		});
-	return column;
+	return objColumn;
     }
     
     @Override
@@ -425,6 +501,31 @@ public class TableChartWidget extends BaseWidget
 	}
 	
 	return false;
+    }
+    
+    @Override
+    public boolean handlePercentageDimentions()
+    {
+	boolean fRet = super.handlePercentageDimentions();
+	
+	double tableWidth = _table.getPrefWidth();
+	for (TableColumnClass col : _columns.getSubColumns())
+	{
+	    col.updateWidthBasedOnParent(tableWidth);
+	    for (TableColumnClass subCol : col.getSubColumns())
+	    {
+		subCol.updateWidthBasedOnParent(tableWidth);
+	    }
+	    
+	}
+	
+	return fRet;
+    }
+    
+    @Override
+    public void UpdateTitle(String newTitle)
+    {
+	
     }
     
 }
