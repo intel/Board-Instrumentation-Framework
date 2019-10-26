@@ -595,7 +595,7 @@ public class GenerateDatapointInfo
 	    return;
 	}
 	
-	int index = 0;
+	int index = -1;
 	
 	for (String strValue : parts)
 	{
@@ -618,9 +618,9 @@ public class GenerateDatapointInfo
 		    else
 		    {
 			precision = 0;
-		    }
-		    
+		    }		    
 		}
+		
 		DecimalFormat df = new DecimalFormat();
 		df.setGroupingUsed(false);
 		df.setMaximumFractionDigits(precision);
