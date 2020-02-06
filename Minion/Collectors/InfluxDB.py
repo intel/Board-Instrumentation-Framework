@@ -641,7 +641,7 @@ def _CollectFunction(useLastMethod,frameworkInterface,target,username,password,d
             except Exception as Ex: #influxDB does NOT have a robust Exception system :-(
                 logger.info("InfluxDB Collector:  {}".format(Ex))
                 client.close()
-                traceback.print_exc()
+                traceback.print_exec()
                 continue
 
             client.close()
