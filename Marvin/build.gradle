@@ -29,11 +29,11 @@
 import java.text.SimpleDateFormat
 plugins {
 	id 'application'
-	id 'org.openjfx.javafxplugin' version '0.0.7'
+	id 'org.openjfx.javafxplugin' version '0.0.9'
 	id 'net.nemerosa.versioning' version '2.8.2'
     id 'java'
     id 'idea'
-	id 'com.gradle.build-scan' version '2.1'
+	/* id 'com.gradle.build-scan' version '2.1' */
 	/*id 'org.beryx.jlink' version '2.10.2'*/
 }
 

@@ -24,7 +24,7 @@ plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
 	id 'net.nemerosa.versioning' version '2.8.2'
-	id 'org.openjfx.javafxplugin' version '0.0.7'
+	id 'org.openjfx.javafxplugin' version '0.0.9'
 	id 'com.gradle.build-scan' version '2.1'
 
     id 'idea'
