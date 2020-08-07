@@ -1,5 +1,5 @@
 ﻿##############################################################################
-#  Copyright (c) 2016 Intel Corporation
+#  Copyright (c) 2020 Intel Corporation
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -55,7 +55,10 @@ def ReadFromFile(Filename):
     except Exception:
         return "N/A"
 
-    return file.read().strip()
+    retData = file.read() 
+    file.close() #close ASAP
+    retData = retData.strip()
+    return retData
 
 # in case we want to run this from a container and mount a dir
 def GetBaseDir():
@@ -525,3 +528,64 @@ def CollectDeviceStatistics(frameworkInterface,**kwargs):
         frameworkInterface.Logger.error("Unrecoverable error in LinuxNetwork Collector plugin: " + str(ex))
             
 
+
+##############################################################################
+#  Returns the information down in /proc/net/softnet_stat, in lists
+#  Example usage, that normalizes to per ke packets per core:
+# <DynamicCollector>
+#   <Plugin>
+#      <PythonFile>Collectors/LinuxNetwork.py</PythonFile>
+#		   <EntryPoint SpawnThread="False">GetPerCorePacketsList</EntryPoint>
+#	   </Plugin>
+#   <Normalize>0.001</Normalize>
+# </DynamicCollector>
+def GetPerCorePacketsList(frameworkInterface):
+    procNetStats = ReadFromFile("/proc/net/softnet_stat")
+    statList = procNetStats.split('\n')
+    processedList=[]
+    droppedList=[]
+    time_squeezeList=[]
+    cpu_collisionList=[]
+    received_rpsList=[]
+    flow_limit_countList=[]
+    olderKernel = False
+    for coreNum,line in enumerate(statList):
+        if True == olderKernel:
+            processed,dropped,time_squeeze,_,_,_,_,_,cpu_collision,received_rps = line.split(" ")
+            flow_limit_count = "0"
+            
+        else: #older kernels do not have flow_limit_count
+            try:
+                processed,dropped,time_squeeze,_,_,_,_,_,cpu_collision,received_rps,flow_limit_count = line.split(" ")
+                
+            except:
+                print(line)
+                processed,dropped,time_squeeze,_,_,_,_,_,cpu_collision,received_rps = line.split(" ")
+                flow_limit_count = "0"
+                olderKernel = True
+                
+        processedList.append(str(int(processed,16)))
+        droppedList.append(str(int(dropped,16)))
+        time_squeezeList.append(str(int(time_squeeze,16)))
+        cpu_collisionList.append(str(int(cpu_collision,16)))
+        received_rpsList.append(str(int(received_rps,16)))
+        flow_limit_countList.append(str(int(flow_limit_count,16)))
+    
+    if not frameworkInterface.DoesCollectorExist("softnet.processed"):
+        frameworkInterface.AddCollector("softnet.processed")
+        frameworkInterface.AddCollector("softnet.dropped")
+        frameworkInterface.AddCollector("softnet.time_squeeze")
+        frameworkInterface.AddCollector("softnet.cpu_collision")
+        frameworkInterface.AddCollector("softnet.received_rps")
+        frameworkInterface.AddCollector("softnet.flow_limit_count")
+       
+    frameworkInterface.SetCollectorValue("softnet.processed",','.join(processedList))
+    frameworkInterface.SetCollectorValue("softnet.dropped",','.join(droppedList))
+    frameworkInterface.SetCollectorValue("softnet.time_squeeze",','.join(time_squeezeList))
+    frameworkInterface.SetCollectorValue("softnet.cpu_collision",','.join(cpu_collisionList))
+    frameworkInterface.SetCollectorValue("softnet.received_rps",','.join(received_rpsList))
+    frameworkInterface.SetCollectorValue("softnet.flow_limit_count",','.join(flow_limit_countList))
+    
+
+
+    

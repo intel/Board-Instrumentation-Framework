@@ -1,5 +1,5 @@
 ﻿##############################################################################
-#  Copyright (c) 2016 Intel Corporation
+#  Copyright (c) 2016-2020 Intel Corporation
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,4 +17,4 @@
 #   External file containing the version string for the application    
 #
 ##############################################################################
-__version__ = "19.08.10 Build 1"
+__version__ = "20.08.07 Build 1"
