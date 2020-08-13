@@ -204,7 +204,7 @@ class DynamicCollector(Collector.Collector):
         if None == retVal:
             retVal = "HelenKeller"
         return retVal
-
+        
     def __createCollector(self,ID,fromPlugin=False):
         objCollector = Collector.Collector(self._NamespaceObject,ID,self._InGroup)
 
@@ -220,6 +220,7 @@ class DynamicCollector(Collector.Collector):
         objCollector.GetElapsedTimeSinceLast = objCollector.GetElapsedTimeForDynamicWidget #remap the fn called
         objCollector.SetLastCollectionTime = objCollector.SetLastCollectionTimeForDynamicWidget
         objCollector.SetProcessThreadID(self.GetProcessThreadID())
+        objCollector.GetElapsedTimeSinceLast = objCollector.GetElapsedTimeSinceLastForDynamicWidget
 
         if True == fromPlugin: # bit of a hack, only need this if from a plugin
         # 'hack' to have multiple namespaces coming from same plugin - like influxdb

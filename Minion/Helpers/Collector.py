@@ -318,6 +318,14 @@ class Collector:
 
         return buffer
         
+    # override this and provide elapsed time from parent dynamic collector
+    # the other logic I have in here to do this was slowly making elapsed time
+    # smaller and smaller for some reason I can't find.  This override fixed behavior
+    # but not the problem, where the smaller reported elapsed time was really goofing up
+    # normilization
+    def GetElapsedTimeSinceLastForDynamicWidget(self):
+        return self.DynamicCollectorParent._LastElapsedTimePeriod
+        
     def _VerifyParams(self,paramList):
         for param in paramList:
             if str(param) == "Invalid input collector ID":
