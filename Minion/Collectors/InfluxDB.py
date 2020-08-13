@@ -224,6 +224,7 @@ class Measurement:
         for category in client.get_list_measurements():
             categories.append(category['name'])
 
+        pprint(categories)
         return categories
 
     # gets all the different possible different datapoint ID's for a category
@@ -533,7 +534,7 @@ class Measurement:
                 for listName in mapsUpdatedThisLoop[Namespace]:
                     #sz = str(len(self._listMap[Namespace][listName]))
                     retMap[Namespace][listName + self._separator + "size"] = str(len(self._listMap[Namespace][listName]))
-                    retMap[Namespace][listName] = ",".join(self._listMap[Namespace][listName])
+                    retMap[Namespace][listName] = ",".join(str(self._listMap[Namespace][listName]))
 
         #print("Process Took {}ms".format(GetCurrMS()-start))
 
@@ -543,6 +544,7 @@ class Measurement:
         dataMap={}
         if None == self._MeasurementList or 0 == len(self._MeasurementList):
             self.determineMeasurementList(dbClient)
+            pprint(self._MeasurementList)
 
         for measurement in self._MeasurementList:
             #self.getKeysForCategory(self,dbClient,measurement) 
