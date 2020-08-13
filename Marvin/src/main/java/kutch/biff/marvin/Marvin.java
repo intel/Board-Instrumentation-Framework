@@ -95,8 +95,7 @@ public class Marvin extends Application
 	Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 	Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
 	
-	LOGGER.info("******* Dumping " + Integer.toString(threadArray.length) + " Threads from thread: "
-		+ Thread.currentThread().getName() + " ****************");
+	LOGGER.log(Level.INFO, "******* Dumping {0} Threads from thread: {1} ****************", new Object[]{Integer.toString(threadArray.length), Thread.currentThread().getName()});
 	
 	String dumpString = "";
 	for (Thread entry : threadArray)
