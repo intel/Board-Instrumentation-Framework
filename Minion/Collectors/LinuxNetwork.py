@@ -23,7 +23,7 @@ import time
 import socket
 import glob
 import array
-import fcntl
+import fcntl # pylint: disable=import-error
 import struct
 from pprint import pprint as pprint
 
@@ -177,6 +177,7 @@ class NetworkInfo:
 
     def __GetDeviceList(self):
         retList=[]
+        #pylint: disable=unused-variable
         for root, dirs, files in os.walk(GetBaseDir()):
             for devName in dirs:
                 if match(self._deviceName,devName):
@@ -196,6 +197,7 @@ class NetworkInfo:
         for ethDev in self.__devList:
             nextDir = GetBaseDir() + "/"  + ethDev + "/statistics"
             baseName='netdev.' + ethDev
+            #pylint: disable=unused-variable
             for statRoot, statDirs, statFiles in os.walk(nextDir):
                 for fname in statFiles:
                     sFileName = nextDir + "/" + fname
@@ -284,7 +286,7 @@ class NetworkInfo:
                     busID=line.split(' ')[0]
                     devInfoStr = line[len(busID)+checkStrLen+2:]
                     lscpiDataMap[busID]=devInfoStr
-
+        #pylint: disable=unused-variable
         except Exception as Ex:
             pass
 
@@ -304,7 +306,7 @@ class NetworkInfo:
             for key in dataMap:
                 if key in busID:
                     return dataMap[key]
-
+        #pylint: disable=unused-variable
         except Exception as ex:
             pass
 
@@ -314,6 +316,7 @@ class NetworkInfo:
         nextDir = GetBaseDir() + "/"  + ethDev + "/statistics"
         baseName='netdev.'
         if not slimDataset:
+            #pylint: disable=unused-variable
             for statRoot, statDirs, statFiles in os.walk(nextDir):
                 for fname in statFiles:
                     sFileName = nextDir + "/" + fname
@@ -370,6 +373,7 @@ class NetworkInfo:
 
     def __GetDriver(self,device):
         link = 	GetBaseDir() + '/' +device + '/device/driver/module/drivers'
+        #pylint: disable=unused-variable
         for root, driver, files in os.walk(link):
             driver = driver[0]
             if None != driver[0] and ':' in driver:
@@ -382,6 +386,7 @@ class NetworkInfo:
 
     def __GatherAllNetworkDeviceInfo(self,slimDataSet,pyhysicalOnly=True):
         tMap={}
+        #pylint: disable=unused-variable
         for root, dirs, files in os.walk(GetBaseDir()):
             for dir in dirs:
                 if False == pyhysicalOnly or self.__IsPhysicalDevice(dir):
@@ -416,7 +421,7 @@ def CollectAllDevices(frameworkInterface,slimDataSetParam,**kwargs):
         SleepTime = float(frameworkInterface.Interval)/1000.0   
 
         InitialRun = True
-        objNetInfo = NetworkInfo()
+        objNetInfo = NetworkInfo(frameworkInterface)
         while not frameworkInterface.KillThreadSignalled():
             dataMap = objNetInfo.__GatherAllNetworkDeviceInfo(slimDataSet,physicalOnly)
             for entry in dataMap:
@@ -463,7 +468,7 @@ def CollectDevice(frameworkInterface,DeviceName,slimDataSetParam):
 
         SleepTime = float(frameworkInterface.Interval)/1000.0
         InitialRun = True
-        objNetInfo = NetworkInfo()
+        objNetInfo = NetworkInfo(frameworkInterface)
         while not frameworkInterface.KillThreadSignalled():
             dataMap={}
             objNetInfo.__GatherNetworkDeviceInfo(DeviceName,dataMap,slimDataSet)
@@ -549,6 +554,7 @@ def GetPerCorePacketsList(frameworkInterface):
     received_rpsList=[]
     flow_limit_countList=[]
     olderKernel = False
+    #pylint: disable=unused-variable
     for coreNum,line in enumerate(statList):
         if True == olderKernel:
             processed,dropped,time_squeeze,_,_,_,_,_,cpu_collision,received_rps = line.split(" ")

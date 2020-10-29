@@ -78,7 +78,7 @@ class UserPluginFramework:
         lenCheck = len(Parameters)      
 
         offset = 0                  #Param1 =  fnName
-
+        #pylint: disable=unused-variable
         try: #different fn calls based upon # of params.
             if 1 == lenCheck: 
                 if None != self.kwargs:

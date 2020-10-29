@@ -151,7 +151,7 @@ class DynamicCollector(Collector.Collector):
 
                 except Exception as ex:
                     return "0"
-
+        #pylint: disable=unused-variable
         except Exception as Ex:
             if not self.__LoadWarningSent:
                 self.__LoadWarningSent = True
@@ -418,7 +418,7 @@ def WaitForLock(LockFileName):
         os.write(lockFile,"lock".encode('utf-8'))
         os.close(lockFile)
         return True
-
+    #pylint: disable=unused-variable
     except Exception as ex:
         #give it one more try
        # iCount=0

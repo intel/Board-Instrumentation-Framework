@@ -32,6 +32,7 @@ def __WalkList(dataList, frameworkInterface,averageFlag,prefix=""):
             pass #shouldn't get here
 
 def __WalkMap(dataMap, frameworkInterface,averageFlag,prefix=""):
+    #pylint: disable=unused-variable
     Logger = frameworkInterface.Logger
     global __averageMap
     for entryKey in dataMap:
@@ -94,6 +95,7 @@ def JSON_Network_Collector(frameworkInterface, IP, Port, averageDataStr):
 
     while not frameworkInterface.KillThreadSignalled():
         try:
+            #pylint: disable=unused-variable
             data, fromAddress = recvSocket.recvfrom(8192)
             data = data.strip().decode("utf-8")
             dataMap = json.loads(data)

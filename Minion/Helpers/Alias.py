@@ -107,6 +107,7 @@ class AliasMgr:
         #open the xml file for reading:
         try:
             file = open(filename,'r')
+        #pylint: disable=unused-variable
         except Exception as ex:
             Log.getLogger().error("Invalid Alias File: " + filename)
             return False
