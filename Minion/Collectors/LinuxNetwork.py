@@ -315,7 +315,7 @@ class NetworkInfo:
 
     def GatherNetworkDeviceInfo(self,ethDev,retMap,slimDataset):
         nextDir = GetBaseDir() + "/"  + ethDev + "/statistics"
-        baseName='netdev.'
+        baseName='netdev.' + ethDev
         if not slimDataset:
             for statRoot, statDirs, statFiles in os.walk(nextDir):
                 for fname in statFiles:
