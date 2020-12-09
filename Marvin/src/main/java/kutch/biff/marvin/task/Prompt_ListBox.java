@@ -38,6 +38,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import kutch.biff.marvin.configuration.Configuration;
+import kutch.biff.marvin.configuration.ConfigurationReader;
 import kutch.biff.marvin.logger.MarvinLogger;
 import kutch.biff.marvin.utility.DataPointGenerator;
 import kutch.biff.marvin.utility.FrameworkNode;
@@ -85,6 +86,7 @@ public class Prompt_ListBox extends BasePrompt
     {
 	if (baseNode.getNodeName().equalsIgnoreCase("List"))
 	{
+            int itemIndex = 0;
 	    for (FrameworkNode node : baseNode.getChildNodes(true))
 	    {
 		if (node.getNodeName().equalsIgnoreCase("#Text") || node.getNodeName().equalsIgnoreCase("#Comment"))
@@ -104,12 +106,16 @@ public class Prompt_ListBox extends BasePrompt
 			strDisplayText = node.getTextContent();
 		    }
 		    /*
-		     * Beginning of work, but not yet done List<DataPointGenerator> dataPoints =
-		     * null; if (node.hasAttribute("CreateDataPoint")) { dataPoints =
-		     * ConfigurationReader.ReadDataPointsForTask(node.getAttribute("CreateDataPoint"
-		     * ),node.getAttribute("Text"),node.getAttribute("Task")); }
-		     * AddListItem(strDisplayText,node.getTextContent(),dataPoints);
+		     * Beginning of work, but not yet done 
 		     */
+
+                    List<DataPointGenerator> dataPoints = null; 
+                    if (node.hasAttribute("CreateDataPoint")) 
+                    { 
+                        dataPoints = ConfigurationReader.ReadDataPointsForTask(itemIndex++,node.getAttribute("CreateDataPoint"),
+                                node.getAttribute("Text"),node.getAttribute("Task")); 
+                    }
+		    AddListItem(strDisplayText,node.getTextContent(),dataPoints);
 		}
 		else
 		{
@@ -130,7 +136,7 @@ public class Prompt_ListBox extends BasePrompt
 	if (_ParamList.isEmpty())
 	{
 	    LOGGER.severe("Listbox Prompt [" + toString() + "] had no <List> items.");
-	    return null;
+	    //return null;
 	}
 	GridPane root = new GridPane();
 	
