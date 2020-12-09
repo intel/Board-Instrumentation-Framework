@@ -279,7 +279,7 @@ def GetSystemAverageCPU(interval=.1,precision=2):
 
 ## Dynamic Collector interface, gets all raw stats
 def CollectStatsFunction(frameworkInterface):
-    dataMap = ReadProcStats(interval=.1,precision=2)
+    dataMap = ReadProcStats()
 
     for collectorID in dataMap:
         if not frameworkInterface.DoesCollectorExist(collectorID):

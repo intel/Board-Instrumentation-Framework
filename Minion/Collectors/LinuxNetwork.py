@@ -14,7 +14,7 @@
 #  limitations under the License.
 ##############################################################################
 #    File Abstract: 
-#    This attempts to get Netowkr information on a Linux System
+#    This attempts to get Network information on a Linux System
 #
 ##############################################################################
 import os
@@ -23,11 +23,12 @@ import time
 import socket
 import glob
 import array
-import fcntl # pylint: disable=import-error
+import fcntl
 import struct
+
 from pprint import pprint as pprint
 
-VersionStr="v19.01.15"
+VersionStr="v20.12.09"
 lscpiDataMap=None
 netdevInfoDir="/sys/class/net"
 
@@ -45,6 +46,9 @@ ETHTOOL_GCOALESCE =	0x0000000e
 ETHTOOL_FWVERS_LEN	= 32
 ETHTOOL_BUSINFO_LEN	= 32
 ETHTOOL_EROMVERS_LEN = 32
+
+def GetCurrMS():
+    return  int(round(time.time() *1000)) # Gives you float secs since epoch, so make it ms and chop
 
 
 def ReadFromFile(Filename):
@@ -100,10 +104,9 @@ def match(strValue_1, strValue_2):
     return False    
 
 class NetworkInfo:
-    def __init__(self,frameworkInterface,**kwargs):
-        self.__frameworkInterface = frameworkInterface
+    def __init__(self,logInst,**kwargs):
         self.__args = kwargs
-        self.__LOGGER = self.__frameworkInterface.Logger
+        self.__LOGGER = logInst
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0) #for ioctl
 
         if False == self.__validateArgs():
@@ -113,9 +116,9 @@ class NetworkInfo:
         args = self.__args
         LOGGER = self.__LOGGER
         if not 'device' in args:
-            LOGGER.error("No device specified for Collector")
-            return False
-        self._deviceName = args['device']
+            self._deviceName = "Not Specified"
+        else:
+            self._deviceName = args['device']
 
         if 'queues' in args:
             self.__queueList= ParseListStr(args['queues'])
@@ -166,18 +169,17 @@ class NetworkInfo:
                 LOGGER.info("source not specified, using data from  driver ")
                 self.__usingDriver = True
 
-        self.__devList = self.__GetDeviceList()                
-        if 0 == len(self.__devList):
-            LOGGER.error("No devices matching: " + self._deviceName )
-            return False
+        #self.__devList = self.__GetDeviceList()                
+        #if 0 == len(self.__devList):
+        #    LOGGER.error("No devices matching: " + self._deviceName )
+        #    return False
 
-        LOGGER.info("Collecting for device(s): " + str(self.__devList))
+        #LOGGER.info("Collecting for device(s): " + str(self.__devList))
 
         return True
 
     def __GetDeviceList(self):
         retList=[]
-        #pylint: disable=unused-variable
         for root, dirs, files in os.walk(GetBaseDir()):
             for devName in dirs:
                 if match(self._deviceName,devName):
@@ -197,7 +199,6 @@ class NetworkInfo:
         for ethDev in self.__devList:
             nextDir = GetBaseDir() + "/"  + ethDev + "/statistics"
             baseName='netdev.' + ethDev
-            #pylint: disable=unused-variable
             for statRoot, statDirs, statFiles in os.walk(nextDir):
                 for fname in statFiles:
                     sFileName = nextDir + "/" + fname
@@ -286,7 +287,7 @@ class NetworkInfo:
                     busID=line.split(' ')[0]
                     devInfoStr = line[len(busID)+checkStrLen+2:]
                     lscpiDataMap[busID]=devInfoStr
-        #pylint: disable=unused-variable
+
         except Exception as Ex:
             pass
 
@@ -306,17 +307,16 @@ class NetworkInfo:
             for key in dataMap:
                 if key in busID:
                     return dataMap[key]
-        #pylint: disable=unused-variable
+
         except Exception as ex:
             pass
 
         return "Unknown Vendor Information"
 
-    def __GatherNetworkDeviceInfo(self,ethDev,retMap,slimDataset):
+    def GatherNetworkDeviceInfo(self,ethDev,retMap,slimDataset):
         nextDir = GetBaseDir() + "/"  + ethDev + "/statistics"
         baseName='netdev.'
         if not slimDataset:
-            #pylint: disable=unused-variable
             for statRoot, statDirs, statFiles in os.walk(nextDir):
                 for fname in statFiles:
                     sFileName = nextDir + "/" + fname
@@ -373,7 +373,6 @@ class NetworkInfo:
 
     def __GetDriver(self,device):
         link = 	GetBaseDir() + '/' +device + '/device/driver/module/drivers'
-        #pylint: disable=unused-variable
         for root, driver, files in os.walk(link):
             driver = driver[0]
             if None != driver[0] and ':' in driver:
@@ -384,13 +383,12 @@ class NetworkInfo:
     def __IsPhysicalDevice(self,device):
         return None != self.__GetDriver(device)
 
-    def __GatherAllNetworkDeviceInfo(self,slimDataSet,pyhysicalOnly=True):
+    def GatherAllNetworkDeviceInfo(self,slimDataSet,pyhysicalOnly=True):
         tMap={}
-        #pylint: disable=unused-variable
         for root, dirs, files in os.walk(GetBaseDir()):
             for dir in dirs:
                 if False == pyhysicalOnly or self.__IsPhysicalDevice(dir):
-                    tMap= self.__GatherNetworkDeviceInfo(dir,tMap,slimDataSet)
+                    tMap= self.GatherNetworkDeviceInfo(dir,tMap,slimDataSet)
             
         return tMap
 
@@ -421,9 +419,9 @@ def CollectAllDevices(frameworkInterface,slimDataSetParam,**kwargs):
         SleepTime = float(frameworkInterface.Interval)/1000.0   
 
         InitialRun = True
-        objNetInfo = NetworkInfo(frameworkInterface)
+        objNetInfo = NetworkInfo(Logger)
         while not frameworkInterface.KillThreadSignalled():
-            dataMap = objNetInfo.__GatherAllNetworkDeviceInfo(slimDataSet,physicalOnly)
+            dataMap = objNetInfo.GatherAllNetworkDeviceInfo(slimDataSet,physicalOnly)
             for entry in dataMap:
                 if InitialRun and not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
                     frameworkInterface.AddCollector(entry)    # Nope, so go add it
@@ -468,10 +466,10 @@ def CollectDevice(frameworkInterface,DeviceName,slimDataSetParam):
 
         SleepTime = float(frameworkInterface.Interval)/1000.0
         InitialRun = True
-        objNetInfo = NetworkInfo(frameworkInterface)
+        objNetInfo = NetworkInfo(Logger,device=DeviceName,source="sysfs")
         while not frameworkInterface.KillThreadSignalled():
             dataMap={}
-            objNetInfo.__GatherNetworkDeviceInfo(DeviceName,dataMap,slimDataSet)
+            objNetInfo.GatherNetworkDeviceInfo(DeviceName,dataMap,slimDataSet)
             for entry in dataMap:
                 if InitialRun and not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
                     frameworkInterface.AddCollector(entry)    # Nope, so go add it
@@ -497,7 +495,10 @@ def CollectDevice(frameworkInterface,DeviceName,slimDataSetParam):
 
 def CollectDeviceStatistics(frameworkInterface,**kwargs): 
 
-    objNetInfo = NetworkInfo(frameworkInterface,**kwargs)
+    Logger = frameworkInterface.Logger
+    Logger.info("Starting LinuxNetwork CollectDeviceStatistics Collector {0}, collecting single Device: {1}".format(VersionStr,kwargs))
+
+    objNetInfo = NetworkInfo(Logger,**kwargs)
     #dataMap=objNetInfo.GetStatisticsFromSysFS()
 
     dataMap = objNetInfo.GetStatistics()
@@ -545,6 +546,10 @@ def CollectDeviceStatistics(frameworkInterface,**kwargs):
 #   <Normalize>0.001</Normalize>
 # </DynamicCollector>
 def GetPerCorePacketsList(frameworkInterface):
+    if not frameworkInterface.DoesCollectorExist("softnet.processed"):
+        Logger = frameworkInterface.Logger
+        Logger.info("Starting LinuxNetwork GetPerCorePacketsList Collector {0}".format(VersionStr))
+
     procNetStats = ReadFromFile("/proc/net/softnet_stat")
     statList = procNetStats.split('\n')
     processedList=[]
@@ -554,7 +559,6 @@ def GetPerCorePacketsList(frameworkInterface):
     received_rpsList=[]
     flow_limit_countList=[]
     olderKernel = False
-    #pylint: disable=unused-variable
     for coreNum,line in enumerate(statList):
         if True == olderKernel:
             processed,dropped,time_squeeze,_,_,_,_,_,cpu_collision,received_rps = line.split(" ")
