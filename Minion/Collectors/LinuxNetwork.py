@@ -169,7 +169,7 @@ class NetworkInfo:
                 LOGGER.info("source not specified, using data from  driver ")
                 self.__usingDriver = True
 
-        #self.__devList = self.__GetDeviceList()                
+        self.__devList = self.__GetDeviceList()                
         #if 0 == len(self.__devList):
         #    LOGGER.error("No devices matching: " + self._deviceName )
         #    return False
