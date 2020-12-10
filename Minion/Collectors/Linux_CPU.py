@@ -114,6 +114,7 @@ class CPULoad(object):
             for cpu_line_list in lines:
                 if '' in cpu_line_list: cpu_line_list.remove('')
                 cpu_line_list = [cpu_line_list[0]]+[float(i) for i in cpu_line_list[1:]]
+                #pylint: disable=unused-variable
                 cpu_id,user,nice,system,idle,iowait,irq,softrig,steal,guest,guest_nice = cpu_line_list
 
                 Idle=idle+iowait
@@ -227,6 +228,7 @@ def getFrequencyInfo(prefix=""):
             coreCount+=1
 
             nextDir = GetBaseDir() + "/"  + cpuDir + "/cpufreq"
+            #pylint: disable=unused-variable
             for statRoot, statDirs, statFiles in os.walk(nextDir):
                 for file in statFiles:
                     if file in desiredFreqStats:

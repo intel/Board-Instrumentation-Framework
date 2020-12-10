@@ -294,6 +294,39 @@ class NetworkInfo:
 
         return lscpiDataMap
 
+    def GetNetworkDeviceInformation(self,ethDev):
+        baseName='netdev.' + ethDev
+        retMap={}
+        verFile = GetBaseDir() + "/"  + ethDev + "/device/driver/module/version"
+        retMap[baseName + ".version"] = ReadFromFile(verFile)
+        numaFile = GetBaseDir() + "/"  + ethDev + "/device/numa_node"
+        retMap[baseName + ".numa_node"] = ReadFromFile(numaFile)
+        retMap[baseName + ".vendor_info"] = self.__GetDeviceVendorInfo(ethDev)
+        mtuFile = GetBaseDir() + "/"  + ethDev + "/mtu"
+        retMap[baseName + ".mtu"] = ReadFromFile(mtuFile)
+        operStateFile = GetBaseDir() + "/"  + ethDev + "/operstate"
+        retMap[baseName + ".state"] = ReadFromFile(operStateFile)
+        macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
+        retMap[baseName + ".macaddress"] = ReadFromFile(macAddrFile)
+        retMap[baseName + ".driver"] = self.__GetDriver(ethDev)
+        speedFile = GetBaseDir() + "/"  + ethDev + "/speed"
+        try:
+            retMap[baseName + ".speed"] = ReadFromFile(speedFile)
+        except:
+            retMap[baseName + ".speed"] = "Unknown"
+                        
+        sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sckt.connect(("8.8.8.8", 80))
+        ipAddr =  sckt.getsockname()[0]
+        retMap[baseName + ".ipaddress"] = str(ipAddr)        
+
+        queuesDir = GetBaseDir() + "/" + ethDev + "/queues"
+        if os.path.isdir(queuesDir):
+            queuCount = len(glob.glob1(queuesDir,"tx*"))
+            retMap[baseName + ".queues"] = str(queuCount)                    
+
+        return retMap
+
     def __GetDeviceVendorInfo(self,ethDev):
         try:
             linkStr=os.readlink(GetBaseDir() + "/"  + ethDev + "/device")
@@ -325,28 +358,31 @@ class NetworkInfo:
                     dataVal = ReadFromFile(sFileName)
                     retMap[baseName + "." + fname] = dataVal
 
-            verFile = GetBaseDir() + "/"  + ethDev + "/device/driver/module/version"
-            retMap[baseName + ".version"] = ReadFromFile(verFile)
-            numaFile = GetBaseDir() + "/"  + ethDev + "/device/numa_node"
-            retMap[baseName + ".numa_node"] = ReadFromFile(numaFile)
-            retMap[baseName + ".vendor_info"] = self.__GetDeviceVendorInfo(ethDev)
-            mtuFile = GetBaseDir() + "/"  + ethDev + "/mtu"
-            retMap[baseName + ".mtu"] = ReadFromFile(mtuFile)
-            operStateFile = GetBaseDir() + "/"  + ethDev + "/operstate"
-            retMap[baseName + ".state"] = ReadFromFile(operStateFile)
-            macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
-            retMap[baseName + ".macaddress"] = ReadFromFile(macAddrFile)
-            retMap[baseName + ".driver"] = self.__GetDriver(ethDev)
-            speedFile = GetBaseDir() + "/"  + ethDev + "/speed"
-            try:
-                retMap[baseName + ".speed"] = ReadFromFile(speedFile)
-            except:
-                retMap[baseName + ".speed"] = "Unknown"
+            #devInfo = self.GetNetworkDeviceInformation(ethDev)
+            #retMap.update(devInfo)
+            
+            # verFile = GetBaseDir() + "/"  + ethDev + "/device/driver/module/version"
+            # retMap[baseName + ".version"] = ReadFromFile(verFile)
+            # numaFile = GetBaseDir() + "/"  + ethDev + "/device/numa_node"
+            # retMap[baseName + ".numa_node"] = ReadFromFile(numaFile)
+            # retMap[baseName + ".vendor_info"] = self.__GetDeviceVendorInfo(ethDev)
+            # mtuFile = GetBaseDir() + "/"  + ethDev + "/mtu"
+            # retMap[baseName + ".mtu"] = ReadFromFile(mtuFile)
+            # operStateFile = GetBaseDir() + "/"  + ethDev + "/operstate"
+            # retMap[baseName + ".state"] = ReadFromFile(operStateFile)
+            # macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
+            # retMap[baseName + ".macaddress"] = ReadFromFile(macAddrFile)
+            # retMap[baseName + ".driver"] = self.__GetDriver(ethDev)
+            # speedFile = GetBaseDir() + "/"  + ethDev + "/speed"
+            # try:
+            #     retMap[baseName + ".speed"] = ReadFromFile(speedFile)
+            # except:
+            #     retMap[baseName + ".speed"] = "Unknown"
                             
-            sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sckt.connect(("8.8.8.8", 80))
-            ipAddr =  sckt.getsockname()[0]
-            retMap[baseName + ".ipaddress"] = str(ipAddr)
+            # sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            # sckt.connect(("8.8.8.8", 80))
+            # ipAddr =  sckt.getsockname()[0]
+            # retMap[baseName + ".ipaddress"] = str(ipAddr)
 
         else: # slim dataset, just to bytes and packets
             for fname in ['rx_bytes','tx_bytes','tx_packets','rx_packets']:
@@ -395,6 +431,22 @@ class NetworkInfo:
                     tMap= self.GatherNetworkDeviceInfo(dir,tMap,slimDataSet)
             
         return tMap
+
+def CollectInfoForDevice(frameworkInterface,DeviceName):
+    global Logger
+    Logger = frameworkInterface.Logger
+    try:
+        objNetInfo = NetworkInfo(Logger,device=DeviceName,source="sysfs")    
+
+        dataMap = objNetInfo.GetNetworkDeviceInformation(DeviceName)
+        for entry in dataMap:
+            if not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
+                frameworkInterface.AddCollector(entry)    # Nope, so go add it
+                    
+            frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
+
+    except Exception as ex:
+        Logger.error("Unrecoverable error in LinuxNetwork Collector plugin: " + str(ex))
 
 
 def CollectAllDevices(frameworkInterface,slimDataSetParam,**kwargs): 

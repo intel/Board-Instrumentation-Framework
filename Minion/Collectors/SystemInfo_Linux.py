@@ -58,7 +58,10 @@ def GetRelease():
     return platform.release()
 
 def GetLinuxDistro():
-    return str(platform.linux_distribution()[0] + " " + platform.linux_distribution()[1])
+    try:
+        return str(platform.linux_distribution()[0] + " " + platform.linux_distribution()[1])
+    except Exception:
+        return "Unknown"
 
 def GetCPUInfo_Model_Linux():
     CPU = 0
