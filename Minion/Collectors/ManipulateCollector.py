@@ -27,7 +27,7 @@ def ZeroOutAverageOperatorHistory(NamespaceID, CollectorID):
             if None != objCollector:
                 if hasattr(objCollector, "historyList"):
                     objCollector.historyList = []  
-
+    #pylint: disable=unused-variable
     except Exception as Ex:
         pass
 
@@ -40,7 +40,7 @@ def SetMaxValueOperatorValue(NamespaceID, CollectorID, newValue):
             if None != objCollector:
                 if hasattr(objCollector, "SetMaxValueForAll"):
                     objCollector.SetMaxValueForAll(newValue)
-
+    #pylint: disable=unused-variable
     except Exception as Ex:
         pass
 
@@ -69,6 +69,6 @@ def SetMinValueOperatorValue(NamespaceID, CollectorID, newValue):
             if None != objCollector:
                 if hasattr(objCollector, "SetMinValueForAll"):
                    objCollector.SetMinValueForAll(newValue)
-
+    #pylint: disable=unused-variable
     except Exception as Ex:
         pass
