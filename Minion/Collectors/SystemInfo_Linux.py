@@ -28,6 +28,7 @@
 
 import platform
 import os
+import csv
 import time
 from collections import namedtuple
 import multiprocessing
@@ -58,13 +59,28 @@ def GetRelease():
     return platform.release()
 
 def GetLinuxDistro():
-    try:
+    try: # was removed in python 3.8 :-(
         return str(platform.linux_distribution()[0] + " " + platform.linux_distribution()[1])
     except Exception:
-        return "Unknown"
-
+        RELEASE_INFO = {}
+        with open("/etc/os-release") as fp:
+            fReader = csv.reader(fp, delimiter="=")
+            for line in fReader:
+                if fReader:
+                    RELEASE_INFO[line[0]] = line[1]
+                    
+        if RELEASE_INFO["ID"] in ["debian", "raspbian"]:
+            with open("/etc/debian_version") as fp:
+                DEBIAN_VERSION = fp.readline().strip()
+                
+            major_version = DEBIAN_VERSION.split(".")[0]
+            version_split = RELEASE_INFO["VERSION"].split(" ", maxsplit=1)
+            if version_split[0] == major_version:
+                RELEASE_INFO["VERSION"] = " ".join([DEBIAN_VERSION] + version_split[1:])
+                            
+        return RELEASE_INFO["NAME"] + " " + RELEASE_INFO["VERSION_ID"]         
+                          
 def GetCPUInfo_Model_Linux():
-    CPU = 0
     with open('/proc/cpuinfo') as f:
         for line in f:
             # Ignore the blank line separating the information between
@@ -79,7 +95,6 @@ def GetCoreCount():
     return str(multiprocessing.cpu_count())
 
 def GetMemoryInfo_Linux(item):
-    retStr = ""
     with open('/proc/meminfo') as f:
         for line in f:
             data = line.split(':')
@@ -214,7 +229,7 @@ def __GetDMI_Data():
             DMI_Data=[]
             for line in tDMI_Data:
                 DMI_Data.append(line.decode('utf-8'))
-
+        #pylint: disable=unused-variable
         except Exception as Ex:
             Logger.error("dmidecode not installed - unable to read all information")
             None
@@ -370,7 +385,7 @@ def CollectSystemInfo_Linux(frameworkInterface,showHyperthreadingCoreDetails=Fal
 
                 if True == showHyperthreadingCoreDetails:
                     pass
-
+            #pylint: disable=unused-variable
             except Exception as Ex:
                 pass
 
