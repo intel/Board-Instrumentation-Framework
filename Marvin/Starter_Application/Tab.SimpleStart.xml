@@ -37,7 +37,8 @@
             <!-- Put some text atop the image -->
             <Widget File="Text\Text.xml" row="1" column="1" Align="S" >
                 <StyleOverride ID="Welcome"/>
-                <InitialValue>Welcome to the World of BIFF</InitialValue>
+                <InitialValue RevertTimeout="4000">Welcome to the World of BIFF</InitialValue>
+                <Revert Timeout="4000" Value="0"/>
             </Widget>
             
             <!-- Let's add some audio -->
