@@ -149,6 +149,7 @@ public class BarChartWidget extends LineChartWidget
     }
     
     @SuppressWarnings("rawtypes")
+    @Override
     public void resetState(String param)
     {
 	int val = 0;

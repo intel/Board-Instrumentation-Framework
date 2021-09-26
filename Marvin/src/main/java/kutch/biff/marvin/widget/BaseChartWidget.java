@@ -599,6 +599,7 @@ abstract public class BaseChartWidget extends BaseWidget
     }
     
     @SuppressWarnings("rawtypes")
+    @Override
     public void resetState(String param)
     {
 	@SuppressWarnings("unused")
