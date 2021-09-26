@@ -284,6 +284,7 @@ class Configuration():
 
             try:
                 _Which = 'Param'
+                kwargs={}
                 for param in node.getElementsByTagName(_Which): # Make an array of the params for the script
                     strParam = Alias.Alias(param.firstChild.nodeValue)
                     try:
@@ -930,7 +931,7 @@ class Configuration():
                     try:
                         objNamespace.__ListenPort = int(Alias.Alias(attributes["PORT"].nodeValue))
                     except Exception as Ex:
-                        Log.getLogger().error(str(ex))
+                        Log.getLogger().error(str(Ex))
                         Log.getLogger().error("Invalid Port set for Incoming Connection")
                         return None
             
@@ -1052,14 +1053,16 @@ class Configuration():
                 objActor.ExecutableName = Alias.Alias(actor.getElementsByTagName(_Which)[0].firstChild.nodeValue)
                     
                 _Which = 'Param'
+                kwargs={}
+
                 for param in actor.getElementsByTagName(_Which): # Make an array of the params for the script
                     strParam = Alias.Alias(param.firstChild.nodeValue)
                     try:
                         key,value=strParam.split('=')
                         kwargs[key] = value
-                        if None == objCollector._kwargs:
-                            objCollector._kwargs={}
-                        objCollector._kwargs[key] = value
+                        if None == objActor._kwargs:
+                            objActor._kwargs={}
+                        objActor._kwargs[key] = value
                     except Exception:
                         Param = CollectorParam.CheckForCollectorAsParam(strParam,objNamespace)
                         objActor.Parameters.append(Param)
