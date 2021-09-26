@@ -107,6 +107,7 @@ class NetworkInfo:
         self.__args = kwargs
         self.__LOGGER = logInst
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0) #for ioctl
+        self._usingDriverAndSysFS = False
 
         if False == self.__validateArgs():
             raise ValueError("Invalid Configuration for LinuxNetwork plugin")
@@ -154,6 +155,29 @@ class NetworkInfo:
             elif srcStr == 'DRIVER':
                 LOGGER.info("Reading Network info from driver" )
                 self.__usingDriver = True
+                
+            elif "|" in srcStr: # could be a combo requested
+                driverRequested=False
+                sysFsRequested=False
+                self.__usingDriver = False
+                
+                parts=srcStr.strip().split("|")
+                
+                for part in parts:
+                    part= part.lstrip().rstrip()
+                    if part.upper() == "DRIVER":
+                        driverRequested = True
+                        self.__usingDriver = True
+                        
+                    elif part.upper() == "SYSFS":
+                        sysFsRequested = True
+                        
+                    else:
+                        LOGGER.info("Invalid source specified: " + args['source'] )
+                        return False
+                    
+                self._usingDriverAndSysFS = driverRequested and sysFsRequested
+                        
 
             else:
                 LOGGER.info("Invalid source specified: " + args['source'] )
@@ -189,10 +213,14 @@ class NetworkInfo:
 
 
     def GetStatistics(self):
+        retMap={}
         if self.__usingDriver:
-            return self.__GetStatisticsFromDriver()
-
-        return self.__GetStatisticsFromSysFS()
+            retMap.update(self.__GetStatisticsFromDriver())
+        
+        if self._usingDriverAndSysFS or False == self.__usingDriver:
+            retMap.update(self.__GetStatisticsFromSysFS())
+        
+        return retMap
 
     def __GetStatisticsFromSysFS(self):
         retMap = {}
@@ -221,7 +249,6 @@ class NetworkInfo:
                 retMap[baseName+".tx_mpps"] = retMap[baseName+".tx_packets"]
                 retMap[baseName+".rx_mpps"] = retMap[baseName+".rx_packets"]
                 retMap[baseName+".bx_mpps"] = str(float(retMap[baseName+".rx_packets"]) + float(retMap[baseName+".tx_packets"]))
-
 
         return retMap
 
