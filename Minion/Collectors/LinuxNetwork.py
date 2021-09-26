@@ -325,34 +325,33 @@ class NetworkInfo:
     def GetNetworkDeviceInformation(self,ethDev):
         baseName='netdev.' + ethDev
         retMap={}
-        if path.isdir(GetBaseDir() + "/"  + ethDev):
-            verFile = GetBaseDir() + "/"  + ethDev + "/device/driver/module/version"
-            retMap[baseName + ".version"] = ReadFromFile(verFile)
-            numaFile = GetBaseDir() + "/"  + ethDev + "/device/numa_node"
-            retMap[baseName + ".numa_node"] = ReadFromFile(numaFile)
-            retMap[baseName + ".vendor_info"] = self.__GetDeviceVendorInfo(ethDev)
-            mtuFile = GetBaseDir() + "/"  + ethDev + "/mtu"
-            retMap[baseName + ".mtu"] = ReadFromFile(mtuFile)
-            operStateFile = GetBaseDir() + "/"  + ethDev + "/operstate"
-            retMap[baseName + ".state"] = ReadFromFile(operStateFile)
-            macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
-            retMap[baseName + ".macaddress"] = ReadFromFile(macAddrFile)
-            retMap[baseName + ".driver"] = self.__GetDriver(ethDev)
-            speedFile = GetBaseDir() + "/"  + ethDev + "/speed"
-            try:
-                retMap[baseName + ".speed"] = ReadFromFile(speedFile)
-            except:
-                retMap[baseName + ".speed"] = "Unknown"
-                        
-        #sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        #sckt.connect(("8.8.8.8", 80))
-        #ipAddr =  sckt.getsockname()[0]
-        #retMap[baseName + ".ipaddress"] = str(ipAddr)        
+        verFile = GetBaseDir() + "/"  + ethDev + "/device/driver/module/version"
+        retMap[baseName + ".version"] = ReadFromFile(verFile)
+        numaFile = GetBaseDir() + "/"  + ethDev + "/device/numa_node"
+        retMap[baseName + ".numa_node"] = ReadFromFile(numaFile)
+        retMap[baseName + ".vendor_info"] = self.__GetDeviceVendorInfo(ethDev)
+        mtuFile = GetBaseDir() + "/"  + ethDev + "/mtu"
+        retMap[baseName + ".mtu"] = ReadFromFile(mtuFile)
+        operStateFile = GetBaseDir() + "/"  + ethDev + "/operstate"
+        retMap[baseName + ".state"] = ReadFromFile(operStateFile)
+        macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
+        retMap[baseName + ".macaddress"] = ReadFromFile(macAddrFile)
+        retMap[baseName + ".driver"] = self.__GetDriver(ethDev)
+        speedFile = GetBaseDir() + "/"  + ethDev + "/speed"
+        try:
+            retMap[baseName + ".speed"] = ReadFromFile(speedFile)
+        except:
+            retMap[baseName + ".speed"] = "Unknown"
+                    
+    #sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #sckt.connect(("8.8.8.8", 80))
+    #ipAddr =  sckt.getsockname()[0]
+    #retMap[baseName + ".ipaddress"] = str(ipAddr)        
 
-            queuesDir = GetBaseDir() + "/" + ethDev + "/queues"
-            if os.path.isdir(queuesDir):
-                queuCount = len(glob.glob1(queuesDir,"tx*"))
-                retMap[baseName + ".queues"] = str(queuCount)                    
+        queuesDir = GetBaseDir() + "/" + ethDev + "/queues"
+        if os.path.isdir(queuesDir):
+            queuCount = len(glob.glob1(queuesDir,"tx*"))
+            retMap[baseName + ".queues"] = str(queuCount)                    
 
         return retMap
 
