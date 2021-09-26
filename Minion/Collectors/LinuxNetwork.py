@@ -25,6 +25,7 @@ import glob
 import array
 import fcntl  # pylint: disable=import-error 
 import struct
+from os import path
 
 from pprint import pprint as pprint
 
@@ -324,33 +325,34 @@ class NetworkInfo:
     def GetNetworkDeviceInformation(self,ethDev):
         baseName='netdev.' + ethDev
         retMap={}
-        verFile = GetBaseDir() + "/"  + ethDev + "/device/driver/module/version"
-        retMap[baseName + ".version"] = ReadFromFile(verFile)
-        numaFile = GetBaseDir() + "/"  + ethDev + "/device/numa_node"
-        retMap[baseName + ".numa_node"] = ReadFromFile(numaFile)
-        retMap[baseName + ".vendor_info"] = self.__GetDeviceVendorInfo(ethDev)
-        mtuFile = GetBaseDir() + "/"  + ethDev + "/mtu"
-        retMap[baseName + ".mtu"] = ReadFromFile(mtuFile)
-        operStateFile = GetBaseDir() + "/"  + ethDev + "/operstate"
-        retMap[baseName + ".state"] = ReadFromFile(operStateFile)
-        macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
-        retMap[baseName + ".macaddress"] = ReadFromFile(macAddrFile)
-        retMap[baseName + ".driver"] = self.__GetDriver(ethDev)
-        speedFile = GetBaseDir() + "/"  + ethDev + "/speed"
-        try:
-            retMap[baseName + ".speed"] = ReadFromFile(speedFile)
-        except:
-            retMap[baseName + ".speed"] = "Unknown"
+        if path.isdir(GetBaseDir() + "/"  + ethDev):
+            verFile = GetBaseDir() + "/"  + ethDev + "/device/driver/module/version"
+            retMap[baseName + ".version"] = ReadFromFile(verFile)
+            numaFile = GetBaseDir() + "/"  + ethDev + "/device/numa_node"
+            retMap[baseName + ".numa_node"] = ReadFromFile(numaFile)
+            retMap[baseName + ".vendor_info"] = self.__GetDeviceVendorInfo(ethDev)
+            mtuFile = GetBaseDir() + "/"  + ethDev + "/mtu"
+            retMap[baseName + ".mtu"] = ReadFromFile(mtuFile)
+            operStateFile = GetBaseDir() + "/"  + ethDev + "/operstate"
+            retMap[baseName + ".state"] = ReadFromFile(operStateFile)
+            macAddrFile = GetBaseDir() + "/"  + ethDev + "/address"
+            retMap[baseName + ".macaddress"] = ReadFromFile(macAddrFile)
+            retMap[baseName + ".driver"] = self.__GetDriver(ethDev)
+            speedFile = GetBaseDir() + "/"  + ethDev + "/speed"
+            try:
+                retMap[baseName + ".speed"] = ReadFromFile(speedFile)
+            except:
+                retMap[baseName + ".speed"] = "Unknown"
                         
-        sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sckt.connect(("8.8.8.8", 80))
-        ipAddr =  sckt.getsockname()[0]
-        retMap[baseName + ".ipaddress"] = str(ipAddr)        
+        #sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        #sckt.connect(("8.8.8.8", 80))
+        #ipAddr =  sckt.getsockname()[0]
+        #retMap[baseName + ".ipaddress"] = str(ipAddr)        
 
-        queuesDir = GetBaseDir() + "/" + ethDev + "/queues"
-        if os.path.isdir(queuesDir):
-            queuCount = len(glob.glob1(queuesDir,"tx*"))
-            retMap[baseName + ".queues"] = str(queuCount)                    
+            queuesDir = GetBaseDir() + "/" + ethDev + "/queues"
+            if os.path.isdir(queuesDir):
+                queuCount = len(glob.glob1(queuesDir,"tx*"))
+                retMap[baseName + ".queues"] = str(queuCount)                    
 
         return retMap
 
@@ -581,10 +583,19 @@ def CollectDeviceStatistics(frameworkInterface,**kwargs):
     Logger = frameworkInterface.Logger
     Logger.info("Starting LinuxNetwork CollectDeviceStatistics Collector {0}, collecting single Device: {1}".format(VersionStr,kwargs))
 
-    objNetInfo = NetworkInfo(Logger,**kwargs)
-    #dataMap=objNetInfo.GetStatisticsFromSysFS()
+    dataMap ={}
+    SleepTime = float(frameworkInterface.Interval)/1000.0
+    
+    while not frameworkInterface.KillThreadSignalled() and not dataMap:
+        # in case driver is NOT loaded
+        objNetInfo = NetworkInfo(Logger,**kwargs)
 
-    dataMap = objNetInfo.GetStatistics()
+        dataMap = objNetInfo.GetStatistics()
+        if not dataMap: #empty dict evaluates to False
+            time.sleep(SleepTime)
+        
+    if frameworkInterface.KillThreadSignalled():
+        return "HelenKeller"
 
     for entry in dataMap:
         if not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
@@ -603,18 +614,17 @@ def CollectDeviceStatistics(frameworkInterface,**kwargs):
     if None == frameworkInterface.KillThreadSignalled: # is not in its own thread
         return "HelenKeller"
 
-    SleepTime = float(frameworkInterface.Interval)/1000.0
 
-    try:
-        while not frameworkInterface.KillThreadSignalled():
+    while not frameworkInterface.KillThreadSignalled():
+        try:
             time.sleep(SleepTime)
             dataMap = objNetInfo.GetStatistics()
 
             for entry in dataMap:
                 frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
 
-    except Exception as ex:
-        frameworkInterface.Logger.error("Unrecoverable error in LinuxNetwork Collector plugin: " + str(ex))
+        except Exception as ex:
+            frameworkInterface.Logger.error("Unrecoverable error in LinuxNetwork Collector plugin: " + str(ex))
             
 
 
