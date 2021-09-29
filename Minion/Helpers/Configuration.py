@@ -619,6 +619,17 @@ class Configuration():
 
             objDynaCollector.SetParseTokens(tokenList)
 
+            skipLineTokenList = []
+            try:
+                tokenNodeList = node.getElementsByTagName('SkipLineToken')
+                for token in tokenNodeList:
+                    skipLineTokenList.append( Alias.Alias(token.firstChild.nodeValue))
+
+            except Exception as Ex:
+                skipLineTokenList = []
+
+            objDynaCollector.SetSkipLineTokens(skipLineTokenList)
+
         if "OverrideNamespace" in attributes.keys():
             AltNS = Alias.Alias(attributes["OverrideNamespace"].nodeValue)
             objDynaCollector.SetOverrideNamespaceString(AltNS)
