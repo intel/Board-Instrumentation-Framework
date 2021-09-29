@@ -180,6 +180,14 @@ class DynamicCollector(Collector.Collector):
         try:
             for line in lines:
                 lineSkipped=False
+                if CheckForLineSkip: # look if line should be skipped, such as a '#'
+                    for skipToken in self.__SkipLineTokenList:
+                        if line.startswith(skipToken):
+                            lineSkipped = True
+                            break
+                if lineSkipped:
+                    break
+
                 for firstToken in self.__TokenList:
                     dataPoint = line.split(firstToken,1)
                     if len(dataPoint) > 1:
@@ -189,22 +197,16 @@ class DynamicCollector(Collector.Collector):
                     ID = dataPoint[0]
                     Value = dataPoint[1]
                     ID = ID.strip()
-                    if CheckForLineSkip: # look if ID is a skip, such as a '#'
-                        for skipToken in self.__SkipLineTokenList:
-                            if ID.startswith(skipToken):
-                                lineSkipped = True
-                                break
                             
-                    if not lineSkipped:
-                        Value = Value.strip()
-                        ID = self.__PrefixStr + ID + self.__SuffixStr
-                        objCollector = self._NamespaceObject.GetCollector(ID)
+                    Value = Value.strip()
+                    ID = self.__PrefixStr + ID + self.__SuffixStr
+                    objCollector = self._NamespaceObject.GetCollector(ID)
 
-                        if None == objCollector:
-                            objCollector = self.__createCollector(ID)
-                            Log.getLogger().debug("Dynamic Collector found with token: '" + firstToken + "'")
+                    if None == objCollector:
+                        objCollector = self.__createCollector(ID)
+                        Log.getLogger().debug("Dynamic Collector found with token: '" + firstToken + "'")
 
-                        objCollector.SetDynamicData(Value,elapsedTime)
+                    objCollector.SetDynamicData(Value,elapsedTime)
 
         except Exception as ex:
             Log.getLogger().error("Something bad happened in DynamicCollector Collector(): " + str(ex))
