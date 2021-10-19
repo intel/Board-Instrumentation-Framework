@@ -71,7 +71,7 @@ public class AboutBox
 	Button OKBtn = new Button("OK");
 	Label By = new Label("by");
 	Label Author = new Label("Patrick Kutch");
-	Label With = new Label("with Brian Johnson");
+	Label With = new Label("with Brian Johnson\nand Michael Shearer");
 	
 	Label Where = new Label("https://github.com/PatrickKutch");
 	

@@ -646,6 +646,11 @@ public class FrameworkNode
      */
     private String HandleAlias(String strData)
     {
+        return HandleAliasWorker(strData,strData);
+    }
+    
+    private String HandleAliasWorker(String strData,String origLine)
+    {
 	String retString = "";
 	if (strData.contains("$(NS)")) // why is this here -8/20/19
 	{
@@ -666,13 +671,18 @@ public class FrameworkNode
 	    {
 		retString = strData.substring(0, OutterIndex + 2);
 		String T = strData.substring(OutterIndex + 2);
-		retString += HandleAlias(T);
+		retString += HandleAliasWorker(T,origLine);
 	    }
 	    else
 	    {
 		String Alias = strData.substring(OutterIndex + 2, CloseParenIndex);
 		retString = strData.substring(0, OutterIndex);
-		retString += ALIASMANAGER.GetAlias(Alias);
+                String strAliasedStr = ALIASMANAGER.GetAlias(Alias);
+                if (strAliasedStr.startsWith("Tried to use Alias"))
+                {
+                    LOGGER.severe("Alias Line with problem:" + origLine);
+                }
+		retString += strAliasedStr;
 		retString += strData.substring(CloseParenIndex + 1);
 	    }
 	}
@@ -680,7 +690,13 @@ public class FrameworkNode
 	{
 	    String Alias = strData.substring(OutterIndex + 2, CloseParenIndex);
 	    retString = strData.substring(0, OutterIndex);
-	    retString += ALIASMANAGER.GetAlias(Alias);
+            String strAliasedStr = ALIASMANAGER.GetAlias(Alias);
+            if (strAliasedStr.startsWith("Tried to use Alias"))
+            {
+                LOGGER.severe("Alias Line with problem:" + origLine);
+            }
+
+	    retString += strAliasedStr;
 	    retString += strData.substring(CloseParenIndex + 1);
 	}
 	else
@@ -688,7 +704,7 @@ public class FrameworkNode
 	    LOGGER.warning("Something looks like an alias but is not correctly formed: " + strData);
 	    return strData;
 	}
-	return HandleAlias(retString);
+	return HandleAliasWorker(retString,origLine);
     }
     
     private ArrayList<FrameworkNode> HandleIf(FrameworkNode parentNode)
