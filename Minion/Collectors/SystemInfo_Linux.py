@@ -38,7 +38,7 @@ from Collectors import Linux_CPU
 from pprint import pprint
 
 DMI_Data=None
-VersionStr="v19.01.15"
+VersionStr="v21.10.19"
 
 
 def ReadFromFile(Filename):
@@ -49,7 +49,10 @@ def ReadFromFile(Filename):
     except Exception:
         return "File [" + Filename + "] does not exist"
 
-    return file.read()
+    fileData = file.read()
+    file.close()
+    fileData = fileData.replace('\x00','') # Newer Kernel is adding NULL character to string in file, this will get around it
+    return fileData
 
 
 def GetPlatform():
@@ -107,7 +110,9 @@ def NumaNodeExists(nodeNum):
 
 def GetNumaInfo(nodeNum):
     retMap={}
-    retMap['system.numa.node' + str(nodeNum) +'.core_list'] = ReadFromFile('/sys/devices/system/node/node'+str(nodeNum)+'/cpulist')
+    fileData = ReadFromFile('/sys/devices/system/node/node'+str(nodeNum)+'/cpulist')
+    fileData = fileData.replace('\n','') # this will not break if there is no '\n'
+    retMap['system.numa.node' + str(nodeNum) +'.core_list'] = fileData
     return retMap
 
 def __GetNumaStats(nodeCount):
