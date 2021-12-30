@@ -29,7 +29,7 @@ from os import path
 
 from pprint import pprint as pprint
 
-VersionStr="v20.12.09"
+VersionStr="v21.12.30"
 lscpiDataMap=None
 netdevInfoDir="/sys/class/net"
 
@@ -120,6 +120,16 @@ class NetworkInfo:
             self._deviceName = "Not Specified"
         else:
             self._deviceName = args['device']
+
+        if 'slim' in args:
+            self._slimDataSet = args['slim'].lower() == 'true' 
+        else:
+            self._slimDataSet = False
+
+        if 'id' in args:
+            self._id = args['id'] 
+        else:
+            self._id = self._deviceName
 
         if 'queues' in args:
             self.__queueList= ParseListStr(args['queues'])
@@ -227,13 +237,22 @@ class NetworkInfo:
         retMap = {}
         for ethDev in self.__devList:
             nextDir = GetBaseDir() + "/"  + ethDev + "/statistics"
-            baseName='netdev.' + ethDev
+            baseName='netdev.' + self._id
             #pylint: disable=unused-variable
-            for statRoot, statDirs, statFiles in os.walk(nextDir):
-                for fname in statFiles:
+
+            if not self._slimDataSet:
+                for statRoot, statDirs, statFiles in os.walk(nextDir):
+                    for fname in statFiles:
+                        sFileName = nextDir + "/" + fname
+                        dataVal = ReadFromFile(sFileName)
+                        retMap[baseName + "." + fname] = dataVal
+
+            else: # slim dataset, just to bytes and packets
+                for fname in ['rx_bytes','tx_bytes','tx_packets','rx_packets']:
                     sFileName = nextDir + "/" + fname
                     dataVal = ReadFromFile(sFileName)
                     retMap[baseName + "." + fname] = dataVal
+
 
             if baseName+".rx_bytes" in retMap: # should ALWAYS be there
                 retMap[baseName+".rx_gbps"] = retMap[baseName+".rx_bytes"]
