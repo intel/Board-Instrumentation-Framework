@@ -51,8 +51,7 @@ import kutch.biff.marvin.logger.MarvinLogger;
  * @author Patrick Kutch
  */
 public class AliasMgr
-{
-    
+{    
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private final static AliasMgr _Mgr = new AliasMgr();
     private final static String strCurrentRowIsOddAlias = "CurrentRowIsOddAlias";

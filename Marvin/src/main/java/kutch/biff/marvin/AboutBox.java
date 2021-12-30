@@ -72,6 +72,7 @@ public class AboutBox
 	Label By = new Label("by");
 	Label Author = new Label("Patrick Kutch");
 	Label With = new Label("with Brian Johnson");
+        Label With2 = new Label("and Michael Shearer");
 	
 	Label Where = new Label("https://github.com/PatrickKutch");
 	
@@ -82,6 +83,7 @@ public class AboutBox
 	GridPane.setHalignment(Author, HPos.CENTER);
 	GridPane.setHalignment(By, HPos.CENTER);
 	GridPane.setHalignment(With, HPos.CENTER);
+	GridPane.setHalignment(With2, HPos.CENTER);
 	GridPane.setHalignment(Where, HPos.CENTER);
 	
 	Label VerLabel = new Label(Version.getVersion());
@@ -100,6 +102,7 @@ public class AboutBox
 	grid.add(By, 1, newBottom++);
 	grid.add(Author, 1, newBottom++);
 	grid.add(With, 1, newBottom++);
+	grid.add(With2, 1, newBottom++);
 	grid.add(Where, 1, newBottom++);
 	grid.add(new Label(" "), 1, newBottom++);
 	if (CONFIG.getConfiguration().GetApplicationID().length() > 0)
