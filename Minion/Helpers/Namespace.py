@@ -19,15 +19,14 @@
 
 import socket
 import sys
-import time
 from Util import Time
 from Util import Sleep
 from Helpers import ThreadManager
 from Helpers import Log
 from Helpers import ServerUDP
 from Helpers import VersionMgr
-import itertools
 import threading
+import fnmatch
 
 __ActiveProcessThread=0
 
@@ -151,11 +150,20 @@ class Namespace():
         ThreadManager.GetThreadManager().StartThread(threadName)
         return len(self._Collectors)
 
+    def _MatchingNamespace(self,strCheckNamespace):
+        me = self._ID.lower()
+        them = strCheckNamespace.lower()
+        if me == them or them == "broadcast":
+            return True
+
+        return fnmatch.fnmatch(me,them)      
+
     #takes a reference actor and looks for a match in this namespace
     def Enact(self,ReferenceActor):
                                                 #This is a Namesapce, so
                                                 #self._ID = namespace
-        if ReferenceActor.Namespace.lower() == self._ID.lower() or ReferenceActor.Namespace.lower() == "broadcast":
+        #if ReferenceActor.Namespace.lower() == self._ID.lower() or ReferenceActor.Namespace.lower() == "broadcast":
+        if self._MatchingNamespace(ReferenceActor.Namespace):
             for objActor in self.__Actors:
                 if objActor.ID.lower() == ReferenceActor.ID.lower():             
                     if objActor.LastUniqueID != ReferenceActor.LastUniqueID:  # can be sent > 1 because this is UDP traffic
