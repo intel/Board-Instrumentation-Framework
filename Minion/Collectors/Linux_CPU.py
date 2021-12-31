@@ -237,7 +237,7 @@ def getFrequencyInfo(prefix=""):
                         
                         retMap[prefix+key] = ReadFromFile_Legacy(readFile)
                         
-    
+
     freqList=None
     # create a comma separated list for graphing
     if "cpu0.cpuinfo_cur_freq" in retMap:
@@ -246,16 +246,25 @@ def getFrequencyInfo(prefix=""):
     else:
         freqKey = "scaling_cur_freq"
 
-    for coreNum in range(0,coreCount):
+
+    for coreNum in range(0,coreCount): # to sort in right order -dir walk not going to do it
         key = "cpu{0}.{1}".format(coreNum,freqKey)
+
         if None == freqList: #1st one
-            freqList=retMap[prefix+key]
+            try:
+                freqList=retMap[prefix+key]
+            except: # nothing there, so likely in a VM, so spoof it
+                freqList = "0"
+                for cn in range(1,coreCount):
+                    freqList += ",0"
+                break
+
         else:
             freqList += ","+retMap[prefix+key]
             
-    retMap[prefix+"cpu_frequency_list"] = freqList
+    #retMap[prefix+"cpu_frequency_list"] = freqList
     
-    return retMap
+    return freqList
     
 
 def GetSystemAverageCPU(interval=.1,precision=2):
