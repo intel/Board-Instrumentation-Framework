@@ -1,0 +1,12 @@
+/* 
+    Document   : nothing yet
+*/
+ .default-color0.chart-bar { -fx-bar-fill: CHART_COLOR_1;
+	-fx-background-color:   linear-gradient(to top, 
+										#0071C5 0%,
+										rgb(20,20,200) 75%,
+                                        rgb(100,20,100) 85%,
+										rgb(200,50,100) 95%,
+                                        rgb(255,0,0) 100%
+                              );
+   } 

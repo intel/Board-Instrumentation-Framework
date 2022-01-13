@@ -1,5 +1,5 @@
-﻿##############################################################################
-#  Copyright (c) 2016-2020 Intel Corporation
+##############################################################################
+#  Copyright (c) 2032 Intel Corporation
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,14 @@
 #  limitations under the License.
 ##############################################################################
 #    File Abstract: 
-#   External file containing the version string for the application    
+#    Gets or Sets an enviroment variable
 #
 ##############################################################################
-__version__ = "22.01.13 Build 1"
+import os
+
+def SetEnvValue(envVarName, envVarVal):
+    os.environ[envVarName] = str(envVarVal)
+
+def GetEnvValue(envVarName):
+    return os.environ.get(envVarName, "Not Set")
+

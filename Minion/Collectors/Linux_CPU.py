@@ -287,6 +287,18 @@ def GetSystemAverageCPU(interval=.1,precision=2):
     
     return str(format(total,strPrecision))
 
+def GetCoreCount():
+    coreCount = 0
+    for cpuDir in os.listdir(GetBaseDir()):
+            if not 'cpu' in cpuDir:
+                continue
+            
+            if cpuDir in ['cpufreq','cpuidle']: #don't want these directories
+                continue
+                
+            coreCount+=1
+            
+    return coreCount
 
 ## Dynamic Collector interface, gets all raw stats
 def CollectStatsFunction(frameworkInterface):
