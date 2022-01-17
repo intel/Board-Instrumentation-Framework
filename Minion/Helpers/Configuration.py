@@ -320,6 +320,8 @@ class Configuration():
                 objCollector = Operator.Operator_Addition(objNamespace,MinionID,IsInGroup)
             elif OperatorType.lower() == "average":
                 objCollector = Operator.Operator_Average(objNamespace,MinionID,IsInGroup)
+            elif OperatorType.lower() == "runningaverage":
+                objCollector = Operator.Operator_RunningAverage(objNamespace,MinionID,IsInGroup)
             elif OperatorType.lower() == "makelist":
                 objCollector = Operator.Operator_MakeList(objNamespace,MinionID,IsInGroup)
             elif OperatorType.lower() == "duplicate":

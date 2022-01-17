@@ -138,6 +138,52 @@ class Operator_Addition(Operator):
 
         return str(total)
 
+class Operator_RunningAverage(Operator):
+    def __init__(self,objNamespace,ID,InGroup=False):
+        Operator.__init__(self,objNamespace,ID,InGroup)
+        self._dataPointList=[]
+        self._Interval = None
+        self._Collectors
+
+    def Collect(self):
+        if None == self._Interval:
+            collectors=self.GetCollectors()
+            self._Collector = collectors[0]
+            try:
+                self._Interval = int(collectors[1].GetLastValue()) * 1000 #make it seconds
+            except:
+                return "Operator Running Average must have time in seconds as 2nd <Input>"
+
+        oldestTime = Time.GetCurrMS() - self._Interval
+        validRangeStart=0
+
+        for index, dataPoint in enumerate(self._dataPointList):
+            val,time = dataPoint
+            if time < oldestTime:
+                validRangeStart = index +1
+
+        if validRangeStart > 0:
+            self._dataPointList = self._dataPointList[validRangeStart:]
+
+        try:
+            val = float(self._Collector.GetLastValue())
+        except:
+            return "Operator Running Average cannot average value {}".format(self._Collector.GetLastValue())
+
+        time = Time.GetCurrMS() - (self._Collector.GetElapsedTimeSinceLast() * 1000)
+        self._dataPointList.append((val,time))
+        tVal = 0.0
+        for val,_ in self._dataPointList:
+            tVal += float(val)
+
+        if len(self._dataPointList) > 0:
+            retVal = tVal/len(self._dataPointList)
+        else:
+            retVal = 0.0
+
+        return retVal
+
+
 #will average the data from other collectors, or a single collector
 class Operator_Average(Operator):
     def __init__(self,objNamespace,ID,InGroup=False):

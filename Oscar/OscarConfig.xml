@@ -21,12 +21,12 @@
 ##############################################################################
 -->
 <Oscar ID="DaGrouch">
-  <IncomingMinionConnection PORT ="5100">
+  <IncomingMinionConnection PORT ="1100">
        <!-- <Oscar IP="OtherOscar.MyNet.com" Port="6200" Key="MarvinAutoConnectKey"/> -->
   </IncomingMinionConnection>
 
    <!-- Points towards Marvin -->
-  <TargetConnection IP="localhost" PORT="5200"/>
-  <TargetConnection IP="localhost" PORT="5300"/>
+  <TargetConnection IP="localhost" PORT="52001"/>
+  <TargetConnection IP="localhost" PORT="53001"/>
   </Oscar>
  
