@@ -685,6 +685,87 @@ public class TaskManager
 	return objTask;
     }
     
+private PulseTask BuildDeltaValueTaskItem(String taskID, FrameworkNode taskNode)
+    {
+	/**
+	 * * Example Task <TaskItem Type="DeltaValue">
+	 * <MarvinDataPoint ID="AppStartupSeconds" Namespace="PK Laptop"/>
+	 * <MarvinDataPoint ID="Currseconds" Namespace="PK Laptop"/>
+	 * <Operation ID="Uptime" Namespace="PK Laptop">Delta | DeltaPercent</Operation> 
+         * </TaskItem>
+	 */
+	boolean errorLogged = false;
+	DeltaValueTask objTask = new DeltaValueTask();
+	
+        boolean firstDPFound=false;
+        boolean secondDPFound=false;
+	for (FrameworkNode node : taskNode.getChildNodes())
+	{
+	    if (node.getNodeName().equalsIgnoreCase("MarvinDataPoint"))
+	    {
+		Utility.ValidateAttributes(new String[] { "Namespace", "ID" }, node);
+		if (node.hasAttribute("Namespace") && node.hasAttribute("ID"))
+		{
+                    if (!firstDPFound )
+                    {
+                        firstDPFound = true;
+                        objTask.SetFirstDatapoint(node.getAttribute("Namespace"), node.getAttribute("ID"));    
+                    }
+                    else if (!secondDPFound)
+                    {
+                        secondDPFound = true;
+                        objTask.SetSecondDatapoint(node.getAttribute("Namespace"), node.getAttribute("ID"));    
+                    }
+                    else
+                    {
+                        LOGGER.severe("Task with ID: " + taskID
+                                + " contains an invalid Delta Task - more than 2 MarvinDataPoints defined. Ignoring extras");
+                        errorLogged = true;
+                    }
+		}
+		else
+		{
+		    LOGGER.severe("Task with ID: " + taskID
+			    + " contains an invalid Mathematic Task - no Namespace and ID defined in MarvinDataPoint");
+		    errorLogged = true;
+		}
+	    }
+	    else if (node.getNodeName().equalsIgnoreCase("Operation"))
+	    {
+		Utility.ValidateAttributes(new String[] { "Namespace", "ID" }, node);
+		if (node.hasAttribute("Namespace") && node.hasAttribute("ID"))
+		{
+                    objTask.SetNamespaceAndID(node.getAttribute("Namespace"), node.getAttribute("ID"));
+		}
+                else
+                {
+			LOGGER.severe(
+				"Task with ID: " + taskID + " contains an invalid Delta Task Operation.  Namespace and ID required ");
+			errorLogged = true;
+                }
+                
+		String strOperationType = node.getTextContent();
+		if (!objTask.SetOperation(strOperationType))
+		{
+		    LOGGER.severe("Task with ID: " + taskID + " contains an invalid Delta Task Task Operation : "
+			    + strOperationType);
+		    errorLogged = true;
+		}
+	    }
+	}
+	if (!objTask.isValid())
+	{
+	    objTask = null;
+	    if (!errorLogged)
+	    {
+		LOGGER.severe("Task with ID: " + taskID
+			+ " contains an invalid Delta Task - no MarvinDataPoint defined");
+	    }
+	}
+	return objTask;
+    }
+        
+    
     /**
      * Read the parameters from the xml file for a Minion task
      *
@@ -1113,7 +1194,10 @@ public class TaskManager
 		{
 		    objTaskItem = BuildMathematicTaskTaskItem(ID, node);
 		}
-		
+		else if (0 == taskType.compareToIgnoreCase("DeltaValue"))
+		{
+		    objTaskItem = BuildDeltaValueTaskItem(ID, node);
+		}
 		else if (0 == taskType.compareToIgnoreCase("DataPulse"))
 		{
 		    objTaskItem = BuildPulseTaskItem(ID, node);

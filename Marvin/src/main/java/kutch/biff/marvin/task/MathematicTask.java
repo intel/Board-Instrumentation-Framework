@@ -95,7 +95,7 @@ public class MathematicTask extends PulseTask
     public boolean SetOperation(String strOper)
     {
 	if (strOper.equalsIgnoreCase("Add") || strOper.equalsIgnoreCase("Subtract")
-		|| strOper.equalsIgnoreCase("Multipley"))
+		|| strOper.equalsIgnoreCase("Multiply"))
 	{
 	    _Operation = strOper;
 	}
