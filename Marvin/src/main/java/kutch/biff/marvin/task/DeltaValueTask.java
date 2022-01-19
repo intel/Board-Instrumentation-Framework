@@ -103,14 +103,14 @@ public class DeltaValueTask extends PulseTask {
                 double diff = Math.abs(doubleVal_1 - doubleVal_2);
                 if (doubleVal_1 < doubleVal_2)
                 {
-                    newVal = diff / doubleVal_2;
+                    newVal = doubleVal_1 / doubleVal_2;
                 }
                 else
                 {
-                    newVal = diff / doubleVal_1;
+                    newVal = doubleVal_2 / doubleVal_1;
                 }
                 
-                newVal *= newVal * 100;
+                newVal = (1 - newVal) * 100;
 	    }
 	    else
 	    {
