@@ -98,19 +98,33 @@ public class DeltaValueTask extends PulseTask {
 	    {
 		newVal = Math.abs(doubleVal_1 - doubleVal_2);
 	    }
-	    else if (_Operation.equalsIgnoreCase("PercentDiff"))
+	    else if (_Operation.equalsIgnoreCase("PercentDifference"))
 	    {
-                double diff = Math.abs(doubleVal_1 - doubleVal_2);
-                if (doubleVal_1 < doubleVal_2)
-                {
-                    newVal = doubleVal_1 / doubleVal_2;
-                }
-                else
-                {
-                    newVal = doubleVal_2 / doubleVal_1;
-                }
+		double diff = doubleVal_1 - doubleVal_2;
                 
-                newVal = (1 - newVal) * 100;
+                newVal = diff/doubleVal_1;
+                
+                newVal = newVal * -100;
+	    }
+	    else if (_Operation.equalsIgnoreCase("FactorDifference"))
+	    {
+		double diff = doubleVal_1 - doubleVal_2;
+                
+                newVal = diff/doubleVal_1 * -1;
+	    }
+	    else if (_Operation.equalsIgnoreCase("PercentDifferenceAbs"))
+	    {
+		double diff = Math.abs(doubleVal_1 - doubleVal_2);
+                
+                newVal = diff/doubleVal_1;
+                
+                newVal = newVal * 100;
+	    }
+	    else if (_Operation.equalsIgnoreCase("FactorDifferenceAbs"))
+	    {
+		double diff = Math.abs(doubleVal_1 - doubleVal_2);
+                
+                newVal = diff/doubleVal_1;
 	    }
 	    else
 	    {
@@ -124,7 +138,7 @@ public class DeltaValueTask extends PulseTask {
     }    
     public boolean SetOperation(String strOper)
     {
-	if (strOper.equalsIgnoreCase("Difference") || strOper.equalsIgnoreCase("PercentDiff"))
+	if (strOper.equalsIgnoreCase("Difference") || strOper.equalsIgnoreCase("PercentDifference") || strOper.equalsIgnoreCase("FactorDifference"))
 	{
 	    _Operation = strOper;
 	}

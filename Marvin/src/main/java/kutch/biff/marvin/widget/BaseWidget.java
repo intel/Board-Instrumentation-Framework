@@ -22,13 +22,18 @@
 package kutch.biff.marvin.widget;
 
 import java.awt.Dimension;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import javafx.collections.ObservableList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,6 +45,7 @@ import org.xml.sax.SAXException;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -474,7 +480,30 @@ abstract public class BaseWidget implements Widget
 	    LOGGER.config("Applying Stylesheet: " + cssFile + " to Widget [" + _DefinitionFile + "]");
 	    // This was a .add(), but changed to Sett all as there was kind of
 	    // memory leak when I changed style via Minion or MarvinTasks...
+            
+	InputStream inputStream;
+	BufferedInputStream bis;
+	DataInputStream inp;
+        String myCssFile = GetCSS_FileWithPath();
+        String result;
+        ObservableList<String> data;
+    	try
+	{
+	    inputStream = new FileInputStream(myCssFile);
+	    bis = new BufferedInputStream(inputStream);
+	    
+           result = new String(bis.readAllBytes());
+            getStylesheets().clear();
+            fRet = getStylesheets().add(result);
+       
+	}
+	catch(Exception e)
+	{
+	    LOGGER.severe("Invalid Playback File: " + cssFile);
+	}                    
 	    fRet = getStylesheets().setAll(cssFile);
+            ObservableList<String> foo = getStylesheets();
+            
 	    if (false == fRet)
 	    {
 		LOGGER.severe("Failed to apply Stylesheet " + cssFile);
@@ -659,6 +688,31 @@ abstract public class BaseWidget implements Widget
 	}
 	return null;
     }
+    
+    protected String GetCSS_FileWithPath()
+    {
+	String strFile = getBaseCSSFilename();
+	if (null != strFile)
+	{
+	    File file = new File(strFile); // first look for fully qualified path
+	    
+	    if (false == file.exists())
+	    { // if didn't find, look in same directory that widget was defined in
+		strFile = getDefinintionFileDirectory() + File.separatorChar + strFile;
+		file = new File(strFile);
+		
+		if (false == file.exists())
+		{
+		    LOGGER.severe("Unable to locate Stylesheet: " + strFile);
+		    return null;
+		}
+	    }
+	    
+	    return strFile;
+	}
+	return null;
+    }
+        
     
     public double getCurrentMaxSteppedRange()
     {
