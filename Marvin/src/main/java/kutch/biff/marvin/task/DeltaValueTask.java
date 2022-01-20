@@ -110,7 +110,7 @@ public class DeltaValueTask extends PulseTask {
 	    {
 		double diff = doubleVal_1 - doubleVal_2;
                 
-                newVal = diff/doubleVal_1 * -1;
+                newVal = (diff/doubleVal_1 * -1)  +1;
 	    }
 	    else if (_Operation.equalsIgnoreCase("PercentDifferenceAbs"))
 	    {
@@ -118,7 +118,7 @@ public class DeltaValueTask extends PulseTask {
                 
                 newVal = diff/doubleVal_1;
                 
-                newVal = newVal * 100;
+                newVal = (newVal * 100) +1;
 	    }
 	    else if (_Operation.equalsIgnoreCase("FactorDifferenceAbs"))
 	    {
