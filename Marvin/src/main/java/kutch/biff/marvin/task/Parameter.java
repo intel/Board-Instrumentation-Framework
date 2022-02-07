@@ -64,6 +64,8 @@ public class Parameter
     
     public static String GetDataSrcVal(String strAlias)
     {
+        try
+        {
 	String parts[] = strAlias.split(",");
 	String strVal = null;
 	
@@ -102,6 +104,13 @@ public class Parameter
 	    }
 	}
 	return strVal;
+        }
+        catch(Exception ex)
+        {
+	    LOGGER.severe("Unexpected Error [" + strAlias +"] " + ex.toString());
+	    return strAlias;
+        }
+        
     }
     
     /***

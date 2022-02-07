@@ -269,7 +269,6 @@ public class Marvin extends Application
 	if (null != _Config.getConfiguration().getMenuBar() && true == _Config.getConfiguration().getShowMenuBar())
 	{
 	    height = _TestPane.getHeight() + _Config.getConfiguration().getMenuBar().getHeight(); // menu + borders +
-												  // tab
 	}
 	
 	objGridPane.getChildren().remove(_TestPane);

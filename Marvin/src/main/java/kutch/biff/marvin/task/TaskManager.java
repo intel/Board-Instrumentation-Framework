@@ -45,7 +45,6 @@ import kutch.biff.marvin.utility.Utility;
  */
 public class TaskManager
 {
-    
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     private static TaskManager _TaskManager = null;
     private static ArrayList<String> _OnStartupList = null;
@@ -66,6 +65,7 @@ public class TaskManager
     private ConcurrentHashMap<String, Client> _ClientMap;
     private DataManager _DataMgr;
     private final ArrayList<String> _DeferredTasks;
+    private final ArrayList<String> _TimedTasks;
     private final ArrayList<PostponedTask> _PostponedTasks;
     private final ArrayList<PostponedTask> _PostponedTasksNew;
     private final ArrayList<ITask> _PostponedTaskObjectThatMustBeRunInGuiThreadList;
@@ -78,6 +78,7 @@ public class TaskManager
 	_TaskMap = new ConcurrentHashMap<>();
 	_DataMgr = null;
 	_ClientMap = null;
+	_TimedTasks = new ArrayList<>();
 	_DeferredTasks = new ArrayList<>();
 	_PostponedTasks = new ArrayList<>();
 	_PostponedTasksNew = new ArrayList<>();
@@ -141,6 +142,12 @@ public class TaskManager
 		}
 		_OnConnectedList.add(TaskID);
 	    }
+            
+            if (objTask.GetInterval() > 0.0)
+            {
+                _TimedTasks.add(TaskID);
+            }
+            
 	    return true;
 	}
 	LOGGER.config("Duplicate Task with ID of " + TaskID + " found. Ignoring.");
@@ -1124,6 +1131,8 @@ private PulseTask BuildDeltaValueTaskItem(String taskID, FrameworkNode taskNode)
 	boolean retVal = false;
 	boolean OnStartup = false;
 	boolean OnConnected = false;
+        double IntervalTime = 0;
+        
 	TaskList objTask = null;
 	
 	if (true == masterNode.hasAttribute("Stepped") && masterNode.getBooleanAttribute("Stepped"))
@@ -1140,7 +1149,17 @@ private PulseTask BuildDeltaValueTaskItem(String taskID, FrameworkNode taskNode)
 	{
 	    objTask = new TaskList();
 	}
-	
+	if (true == masterNode.hasAttribute("Interval"))
+	{
+	    IntervalTime = masterNode.getDoubleAttribute("Interval", -1.0);
+            if (IntervalTime < 0.0)
+            {
+                IntervalTime = 0.0;
+            }
+            IntervalTime = IntervalTime * 1000.0; // specified in seconds, checked in ms
+            objTask.SetInterval(IntervalTime);
+	}
+        
 	if (true == masterNode.hasAttribute("PerformOnStartup"))
 	{
 	    OnStartup = masterNode.getBooleanAttribute("PerformOnStartup");
@@ -1325,10 +1344,12 @@ private PulseTask BuildDeltaValueTaskItem(String taskID, FrameworkNode taskNode)
 		}
 		if (node.getTextContent().length() > 0)
 		{
-		    if (node.hasAttributes())
-		    {
-			LOGGER.severe("Specified a value and an attribute for <Param>.  They are mutually exclusive.");
-		    }
+//		    if (node.hasAttributes())
+//		    {
+//                        String y = node.getAttributeList();
+//                        String x = node.toString();
+//			LOGGER.severe("Specified a value and an attribute for <Param>.  They are mutually exclusive.");
+//		    }
 		    
 		    Params.add(new Parameter(node.getTextContent()));
 		}
@@ -1508,6 +1529,14 @@ private PulseTask BuildDeltaValueTaskItem(String taskID, FrameworkNode taskNode)
 		{
 		    PerformTask(strTask);
 		}
+                for (String strTask: _TimedTasks)
+                {
+                    TaskList objTaskList = _TaskMap.get(strTask.toUpperCase());
+                    if (objTaskList.ReadyForIntervalExecuation())
+                    {
+                        PerformTask(strTask);
+                    }
+                }
 	    }
 	});
 	// Now go and process all of the postponed tasks that need to be done in gui
@@ -1855,5 +1884,4 @@ private PulseTask BuildDeltaValueTaskItem(String taskID, FrameworkNode taskNode)
 	
 	return returnVal;
     }
-    
 }

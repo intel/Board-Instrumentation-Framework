@@ -35,10 +35,14 @@ public class TaskList
     protected final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
     protected ArrayList<BaseTask> _TaskItems;
     protected TaskManager TASKMAN = TaskManager.getTaskManager();
+    protected double Interval;
+    protected double lastExecution;
     
     public TaskList()
     {
 	_TaskItems = null;
+        Interval=0.0;
+        lastExecution = System.currentTimeMillis();
     }
     
     public void AddTaskItem(BaseTask objTask)
@@ -49,6 +53,26 @@ public class TaskList
 	}
 	
 	_TaskItems.add(objTask);
+    }
+    public void SetInterval(double newIntervalInMilliseconds)
+    {
+        Interval = newIntervalInMilliseconds;
+    }
+    public double GetInterval()
+    {
+        return Interval;
+    }
+    
+    public boolean ReadyForIntervalExecuation()
+    {
+        if (Interval > 0.0)
+        {
+            if ((System.currentTimeMillis() - lastExecution) > Interval )
+            {
+                return true;
+            }
+        }
+        return false;
     }
     
     public ArrayList<BaseTask> GetTasks()
@@ -63,7 +87,6 @@ public class TaskList
 	    LOGGER.severe("Attempted to perform a task with no items!");
 	    return false;
 	}
-	
 	for (ITask task : _TaskItems)
 	{
 	    if (null != task)
@@ -86,6 +109,7 @@ public class TaskList
 		LOGGER.severe("Tried to perform a NULL task");
 	    }
 	}
+	lastExecution = System.currentTimeMillis();
 	return true;
     }
 }

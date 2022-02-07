@@ -101,7 +101,7 @@ public class Configuration
     private boolean _EnforceMediaSupport;
     private Cursor _prevCursor = null;
     private int _BusyCursorRequestCount;
-    
+    private boolean _DoNotReportAliasErrors;
     private boolean _ImmediateRefreshRequsted;
     
     public Configuration()
@@ -123,8 +123,6 @@ public class Configuration
 	fAboutCreated = false;
 	HeartbeatInterval = 5; // 5 secs
 	_AppBorderWidth = 8;
-//        _topOffset = 0;
-//        _bottomOffset = 0;
 	_GuiTimerUpdateInterval = 350;
 	_ScaleProperty = new SimpleDoubleProperty(1.0);
 	_CurrWidthProperty = new SimpleDoubleProperty();
@@ -135,7 +133,6 @@ public class Configuration
 	_Side = Side.TOP;
 	_PrimaryScreen = Screen.getPrimary();
 	_PrimaryScreenDetermined = false;
-//       __DynamicTabList = new ArrayList<>();
 	_ShuttingDown = false;
 	
 	_LastLiveDataReceived = 0;
@@ -148,6 +145,7 @@ public class Configuration
 	_appScene = null;
 	_BusyCursorRequestCount = 0;
 	_ImmediateRefreshRequsted = false;
+        _DoNotReportAliasErrors= false;
     }
     
     void AddAbout()
@@ -166,6 +164,16 @@ public class Configuration
 	});
 	objMenu.getItems().add(item);
 	_MenuBar.getMenus().add(objMenu);
+    }
+    
+    public boolean DoNotReportAliasErrors()
+    {
+        return _DoNotReportAliasErrors;
+    }
+    
+    public void SetDoNotReportAliasErrors(boolean newVal)
+    {
+        _DoNotReportAliasErrors = newVal;
     }
     
     public void addOscarBullhornEntry(String address, int Port, String Key)

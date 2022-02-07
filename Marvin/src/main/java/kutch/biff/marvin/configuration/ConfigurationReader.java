@@ -1322,10 +1322,12 @@ public class ConfigurationReader
 	    {
 		_Configuration = new Configuration();
 	    }
+            Configuration.getConfig().SetDoNotReportAliasErrors(true);
 	    if (false == ReadAppSettings(doc, false))
 	    {
 		return null;
 	    }
+            Configuration.getConfig().SetDoNotReportAliasErrors(false);
 	    
 	    if (false == ReadTaskAndConditionals(doc))
 	    {
@@ -1429,10 +1431,16 @@ public class ConfigurationReader
 	boolean NetworkSettingsRead = false;
 	FrameworkNode baseNode = new FrameworkNode(appStuff.item(0));
 	FetchDimenstions(baseNode);
-	
+        
+	boolean currErrorBool = Configuration.getConfig().DoNotReportAliasErrors();
+        Configuration.getConfig().SetDoNotReportAliasErrors(basicInfoOnly);
+        
 	AliasMgr.getAliasMgr().addMarvinInfo();
 	AliasMgr.ReadAliasFromRootDocument(doc);
 	ReadAppAttributes(baseNode);
+        
+        Configuration.getConfig().SetDoNotReportAliasErrors(currErrorBool);
+        
 	
 	ArrayList<String> DeclaredTabList = new ArrayList<>();
 	
@@ -1645,6 +1653,7 @@ public class ConfigurationReader
 		catch(NumberFormatException ex)
 		{
 		    LOGGER.severe("Invalid Application <Inset> configuration.");
+                    
 		    return false;
 		}
 		if (node.hasAttribute("legacymode"))

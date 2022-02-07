@@ -29,7 +29,6 @@ import java.util.Iterator;
  */
 public class SteppedTaskList extends TaskList
 {
-    
     private boolean _Looped;
     Iterator<BaseTask> iter = null;
     
