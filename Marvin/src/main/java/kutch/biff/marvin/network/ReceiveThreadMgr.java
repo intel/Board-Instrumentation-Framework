@@ -258,7 +258,7 @@ public class ReceiveThreadMgr implements Runnable
 	    String Remote = node.getChild("Requester").getTextContent();
 	    String MarvinID = node.getChild("MarvinID").getTextContent();
 	    String Task = node.getChild("Task").getTextContent();
-	    if (!Version.equalsIgnoreCase("1.0"))
+//	    if (!Version.equalsIgnoreCase("1.0"))
 	    {
 		String RequestNumber = node.getChild("RequestNumber").getTextContent();
 		if (LastMarvinTaskReceived.containsKey(Remote))
