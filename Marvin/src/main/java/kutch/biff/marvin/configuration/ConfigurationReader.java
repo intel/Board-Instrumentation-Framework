@@ -1023,7 +1023,7 @@ public class ConfigurationReader
 	String externFile = null;
 	FrameworkNode nodeToPass = taskNode;
 	
-	Utility.ValidateAttributes(new String[] { "ID", "File", "PerformOnStartup", "PerformOnConnect", "stepped" },
+	Utility.ValidateAttributes(new String[] { "ID", "File", "PerformOnStartup", "PerformOnConnect", "stepped","interval" },
 		taskNode);
 	if (false == taskNode.hasAttribute("ID"))
 	{
@@ -2097,7 +2097,7 @@ public class ConfigurationReader
 		    }
 		    if (node.hasAttribute("task"))
 		    {
-			tab.setOnActivateTask(node.getAttribute("task"));
+			//tab.setOnActivateTask(node.getAttribute("task"));
 		    }
 		    
 		    if (node.hasAttribute("hgap"))
