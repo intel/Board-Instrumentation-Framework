@@ -1141,7 +1141,7 @@ private PulseTask BuildDeltaValueTaskItem(String taskID, FrameworkNode taskNode)
 	    
 	    if (true == masterNode.hasAttribute("LoopTasks"))
 	    {
-		objSteppedTask.setLooped(masterNode.getBooleanAttribute("PerformOnStartup"));
+		objSteppedTask.setLooped(masterNode.getBooleanAttribute("LoopTasks"));
 	    }
 	    objTask = objSteppedTask;
 	}

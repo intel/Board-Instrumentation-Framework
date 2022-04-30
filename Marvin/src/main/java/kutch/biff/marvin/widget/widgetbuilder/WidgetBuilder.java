@@ -222,7 +222,7 @@ public class WidgetBuilder
 	else
 	{ // if not an external declaration, check for known options
 	    Utility.ValidateAttributes(new String[] { "row", "column", "rowSpan", "colSpan", "columnSpan", "hgap",
-		    "vgap", "Align", "Height", "Width" }, dynaGridNode);
+		    "vgap", "Align", "Height", "Width","task" }, dynaGridNode);
 	    
 	}
 	

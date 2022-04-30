@@ -1023,7 +1023,7 @@ public class ConfigurationReader
 	String externFile = null;
 	FrameworkNode nodeToPass = taskNode;
 	
-	Utility.ValidateAttributes(new String[] { "ID", "File", "PerformOnStartup", "PerformOnConnect", "stepped","interval" },
+	Utility.ValidateAttributes(new String[] { "ID", "File", "PerformOnStartup", "PerformOnConnect", "stepped","interval","LoopTasks" },
 		taskNode);
 	if (false == taskNode.hasAttribute("ID"))
 	{

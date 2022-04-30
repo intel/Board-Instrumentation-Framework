@@ -505,7 +505,7 @@ public class AliasMgr {
         try {
             while ((line = br.readLine()) != null) {
                 if (line.trim() != null) {
-                    StringTokenizer st = new StringTokenizer(line, "=#");
+                    StringTokenizer st = new StringTokenizer(line, "=");
                     String strAlias, Value;
                     if (st.hasMoreElements()) {
                         strAlias = ((String) st.nextElement()).trim();
