@@ -2031,7 +2031,7 @@ public class ConfigurationReader
 			String id = node.getAttribute("ID");
 			if (TabAlreadyLoaded(TabList, id))
 			{
-			    LOGGER.severe("<Tab ID=" + id + "> defined twice in <Tabs>.");
+			    LOGGER.severe("Tab ID=" + id + " defined twice in <Tabs>.");
 			    return null;
 			}
 			

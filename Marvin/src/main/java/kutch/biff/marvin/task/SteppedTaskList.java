@@ -30,7 +30,7 @@ import java.util.Iterator;
 public class SteppedTaskList extends TaskList
 {
     private boolean _Looped;
-    Iterator<BaseTask> iter = null;
+    Iterator<BaseTask> _iter = null;
     
     public SteppedTaskList()
     {
@@ -46,15 +46,15 @@ public class SteppedTaskList extends TaskList
 	    LOGGER.severe("Attempted to perform a task with no items!");
 	    return false;
 	}
-	
-	if (null == iter)
+
+	if (null == _iter)
 	{
-	    iter = _TaskItems.iterator();
+	    _iter = _TaskItems.iterator();
 	}
 	
-	if (iter.hasNext())
+	if (_iter.hasNext())
 	{
-	    ITask task = iter.next();
+	    ITask task = _iter.next();
 	    
 	    if (null != task)
 	    {
@@ -76,9 +76,16 @@ public class SteppedTaskList extends TaskList
 		LOGGER.severe("Tried to perform a NULL task");
 	    }
 	}
-	if (!iter.hasNext() && _Looped)
+	if (!_iter.hasNext())
 	{
-	    iter = null; // reset
+             if (!_Looped)
+             {
+                _iter = null; // reset, will run again if 'clicked' or selected
+             }
+             else
+             {
+                 _iter = _TaskItems.iterator();
+             }
 	}
 	
 	return true;
