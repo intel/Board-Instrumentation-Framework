@@ -4,6 +4,7 @@
 /Marvin/build.xml
 /Marvin/nbproject
 /Marvin/Dependencies/Enzo*
+!/Marvin/Dependencies/Enzo*.jar
 /Marvin/release
 /*/*/__pycache__/
 /*/*/*.pyc
@@ -14,3 +15,8 @@
 /oscar/oscar.sln
 /oscar/oscar.v12.suo
 /Marvin/${store.dir}/
+
+bin/
+.gradle
+.idea
+out
