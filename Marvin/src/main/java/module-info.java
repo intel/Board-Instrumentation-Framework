@@ -6,10 +6,10 @@ module kutch.biff.marvin
     requires javafx.swing;
     requires javafx.base;
     requires java.logging;
-    
+
     requires javafx.graphics;
     requires java.xml;
     requires eu.hansolo.enzo;
-    
+
     exports kutch.biff.marvin;
 }
