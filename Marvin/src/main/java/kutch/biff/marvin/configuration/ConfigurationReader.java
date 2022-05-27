@@ -1394,14 +1394,11 @@ public class ConfigurationReader {
                             return null;
                         }
                     }
-                    objItem.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent t) {
-                            for (DataPointGenerator dpGen : dataPoints) {
-                                dpGen.generate();
-                            }
-                            TASKMAN.PerformTask(strTask);
+                    objItem.setOnAction(t -> {
+                        for (DataPointGenerator dpGen : dataPoints) {
+                            dpGen.generate();
                         }
+                        TASKMAN.PerformTask(strTask);
                     });
                 }
                 return objItem;

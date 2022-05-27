@@ -173,19 +173,17 @@ public class DynamicImageWidget extends StaticImageWidget {
 
             DynamicImageWidget objDynaImg = this;
 
-            dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-                @Override
-                public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                    boolean ChangeOcurred = false;
-                    if (IsPaused()) {
-                        return;
-                    }
+            dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+                boolean ChangeOcurred = false;
+                if (IsPaused()) {
+                    return;
+                }
 
-                    String strVal = newVal.toString().replaceAll("(\\r|\\n)", "");
+                String strVal = newVal.toString().replaceAll("(\\r|\\n)", "");
 
-                    String key;
+                String key;
 
-                    if (strVal.equalsIgnoreCase("Next")) // go to next image in the list
+                if (strVal.equalsIgnoreCase("Next")) // go to next image in the list
                     {
                         key = _ListID.GetNext();
 
@@ -193,23 +191,23 @@ public class DynamicImageWidget extends StaticImageWidget {
                     {
                         key = _ListID.GetPrevious();
                     } else if (strVal.equalsIgnoreCase("Monitor")) {
-                        ChangeOcurred = MonitorForFilechange();
-                        if (ChangeOcurred) {
-                            key = _CurrentKey;
-
-                        }
+                    ChangeOcurred = MonitorForFilechange();
+                    if (ChangeOcurred) {
                         key = _CurrentKey;
 
-                        MarvinTask mt = new MarvinTask();
-                        mt.AddDataset(getMinionID(), getNamespace(), "Monitor");
-                        TASKMAN.AddPostponedTask(mt, _MonitorInterval);
-                    } else {
-                        key = strVal; // expecting an ID
-                        _ListID.get(key); // just to keep next/prev alignment
                     }
-                    key = key.toLowerCase();
-                    if (_ImageFilenames.containsKey(key)) {
-                        if (!key.equalsIgnoreCase(_CurrentKey) || ChangeOcurred) // no reason to re-load if it is
+                    key = _CurrentKey;
+
+                    MarvinTask mt = new MarvinTask();
+                    mt.AddDataset(getMinionID(), getNamespace(), "Monitor");
+                    TASKMAN.AddPostponedTask(mt, _MonitorInterval);
+                } else {
+                    key = strVal; // expecting an ID
+                    _ListID.get(key); // just to keep next/prev alignment
+                }
+                key = key.toLowerCase();
+                if (_ImageFilenames.containsKey(key)) {
+                    if (!key.equalsIgnoreCase(_CurrentKey) || ChangeOcurred) // no reason to re-load if it is
                         // already loaded
                         {
                             DynamicTransition objTransition = null;
@@ -240,20 +238,19 @@ public class DynamicImageWidget extends StaticImageWidget {
                                 _ImageViewMap.get(_CurrentKey).setVisible(true);
                             }
                         }
-                    } else {
-                        LOGGER.warning("Received unknown ID: [" + strVal + "] for dynamic Image#" + getName() + ": ["
-                                + getNamespace() + ":" + getMinionID() + "]");
+                } else {
+                    LOGGER.warning("Received unknown ID: [" + strVal + "] for dynamic Image#" + getName() + ": ["
+                            + getNamespace() + ":" + getMinionID() + "]");
+                    return;
+                }
+                if (_AutoAdvance) {
+                    if (!_AutoLoopWithAdvance && _ListID.IsLast(key)) {
+                        _AutoAdvance = false;
                         return;
                     }
-                    if (_AutoAdvance) {
-                        if (!_AutoLoopWithAdvance && _ListID.IsLast(key)) {
-                            _AutoAdvance = false;
-                            return;
-                        }
-                        MarvinTask mt = new MarvinTask();
-                        mt.AddDataset(getMinionID(), getNamespace(), "Next");
-                        TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
-                    }
+                    MarvinTask mt = new MarvinTask();
+                    mt.AddDataset(getMinionID(), getNamespace(), "Next");
+                    TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
                 }
             });
             SetupTaskAction();
@@ -471,16 +468,13 @@ public class DynamicImageWidget extends StaticImageWidget {
         BaseWidget objWidget = this;
         if (null != getTaskID() || CONFIG.isDebugMode()) // only do if a task to setup, or if debug mode
         {
-            EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    if (event.isShiftDown() && CONFIG.isDebugMode()) {
-                        LOGGER.info(objWidget.toString(true));
-                    } else if (_TaskMap.containsKey(_CurrentKey) && true == CONFIG.getAllowTasks()) {
-                        TASKMAN.PerformTask(_TaskMap.get(_CurrentKey));
-                    } else if (null != getTaskID() && true == CONFIG.getAllowTasks()) {
-                        TASKMAN.PerformTask(getTaskID());
-                    }
+            EventHandler<MouseEvent> eh = event -> {
+                if (event.isShiftDown() && CONFIG.isDebugMode()) {
+                    LOGGER.info(objWidget.toString(true));
+                } else if (_TaskMap.containsKey(_CurrentKey) && true == CONFIG.getAllowTasks()) {
+                    TASKMAN.PerformTask(_TaskMap.get(_CurrentKey));
+                } else if (null != getTaskID() && true == CONFIG.getAllowTasks()) {
+                    TASKMAN.PerformTask(getTaskID());
                 }
             };
             for (String key : _ImageFilenames.keySet()) {

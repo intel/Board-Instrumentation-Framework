@@ -100,25 +100,22 @@ public class SteelGaugeWidget extends BaseWidget {
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
         SetupPeekaboo(DataManager.getDataManager());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
-
-                double newDialValue = 0;
-                String strVal = newVal.toString();
-                try {
-                    newDialValue = Double.parseDouble(strVal);
-                    HandleSteppedRange(newDialValue);
-                } catch (Exception ex) {
-                    LOGGER.severe("Invalid data for Gauge received: " + strVal);
-                    return;
-                }
-
-                _Gauge.setValue(newDialValue);
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
             }
+
+            double newDialValue = 0;
+            String strVal = newVal.toString();
+            try {
+                newDialValue = Double.parseDouble(strVal);
+                HandleSteppedRange(newDialValue);
+            } catch (Exception ex) {
+                LOGGER.severe("Invalid data for Gauge received: " + strVal);
+                return;
+            }
+
+            _Gauge.setValue(newDialValue);
         });
 
         return ApplyCSS();
@@ -362,11 +359,7 @@ public class SteelGaugeWidget extends BaseWidget {
         ConfigureAlignment();
         EventHandler<MouseEvent> eh = SetupTaskAction(); // special because Gauge can be interactive
         if (null == eh) {
-            eh = new EventHandler<MouseEvent>() // create a dummy one, because we dont' want interactive
-            {
-                @Override
-                public void handle(MouseEvent event) {
-                }
+            eh = event -> {
             };
         }
         _Gauge.customKnobClickHandlerProperty().set(eh);

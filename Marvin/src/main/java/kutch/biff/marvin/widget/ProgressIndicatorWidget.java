@@ -46,26 +46,23 @@ public class ProgressIndicatorWidget extends BaseWidget {
         ConfigureAlignment();
         SetupPeekaboo(dataMgr);
         pane.add(_Indicator, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
-                double newDialValue = 0;
-                String strVal = newVal.toString();
-                try {
-                    newDialValue = Double.parseDouble(strVal);
-                } catch (Exception ex) {
-                    LOGGER.severe("Invalid data for Progress Indicator received: " + strVal);
-                    return;
-                }
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
+            }
+            double newDialValue = 0;
+            String strVal = newVal.toString();
+            try {
+                newDialValue = Double.parseDouble(strVal);
+            } catch (Exception ex) {
+                LOGGER.severe("Invalid data for Progress Indicator received: " + strVal);
+                return;
+            }
 
-                if (0.0 == newDialValue) {
-                    _Indicator.setProgress(newDialValue);
-                } else {
-                    _Indicator.setProgress(newDialValue / 100);
-                }
+            if (0.0 == newDialValue) {
+                _Indicator.setProgress(newDialValue);
+            } else {
+                _Indicator.setProgress(newDialValue / 100);
             }
         });
         SetupTaskAction();

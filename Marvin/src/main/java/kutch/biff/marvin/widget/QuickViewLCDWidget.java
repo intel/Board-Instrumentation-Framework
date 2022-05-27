@@ -93,27 +93,24 @@ public class QuickViewLCDWidget extends GridWidget implements IQuickViewSort {
             getGridPane().setVgap(getvGap());
         }
 
-        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
+        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
+            }
+            String strVal = newVal.toString();
+            String[] parts = strVal.split(":");
+            if (parts.length > 1) {
+                String ID = parts[0];
+                String Value = parts[1];
+                if (_DataPointMap.containsKey(ID.toLowerCase())) {
+                    return; // already made one for this!
                 }
-                String strVal = newVal.toString();
-                String[] parts = strVal.split(":");
-                if (parts.length > 1) {
-                    String ID = parts[0];
-                    String Value = parts[1];
-                    if (_DataPointMap.containsKey(ID.toLowerCase())) {
-                        return; // already made one for this!
-                    }
-                    if (_ExclusionList.containsKey(ID.toLowerCase())) {
-                        return; // not wanted
-                    }
-                    _DataPointMap.put(ID.toLowerCase(), ID); // add the key to the map don't care about the stored
-                    // value, just the key
-                    CreateDataWidget(ID, Value); // didn't find it, so go make one
+                if (_ExclusionList.containsKey(ID.toLowerCase())) {
+                    return; // not wanted
                 }
+                _DataPointMap.put(ID.toLowerCase(), ID); // add the key to the map don't care about the stored
+                // value, just the key
+                CreateDataWidget(ID, Value); // didn't find it, so go make one
             }
         });
         SetupPeekaboo(dataMgr);

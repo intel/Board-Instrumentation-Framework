@@ -119,18 +119,16 @@ public class FlipPanelWidget extends BaseWidget {
 
         SetupPeekaboo(dataMgr);
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                String strVal = newVal.toString();
-                Orientation orientation = getRequestedOrientation(strVal);
-                if (strVal.equalsIgnoreCase("Flip")) {
-                    DoFlip();
-                } else if (strVal.equalsIgnoreCase("Front")) {
-                    DoFlip(false, getOrientation());
-                } else if (strVal.equalsIgnoreCase("Back")) {
-                    DoFlip(true, getOrientation());
-                } else if (strVal.length() > 4 && strVal.substring(0, 5).equalsIgnoreCase("Flip:")) // Flip, but with a
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            String strVal = newVal.toString();
+            Orientation orientation = getRequestedOrientation(strVal);
+            if (strVal.equalsIgnoreCase("Flip")) {
+                DoFlip();
+            } else if (strVal.equalsIgnoreCase("Front")) {
+                DoFlip(false, getOrientation());
+            } else if (strVal.equalsIgnoreCase("Back")) {
+                DoFlip(true, getOrientation());
+            } else if (strVal.length() > 4 && strVal.substring(0, 5).equalsIgnoreCase("Flip:")) // Flip, but with a
                 // direction
                 {
                     if (null != orientation) {
@@ -152,9 +150,8 @@ public class FlipPanelWidget extends BaseWidget {
                     }
                 } else {
 
-                }
-
             }
+
         });
 
         return ApplyCSS();

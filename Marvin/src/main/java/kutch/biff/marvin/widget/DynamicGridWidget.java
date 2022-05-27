@@ -238,17 +238,15 @@ public class DynamicGridWidget extends GridWidget {
                 TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
             }
 
-            dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-                @Override
-                public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                    if (IsPaused()) {
-                        return;
-                    }
+            dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+                if (IsPaused()) {
+                    return;
+                }
 
-                    String strVal = newVal.toString().replaceAll("(\\r|\\n)", "");
-                    String key;
+                String strVal = newVal.toString().replaceAll("(\\r|\\n)", "");
+                String key;
 
-                    if (strVal.equalsIgnoreCase("Next")) // go to next image in the list
+                if (strVal.equalsIgnoreCase("Next")) // go to next image in the list
                     {
                         int count = _ListID.size();
 
@@ -276,11 +274,10 @@ public class DynamicGridWidget extends GridWidget {
                             return;
                         }
                     } else {
-                        key = strVal; // expecting an ID
-                        _ListID.get(key); // just to keep next/prev alignment
-                    }
-                    ActivateGrid(key);
+                    key = strVal; // expecting an ID
+                    _ListID.get(key); // just to keep next/prev alignment
                 }
+                ActivateGrid(key);
             });
 
             return true;

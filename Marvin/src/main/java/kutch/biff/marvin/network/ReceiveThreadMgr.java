@@ -267,33 +267,30 @@ public class ReceiveThreadMgr implements Runnable {
     @SuppressWarnings({"deprecation", "serial"})
     @Override
     public void run() {
-        Runnable processQueuedDataThread = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (false == fKillRequested) {
-                        if (!_DataQueue.isEmpty()) {
-                            HashMap<InetAddress, String> dataItem = (HashMap<InetAddress, String>) _DataQueue.take();
-                            // dataItem[dataItem.keySet()[0]]
-                            InetAddress addr = dataItem.keySet().iterator().next();
-                            Process(dataItem.get(addr).getBytes(), addr);
-                        } else {
-                            if (_WorkerThreadCount.get() > 1) {
-                                _WorkerThreadCount.decrementAndGet();
-                                // LOGGER.info("Reducing processing Thread Count");
-                                return;
-                            }
-                            try {
-                                Thread.sleep(2); // didn't read anything, socket read timed out, so take a nap
-                            } catch (InterruptedException ex1) {
-                            }
+        Runnable processQueuedDataThread = () -> {
+            try {
+                while (false == fKillRequested) {
+                    if (!_DataQueue.isEmpty()) {
+                        HashMap<InetAddress, String> dataItem = (HashMap<InetAddress, String>) _DataQueue.take();
+                        // dataItem[dataItem.keySet()[0]]
+                        InetAddress addr = dataItem.keySet().iterator().next();
+                        Process(dataItem.get(addr).getBytes(), addr);
+                    } else {
+                        if (_WorkerThreadCount.get() > 1) {
+                            _WorkerThreadCount.decrementAndGet();
+                            // LOGGER.info("Reducing processing Thread Count");
+                            return;
+                        }
+                        try {
+                            Thread.sleep(2); // didn't read anything, socket read timed out, so take a nap
+                        } catch (InterruptedException ex1) {
                         }
                     }
-                    _WorkerThreadCount.decrementAndGet();
-                    // LOGGER.info("Receive Queue Processing Thread successfully terminated.");
-                } catch (InterruptedException e) {
-                    LOGGER.severe(e.toString());
                 }
+                _WorkerThreadCount.decrementAndGet();
+                // LOGGER.info("Receive Queue Processing Thread successfully terminated.");
+            } catch (InterruptedException e) {
+                LOGGER.severe(e.toString());
             }
         };
 

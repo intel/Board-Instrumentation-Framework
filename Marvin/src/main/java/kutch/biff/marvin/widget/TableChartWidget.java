@@ -385,13 +385,8 @@ public class TableChartWidget extends BaseWidget {
         TableColumn<ObservableList<StringProperty>, String> objColumn = new TableColumn<>();
         objColumn.setText(columnTitle);
         objColumn.setCellValueFactory(
-                new Callback<TableColumn.CellDataFeatures<ObservableList<StringProperty>, String>, ObservableValue<String>>() {
-                    @Override
-                    public ObservableValue<String> call(
-                            CellDataFeatures<ObservableList<StringProperty>, String> cellDataFeatures) {
-                        return cellDataFeatures.getValue().get(columnIndex);
-                    }
-                });
+                
+                        cellDataFeatures -> cellDataFeatures.getValue().get(columnIndex));
         return objColumn;
     }
 

@@ -120,12 +120,9 @@ public class AboutBox {
         grid.add(objSlider, 1, newBottom++);
         objSlider.setVisible(false);
 
-        aboutImg.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.isShiftDown()) {
-                    objSlider.setVisible(true);
-                }
+        aboutImg.setOnMouseClicked(event -> {
+            if (event.isShiftDown()) {
+                objSlider.setVisible(true);
             }
         });
 
@@ -134,11 +131,8 @@ public class AboutBox {
         grid.setStyle(
                 "-fx-padding: 5; -fx-background-color: cornsilk; -fx-border-width:5; -fx-border-color: linear-gradient(to bottom, chocolate, derive(chocolate, 50%));");
 
-        OKBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent t) {
-                stage.close();
-            }
+        OKBtn.setOnAction(t -> {
+            stage.close();
         });
 
         // place on correct screen.
@@ -176,17 +170,13 @@ public class AboutBox {
         scalingString += String.format("%.2f", CONFIG.getConfiguration().getScaleFactor());
         lblScaling = new Label(scalingString);
 
-        CONFIG.getConfiguration().getScaleProperty().addListener(new ChangeListener<Number>() // when the scale changes
-        {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
-                String scalingString = "Scaling: ";
-                if (CONFIG.getConfiguration().isAutoScale()) {
-                    scalingString += "[AutoScale] ";
-                }
-                scalingString += String.format("%.2f", CONFIG.getConfiguration().getScaleFactor());
-                lblScaling.setText(scalingString);
+        CONFIG.getConfiguration().getScaleProperty().addListener((observableValue, number, number2) -> {
+            String scalingString = "Scaling: ";
+            if (CONFIG.getConfiguration().isAutoScale()) {
+                scalingString += "[AutoScale] ";
             }
+            scalingString += String.format("%.2f", CONFIG.getConfiguration().getScaleFactor());
+            lblScaling.setText(scalingString);
         });
 
         lblAppDimensions = new Label("Screen Size: " + Integer.toString(appWidth) + "x" + Integer.toString(appHeight));

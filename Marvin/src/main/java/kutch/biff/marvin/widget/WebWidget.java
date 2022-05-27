@@ -79,40 +79,33 @@ public class WebWidget extends BaseWidget {
 
         pane.add(_Browser, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
-                _HackedFile = null;
-                SetContent(newVal.toString());
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
             }
+            _HackedFile = null;
+            SetContent(newVal.toString());
         });
 
         // check status of loading
-        _Browser.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
-            @SuppressWarnings("rawtypes")
-            @Override
-            public void changed(ObservableValue ov, State oldState, State newState) {
-                if (newState == State.FAILED) {
-                    // browser requires absolute path, so let's try to provide that, in case a
-                    // relative one was provided
-                    if ("file:".equalsIgnoreCase(_CurrentContent.substring(0, 5))) {
-                        if (_HackedFile == null) {
-                            Path currentRelativePath = Paths.get("");
-                            String workDir = currentRelativePath.toAbsolutePath().toString() + java.io.File.separator;
+        _Browser.getEngine().getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
+            if (newState == State.FAILED) {
+                // browser requires absolute path, so let's try to provide that, in case a
+                // relative one was provided
+                if ("file:".equalsIgnoreCase(_CurrentContent.substring(0, 5))) {
+                    if (_HackedFile == null) {
+                        Path currentRelativePath = Paths.get("");
+                        String workDir = currentRelativePath.toAbsolutePath().toString() + java.io.File.separator;
 
-                            _HackedFile = _CurrentContent;
-                            _CurrentContent = "file:" + workDir + _CurrentContent.substring(5);
-                            SetContent(_CurrentContent);
-                            return;
-                        }
-                        _CurrentContent = _HackedFile;
+                        _HackedFile = _CurrentContent;
+                        _CurrentContent = "file:" + workDir + _CurrentContent.substring(5);
+                        SetContent(_CurrentContent);
+                        return;
                     }
-
-                    LOGGER.info("Error loading web widget content: " + _CurrentContent);
+                    _CurrentContent = _HackedFile;
                 }
+
+                LOGGER.info("Error loading web widget content: " + _CurrentContent);
             }
         });
 

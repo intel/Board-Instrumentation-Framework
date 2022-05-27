@@ -91,12 +91,8 @@ public class PDF_ReaderWidget extends BaseWidget {
                 TASKMAN.AddPostponedTask(mt, _AutoAdvanceInterval);
             }
 
-            dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-                @Override
-                public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                    MyHandler(newVal);
-                }
-
+            dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+                MyHandler(newVal);
             });
             return ApplyCSS();
         }

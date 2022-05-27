@@ -56,16 +56,13 @@ public class ListBoxText extends BaseWidget {
         SetupPeekaboo(dataMgr);
 
         pane.add(_listView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
-
-                String TextString = newVal.toString();
-                addEntry(TextString);
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
             }
+
+            String TextString = newVal.toString();
+            addEntry(TextString);
         });
 
         SetupTaskAction();

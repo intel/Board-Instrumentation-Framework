@@ -97,16 +97,14 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort {
             getGridPane().setVgap(getvGap());
         }
 
-        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
+        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
+            }
 
-                String strVal = newVal.toString();
-                String[] parts = strVal.split(":");
-                if (parts.length > 1) // check to see if we have already created the widget
+            String strVal = newVal.toString();
+            String[] parts = strVal.split(":");
+            if (parts.length > 1) // check to see if we have already created the widget
                 {
                     String ID = parts[0];
                     String Value = parts[1];
@@ -120,7 +118,6 @@ public class QuickViewWidget extends GridWidget implements IQuickViewSort {
                     // value, just the key
                     CreateDataWidget(ID, Value); // didn't find it, so go make one
                 }
-            }
         });
         SetupPeekaboo(dataMgr);
         SetupTaskAction();

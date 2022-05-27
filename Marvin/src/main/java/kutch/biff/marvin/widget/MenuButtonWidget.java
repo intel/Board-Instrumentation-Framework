@@ -147,14 +147,11 @@ public class MenuButtonWidget extends ButtonWidget {
 
     private void setupChangeTitleListener(MenuItem objItem) {
         if (__UpdateTitleFromSelection) {
-            EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    if (__UpdateTitleFromSelection) // sometimes flag is read AFTER handler setup
+            EventHandler<ActionEvent> eventHandler = event -> {
+                if (__UpdateTitleFromSelection) // sometimes flag is read AFTER handler setup
                     {
                         _Button.setText(objItem.getText());
                     }
-                }
             };
             objItem.addEventHandler(ActionEvent.ACTION, eventHandler);
         }

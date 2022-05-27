@@ -81,14 +81,11 @@ public class SteelLCDWidget extends BaseWidget {
         pane.add(_LCD, getColumn(), getRow(), getColumnSpan(), getRowSpan());
         SetupPeekaboo(dataMgr);
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
-                SetValue(newVal.toString());
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
             }
+            SetValue(newVal.toString());
         });
         SetupTaskAction();
 

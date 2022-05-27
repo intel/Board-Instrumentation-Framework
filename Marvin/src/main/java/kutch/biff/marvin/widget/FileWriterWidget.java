@@ -96,16 +96,14 @@ public class FileWriterWidget extends BaseWidget {
             return false;
         }
 
-        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
+        dataMgr.AddWildcardListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
+            }
 
-                String strVal = newVal.toString();
-                String[] parts = strVal.split(":");
-                if (parts.length > 1) // check to see if we have already created the widget
+            String strVal = newVal.toString();
+            String[] parts = strVal.split(":");
+            if (parts.length > 1) // check to see if we have already created the widget
                 {
                     String ID = parts[0];
                     String Value = parts[1];
@@ -122,7 +120,6 @@ public class FileWriterWidget extends BaseWidget {
                         Overwrite();
                     }
                 }
-            }
         });
         SetupPeekaboo(dataMgr);
 

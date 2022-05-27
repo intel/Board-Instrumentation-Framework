@@ -45,28 +45,25 @@ public class ProgressBarWidget extends BaseWidget {
         ConfigureAlignment();
         SetupPeekaboo(dataMgr);
         pane.add(_ProgressBar, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
-
-                double newValue = 0;
-                String strVal = newVal.toString();
-                try {
-                    newValue = Double.parseDouble(strVal);
-                } catch (Exception ex) {
-                    LOGGER.severe("Invalid data for Progress Bar received: " + strVal);
-                    return;
-                }
-                if (0.0 == newValue) {
-                    _ProgressBar.setProgress(newValue);
-                } else {
-                    _ProgressBar.setProgress(newValue / 100);
-                }
-
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
             }
+
+            double newValue = 0;
+            String strVal = newVal.toString();
+            try {
+                newValue = Double.parseDouble(strVal);
+            } catch (Exception ex) {
+                LOGGER.severe("Invalid data for Progress Bar received: " + strVal);
+                return;
+            }
+            if (0.0 == newValue) {
+                _ProgressBar.setProgress(newValue);
+            } else {
+                _ProgressBar.setProgress(newValue / 100);
+            }
+
         });
 
         SetupTaskAction();

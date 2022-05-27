@@ -65,11 +65,8 @@ public class ButtonWidget extends BaseWidget {
             return false;
         }
         pane.add(getButton(), getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                onChange(o, oldVal, newVal);
-            }
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            onChange(o, oldVal, newVal);
         });
 
         SetupTaskAction();

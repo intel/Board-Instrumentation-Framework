@@ -125,19 +125,11 @@ public class TranslationCalculator {
     }
 
     private void SetupListeners() {
-        _WorkingPane.widthProperty().addListener(new ChangeListener<Number>() // when things are resized
-        {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number number, Number oldNumber) {
-                Calculate();
-            }
+        _WorkingPane.widthProperty().addListener((observable, number, oldNumber) -> {
+            Calculate();
         });
-        _WorkingPane.heightProperty().addListener(new ChangeListener<Number>() // when things are resized
-        {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number number, Number oldNumber) {
-                Calculate();
-            }
+        _WorkingPane.heightProperty().addListener((observable, number, oldNumber) -> {
+            Calculate();
         });
         /*
          * _ReferencePane.layoutBoundsProperty().addListener(new
@@ -148,12 +140,8 @@ public class TranslationCalculator {
          * clip.setHeight(bounds.getHeight()); _ReferencePane.setClip(clip);
          * Calculate(); } });
          */
-        _Scale.addListener(new ChangeListener<Number>() // when the scale changes
-        {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
-                Calculate();
-            }
+        _Scale.addListener((observableValue, number, number2) -> {
+            Calculate();
         });
     }
 }

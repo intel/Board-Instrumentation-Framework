@@ -66,26 +66,23 @@ public class LineChartWidget_MS extends BaseChartWidget {
         pane.add(getChart(), getColumn(), getRow(), getColumnSpan(), getRowSpan());
         if (0 == _SeriesOrder.size()) {
             for (SeriesDataSet ds : getSeries()) {
-                dataMgr.AddListener(ds.getID(), ds.getNamespace(), new ChangeListener<Object>() {
-                    @Override
-                    public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                        if (IsPaused()) {
-                            return;
-                        }
-
-                        String strVal = newVal.toString();
-                        double newValue = 0;
-                        try {
-                            newValue = Double.parseDouble(strVal);
-                            newValue *= ds.getScaleValue();
-                            HandleSteppedRange(newValue);
-                            strVal = Double.toString(newValue);
-                        } catch (Exception ex) {
-                            LOGGER.severe("Invalid data for Chart received: " + strVal);
-                            return;
-                        }
-                        OnDataArrived(ds, strVal);
+                dataMgr.AddListener(ds.getID(), ds.getNamespace(), (o, oldVal, newVal) -> {
+                    if (IsPaused()) {
+                        return;
                     }
+
+                    String strVal = newVal.toString();
+                    double newValue = 0;
+                    try {
+                        newValue = Double.parseDouble(strVal);
+                        newValue *= ds.getScaleValue();
+                        HandleSteppedRange(newValue);
+                        strVal = Double.toString(newValue);
+                    } catch (Exception ex) {
+                        LOGGER.severe("Invalid data for Chart received: " + strVal);
+                        return;
+                    }
+                    OnDataArrived(ds, strVal);
                 });
             }
         } else {

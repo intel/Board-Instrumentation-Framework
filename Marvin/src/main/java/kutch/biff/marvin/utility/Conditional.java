@@ -213,11 +213,8 @@ public class Conditional {
     }
 
     public void Enable() {
-        DataManager.getDataManager().AddListener(_Value1_ID, _Value1_Namespace, new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                Perform(newVal.toString());
-            }
+        DataManager.getDataManager().AddListener(_Value1_ID, _Value1_Namespace, (o, oldVal, newVal) -> {
+            Perform(newVal.toString());
         });
     }
 

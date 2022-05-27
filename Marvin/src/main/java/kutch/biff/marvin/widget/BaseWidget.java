@@ -1683,12 +1683,9 @@ abstract public class BaseWidget implements Widget {
 
         getStylableObject().setVisible(_PeekabooShowDefault);
         for (Pair<String, String> peekaboo : _Peekaboos) {
-            dataMgr.AddListener(peekaboo.getValue(), peekaboo.getKey(), new ChangeListener<Object>() {
-                @Override
-                public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                    String strPeek = newVal.toString();
-                    HandlePeekabooMessage(strPeek);
-                }
+            dataMgr.AddListener(peekaboo.getValue(), peekaboo.getKey(), (o, oldVal, newVal) -> {
+                String strPeek = newVal.toString();
+                HandlePeekabooMessage(strPeek);
             });
         }
     }
@@ -1699,21 +1696,10 @@ abstract public class BaseWidget implements Widget {
         {
             if (null != getTaskID() || CONFIG.isDebugMode()) // only do if a task to setup, or if debug mode
             {
-                EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        mouseHandler(event);
-                        // to make menus and such much zippier
-                        CONFIG.requestImmediateRefresh();
-                    }
-                    /*
-                     * if (CONFIG.isDebugMode() && event.isShiftDown()) {
-                     * LOGGER.info(objWidget.toString(true)); } else if (CONFIG.isDebugMode() &&
-                     * event.isControlDown()) { if (null != getStylableObject()) {
-                     * AddAdditionalStyleOverride(DebugStyles.GetNext()); ApplyCSS(); } } else if
-                     * (null != getTaskID() && true == CONFIG.getAllowTasks()) {
-                     * TASKMAN.PerformTask(getTaskID()); } }
-                     */
+                EventHandler<MouseEvent> eh = event -> {
+                    mouseHandler(event);
+                    // to make menus and such much zippier
+                    CONFIG.requestImmediateRefresh();
                 };
                 getStylableObject().setOnMouseClicked(eh);
                 _MouseHasBeenSetup = true;

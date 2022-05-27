@@ -136,16 +136,13 @@ public class VideoPlayerWidget extends MediaPlayerWidget {
             BaseWidget objWidget = this;
             if (_TaskMap.size() > 0 || CONFIG.isDebugMode()) // only do if a task to setup, or if debug mode
             {
-                EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if (event.isShiftDown() && CONFIG.isDebugMode()) {
-                            LOGGER.info(objWidget.toString(true));
-                        } else if (true == CONFIG.getAllowTasks() && _TaskMap.containsKey(_CurrentMediaID.toLowerCase())) {
-                            TASKMAN.PerformTask(_TaskMap.get(_CurrentMediaID.toLowerCase()));
-                        } else if (null != getTaskID() && true == CONFIG.getAllowTasks()) {
-                            TASKMAN.PerformTask(getTaskID());
-                        }
+                EventHandler<MouseEvent> eh = event -> {
+                    if (event.isShiftDown() && CONFIG.isDebugMode()) {
+                        LOGGER.info(objWidget.toString(true));
+                    } else if (true == CONFIG.getAllowTasks() && _TaskMap.containsKey(_CurrentMediaID.toLowerCase())) {
+                        TASKMAN.PerformTask(_TaskMap.get(_CurrentMediaID.toLowerCase()));
+                    } else if (null != getTaskID() && true == CONFIG.getAllowTasks()) {
+                        TASKMAN.PerformTask(getTaskID());
                     }
                 };
                 getStylableObject().setOnMouseClicked(eh);

@@ -63,24 +63,21 @@ public class SteelGauge180Widget extends BaseWidget {
 
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
-
-                double newDialValue = 0;
-                String strVal = newVal.toString();
-                try {
-                    newDialValue = Double.parseDouble(strVal);
-                    HandleSteppedRange(newDialValue);
-                } catch (NumberFormatException ex) {
-                    LOGGER.severe("Invalid data for 180  Gauge received: " + strVal);
-                    return;
-                }
-                _Gauge.setValue(newDialValue);
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
             }
+
+            double newDialValue = 0;
+            String strVal = newVal.toString();
+            try {
+                newDialValue = Double.parseDouble(strVal);
+                HandleSteppedRange(newDialValue);
+            } catch (NumberFormatException ex) {
+                LOGGER.severe("Invalid data for 180  Gauge received: " + strVal);
+                return;
+            }
+            _Gauge.setValue(newDialValue);
         });
 
         return true;

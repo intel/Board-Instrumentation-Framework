@@ -81,60 +81,57 @@ public class TextWidget extends BaseWidget {
 
         pane.add(_Group, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
+            }
 
-                _TextString = newVal.toString();
-                if (DecimalsSet) {
-                    try {
-                        String fmtString = "%." + Integer.toString(getDecimalPlaces()) + "f";
-                        float fVal = Float.parseFloat(_TextString);
-                        _TextString = String.format(fmtString, fVal);
-                    } catch (Exception ex) {
+            _TextString = newVal.toString();
+            if (DecimalsSet) {
+                try {
+                    String fmtString = "%." + Integer.toString(getDecimalPlaces()) + "f";
+                    float fVal = Float.parseFloat(_TextString);
+                    _TextString = String.format(fmtString, fVal);
+                } catch (Exception ex) {
 
-                    }
                 }
-                if (true == _NumericFormat) {
-                    try {
-                        if (_TextString.contains(".")) // good bet it's a float
+            }
+            if (true == _NumericFormat) {
+                try {
+                    if (_TextString.contains(".")) // good bet it's a float
                         {
                             _TextString = NumberFormat.getNumberInstance().format(Float.parseFloat(_TextString));
                         } else {
-                            _TextString = NumberFormat.getNumberInstance().format(Long.parseLong(_TextString));
-                        }
-                    } catch (Exception Ex) {
-                        // System.out.println(Ex.toString());
+                        _TextString = NumberFormat.getNumberInstance().format(Long.parseLong(_TextString));
                     }
-                } else if (true == _MonetaryFormat) {
-                    if (_TextString.contains(".")) // good bet it's a float
+                } catch (Exception Ex) {
+                    // System.out.println(Ex.toString());
+                }
+            } else if (true == _MonetaryFormat) {
+                if (_TextString.contains(".")) // good bet it's a float
                     {
                         _TextString = NumberFormat.getCurrencyInstance().format(Float.parseFloat(_TextString));
                     } else {
-                        _TextString = NumberFormat.getCurrencyInstance().format(Long.parseLong(_TextString));
+                    _TextString = NumberFormat.getCurrencyInstance().format(Long.parseLong(_TextString));
 
-                    }
-                } else if (true == _PercentFormat) {
-                    if (_TextString.contains(".")) // good bet it's a float
+                }
+            } else if (true == _PercentFormat) {
+                if (_TextString.contains(".")) // good bet it's a float
                     {
                         _TextString = NumberFormat.getPercentInstance().format(Float.parseFloat(_TextString));
                     } else {
-                        _TextString = NumberFormat.getPercentInstance().format(Long.parseLong(_TextString));
+                    _TextString = NumberFormat.getPercentInstance().format(Long.parseLong(_TextString));
 
-                    }
                 }
-                _TextString += _Suffix;
+            }
+            _TextString += _Suffix;
 
-                if (_TextString.length() < 2) // seems a single character won't display - bug in Java
+            if (_TextString.length() < 2) // seems a single character won't display - bug in Java
                 {
                     _TextString += " ";
                 }
-                _TextControl.setText(_TextString);
+            _TextControl.setText(_TextString);
 
-            }
         });
 
         SetupTaskAction();

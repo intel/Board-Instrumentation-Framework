@@ -83,27 +83,24 @@ public class SteelGaugeRadialSteelWidget extends BaseWidget {
         getParentPane().add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
         SetupPeekaboo(DataManager.getDataManager());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
-
-                double newDialValue = 0;
-                String strVal = newVal.toString();
-                try {
-                    newDialValue = Double.parseDouble(strVal);
-                    HandleSteppedRange(newDialValue);
-
-                    // oldDialValue = Double.parseDouble(oldVal.toString());
-                } catch (Exception ex) {
-                    LOGGER.severe("Invalid data for Gauge received: " + strVal);
-                    return;
-                }
-
-                _Gauge.setValue(newDialValue);
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
             }
+
+            double newDialValue = 0;
+            String strVal = newVal.toString();
+            try {
+                newDialValue = Double.parseDouble(strVal);
+                HandleSteppedRange(newDialValue);
+
+                // oldDialValue = Double.parseDouble(oldVal.toString());
+            } catch (Exception ex) {
+                LOGGER.severe("Invalid data for Gauge received: " + strVal);
+                return;
+            }
+
+            _Gauge.setValue(newDialValue);
         });
 
         return ApplyCSS();
