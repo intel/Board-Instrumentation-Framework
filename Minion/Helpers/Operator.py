@@ -143,12 +143,11 @@ class Operator_RunningAverage(Operator):
         Operator.__init__(self,objNamespace,ID,InGroup)
         self._dataPointList=[]
         self._Interval = None
-        self._Collectors
 
     def Collect(self):
+        collectors=self.GetCollectors()
+        Collector = collectors[0]
         if None == self._Interval:
-            collectors=self.GetCollectors()
-            self._Collector = collectors[0]
             try:
                 self._Interval = int(collectors[1].GetLastValue()) * 1000 #make it seconds
             except:
@@ -166,11 +165,13 @@ class Operator_RunningAverage(Operator):
             self._dataPointList = self._dataPointList[validRangeStart:]
 
         try:
-            val = float(self._Collector.GetLastValue())
+            val = float(Collector.GetLastValue())
         except:
-            return "Operator Running Average cannot average value {}".format(self._Collector.GetLastValue())
+            return "Operator Running Average cannot average value {}".format(Collector.GetLastValue())
 
-        time = Time.GetCurrMS() - (self._Collector.GetElapsedTimeSinceLast() * 1000)
+
+        time = Time.GetCurrMS()
+
         self._dataPointList.append((val,time))
         tVal = 0.0
         for val,_ in self._dataPointList:
@@ -625,8 +626,3 @@ class Operator_UserDefined(Operator):
         self._objNormalCollector._Parameters = origParams
 
         return collectedVal
-
-
-
-
-

@@ -60,7 +60,7 @@ import ast
 import time
 import traceback
 
-VersionStr="20.02.07 Build 1"
+VersionStr="22.08.30 Build 1"
 
 logger = object()
 
@@ -187,11 +187,11 @@ class Measurement:
         metrics = body['data']['result']
         listMap={}
         returnMap={}
-        
         for result in metrics:
             #metric = result['metric']['__name__']
-            if not 'exported_instance' in result['metric']:
-                continue # means is probably prometheus daemon stats, so ignore
+            # if not 'exported_instance' in result['metric']:
+            #     continue # means is probably prometheus daemon stats, so ignore
+
 
             #server = result['metric']['exported_instance']
             #timestamp = result['value'][0]
