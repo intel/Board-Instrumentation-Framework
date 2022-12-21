@@ -171,12 +171,12 @@ public class AboutBox {
         lblScaling = new Label(scalingString);
 
         CONFIG.getConfiguration().getScaleProperty().addListener((observableValue, number, number2) -> {
-            String scalingString = "Scaling: ";
+            String scalingStr = "Scaling: ";
             if (CONFIG.getConfiguration().isAutoScale()) {
-                scalingString += "[AutoScale] ";
+                scalingStr += "[AutoScale] ";
             }
-            scalingString += String.format("%.2f", CONFIG.getConfiguration().getScaleFactor());
-            lblScaling.setText(scalingString);
+            scalingStr += String.format("%.2f", CONFIG.getConfiguration().getScaleFactor());
+            lblScaling.setText(scalingStr);
         });
 
         lblAppDimensions = new Label("Screen Size: " + Integer.toString(appWidth) + "x" + Integer.toString(appHeight));
