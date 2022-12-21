@@ -65,46 +65,40 @@ public class DoubleBarGaugeWidget extends BaseWidget {
 
         pane.add(_Gauge, getColumn(), getRow(), getColumnSpan(), getRowSpan());
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
-
-                double newDialValue = 0;
-                String strVal = newVal.toString();
-                try {
-                    newDialValue = Double.parseDouble(strVal);
-                } catch (NumberFormatException ex) {
-                    LOGGER.severe("Invalid data for BarGauge received: " + strVal);
-                    return;
-                }
-                _Gauge.setInnerValue(newDialValue);
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
             }
+
+            double newDialValue = 0;
+            String strVal = newVal.toString();
+            try {
+                newDialValue = Double.parseDouble(strVal);
+            } catch (NumberFormatException ex) {
+                LOGGER.severe("Invalid data for BarGauge received: " + strVal);
+                return;
+            }
+            _Gauge.setInnerValue(newDialValue);
         });
 
         if (null == _OuterID || null == _OuterNamespace) {
             LOGGER.severe("No Outter Data source defined for BarGauge");
             return false;
         }
-        dataMgr.AddListener(_OuterID, _OuterNamespace, new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
-
-                double newDialValue = 0;
-                String strVal = newVal.toString();
-                try {
-                    newDialValue = Double.parseDouble(strVal);
-                } catch (NumberFormatException ex) {
-                    LOGGER.severe("Invalid data for BarGauge received: " + strVal);
-                    return;
-                }
-                _Gauge.setOuterValue(newDialValue);
+        dataMgr.AddListener(_OuterID, _OuterNamespace, (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
             }
+
+            double newDialValue = 0;
+            String strVal = newVal.toString();
+            try {
+                newDialValue = Double.parseDouble(strVal);
+            } catch (NumberFormatException ex) {
+                LOGGER.severe("Invalid data for BarGauge received: " + strVal);
+                return;
+            }
+            _Gauge.setOuterValue(newDialValue);
         });
         return true;
     }

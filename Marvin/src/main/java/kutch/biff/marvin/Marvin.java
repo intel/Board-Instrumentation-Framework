@@ -881,11 +881,8 @@ public class Marvin extends Application {
                         basicConfig.setCanvasHeight(cvHeight);
 
                         stage.setIconified(true);
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                FinishLoad(stage);
-                            }
+                        Platform.runLater(() -> {
+                            FinishLoad(stage);
                         });
                     }
                 });

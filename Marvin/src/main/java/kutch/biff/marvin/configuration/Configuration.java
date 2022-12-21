@@ -149,11 +149,8 @@ public class Configuration {
         MenuItem item = new MenuItem("About");
         fAboutCreated = true;
 
-        item.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent t) {
-                AboutBox.ShowAboutBox();
-            }
+        item.setOnAction(t -> {
+            AboutBox.ShowAboutBox();
         });
         objMenu.getItems().add(item);
         _MenuBar.getMenus().add(objMenu);

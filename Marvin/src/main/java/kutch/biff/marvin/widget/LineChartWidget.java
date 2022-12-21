@@ -57,36 +57,33 @@ public class LineChartWidget extends LineChartWidget_MS {
         pane.add(getChart(), getColumn(), getRow(), getColumnSpan(), getRowSpan());
         // hmm, only get called if different, that could be a problem for a chart
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
+            }
+
+            String[] strList = newVal.toString().split(",");
+            int iIndex = 0;
+            for (String strValue : strList) {
+                double newValue;
+                try {
+                    newValue = Double.parseDouble(strValue);
+                    HandleSteppedRange(newValue);
+                } catch (NumberFormatException ex) {
+                    LOGGER.severe("Invalid data for Line Chart received: " + strValue);
                     return;
                 }
 
-                String[] strList = newVal.toString().split(",");
-                int iIndex = 0;
-                for (String strValue : strList) {
-                    double newValue;
-                    try {
-                        newValue = Double.parseDouble(strValue);
-                        HandleSteppedRange(newValue);
-                    } catch (NumberFormatException ex) {
-                        LOGGER.severe("Invalid data for Line Chart received: " + strValue);
-                        return;
-                    }
-
-                    if (iIndex < getSeries().size()) {
-                        SeriesDataSet ds = getSeries().get(iIndex++);
-                        ShiftSeries(ds.getSeries(), getxAxisMaxCount());
-                        ds.getSeries().getData().add(new XYChart.Data<>(ds.getSeries().getData().size(), newValue));
-                    } else {
-                        LOGGER.severe(
-                                "Received More datapoints for Line Chart than was defined in application definition file. Received "
-                                        + Integer.toString(strList.length) + " expecting "
-                                        + Integer.toString(getSeries().size()));
-                        return;
-                    }
+                if (iIndex < getSeries().size()) {
+                    SeriesDataSet ds = getSeries().get(iIndex++);
+                    ShiftSeries(ds.getSeries(), getxAxisMaxCount());
+                    ds.getSeries().getData().add(new XYChart.Data<>(ds.getSeries().getData().size(), newValue));
+                } else {
+                    LOGGER.severe(
+                            "Received More datapoints for Line Chart than was defined in application definition file. Received "
+                                    + Integer.toString(strList.length) + " expecting "
+                                    + Integer.toString(getSeries().size()));
+                    return;
                 }
             }
         });

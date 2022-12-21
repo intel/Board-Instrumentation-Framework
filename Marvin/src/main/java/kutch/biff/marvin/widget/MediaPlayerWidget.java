@@ -123,17 +123,15 @@ public abstract class MediaPlayerWidget extends BaseWidget {
     }
 
     private void ConfigurePlayback(DataManager dataMgr) {
-        dataMgr.AddListener(_PlaybackControlID, _PlaybackControl_Namespace, new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                String strPlaybackCmd = newVal.toString();
-                if (strPlaybackCmd.equalsIgnoreCase("Play")) {
-                    OnPlay();
-                } else if (strPlaybackCmd.equalsIgnoreCase("Pause")) {
-                    OnPause();
-                } else if (strPlaybackCmd.equalsIgnoreCase("Stop")) {
-                    OnStop();
-                } else if (strPlaybackCmd.contains(":")) // could be Volume or JumpTo
+        dataMgr.AddListener(_PlaybackControlID, _PlaybackControl_Namespace, (o, oldVal, newVal) -> {
+            String strPlaybackCmd = newVal.toString();
+            if (strPlaybackCmd.equalsIgnoreCase("Play")) {
+                OnPlay();
+            } else if (strPlaybackCmd.equalsIgnoreCase("Pause")) {
+                OnPause();
+            } else if (strPlaybackCmd.equalsIgnoreCase("Stop")) {
+                OnStop();
+            } else if (strPlaybackCmd.contains(":")) // could be Volume or JumpTo
                 {
                     String[] parts = strPlaybackCmd.split(":");
                     double dVal;
@@ -156,7 +154,6 @@ public abstract class MediaPlayerWidget extends BaseWidget {
                         LOGGER.severe(_WidgetType + " received invalid command --> " + strPlaybackCmd);
                     }
                 }
-            }
         });
     }
 
@@ -178,26 +175,23 @@ public abstract class MediaPlayerWidget extends BaseWidget {
             ConfigurePlayback(dataMgr);
         }
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                String strVal = newVal.toString().replaceAll("(\\r|\\n)", "");
-                String key;
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            String strVal = newVal.toString().replaceAll("(\\r|\\n)", "");
+            String key;
 
-                if (strVal.equalsIgnoreCase("Next")) // go to next media in the list
+            if (strVal.equalsIgnoreCase("Next")) // go to next media in the list
                 {
                     key = _ListOfIDs.GetNext();
                 } else if (strVal.equalsIgnoreCase("Previous")) // go to previous media in the list
                 {
                     key = _ListOfIDs.GetPrevious();
                 } else {
-                    key = strVal; // expecting an ID
-                    _ListOfIDs.get(key); // just to keep next/prev alignment
-                }
-
-                key = key.toLowerCase();
-                PlayMedia(key);
+                key = strVal; // expecting an ID
+                _ListOfIDs.get(key); // just to keep next/prev alignment
             }
+
+            key = key.toLowerCase();
+            PlayMedia(key);
         });
 
         if (null != _CurrentMediaID) {
@@ -240,11 +234,7 @@ public abstract class MediaPlayerWidget extends BaseWidget {
                 }
                 OnErrorOcurred();
             });
-            objPlayer.setOnEndOfMedia(() ->
-            {
-                // LOGGER.info(_WidgetType + " [" + strID + "] --> End of media");
-                OnPlaybackDone();
-            });
+            objPlayer.setOnEndOfMedia(this::OnPlaybackDone);
             objPlayer.setOnPaused(() ->
             {
                 LOGGER.info(_WidgetType + " [" + strID + "] --> Paused");

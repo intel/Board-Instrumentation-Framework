@@ -1208,18 +1208,15 @@ public class TaskManager {
         }
 
         // String Task;
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() { // go run this in a GUI thread
-                //
-                for (String strTask : localDeferredTasksToRun) {
+        Platform.runLater(() -> { // go run this in a GUI thread
+            //
+            for (String strTask : localDeferredTasksToRun) {
+                PerformTask(strTask);
+            }
+            for (String strTask : _TimedTasks) {
+                TaskList objTaskList = _TaskMap.get(strTask.toUpperCase());
+                if (objTaskList.ReadyForIntervalExecuation()) {
                     PerformTask(strTask);
-                }
-                for (String strTask : _TimedTasks) {
-                    TaskList objTaskList = _TaskMap.get(strTask.toUpperCase());
-                    if (objTaskList.ReadyForIntervalExecuation()) {
-                        PerformTask(strTask);
-                    }
                 }
             }
         });
@@ -1234,16 +1231,13 @@ public class TaskManager {
             }
         }
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() { // go run this in a GUI thread
-                //
-                for (ITask objTask : localPostponedTaskstoRun) {
-                    objTask.PerformTask();
-                }
-                if (localPostponedTaskstoRun.size() > 0) {
-                    Configuration.getConfig().requestImmediateRefresh();
-                }
+        Platform.runLater(() -> { // go run this in a GUI thread
+            //
+            for (ITask objTask : localPostponedTaskstoRun) {
+                objTask.PerformTask();
+            }
+            if (localPostponedTaskstoRun.size() > 0) {
+                Configuration.getConfig().requestImmediateRefresh();
             }
         });
 

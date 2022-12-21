@@ -61,32 +61,29 @@ public class PieChartWidget extends BaseWidget {
         SetupPeekaboo(dataMgr);
 
         pane.add(_Chart, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
+            }
+            String[] strList = newVal.toString().split(","); // expecting comma separated data
+            int iIndex = 0;
+            for (String strValue : strList) {
+                double newValue;
+                try {
+                    newValue = Double.parseDouble(strValue);
+                } catch (NumberFormatException ex) {
+                    LOGGER.severe("Invalid data for Line Chart received: " + strValue);
                     return;
                 }
-                String[] strList = newVal.toString().split(","); // expecting comma separated data
-                int iIndex = 0;
-                for (String strValue : strList) {
-                    double newValue;
-                    try {
-                        newValue = Double.parseDouble(strValue);
-                    } catch (NumberFormatException ex) {
-                        LOGGER.severe("Invalid data for Line Chart received: " + strValue);
-                        return;
-                    }
 
-                    if (iIndex < _Slices.size()) {
-                        _Chart.getData().get(iIndex).setPieValue(newValue);
-                    } else {
-                        LOGGER.severe(
-                                "Received More datapoints for Pie Chart than was defined in application definition file");
-                        return;
-                    }
-                    iIndex++;
+                if (iIndex < _Slices.size()) {
+                    _Chart.getData().get(iIndex).setPieValue(newValue);
+                } else {
+                    LOGGER.severe(
+                            "Received More datapoints for Pie Chart than was defined in application definition file");
+                    return;
                 }
+                iIndex++;
             }
         });
 

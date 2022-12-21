@@ -55,12 +55,9 @@ public class MarvinLocalData {
         _interval = interval;
         if (_interval > 0) {
             _StopSignalled = false;
-            Runnable myRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    if (false == _StopSignalled) {
-                        PerformMagic();
-                    }
+            Runnable myRunnable = () -> {
+                if (false == _StopSignalled) {
+                    PerformMagic();
                 }
             };
 

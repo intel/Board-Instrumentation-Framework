@@ -87,15 +87,12 @@ public class Prompt_InputBox extends BasePrompt {
 
         dialog.centerOnScreen();
 
-        objPrompt.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent ke) {
-                KeyCode kc = ke.getCode();
-                if (kc.equals(KeyCode.ENTER)) {
-                    SetPromptedValue(objPrompt.getText());
-                    _PrevVal = objPrompt.getText();
-                    dialog.close();
-                }
+        objPrompt.setOnKeyPressed(ke -> {
+            KeyCode kc = ke.getCode();
+            if (kc.equals(KeyCode.ENTER)) {
+                SetPromptedValue(objPrompt.getText());
+                _PrevVal = objPrompt.getText();
+                dialog.close();
             }
         });
 

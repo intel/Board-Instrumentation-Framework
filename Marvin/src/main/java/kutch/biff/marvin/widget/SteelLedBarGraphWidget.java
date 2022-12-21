@@ -70,29 +70,26 @@ public class SteelLedBarGraphWidget extends BaseWidget {
         pane.add(_BarGraph, getColumn(), getRow(), getColumnSpan(), getRowSpan());
         // pane.add(_Pane, getColumn(), getRow(),getRowSpan(),getColumnSpan());
 
-        dataMgr.AddListener(getMinionID(), getNamespace(), new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> o, Object oldVal, Object newVal) {
-                if (IsPaused()) {
-                    return;
-                }
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
+            }
 
-                double newDialValue = 0;
-                String strVal = newVal.toString();
+            double newDialValue = 0;
+            String strVal = newVal.toString();
 
-                try {
-                    newDialValue = Double.parseDouble(strVal);
+            try {
+                newDialValue = Double.parseDouble(strVal);
 
-                } catch (NumberFormatException ex) {
-                    LOGGER.severe("Invalid data for LED received: " + strVal);
-                    return;
-                }
+            } catch (NumberFormatException ex) {
+                LOGGER.severe("Invalid data for LED received: " + strVal);
+                return;
+            }
 
-                if (0.0 == newDialValue) {
-                    _BarGraph.setValue(newDialValue);
-                } else {
-                    _BarGraph.setValue(newDialValue / 100);
-                }
+            if (0.0 == newDialValue) {
+                _BarGraph.setValue(newDialValue);
+            } else {
+                _BarGraph.setValue(newDialValue / 100);
             }
         });
         SetupTaskAction();
