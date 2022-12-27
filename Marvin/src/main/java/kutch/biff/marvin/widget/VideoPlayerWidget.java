@@ -1,20 +1,20 @@
 /*
  * ##############################################################################
  * #  Copyright (c) 2016 Intel Corporation
- * # 
+ * #
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
  * #  You may obtain a copy of the License at
- * # 
+ * #
  * #      http://www.apache.org/licenses/LICENSE-2.0
- * # 
+ * #
  * #  Unless required by applicable law or agreed to in writing, software
  * #  distributed under the License is distributed on an "AS IS" BASIS,
  * #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * #  See the License for the specific language governing permissions and
  * #  limitations under the License.
  * ##############################################################################
- * #    File Abstract: 
+ * #    File Abstract:
  * #
  * #
  * ##############################################################################
@@ -33,158 +33,128 @@ import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.utility.FrameworkNode;
 
 /**
- *
  * @author Patrick Kutch
  */
-public class VideoPlayerWidget extends MediaPlayerWidget
-{
+public class VideoPlayerWidget extends MediaPlayerWidget {
     private static boolean _HasBeenVerified = false;
     private static boolean _IsValid = true;
     private final MediaView _mediaView;
     private boolean _RetainAspectRatio;
-    
+
     /**
      *
      */
-    public VideoPlayerWidget()
-    {
-	super("VideoPlayerWidget");
-	_mediaView = new MediaView();
-	_RetainAspectRatio = true;
+    public VideoPlayerWidget() {
+        super("VideoPlayerWidget");
+        _mediaView = new MediaView();
+        _RetainAspectRatio = true;
     }
-    
+
     @Override
-    protected void ConfigureDimentions()
-    {
-	if (getHeight() > 0)
-	{
-	    _mediaView.setFitHeight(getHeight());
-	}
-	if (getWidth() > 0)
-	{
-	    _mediaView.setFitWidth(getWidth());
-	}
+    protected void ConfigureDimentions() {
+        if (getHeight() > 0) {
+            _mediaView.setFitHeight(getHeight());
+        }
+        if (getWidth() > 0) {
+            _mediaView.setFitWidth(getWidth());
+        }
     }
-    
+
     @Override
-    
-    public boolean Create(GridPane pane, DataManager dataMgr)
-    {
-	ConfigureDimentions();
-	ConfigureAlignment();
-	
-	SetupPeekaboo(dataMgr);
-	_mediaView.setPreserveRatio(_RetainAspectRatio);
-	
-	if (!Create(dataMgr))
-	{
-	    return false;
-	}
-	pane.add(_mediaView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
-	
-	SetupTaskAction();
-	return true;
+
+    public boolean Create(GridPane pane, DataManager dataMgr) {
+        ConfigureDimentions();
+        ConfigureAlignment();
+
+        SetupPeekaboo(dataMgr);
+        _mediaView.setPreserveRatio(_RetainAspectRatio);
+
+        if (!Create(dataMgr)) {
+            return false;
+        }
+        pane.add(_mediaView, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+
+        SetupTaskAction();
+        return true;
     }
-    
-    public boolean getRetainAspectRatio()
-    {
-	return _RetainAspectRatio;
+
+    public boolean getRetainAspectRatio() {
+        return _RetainAspectRatio;
     }
-    
+
     @Override
-    public Node getStylableObject()
-    {
-	return _mediaView;
+    public Node getStylableObject() {
+        return _mediaView;
     }
-    
+
     @Override
-    public ObservableList<String> getStylesheets()
-    {
-	return _mediaView.getStyleClass();
+    public ObservableList<String> getStylesheets() {
+        return _mediaView.getStyleClass();
     }
-    
+
     @Override
-    public boolean HandleWidgetSpecificSettings(FrameworkNode node)
-    {
-	return HandleWidgetSpecificSettings(node, "Video");
+    public boolean HandleWidgetSpecificSettings(FrameworkNode node) {
+        return HandleWidgetSpecificSettings(node, "Video");
     }
-    
+
     @Override
-    public boolean HasBeenVerified()
-    {
-	return VideoPlayerWidget._HasBeenVerified;
+    public boolean HasBeenVerified() {
+        return VideoPlayerWidget._HasBeenVerified;
     }
-    
+
     @Override
-    public boolean IsValid()
-    {
-	return _IsValid;
+    public boolean IsValid() {
+        return _IsValid;
     }
-    
+
     @Override
-    protected boolean OnNewMedia(MediaPlayer objMediaPlayer)
-    {
-	_mediaView.setMediaPlayer(objMediaPlayer);
-	
-	return true;
+    protected boolean OnNewMedia(MediaPlayer objMediaPlayer) {
+        _mediaView.setMediaPlayer(objMediaPlayer);
+
+        return true;
     }
-    
+
     @Override
-    public void setHasBeenVerified(boolean _HasBeenVerified)
-    {
-	VideoPlayerWidget._HasBeenVerified = _HasBeenVerified;
+    public void setHasBeenVerified(boolean _HasBeenVerified) {
+        VideoPlayerWidget._HasBeenVerified = _HasBeenVerified;
     }
-    
+
     @Override
-    public void SetIsValid(boolean flag)
-    {
-	_IsValid = flag;
+    public void SetIsValid(boolean flag) {
+        _IsValid = flag;
     }
-    
-    public void setRetainAspectRatio(boolean _RetainAspectRatio)
-    {
-	this._RetainAspectRatio = _RetainAspectRatio;
+
+    public void setRetainAspectRatio(boolean _RetainAspectRatio) {
+        this._RetainAspectRatio = _RetainAspectRatio;
     }
-    
+
     @Override
-    public EventHandler<MouseEvent> SetupTaskAction()
-    {
-	if (false == isMouseHasBeenSetup()) // quick hack, as I call this from MOST widgets, but now want it from all.
-					    // Will eventually remove from individual widgets.
-	{
-	    BaseWidget objWidget = this;
-	    if (_TaskMap.size() > 0 || CONFIG.isDebugMode()) // only do if a task to setup, or if debug mode
-	    {
-		EventHandler<MouseEvent> eh = new EventHandler<MouseEvent>()
-		{
-		    @Override
-		    public void handle(MouseEvent event)
-		    {
-			if (event.isShiftDown() && CONFIG.isDebugMode())
-			{
-			    LOGGER.info(objWidget.toString(true));
-			}
-			else if (true == CONFIG.getAllowTasks() && _TaskMap.containsKey(_CurrentMediaID.toLowerCase()))
-			{
-			    TASKMAN.PerformTask(_TaskMap.get(_CurrentMediaID.toLowerCase()));
-			}
-			else if (null != getTaskID() && true == CONFIG.getAllowTasks())
-			{
-			    TASKMAN.PerformTask(getTaskID());
-			}
-		    }
-		};
-		getStylableObject().setOnMouseClicked(eh);
-		setMouseHasBeenSetup(true);
-		return eh;
-	    }
-	}
-	return null;
+    public EventHandler<MouseEvent> SetupTaskAction() {
+        if (false == isMouseHasBeenSetup()) // quick hack, as I call this from MOST widgets, but now want it from all.
+        // Will eventually remove from individual widgets.
+        {
+            BaseWidget objWidget = this;
+            if (_TaskMap.size() > 0 || CONFIG.isDebugMode()) // only do if a task to setup, or if debug mode
+            {
+                EventHandler<MouseEvent> eh = event -> {
+                    if (event.isShiftDown() && CONFIG.isDebugMode()) {
+                        LOGGER.info(objWidget.toString(true));
+                    } else if (true == CONFIG.getAllowTasks() && _TaskMap.containsKey(_CurrentMediaID.toLowerCase())) {
+                        TASKMAN.PerformTask(_TaskMap.get(_CurrentMediaID.toLowerCase()));
+                    } else if (null != getTaskID() && true == CONFIG.getAllowTasks()) {
+                        TASKMAN.PerformTask(getTaskID());
+                    }
+                };
+                getStylableObject().setOnMouseClicked(eh);
+                setMouseHasBeenSetup(true);
+                return eh;
+            }
+        }
+        return null;
     }
-    
+
     @Override
-    protected boolean VerifyMedia(Media objMedia)
-    {
-	return true;
+    protected boolean VerifyMedia(Media objMedia) {
+        return true;
     }
 }
