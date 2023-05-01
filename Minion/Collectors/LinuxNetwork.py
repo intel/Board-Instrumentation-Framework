@@ -1,5 +1,5 @@
 ﻿##############################################################################
-#  Copyright (c) 2020 Intel Corporation
+#  Copyright (c) 2020-2023 Intel Corporation
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 #  limitations under the License.
 ##############################################################################
 #    File Abstract: 
-#    This attempts to get Network information on a Linux System
+#    Gathers networking information vai varios methods under Linux
 #
 ##############################################################################
 import os
@@ -29,7 +29,7 @@ from os import path
 
 from pprint import pprint as pprint
 
-VersionStr="v21.12.30"
+VersionStr="v22.04.30"
 lscpiDataMap=None
 netdevInfoDir="/sys/class/net"
 
@@ -708,6 +708,48 @@ def GetPerCorePacketsList(frameworkInterface):
     frameworkInterface.SetCollectorValue("softnet.received_rps",','.join(received_rpsList))
     frameworkInterface.SetCollectorValue("softnet.flow_limit_count",','.join(flow_limit_countList))
     
+def IpRoute2GatherVfStatsForPF(frameworkInterface,pfName):
+    cmdAndParams=['ip', '-s', '-s', 'link', 'show', pfName]
+    data = subprocess.check_output(cmdAndParams).splitlines()
 
+    currVfNum=None
+    nextLine=None
+    dataMap={}
+    for line in data:
+        line = line.decode('utf-8')
+        line = line.strip() # get rid of leading/trailing stuff
+        if None != currVfNum:
+            if nextLine=='TX' or nextLine=='RX':
+                rawParts=line.split(' ')
+                parts=[]
+                for part in rawParts:
+                    if part=='':
+                        pass
+                    else:
+                        parts.append(part)
+                
+                dataMap["{}.vf.{}.{}.bytes".format(pfName,currVfNum,nextLine)] = parts[0]
+                dataMap["{}.vf.{}.{}.packets".format(pfName,currVfNum,nextLine)] = parts[1]
+                if nextLine=='RX':
+                    dataMap["{}.vf.{}.{}.mcast".format(pfName,currVfNum,nextLine)] = parts[2]
+                    dataMap["{}.vf.{}.{}.bcast".format(pfName,currVfNum,nextLine)] = parts[3]
+                    dataMap["{}.vf.{}.{}.dropped".format(pfName,currVfNum,nextLine)] = parts[4]
+                if nextLine=='TX':
+                    dataMap["{}.vf.{}.{}.dropped".format(pfName,currVfNum,nextLine)] = parts[2]
 
-    
+            if 'RX: bytes' in line:
+                nextLine='RX'
+            elif 'TX: bytes' in line:
+                nextLine='TX'
+            else:
+                nextLine=None
+
+        if 'vf ' in line:
+            parts=line.split(' ')
+            currVfNum=parts[1]
+        
+        for entry in dataMap:
+            if not frameworkInterface.DoesCollectorExist(entry): # Do we already have this ID?
+                frameworkInterface.AddCollector(entry)    # Nope, so go add it
+                    
+            frameworkInterface.SetCollectorValue(entry,dataMap[entry]) 
