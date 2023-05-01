@@ -141,6 +141,12 @@ class Namespace():
 
         if True == runOnce:
             return len(self._Collectors)
+        
+        # may have specified listen port and ip
+        if hasattr(self,"_Configuration__ListenIP"):
+            self.__ListenIP = self._Configuration__ListenIP
+        if hasattr(self,"_Configuration__ListenPort"):
+            self.__ListenPort = self._Configuration__ListenPort
 
         self._Server = ServerUDP.ServerUDP(self.__ListenIP,self.__ListenPort,self)
         self._Server.Start()
