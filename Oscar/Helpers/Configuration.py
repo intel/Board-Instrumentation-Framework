@@ -441,6 +441,7 @@ class Configuration():
         #    <Port>5000</Port>
         #</Marvin>
                 
+        Log.getLogger().debug("Sending auto connect message to {}:{} with Key={}".format(IP,Port,Key))
         hashGen = hashlib.md5(str.encode(Key))
         HashOfKey = hashGen.hexdigest()
         IP1 = socket.gethostbyname(socket.gethostname())
