@@ -115,8 +115,7 @@ public class Marvin extends Application {
 
     public static void main(final String[] args) {
         if (!JVMversion.meetsMinimumVersion()) {
-            System.out.println("Not valid JVM version.  Requires 1." + JVMversion.MINIMUM_MAJOR_VERSION + " build "
-                    + JVMversion.MINIMUM_BUILD_VERSION + " or newer");
+            System.out.println("Not valid JVM version.  Requires " + JVMversion.MINIMUM_MAJOR_VERSION  + " or newer");
             return;
         }
         try {

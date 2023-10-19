@@ -341,6 +341,7 @@ public class DynamicImageWidget extends StaticImageWidget {
                 _ListID.add(Id);
                 if (node.hasAttribute("Monitor")) {
                     if (node.getBooleanAttribute("Monitor")) {
+                        //todo - this needs to be documented
                         _MontorMap.put(Id, file.lastModified());
                     }
                 }

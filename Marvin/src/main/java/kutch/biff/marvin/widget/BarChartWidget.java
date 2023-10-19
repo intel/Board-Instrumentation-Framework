@@ -153,7 +153,6 @@ public class BarChartWidget extends LineChartWidget {
             }
 
         }
-
     }
 
     protected void resizeAxis(int newSize) {

@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2016 Intel Corporation
+ * #  Copyright (c) 2016-2023 Intel Corporation
  * #
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -20,47 +20,24 @@
  * ##############################################################################
  */
 package kutch.biff.marvin.utility;
+import java.util.*;
 
 public class JVMversion {
-    public static final int MINIMUM_MAJOR_VERSION = 8;
-    public static final int MINIMUM_BUILD_VERSION = 20;
+    public static final int MINIMUM_MAJOR_VERSION = 12;
 
     public static boolean meetsMinimumVersion() {
-        String version = System.getProperty("java.version");
-
-        if (version.charAt(0) == '9') // tweak to support java 9 - format of version string changed between 8 and 9
-        {
-            return true;
-        }
-        if (version.charAt(0) == '1' && version.charAt(1) != '.') // tweak to support java > 9
-        {
-            return true;
-        }
+        String versionStr = System.getProperty("java.version");
+        String versionParts[] = versionStr.split("\\.");
+        System.out.println(versionStr);
+        System.out.println(Arrays.toString(versionParts));
         try {
-            Integer.parseInt(String.valueOf(version.charAt(2)));
-        } catch (Exception ex) {
-            System.out.println("********** Unknown version of Java: " + version);
+            int sys_major_version = Integer.parseInt(versionParts[0]);
+
+            return sys_major_version >= MINIMUM_MAJOR_VERSION;
+        } 
+        catch (Exception ex) {
             return false;
         }
-
-        int sys_major_version = Integer.parseInt(String.valueOf(version.charAt(2)));
-
-        if (sys_major_version < MINIMUM_MAJOR_VERSION) {
-            return false;
-        } else if (sys_major_version > MINIMUM_MAJOR_VERSION) {
-            return true;
-        } else {
-            int splitPosition = version.lastIndexOf("_");
-
-            try {
-                int majorVer = Integer.parseInt(version.substring(splitPosition + 1));
-
-                return (majorVer >= MINIMUM_BUILD_VERSION);
-
-            } catch (Exception ex) {
-                return false;
-            }
-        }
+        
     }
-
 }
