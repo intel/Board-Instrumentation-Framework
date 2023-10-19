@@ -965,6 +965,8 @@ class Configuration():
                 continue # don't care
             elif node.nodeName.lower() == "targetconnection":
                 continue # don't care
+            elif node.nodeName.lower() == "incomingconnection":
+                continue # don't care
             elif node.nodeName.lower() == "#text":
                 continue # don't care
             elif node.nodeName.lower() == "name":
