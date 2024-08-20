@@ -15,34 +15,26 @@
  */
 
 // Enzo main build file
-import java.text.SimpleDateFormat 
+import java.text.SimpleDateFormat
 
-import org.gradle.api.XmlProvider
-import org.gradle.api.artifacts.maven.MavenDeployment
-/* Updated by Patrick Kutch to accomidate Java 11 */
+/* Updated by Patrick Kutch to accommodate Java 11 */
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
-//	id 'net.nemerosa.versioning' version '2.8.2'
-	id 'org.openjfx.javafxplugin' version '0.0.13'
-	id 'com.gradle.build-scan' version '2.1'
-
+    id 'org.openjfx.javafxplugin' version '0.0.13'
     id 'idea'
-    id 'java'
+    id 'signing'
 }
 
 sourceCompatibility = '11'
-version = '1.0.0-SNAPSHOT' // Manually specified project version
+version = 'Enzo-0.3.6a' // Manually specified project version
 
 wrapper {
     gradleVersion = '7.6'
 }
 
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
-	mavenCentral()
+    mavenCentral() // Use Maven Central for resolving your dependencies.
 }
 
 apply plugin: 'idea'
@@ -61,9 +53,8 @@ if (file("signing.properties").exists()) {
     props.each { key, value -> project.ext[key] = value }
 }
 
-
-//set build variables based on build type (release, continuous integration, development)
-if(hasProperty("release")) {
+// Set build variables based on build type (release, continuous integration, development)
+if (hasProperty("release")) {
     isReleaseBuild = true
     sonatypeRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
 } else if (hasProperty("snapshot")) {
@@ -74,18 +65,13 @@ if(hasProperty("release")) {
     isDevBuild = true
 }
 
-repositories {
-    jcenter()
-	mavenCentral()
-}
-
 javafx {
     version = "11"
     modules = [ 'javafx.controls' ]
-} 
+}
 
-subprojects.each {
-    subproject -> evaluationDependsOn(subproject.path)
+subprojects.each { subproject ->
+    evaluationDependsOn(subproject.path)
 }
 
 Date buildTimeAndDate = new Date()
@@ -93,73 +79,80 @@ ext {
     buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
     buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
 }
+
 dependencies {
-    compile 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
-
 // create one jar for the library
-task oneJar(type: Jar, dependsOn: subprojects.assemble) {
-    subprojects.each {
-        subproject ->
-            String fileBaseName = subproject.name
-            System.out.println(fileBaseName)
-            from subproject.configurations.archives.allArtifacts.files.filter { it.name.endsWith("${fileBaseName}-${version}.jar") }.collect { zipTree(it) }
+tasks.register('oneJar', Jar) {
+    // Ensure the JARs of the subprojects are built
+    dependsOn subprojects.findAll { it.plugins.hasPlugin('java') }.collect { it.tasks.jar }
+
+    // Include the JAR files from each subproject
+    subprojects.findAll { it.plugins.hasPlugin('java') }.each { subproject ->
+        from zipTree(subproject.tasks.jar.archiveFile.get())
     }
-	    from {
-        configurations.runtimeClasspath.collect { 'build/classes' }
+
+    // Optional: include the runtime classpath if necessary
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+
+    // Set the duplicates strategy to handle conflicts like duplicate module-info.class files
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
         attributes(
-                'Built-By': System.properties['user.name'],
-                'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
-                'Build-Date': project.buildDate,
-                'Build-Time': project.buildTime,
-                'Build-Revision': versioning.info.commit,
-                'Specification-Title': project.name,
-                'Specification-Version': project.version,
-                'Implementation-Title': project.name,
-                'Implementation-Version': project.version,
-                'Bundle-Name': project.name,
-                'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://www.eclipse.org/legal/eplfaq.php',
-                'Bundle-Description': 'enzo widgets',
-                'Bundle-SymbolicName': 'eu.hansolo.enzo',
-                'Automatic-Module-Name': 'eu.hansolo.enzo'
+            'Built-By': System.properties['user.name'],
+            'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
+            'Build-Date': project.buildDate,
+            'Build-Time': project.buildTime,
+            'Specification-Title': project.name,
+            'Specification-Version': project.version,
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Bundle-Name': project.name,
+            'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0',
+            'Bundle-Description': 'Enzo widgets',
+            'Bundle-SymbolicName': 'eu.hansolo.enzo',
+            'Automatic-Module-Name': 'eu.hansolo.enzo'
         )
     }
-	
+
+    archiveFileName = "${version}.jar"
 }
 
 
 // create one jar for the javadoc
-task docs(type: Javadoc) {
+tasks.register('docs', Javadoc) {
     source subprojects.collect { project -> project.sourceSets.main.allJava }
     classpath = files(subprojects.collect { project -> project.sourceSets.main.compileClasspath })
     destinationDir = new File('build/docs/javadoc')
 }
-task javadocJar(type: Jar, dependsOn: docs) {
-    classifier ='javadoc'
+
+tasks.register('javadocJar', Jar) {
+    dependsOn tasks.docs
+    classifier = 'javadoc'
     from 'build/docs/javadoc'
 }
 
-
 // create one jar for the source files
-task sourcesJar(type: Jar, dependsOn: javadocJar) {
-    classifier  = 'sources'
-    subprojects.each {
-        subproject ->
-            from subproject.configurations.archives.allArtifacts.files.filter { it.name.endsWith("sources.jar") }.collect { zipTree(it) }
+tasks.register('sourcesJar', Jar) {
+    dependsOn tasks.javadocJar
+    classifier = 'sources'
+    subprojects.findAll { it.plugins.hasPlugin('java') }.each { subproject ->
+        from subproject.configurations.archives.allArtifacts.files.filter {
+            it.name.endsWith("sources.jar")
+        }.collect { zipTree(it) }
     }
 }
 
-
 artifacts {
-    archives oneJar
-    archives javadocJar
-    archives sourcesJar
+    archives tasks.oneJar
+    archives tasks.javadocJar
+    archives tasks.sourcesJar
 }
-
 
 // signing the artifacts
 if (isReleaseBuild) {
@@ -167,10 +160,7 @@ if (isReleaseBuild) {
         sign configurations.archives
     }
 } else {
-    task signArchives {
+    tasks.register('signArchives') {
         // do nothing
     }
 }
-
-
-

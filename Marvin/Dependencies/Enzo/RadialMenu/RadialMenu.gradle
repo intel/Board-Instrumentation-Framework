@@ -39,5 +39,5 @@ apply plugin: 'application'
 mainClassName = 'eu.hansolo.enzo.radialmenu.Demo'
 
 dependencies {
-    compile project(':Common')
+    implementation project(':Common')
 }

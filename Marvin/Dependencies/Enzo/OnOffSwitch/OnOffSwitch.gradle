@@ -39,5 +39,5 @@ apply plugin: 'application'
 mainClassName = 'eu.hansolo.enzo.onoffswitch.Demo'
 
 dependencies {
-    compile project(':Common')
+    implementation project(':Common')
 }

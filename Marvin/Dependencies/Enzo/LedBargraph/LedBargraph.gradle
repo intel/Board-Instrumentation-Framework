@@ -39,5 +39,5 @@ apply plugin: 'application'
 mainClassName = 'eu.hansolo.enzo.ledbargraph.Demo'
 
 dependencies {
-    compile project(':Led')
+    implementation project(':Led')
 }

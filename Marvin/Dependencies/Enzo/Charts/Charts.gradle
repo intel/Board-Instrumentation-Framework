@@ -39,5 +39,5 @@ apply plugin: 'application'
 mainClassName = 'eu.hansolo.enzo.charts.DemoSimpleRadarChart'
 
 dependencies {
-    compile project(':Common'), project(':Fonts')
+    implementation project(':Common'), project(':Fonts')
 }

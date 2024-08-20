@@ -39,6 +39,6 @@ apply plugin: 'application'
 mainClassName = 'eu.hansolo.enzo.gauge.DemoGauge'
 
 dependencies {
-    compile project(':Common'), project(':Fonts')
+    implementation project(':Common'), project(':Fonts')
 }
 

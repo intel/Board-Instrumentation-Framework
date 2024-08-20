@@ -20,14 +20,29 @@ include 'Common', 'Fonts', 'CanvasLed', 'Led', 'Charts', 'Clock', 'Experimental'
         'SplitFlap', 'VUMeter', 'FlipPanel', 'ValidationPane'
 */
 
+// Applying the Gradle Enterprise plugin for build scans
+plugins {
+    id 'com.gradle.enterprise' version '3.15.1'
+}
+
+// Configuring Gradle Enterprise build scans
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+        termsOfServiceAgree = 'yes'
+    }
+}
+
+// Including the subprojects for the 'Enzo' root project
 include 'Common', 'Fonts', 'Experimental', 'Gauge', 'Led',
         'Lcd', 'LedBargraph', 'FlipPanel', 'ValidationPane', 'RoundLcdClock'
 
-
 rootProject.name = 'Enzo'
 
+// Setting the build file name for each subproject
 rootProject.children.each { project ->
     String fileBaseName = project.name
     project.buildFileName = "${fileBaseName}.gradle"
     assert project.buildFile.isFile()
 }
+
