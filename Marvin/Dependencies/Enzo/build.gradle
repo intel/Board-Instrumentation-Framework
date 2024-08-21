@@ -17,7 +17,6 @@
 // Enzo main build file
 import java.text.SimpleDateFormat
 
-/* Updated by Patrick Kutch to accommodate Java 11 */
 plugins {
     id 'java-library'
     id 'org.openjfx.javafxplugin' version '0.0.13'
@@ -26,7 +25,7 @@ plugins {
 }
 
 sourceCompatibility = '11'
-version = 'Enzo-0.3.6a' // Manually specified project version
+version = '0.3.6a' // Manually specified project version
 
 wrapper {
     gradleVersion = '7.6'
@@ -34,6 +33,7 @@ wrapper {
 
 repositories {
     mavenCentral()
+    gradlePluginPortal() // Ensure the plugin portal is included for resolving plugins
 }
 
 apply plugin: 'idea'
@@ -51,10 +51,6 @@ javafx {
     modules = [ 'javafx.controls' ]
 }
 
-subprojects.each { subproject ->
-    evaluationDependsOn(subproject.path)
-}
-
 Date buildTimeAndDate = new Date()
 ext {
     buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
@@ -65,19 +61,31 @@ dependencies {
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
-// create one jar for the library
-tasks.register('oneJar', Jar) {
-    dependsOn subprojects.findAll { it.plugins.hasPlugin('java') }.collect { it.tasks.jar }
+subprojects {
+    apply plugin: 'java'
 
-    subprojects.findAll { it.plugins.hasPlugin('java') }.each { subproject ->
-        from zipTree(subproject.tasks.jar.archiveFile.get())
+    // Configure each subproject to use Java 11
+    sourceCompatibility = '11'
+
+    // Ensure subprojects use the same repositories as the root project
+    repositories {
+        mavenCentral()
     }
 
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    // Configure dependencies for subprojects
+    dependencies {
+        implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     }
+}
 
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+// Create the main jar for the library with outputs from all subprojects
+task oneJar(type: Jar) {
+    baseName = 'Enzo'
+
+    // Include compiled classes and resources from all subprojects
+    subprojects.each { subproject ->
+        from subproject.sourceSets.main.output
+    }
 
     manifest {
         attributes(
@@ -96,50 +104,26 @@ tasks.register('oneJar', Jar) {
             'Automatic-Module-Name': 'eu.hansolo.enzo'
         )
     }
-
-    archiveFileName = "${version}.jar"
 }
 
-// create one jar for the javadoc
-tasks.register('docs', Javadoc) {
-    source subprojects.collect { project -> project.sourceSets.main.allJava }
-    classpath = files(subprojects.collect { project -> project.sourceSets.main.compileClasspath })
-    destinationDir = new File('build/docs/javadoc')
-}
 // create one jar for the javadoc
 tasks.register('javadocJar', Jar) {
-    // Ensure the Javadocs are generated for all subprojects
-    dependsOn subprojects.findAll { it.plugins.hasPlugin('java') }.collect { it.tasks.javadoc }
-
-    // Include the Javadoc files from each subproject
-    subprojects.findAll { it.plugins.hasPlugin('java') }.each { subproject ->
-        from subproject.tasks.javadoc.destinationDir
-    }
+    dependsOn subprojects.javadoc // Ensure the Javadoc task runs for all subprojects
+    from subprojects.javadoc.destinationDir
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Handle duplicate entries
 
-    classifier = 'javadoc'
-    archiveFileName = "javadoc-${version}.jar"
+    archiveClassifier.set('javadoc')
 }
 
 // create one jar for the source files
 tasks.register('sourcesJar', Jar) {
-    // Ensure the source JARs are created for all subprojects
-    dependsOn subprojects.findAll { it.plugins.hasPlugin('java') }.collect { it.tasks.jar }
-
-    // Include the source files from each subproject
-    subprojects.findAll { it.plugins.hasPlugin('java') }.each { subproject ->
-        from subproject.sourceSets.main.allSource
-    }
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Handle duplicate entries
-
-    classifier = 'sources'
-    archiveFileName = "sources-${version}.jar"
+    from subprojects.sourceSets.main.allSource
+    archiveClassifier.set('sources')
 }
 
 artifacts {
-    archives tasks.oneJar
+    archives oneJar
     archives tasks.javadocJar
     archives tasks.sourcesJar
 }

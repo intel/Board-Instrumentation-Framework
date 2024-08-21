@@ -19,6 +19,12 @@ include 'Common', 'Fonts', 'CanvasLed', 'Led', 'Charts', 'Clock', 'Experimental'
         'QlockTwo', 'RadialMenu', 'RoundLcdClock', 'SevenSegment', 'SignalTower', 'SimpleIndicator', 'SixteenSegment', 
         'SplitFlap', 'VUMeter', 'FlipPanel', 'ValidationPane'
 */
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
 
 // Applying the Gradle Enterprise plugin for build scans
 plugins {
