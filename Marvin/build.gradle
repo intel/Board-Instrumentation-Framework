@@ -1,6 +1,6 @@
 /*
  * ##############################################################################
- * #  Copyright (c) 2019 by Patrick Kutch https://github.com/PatrickKutch
+ * #  Copyright (c) 2024 by Patrick Kutch https://github.com/PatrickKutch
  * # 
  * # Licensed under the Apache License, Version 2.0 (the "License");
  * #  you may not use this file except in compliance with the License.
@@ -18,9 +18,13 @@
  * #    Gradle build file for the Marvin JAVA application, Java 11 Builds a monolithic Jar
  * #
  * #	Steps to build:
+ * #	gradlew buildEnzo
+ * #	gradlew copyEnzoJar
  * #	gradlew build
  * #
- * #
+ * #    or 
+ * #	gradlew buildDeps
+ * #	gradlew build
  * ##############################################################################
  */
 
@@ -43,10 +47,7 @@ javafx {
 }
 
 dependencies {
-    implementation files('Dependencies/Enzo-0.3.6a.jar') // Assuming Enzo jar is in the Dependencies directory
-}
-dependencies {
-    implementation files('Dependencies/Enzo-0.3.6a.jar') // Add Enzo to the classpath
+    implementation files('Dependencies/Enzo-0.3.6a.jar') // Using the Enzo JAR from the Dependencies folder
 }
 
 Date buildTimeAndDate = new Date()
@@ -59,7 +60,7 @@ mainClassName = 'kutch.biff.marvin.Launcher'
 
 jar {
     baseName = 'BIFF.Marvin'
-    
+
     manifest {
         attributes(
             'Main-Class': mainClassName,
@@ -84,8 +85,31 @@ jar {
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } // Include dependencies, including Enzo
     }
-    
+
     with copySpec {
-        from sourceSets.main.output // Include your compiled classes and resources
+        from sourceSets.main.output // Include Marvin's compiled classes and resources
     }
+}
+
+// Task to build the Enzo library
+task buildEnzo(type: GradleBuild) {
+    println "-------- Building ENZO Library ---------"
+    buildFile = "Dependencies/Enzo/build.gradle"
+    tasks = ['build']
+}
+
+// Task to copy the built Enzo JAR into the Dependencies folder
+task copyEnzoJar(type: Copy) {
+    println "-------- Copying ENZO Library ---------"
+    from 'Dependencies/Enzo/build/libs'
+    include '*.jar'
+    into 'Dependencies'
+}
+
+// Make sure that copyEnzoJar runs after buildEnzo
+copyEnzoJar.mustRunAfter buildEnzo
+
+// Create a task that depends on buildEnzo, copyEnzoJar, and build Marvin
+task buildDeps {
+    dependsOn buildEnzo, copyEnzoJar
 }
