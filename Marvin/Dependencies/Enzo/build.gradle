@@ -47,7 +47,7 @@ if (file("signing.properties").exists()) {
 }
 
 javafx {
-    version = "11"
+    version = "12"
     modules = [ 'javafx.controls' ]
 }
 

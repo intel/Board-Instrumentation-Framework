@@ -42,7 +42,7 @@ repositories {
 }
 
 javafx {
-    version = "11"
+    version = "12"
     modules = [ 'javafx.controls', 'javafx.web', 'javafx.media', 'javafx.swing', 'javafx.graphics', 'javafx.base']
 }
 
@@ -112,4 +112,11 @@ copyEnzoJar.mustRunAfter buildEnzo
 // Create a task that depends on buildEnzo, copyEnzoJar, and build Marvin
 task buildDeps {
     dependsOn buildEnzo, copyEnzoJar
+}
+
+task runJar(type: JavaExec) {
+    group = 'application'
+    description = 'Run the application from the JAR file.'
+    main = '-jar'
+    args = ['build/libs/BIFF.Marvin.jar']
 }
