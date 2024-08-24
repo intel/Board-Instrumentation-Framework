@@ -38,7 +38,7 @@
             <Widget File="Text\Text.xml" row="1" column="1" Align="S" >
                 <StyleOverride ID="Welcome"/>
                 <InitialValue RevertTimeout="4000">Welcome to the World of BIFF</InitialValue>
-                <Revert Timeout="4000" Value="0"/>
+                <!--<Revert Timeout="4000" Value="0"/>-->
             </Widget>
             
             <!-- Let's add some audio -->

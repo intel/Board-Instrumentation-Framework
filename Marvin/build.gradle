@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 /*
  * ##############################################################################
  * #  Copyright (c) 2024 by Patrick Kutch https://github.com/PatrickKutch
@@ -48,6 +50,28 @@ javafx {
 
 dependencies {
     implementation files('Dependencies/Enzo-0.3.6a.jar') // Using the Enzo JAR from the Dependencies folder
+}
+
+// Default: Disable debug information for the standard build
+tasks.withType(JavaCompile) {
+    options.debug = false
+}
+
+// Task to build with debug information
+task buildDebug {
+    println ">>>>> Performing DEBUG build <<<<<<<"
+    description = "Builds the project with debug information."
+    group = "build"
+
+    doFirst {
+        tasks.withType(JavaCompile).each {
+            it.options.debug = true
+            it.options.debugOptions.debugLevel = 'source,lines,vars'
+        }
+    }
+
+    // Run the build after enabling debug options
+    finalizedBy 'assemble'
 }
 
 Date buildTimeAndDate = new Date()
@@ -106,7 +130,6 @@ task copyEnzoJar(type: Copy) {
     into 'Dependencies'
 }
 
-// Make sure that copyEnzoJar runs after buildEnzo
 copyEnzoJar.mustRunAfter buildEnzo
 
 // Create a task that depends on buildEnzo, copyEnzoJar, and build Marvin
@@ -119,4 +142,33 @@ task runJar(type: JavaExec) {
     description = 'Run the application from the JAR file.'
     main = '-jar'
     args = ['build/libs/BIFF.Marvin.jar']
+
+    doFirst {
+        if (project.hasProperty('appArgs')) {
+            project.appArgs.split(' ').each { arg ->
+                args += arg
+            }
+        }
+        println "Running JAR: ${workingDir} java ${args}"
+    }
+}
+
+task debugJar(type: JavaExec) {
+    group = 'application'
+    description = 'Run the application from the JAR file with debugging enabled.'
+
+    main = '-jar'
+    args = ['build/libs/BIFF.Marvin.jar']
+
+    // JVM arguments to enable debugging on port 5005
+    jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
+
+    doFirst {
+        if (project.hasProperty('appArgs')) {
+            project.appArgs.split(' ').each { arg ->
+                args += arg
+            }
+        }
+        println "Running in debug mode: ${workingDir} java ${jvmArgs} ${args}"
+    }
 }
