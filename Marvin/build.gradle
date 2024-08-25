@@ -52,26 +52,15 @@ dependencies {
     implementation files('Dependencies/Enzo-0.3.6a.jar') // Using the Enzo JAR from the Dependencies folder
 }
 
-// Default: Disable debug information for the standard build
+// Configure the compileJava task to use debug options based on the debugBuild property
 tasks.withType(JavaCompile) {
-    options.debug = false
-}
-
-// Task to build with debug information
-task buildDebug {
-    println ">>>>> Performing DEBUG build <<<<<<<"
-    description = "Builds the project with debug information."
-    group = "build"
-
-    doFirst {
-        tasks.withType(JavaCompile).each {
-            it.options.debug = true
-            it.options.debugOptions.debugLevel = 'source,lines,vars'
-        }
+    options.debug = project.hasProperty('debugBuild')
+    if (options.debug) {
+        options.debugOptions.debugLevel = 'source,lines,vars'
+        println ">>>>> DEBUG mode enabled for Java compilation <<<<<"
+    } else {
+        println ">>>>> DEBUG mode disabled for Java compilation <<<<<"
     }
-
-    // Run the build after enabling debug options
-    finalizedBy 'assemble'
 }
 
 Date buildTimeAndDate = new Date()
