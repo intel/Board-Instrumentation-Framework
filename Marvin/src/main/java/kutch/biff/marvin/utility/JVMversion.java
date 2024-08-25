@@ -28,8 +28,8 @@ public class JVMversion {
     public static boolean meetsMinimumVersion() {
         String versionStr = System.getProperty("java.version");
         String versionParts[] = versionStr.split("\\.");
-        System.out.println(versionStr);
-        System.out.println(Arrays.toString(versionParts));
+//        System.out.println(versionStr);
+//        System.out.println(Arrays.toString(versionParts));
         try {
             int sys_major_version = Integer.parseInt(versionParts[0]);
 

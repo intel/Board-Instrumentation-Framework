@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 /*
  * ##############################################################################
  * #  Copyright (c) 2024 by Patrick Kutch https://github.com/PatrickKutch
@@ -29,8 +27,8 @@ import java.text.SimpleDateFormat
  * #	gradlew build
  * ##############################################################################
  */
-
 import java.text.SimpleDateFormat
+import java.util.Properties
 
 plugins {
     id 'application'
@@ -51,46 +49,84 @@ javafx {
 dependencies {
     implementation files('Dependencies/Enzo-0.3.6a.jar') // Using the Enzo JAR from the Dependencies folder
 }
+mainClassName = 'kutch.biff.marvin.Launcher'
 
-// Configure the compileJava task to use debug options based on the debugBuild property
-tasks.withType(JavaCompile) {
-    options.debug = project.hasProperty('debugBuild')
-    if (options.debug) {
-        options.debugOptions.debugLevel = 'source,lines,vars'
-        println ">>>>> DEBUG mode enabled for Java compilation <<<<<"
-    } else {
-        println ">>>>> DEBUG mode disabled for Java compilation <<<<<"
+// Load and update version properties from the Marvin.version.properties file
+def versionPropsFile = file('src/main/resources/kutch/biff/marvin/version/Marvin.version.properties')
+def versionProps = new Properties()
+
+task updateVersionProperties {
+    doLast {
+        if (versionPropsFile.exists()) {
+            versionProps.load(new FileInputStream(versionPropsFile))
+
+            // Increment the build version
+            def buildVersion = versionProps['Build_Version'].toInteger() + 1
+            versionProps['Build_Version'] = buildVersion.toString()
+
+            // Update the date information
+            Date currentDate = new Date()
+            def buildDate = new SimpleDateFormat('yyyy-MM-dd').format(currentDate)
+            def buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(currentDate)
+            versionProps['Date'] = new SimpleDateFormat('yyyy/MM/dd HH:mm').format(currentDate)
+            versionProps['Year_Version'] = new SimpleDateFormat('yy').format(currentDate)
+            versionProps['Month_Version'] = new SimpleDateFormat('MM').format(currentDate)
+            versionProps['Day_Version'] = new SimpleDateFormat('dd').format(currentDate)
+
+            // Save the updated properties back to the file
+            versionProps.store(new FileOutputStream(versionPropsFile), null)
+
+            // Set the properties in the project.ext to make them accessible in other tasks
+            project.ext.set('buildVersion', versionProps['Build_Version'])
+            project.ext.set('releaseType', versionProps['Release'])
+            project.ext.set('versionDate', versionProps['Date'])
+            project.ext.set('buildDate', buildDate)
+            project.ext.set('buildTime', buildTime)
+
+            println "Updated version properties: Build Version=${buildVersion}, Date=${versionProps['Date']}"
+        } else {
+            throw new GradleException("Version properties file not found: ${versionPropsFile}")
+        }
     }
 }
 
-Date buildTimeAndDate = new Date()
-ext {
-    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
-    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
-}
-
-mainClassName = 'kutch.biff.marvin.Launcher'
-
+// Ensure the updateVersionProperties task runs before the jar task
 jar {
+    dependsOn updateVersionProperties
+
     baseName = 'BIFF.Marvin'
 
-    manifest {
-        attributes(
-            'Main-Class': mainClassName,
-            'Built-By': System.properties['user.name'],
-            'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
-            'Build-Date': project.buildDate,
-            'Build-Time': project.buildTime,
-            'Specification-Title': project.name,
-            'Specification-Version': project.version,
-            'Implementation-Title': project.name,
-            'Implementation-Version': project.version,
-            'Bundle-Name': project.name,
-            'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0',
-            'Bundle-Description': 'BIFF Marvin',
-            'Bundle-SymbolicName': 'kutch.biff.marvin.Marvin',
-            'Automatic-Module-Name': 'kutch.biff.marvin.Marvin'
-        )
+   doFirst {
+        // Collect all the manifest attributes into a map
+        def manifestAttributes = [
+            'Main-Class'           : mainClassName,
+            'Built-By'             : System.properties['user.name'],
+            'Created-By'           : System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
+            'Build-Date'           : "${project.ext.buildDate}",
+            'Build-Time'           : "${project.ext.buildTime}",
+            'Specification-Title'  : project.name,
+            'Specification-Version': "${project.ext.buildVersion}",
+            'Implementation-Title' : project.name,
+            'Implementation-Version': "${project.ext.buildVersion}",
+            'Bundle-Name'          : project.name,
+            'Bundle-License'       : 'https://www.apache.org/licenses/LICENSE-2.0',
+            'Bundle-Description'   : 'BIFF Marvin',
+            'Bundle-SymbolicName'  : 'kutch.biff.marvin.Marvin',
+            'Automatic-Module-Name': 'kutch.biff.marvin.Marvin',
+            'Release-Type'         : "${project.ext.releaseType}",
+            'Version-Date'         : "${project.ext.versionDate}"
+        ]
+
+        // Print the manifest attributes to the console
+       // println "Manifest attributes:"
+       // manifestAttributes.each { key, value ->
+       //     println "${key}: ${value}"
+       // }
+
+        // Set the manifest attributes
+        manifest {
+            attributes(manifestAttributes)
+        }
     }
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Handle duplicate entries
@@ -101,6 +137,16 @@ jar {
 
     with copySpec {
         from sourceSets.main.output // Include Marvin's compiled classes and resources
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.debug = project.hasProperty('debugBuild')
+    if (options.debug) {
+        options.debugOptions.debugLevel = 'source,lines,vars'
+        println ">>>>> DEBUG mode enabled for Java compilation <<<<<"
+    } else {
+        println ">>>>> DEBUG mode disabled for Java compilation <<<<<"
     }
 }
 
@@ -120,6 +166,9 @@ task copyEnzoJar(type: Copy) {
 }
 
 copyEnzoJar.mustRunAfter buildEnzo
+
+// Ensure updateVersionProperties runs before any build
+tasks.build.dependsOn updateVersionProperties
 
 // Create a task that depends on buildEnzo, copyEnzoJar, and build Marvin
 task buildDeps {
