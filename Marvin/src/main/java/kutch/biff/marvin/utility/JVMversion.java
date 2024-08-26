@@ -20,7 +20,6 @@
  * ##############################################################################
  */
 package kutch.biff.marvin.utility;
-import java.util.*;
 
 public class JVMversion {
     public static final int MINIMUM_MAJOR_VERSION = 12;
@@ -28,14 +27,13 @@ public class JVMversion {
     public static boolean meetsMinimumVersion() {
         String versionStr = System.getProperty("java.version");
         String versionParts[] = versionStr.split("\\.");
-//        System.out.println(versionStr);
-//        System.out.println(Arrays.toString(versionParts));
+
         try {
             int sys_major_version = Integer.parseInt(versionParts[0]);
 
             return sys_major_version >= MINIMUM_MAJOR_VERSION;
         } 
-        catch (Exception ex) {
+        catch (NumberFormatException ex) {
             return false;
         }
         

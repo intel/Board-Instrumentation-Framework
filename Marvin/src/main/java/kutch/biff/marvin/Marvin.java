@@ -90,7 +90,7 @@ public class Marvin extends Application {
     public static void DumpThreads(boolean showStack) {
         showStack = false;
         Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-        Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+        Thread[] threadArray = threadSet.toArray(Thread[]::new);
 
         LOGGER.log(Level.INFO, "******* Dumping {0} Threads from thread: {1} ****************", new Object[]{Integer.toString(threadArray.length), Thread.currentThread().getName()});
 
@@ -114,7 +114,8 @@ public class Marvin extends Application {
     }
 
     public static void main(final String[] args) {
-        if (!JVMversion.meetsMinimumVersion()) {
+        if (JVMversion.meetsMinimumVersion()) {
+        } else {
             System.out.println("Not valid JVM version.  Requires " + JVMversion.MINIMUM_MAJOR_VERSION  + " or newer");
             return;
         }
@@ -611,12 +612,11 @@ public class Marvin extends Application {
             if (null != strCSS) {
                 try {
                     if (false == StyleSheets.add(strCSS)) {
-                        LOGGER.severe(
-                                "Problems with application stylesheet: " + _Config.getConfiguration().getCSSFile());
+                        LOGGER.log(Level.SEVERE, "Problems with application stylesheet: {0}", _Config.getConfiguration().getCSSFile());
                         return false;
                     }
                 } catch (Exception ex) {
-                    LOGGER.severe("Problems with application stylesheet: " + _Config.getConfiguration().getCSSFile());
+                    LOGGER.log(Level.SEVERE, "Problems with application stylesheet: {0}", _Config.getConfiguration().getCSSFile());
                     return false;
                 }
             }
@@ -677,7 +677,7 @@ public class Marvin extends Application {
 
         _Config.getConfiguration().setPane(pane);
         long elapsed = System.currentTimeMillis() - startTime;
-        LOGGER.info("Time taken to initialize all widgets: " + Long.toString(elapsed) + "ms.");
+        LOGGER.log(Level.INFO, "Time taken to initialize all widgets: {0}ms.", Long.toString(elapsed));
 
         return RetVal;
     }

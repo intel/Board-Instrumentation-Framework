@@ -57,35 +57,46 @@ def versionProps = new Properties()
 
 task updateVersionProperties {
     doLast {
-        if (versionPropsFile.exists()) {
-            versionProps.load(new FileInputStream(versionPropsFile))
+        if (project.hasProperty('updateReleaseInfo')) {
+            if (versionPropsFile.exists()) {
+                versionProps.load(new FileInputStream(versionPropsFile))
 
-            // Increment the build version
-            def buildVersion = versionProps['Build_Version'].toInteger() + 1
-            versionProps['Build_Version'] = buildVersion.toString()
+                // Increment the build version
+                def buildVersion = versionProps['Build_Version'].toInteger() + 1
+                versionProps['Build_Version'] = buildVersion.toString()
 
-            // Update the date information
-            Date currentDate = new Date()
-            def buildDate = new SimpleDateFormat('yyyy-MM-dd').format(currentDate)
-            def buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(currentDate)
-            versionProps['Date'] = new SimpleDateFormat('yyyy/MM/dd HH:mm').format(currentDate)
-            versionProps['Year_Version'] = new SimpleDateFormat('yy').format(currentDate)
-            versionProps['Month_Version'] = new SimpleDateFormat('MM').format(currentDate)
-            versionProps['Day_Version'] = new SimpleDateFormat('dd').format(currentDate)
+                // Update the date information
+                Date currentDate = new Date()
+                def buildDate = new SimpleDateFormat('yyyy-MM-dd').format(currentDate)
+                def buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(currentDate)
+                versionProps['Date'] = new SimpleDateFormat('yyyy/MM/dd HH:mm').format(currentDate)
+                versionProps['Year_Version'] = new SimpleDateFormat('yy').format(currentDate)
+                versionProps['Month_Version'] = new SimpleDateFormat('MM').format(currentDate)
+                versionProps['Day_Version'] = new SimpleDateFormat('dd').format(currentDate)
 
-            // Save the updated properties back to the file
-            versionProps.store(new FileOutputStream(versionPropsFile), null)
+                // Save the updated properties back to the file
+                versionProps.store(new FileOutputStream(versionPropsFile), null)
 
-            // Set the properties in the project.ext to make them accessible in other tasks
-            project.ext.set('buildVersion', versionProps['Build_Version'])
-            project.ext.set('releaseType', versionProps['Release'])
-            project.ext.set('versionDate', versionProps['Date'])
-            project.ext.set('buildDate', buildDate)
-            project.ext.set('buildTime', buildTime)
+                // Set the properties in the project.ext to make them accessible in other tasks
+                project.ext.set('buildVersion', versionProps['Build_Version'])
+                project.ext.set('releaseType', versionProps['Release'])
+                project.ext.set('versionDate', versionProps['Date'])
+                project.ext.set('buildDate', buildDate)
+                project.ext.set('buildTime', buildTime)
 
-            println "Updated version properties: Build Version=${buildVersion}, Date=${versionProps['Date']}"
+                println "Updated version properties: Build Version=${buildVersion}, Date=${versionProps['Date']}"
+            } else {
+                throw new GradleException("Version properties file not found: ${versionPropsFile}")
+            }
         } else {
-            throw new GradleException("Version properties file not found: ${versionPropsFile}")
+            println "Skipping version update as 'updateReleaseInfo' property is not set."
+
+            // Set default values to avoid missing property errors
+            project.ext.set('buildVersion', versionProps['Build_Version'] ?: '0')
+            project.ext.set('releaseType', versionProps['Release'] ?: 'Unknown')
+            project.ext.set('versionDate', versionProps['Date'] ?: 'Unknown')
+            project.ext.set('buildDate', 'Unknown')
+            project.ext.set('buildTime', 'Unknown')
         }
     }
 }
@@ -96,7 +107,7 @@ jar {
 
     baseName = 'BIFF.Marvin'
 
-   doFirst {
+    doFirst {
         // Collect all the manifest attributes into a map
         def manifestAttributes = [
             'Main-Class'           : mainClassName,
@@ -116,12 +127,6 @@ jar {
             'Release-Type'         : "${project.ext.releaseType}",
             'Version-Date'         : "${project.ext.versionDate}"
         ]
-
-        // Print the manifest attributes to the console
-       // println "Manifest attributes:"
-       // manifestAttributes.each { key, value ->
-       //     println "${key}: ${value}"
-       // }
 
         // Set the manifest attributes
         manifest {
