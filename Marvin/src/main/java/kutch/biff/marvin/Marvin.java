@@ -92,6 +92,7 @@ public class Marvin extends Application {
         Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
         Thread[] threadArray = threadSet.toArray(Thread[]::new);
 
+
         LOGGER.log(Level.INFO, "******* Dumping {0} Threads from thread: {1} ****************", new Object[]{Integer.toString(threadArray.length), Thread.currentThread().getName()});
 
         String dumpString = "";
@@ -677,7 +678,9 @@ public class Marvin extends Application {
 
         _Config.getConfiguration().setPane(pane);
         long elapsed = System.currentTimeMillis() - startTime;
+
         LOGGER.log(Level.INFO, "Time taken to initialize all widgets: {0}ms.", Long.toString(elapsed));
+
 
         return RetVal;
     }

@@ -151,7 +151,6 @@ public class BarChartWidget extends LineChartWidget {
             for (Data<String, Number> objSeries : objSeriesEntry.getData()) {
                 objSeries.setYValue(val);
             }
-
         }
     }
 
