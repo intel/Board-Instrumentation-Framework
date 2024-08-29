@@ -24,8 +24,6 @@ package kutch.biff.marvin.widget;
 import java.io.File;
 import java.util.HashMap;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;

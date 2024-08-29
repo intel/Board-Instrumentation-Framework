@@ -169,6 +169,8 @@ class Namespace():
                                                 #This is a Namesapce, so
                                                 #self._ID = namespace
         #if ReferenceActor.Namespace.lower() == self._ID.lower() or ReferenceActor.Namespace.lower() == "broadcast":
+        Log.getLogger().debug("Received Task - Namespace:{} ID:{}".format(ReferenceActor.Namespace,ReferenceActor.ID))
+
         if self._MatchingNamespace(ReferenceActor.Namespace):
             for objActor in self.__Actors:
                 if objActor.ID.lower() == ReferenceActor.ID.lower():             
@@ -195,6 +197,7 @@ class Namespace():
                     else:
                         #Log.getLogger().info("Ignoring Duplicate On-Demand")
                         break
+        
 
                 
     def GetID(self):

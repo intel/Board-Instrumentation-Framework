@@ -26,8 +26,6 @@ import java.util.logging.Logger;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Side;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;

@@ -109,7 +109,6 @@ public class Marvin extends Application {
     }
 
     // returns the base tab pane - used for dynamic tabs in debug mode
-    @SuppressWarnings("exports")
     public static TabPane GetBaseTabPane() {
         return _objTabPane;
     }
@@ -309,7 +308,6 @@ public class Marvin extends Application {
         }
     }
 
-    @SuppressWarnings("exports")
     public void FinishLoad(Stage stage) {
         stage.setIconified(true);
 
@@ -701,7 +699,6 @@ public class Marvin extends Application {
         basePlane.add(_TestPane, 2, 2);
     }
 
-    @SuppressWarnings("exports")
     @Override
     public void start(Stage stage) throws Exception {
         _DataMgr = new DataManager();

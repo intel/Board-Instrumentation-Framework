@@ -24,8 +24,7 @@ package kutch.biff.marvin.widget;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker.State;
 import javafx.geometry.NodeOrientation;

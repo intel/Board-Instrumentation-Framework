@@ -23,7 +23,6 @@ package kutch.biff.marvin.widget;
 
 import java.io.File;
 
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;

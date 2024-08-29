@@ -25,8 +25,6 @@ import static kutch.biff.marvin.widget.widgetbuilder.WidgetBuilder.ReadGridInfo;
 
 import java.util.HashMap;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.configuration.ConfigurationReader;

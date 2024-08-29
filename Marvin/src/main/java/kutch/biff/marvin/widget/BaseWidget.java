@@ -24,7 +24,6 @@ package kutch.biff.marvin.widget;
 import java.awt.Dimension;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,8 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javafx.collections.ObservableList;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,9 +41,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -409,6 +403,7 @@ abstract public class BaseWidget implements Widget {
         _Peekaboos.add(newPeekaboo);
     }
 
+    @SuppressWarnings("resource")
     protected boolean ApplyCSS() {
         String cssFile = GetCSS_File();
         if (null != cssFile) {
@@ -421,10 +416,10 @@ abstract public class BaseWidget implements Widget {
 
             InputStream inputStream;
             BufferedInputStream bis;
-            DataInputStream inp;
+            //DataInputStream inp;
             String myCssFile = GetCSS_FileWithPath();
             String result;
-            ObservableList<String> data;
+            //ObservableList<String> data;
             try {
                 inputStream = new FileInputStream(myCssFile);
                 bis = new BufferedInputStream(inputStream);
@@ -437,7 +432,6 @@ abstract public class BaseWidget implements Widget {
                 LOGGER.severe("Invalid Playback File: " + cssFile);
             }
             fRet = getStylesheets().setAll(cssFile);
-            ObservableList<String> foo = getStylesheets();
 
             if (false == fRet) {
                 LOGGER.severe("Failed to apply Stylesheet " + cssFile);

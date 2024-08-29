@@ -23,6 +23,7 @@
 <Oscar ID="DaGrouch">
   <IncomingMinionConnection PORT ="1100">
        <!-- <Oscar IP="OtherOscar.MyNet.com" Port="6200" Key="MarvinAutoConnectKey"/> -->
+            <Oscar IP="10.166.11.12" Port="54321" Key="t-Pipe-Key"/> 
   </IncomingMinionConnection>
 
    <!-- Points towards Marvin -->

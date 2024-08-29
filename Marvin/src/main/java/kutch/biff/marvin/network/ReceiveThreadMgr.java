@@ -199,7 +199,7 @@ public class ReceiveThreadMgr implements Runnable {
          */
         FrameworkNode node = new FrameworkNode(baseNode);
         try {
-            String Version = node.getChild("Version").getTextContent();
+        //    String Version = node.getChild("Version").getTextContent();
             String Remote = node.getChild("Requester").getTextContent();
             String MarvinID = node.getChild("MarvinID").getTextContent();
             String Task = node.getChild("Task").getTextContent();
@@ -264,49 +264,48 @@ public class ReceiveThreadMgr implements Runnable {
         }
     }
 
-    @SuppressWarnings({"deprecation", "serial"})
+  //  @SuppressWarnings({"deprecation", "serial"})
     @Override
     public void run() {
         Runnable processQueuedDataThread = () -> {
             try {
-                while (false == fKillRequested) {
+                while (!fKillRequested) {
                     if (!_DataQueue.isEmpty()) {
                         HashMap<InetAddress, String> dataItem = (HashMap<InetAddress, String>) _DataQueue.take();
-                        // dataItem[dataItem.keySet()[0]]
                         InetAddress addr = dataItem.keySet().iterator().next();
                         Process(dataItem.get(addr).getBytes(), addr);
                     } else {
                         if (_WorkerThreadCount.get() > 1) {
                             _WorkerThreadCount.decrementAndGet();
-                            // LOGGER.info("Reducing processing Thread Count");
                             return;
                         }
                         try {
                             Thread.sleep(2); // didn't read anything, socket read timed out, so take a nap
                         } catch (InterruptedException ex1) {
+                            Thread.currentThread().interrupt(); // Restore the interrupted status
                         }
                     }
                 }
                 _WorkerThreadCount.decrementAndGet();
-                // LOGGER.info("Receive Queue Processing Thread successfully terminated.");
             } catch (InterruptedException e) {
                 LOGGER.severe(e.toString());
+                Thread.currentThread().interrupt(); // Restore the interrupted status
             }
         };
-
+    
         Thread procThread = new Thread(processQueuedDataThread, ">>>> Base Process Queue Thread <<<<<");
-
+    
         procThread.start();
         _WorkerThreadCount.set(1);
-
-        while (false == fKillRequested) {
+    
+        while (!fKillRequested) {
             byte[] buffer = new byte[CONFIG.getMaxPacketSize()];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             try {
                 _socket.receive(packet);
-                if (false == fKillRequested) {
+                if (!fKillRequested) {
                     String trimmed = new String(packet.getData(), 0, packet.getLength());
-
+    
                     _DataQueue.add(new HashMap<InetAddress, String>() {
                         {
                             put(packet.getAddress(), trimmed);
@@ -315,28 +314,32 @@ public class ReceiveThreadMgr implements Runnable {
                                         + Integer.toString(_DataQueue.size()) + " packets to process.");
                                 int threadNum = _WorkerThreadCount.incrementAndGet();
                                 Thread procThread = new Thread(processQueuedDataThread,
-                                        ">>>> Additionial Process Queue Thread #" + Integer.toString(threadNum)
+                                        ">>>> Additional Process Queue Thread #" + Integer.toString(threadNum)
                                                 + " <<<<<");
                                 procThread.start();
                             }
                         }
                     });
-                    // Process(trimmed.getBytes(), packet.getAddress());
                 } else {
-                    return; // kill
+                    break; // kill
                 }
-
+    
             } catch (IOException ex) {
-                if (false == fKillRequested) {
+                if (!fKillRequested) {
                     try {
                         Thread.sleep(1); // didn't read anything, socket read timed out, so take a nap
                     } catch (InterruptedException ex1) {
+                        Thread.currentThread().interrupt(); // Restore the interrupted status
                     }
                 }
             }
         }
-
-        procThread.stop();
+    
+        try {
+            procThread.join(); // Wait for the processing thread to finish
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+        }
         _fStopped = true;
     }
 

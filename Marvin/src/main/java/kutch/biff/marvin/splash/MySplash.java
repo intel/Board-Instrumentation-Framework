@@ -82,23 +82,35 @@ public class MySplash {
     public void appVisible() {
         _appVisible = true;
     }
-
-    private Image getAlternateSplashImage() {
-        Image retImage = null;
-        if (null != strAltSplash) {
-            String fname = convertToFileOSSpecific(strAltSplash);
-            File file = new File(fname);
-            if (file.exists()) {
-                String fn = "file:" + fname;
-                retImage = new Image(fn);
-                LOGGER.info("Using alternate splash image: " + strAltSplash);
-            } else {
-                LOGGER.warning(
-                        "Specified alternate splash image: " + strAltSplash + ". Does not exist.  Using default.");
-            }
+/**
+ * Retrieves an alternate splash image if specified.
+ * 
+ * This method checks if an alternate splash image path is provided. If so, it converts the path to an OS-specific format,
+ * checks if the file exists, and if it does, loads the image. If the file does not exist, it logs a warning and returns null.
+ * 
+ * @return the alternate splash image if it exists, otherwise null.
+ */
+private Image getAlternateSplashImage() {
+    Image retImage = null;
+    if (null != strAltSplash) {
+        // Convert the alternate splash image path to an OS-specific format
+        String fname = convertToFileOSSpecific(strAltSplash);
+        File file = new File(fname);
+        
+        // Check if the file exists
+        if (file.exists()) {
+            // Load the image from the file path
+            String fn = "file:" + fname;
+            retImage = new Image(fn);
+            LOGGER.info("Using alternate splash image: " + strAltSplash);
+        } else {
+            // Log a warning if the file does not exist
+            LOGGER.warning(
+                    "Specified alternate splash image: " + strAltSplash + ". Does not exist.  Using default.");
         }
-        return retImage;
     }
+    return retImage;
+}
 
     public void init() {
         if (false == _Show) {

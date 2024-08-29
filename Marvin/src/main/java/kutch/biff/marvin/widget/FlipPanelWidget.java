@@ -24,8 +24,6 @@ package kutch.biff.marvin.widget;
 import java.io.File;
 
 import eu.hansolo.enzo.flippanel.FlipPanel;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
