@@ -22,8 +22,6 @@
 package kutch.biff.marvin.widget;
 
 import eu.hansolo.enzo.lcd.Lcd;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.datamanager.DataManager;

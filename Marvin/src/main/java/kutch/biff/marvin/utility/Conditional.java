@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.logger.MarvinLogger;

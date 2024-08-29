@@ -790,7 +790,7 @@ public class ConfigurationReader {
                 return false;
             }
             Document externDoc = OpenXMLFile(externFile); // TODO, likely need to make path OS independent in
-            // OpenXMLFile app
+            // OpenXMLFile app 
             if (externDoc != null) {
                 nodeToPass = new FrameworkNode((Node) externDoc);
             } else {

@@ -23,8 +23,7 @@ package kutch.biff.marvin.widget;
 
 import java.text.NumberFormat;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Group;

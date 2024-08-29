@@ -347,7 +347,7 @@ public class ReceiveThreadMgr implements Runnable {
         _fStopped = false;
         fKillRequested = true;
         try {
-            Thread.sleep(50); // let the worker theads have a chance to end
+            Thread.sleep(50); // let the worker threads have a chance to end
         } catch (InterruptedException ex) {
 
         }

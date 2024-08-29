@@ -23,8 +23,6 @@ package kutch.biff.marvin.widget;
 
 import eu.hansolo.enzo.led.Led;
 import eu.hansolo.enzo.ledbargraph.LedBargraph;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.layout.GridPane;

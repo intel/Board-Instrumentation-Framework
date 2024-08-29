@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaMarkerEvent;

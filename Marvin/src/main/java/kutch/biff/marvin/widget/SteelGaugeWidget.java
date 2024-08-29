@@ -29,8 +29,6 @@ import java.util.List;
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.gauge.Gauge;
 import eu.hansolo.enzo.gauge.Gauge.TickLabelOrientation;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;

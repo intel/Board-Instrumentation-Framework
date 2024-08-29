@@ -24,8 +24,6 @@ package kutch.biff.marvin.widget;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.PieChart;
 import javafx.scene.layout.GridPane;

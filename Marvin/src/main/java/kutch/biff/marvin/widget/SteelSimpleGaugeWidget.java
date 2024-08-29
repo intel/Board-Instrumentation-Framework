@@ -28,8 +28,6 @@ import java.util.List;
 
 import eu.hansolo.enzo.common.Section;
 import eu.hansolo.enzo.gauge.SimpleGauge;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;

@@ -26,8 +26,6 @@ import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.Chart;

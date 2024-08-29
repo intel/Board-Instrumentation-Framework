@@ -21,8 +21,6 @@
  */
 package kutch.biff.marvin.widget;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.datamanager.DataManager;

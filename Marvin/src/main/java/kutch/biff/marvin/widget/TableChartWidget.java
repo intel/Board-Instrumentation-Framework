@@ -28,15 +28,12 @@ import java.util.List;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
-import javafx.util.Callback;
 import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
 import kutch.biff.marvin.datamanager.MarvinChangeListener;

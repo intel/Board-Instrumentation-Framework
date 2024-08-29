@@ -25,8 +25,6 @@ import static java.lang.Math.abs;
 
 import eu.hansolo.enzo.gauge.Radial;
 import eu.hansolo.enzo.gauge.Radial.TickLabelOrientation;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.GridPane;
 import kutch.biff.marvin.datamanager.DataManager;

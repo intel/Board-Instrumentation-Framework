@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import kutch.biff.marvin.datamanager.DataManager;
