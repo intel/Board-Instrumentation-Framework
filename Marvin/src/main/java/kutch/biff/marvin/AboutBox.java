@@ -20,7 +20,6 @@
  * ##############################################################################
  */
 package kutch.biff.marvin;
-
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Locale;

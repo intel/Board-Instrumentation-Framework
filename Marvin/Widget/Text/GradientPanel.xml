@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 ##############################################################################
-#  Copyright (c) 2018 Intel Corporation
+#  Copyright (c) 2016 Intel Corporation
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,6 +20,13 @@
 ##############################################################################
 -->
 
-<Widget Type = "FileWriter">    
-    
+
+<Widget Type = "GradientPanel">    
+    <Style>GradientPanel.css</Style>
+    <ShowValue>True</ShowValue>
+    <ShowTitle>True</ShowTitle>
+    <Decimals>2</Decimals>
+    <MinValue>0</MinValue>
+    <MaxValue>100</MaxValue>
+    <UnitText>Unit Text</UnitText>
 </Widget>
