@@ -19,11 +19,17 @@
     -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-fill: black; /* Text color */
+    -fx-text-alignment: center; /* Center align the text */
+    -fx-alignment: center; /* Center align the text */
+    -fx-padding: 0 10px; /* Optional: add padding if needed */    
 }
 
 .value-text {
     -fx-font-size: 14px;
     -fx-fill: darkblue; /* Text color */
+    -fx-text-alignment: right; /* Right align the text */
+    -fx-alignment: center-right; /* Right align the text */
+    -fx-padding: 0 10px; /* Optional: add padding if needed */    
 }
 
 .gradient-panel {

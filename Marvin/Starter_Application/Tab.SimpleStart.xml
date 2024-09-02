@@ -40,6 +40,19 @@
                 <InitialValue RevertTimeout="4000">Welcome to the World of BIFF</InitialValue>
                 <!--<Revert Timeout="4000" Value="0"/>-->
             </Widget>
+            <Widget File="Text\GradientPanel.xml" row="1" column="1" Align="S" width="200" heigth="200" >
+                <Title>Fodddo</Title>
+                <Colors>
+                    <Color>
+                        <Hex>#00ff00</Hex> <!-- Blue -->
+                        <Weight>0.5</Weight>
+                    </Color>
+                    <Color>
+                        <Hex>#FF0000</Hex> <!-- Red -->
+                        <Weight>0.5</Weight>
+                    </Color>
+                </Colors>
+            </Widget>
             
             <!-- Let's add some audio -->
             <Widget File="Media\AudioPlayer.xml" row="1" column="1">

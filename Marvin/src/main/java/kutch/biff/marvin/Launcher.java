@@ -24,6 +24,17 @@ package kutch.biff.marvin;
 public class Launcher {
 
     public static void main(String[] args) {
+            try {
+                Thread.sleep(2000);  // 2-second delay for debugger
+            } catch (InterruptedException e) {
+            }
+        if (Boolean.getBoolean("debugBuild")) {
+            try {
+                System.out.println("Sleeping to allow debugger to activate");
+                Thread.sleep(2000);  // 2-second delay for debugger
+            } catch (InterruptedException e) {
+            }
+        }           
         Marvin.main(args);
     }
 }

@@ -29,4 +29,22 @@
     <MinValue>0</MinValue>
     <MaxValue>100</MaxValue>
     <UnitText>Unit Text</UnitText>
+    <Colors>
+        <Color>
+            <Hex>#0000FF</Hex> <!-- Blue -->
+            <Weight>0.1</Weight>
+        </Color>
+        <Color>
+            <Hex>#00FF00</Hex> <!-- Green -->
+            <Weight>0.4</Weight>
+        </Color>
+        <Color>
+            <Hex>#FFFF00</Hex> <!-- Yellow -->
+            <Weight>0.3</Weight>
+        </Color>
+        <Color>
+            <Hex>#FF0000</Hex> <!-- Red -->
+            <Weight>0.2</Weight>
+        </Color>
+    </Colors>    
 </Widget>

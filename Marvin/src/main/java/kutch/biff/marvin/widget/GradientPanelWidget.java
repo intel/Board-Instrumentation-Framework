@@ -1,13 +1,36 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * ##############################################################################
+ * #  Copyright (c) 2024 Intel Corporation
+ * #
+ * # Licensed under the Apache License, Version 2.0 (the "License");
+ * #  you may not use this file except in compliance with the License.
+ * #  You may obtain a copy of the License at
+ * #
+ * #      http://www.apache.org/licenses/LICENSE-2.0
+ * #
+ * #  Unless required by applicable law or agreed to in writing, software
+ * #  distributed under the License is distributed on an "AS IS" BASIS,
+ * #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * #  See the License for the specific language governing permissions and
+ * #  limitations under the License.
+ * ##############################################################################
+ * #    File Abstract:
+ * #
+ * #
+ * ##############################################################################
  */
 package kutch.biff.marvin.widget;
 
+import java.util.List;
+import java.util.logging.Level;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
+import kutch.biff.marvin.control.GradientColor;
+import kutch.biff.marvin.control.GradientPanelControl;
 import kutch.biff.marvin.datamanager.DataManager;
+import kutch.biff.marvin.utility.FrameworkNode;
+import kutch.biff.marvin.widget.widgetbuilder.GradientPanelWidgetBuilder;
 
 /**
  *
@@ -15,24 +38,84 @@ import kutch.biff.marvin.datamanager.DataManager;
  */
 public class GradientPanelWidget extends BaseWidget {
 
+    private final GradientPanelControl _gradientPanel;
+    
+    public GradientPanelWidget() {
+        _gradientPanel = new GradientPanelControl();
+    }
+    
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        SetParent(pane);
+        SetupPeekaboo(dataMgr);
+        pane.add(_gradientPanel, getColumn(), getRow(), getColumnSpan(), getRowSpan());
+        _gradientPanel.setLabel(getTitle());
+
+        dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
+            if (IsPaused()) {
+                return;
+            }
+
+            String strVal = newVal.toString();
+            try {
+                float newValue = Float.parseFloat(strVal);
+                _gradientPanel.setValue(newValue);
+            } catch (NumberFormatException ex) {
+                LOGGER.log(Level.SEVERE, "Invalid data for GradientPanel received: {0}", strVal);
+            }
+        });
+
+        return ApplyCSS();
     }
 
     @Override
     public Node getStylableObject() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return _gradientPanel;
     }
 
     @Override
     public ObservableList<String> getStylesheets() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return _gradientPanel.getStylesheets();
     }
 
     @Override
     public void UpdateTitle(String newTitle) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        _gradientPanel.setLabel(newTitle);
     }
+    
+    public void setMinValue(float newVal) {
+        _gradientPanel.setMinValue(newVal);
+    }
+    
+    public void setMaxValue(float newVal) {
+        _gradientPanel.setMaxValue(newVal);
+    }
+    
+    public void setUnitText(String newVal){
+    }
+    
+    public void setGradientColors(List<GradientColor> gradientColors) {
+        _gradientPanel.setGradientColors(gradientColors);
+    }
+    public void setShowValue(boolean newVal){
+        _gradientPanel.setShowValue(newVal);
+    }
+    
+    public void setShowLabel(boolean newVal){
+        _gradientPanel.setShowLabel(newVal);
+    }
+    
+    @Override
+    public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode) {
+        if (widgetNode.getNodeName().equalsIgnoreCase("Colors")) {
+            List<GradientColor> colors = GradientPanelWidgetBuilder.readColors(widgetNode);
+            if (colors.size() > 1) {
+                _gradientPanel.setGradientColors(colors);
+                return true;
+            } 
+        }
+        return false;
+    }
+
     
 }
