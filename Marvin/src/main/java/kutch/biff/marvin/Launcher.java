@@ -21,7 +21,6 @@
  */
 package kutch.biff.marvin;
 
-import java.util.Properties;
 import kutch.biff.marvin.version.Version;
 
 public class Launcher {

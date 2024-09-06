@@ -55,6 +55,7 @@ public class GradientPanelWidget extends BaseWidget {
         SetParent(pane);
         ConfigureDimentions();
         ConfigureAlignment();
+        _gradientPanel.setLabel(getTitle());
 
         dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
             if (IsPaused()) {
@@ -65,12 +66,11 @@ public class GradientPanelWidget extends BaseWidget {
             try {
                 float newValue = Float.parseFloat(strVal);
                 _gradientPanel.setValue(newValue);
+                ApplyCSS();
             } catch (NumberFormatException ex) {
                 LOGGER.log(Level.SEVERE, "Invalid data for GradientPanel received: {0}", strVal);
             }
         });
-
-        _gradientPanel.updateValue(_gradientPanel.getMinValue());
 
         return ApplyCSS();
     }
@@ -135,7 +135,7 @@ public class GradientPanelWidget extends BaseWidget {
     public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode) {
         if (widgetNode.getNodeName().equalsIgnoreCase("Colors")) {
             List<GradientColor> colors = GradientPanelWidgetBuilder.readColors(widgetNode);
-            if (colors.size() > 1) {
+            if (colors != null && colors.size() > 1) {
                 _gradientPanel.setGradientColors(colors);
                 return true;
             } 

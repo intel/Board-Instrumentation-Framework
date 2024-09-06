@@ -56,6 +56,25 @@
 			<Param>2</Param>
 		</Collector>
 
+		<Collector ID="Gradient.1" Frequency="1000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>StepValue</Param>
+			<Param>Inst_1</Param>
+			<Param>0</Param>
+			<Param>100</Param>
+			<Param>5</Param>
+		</Collector>
+
+		
+		<Collector ID="Gradient.2" Frequency="2000">
+			<Executable>Collectors\RandomVal.py</Executable>
+			<Param>StepValue</Param>
+			<Param>Inst_2</Param>
+			<Param>70</Param>
+			<Param>120</Param>
+			<Param>5</Param>
+		</Collector>
+
 		<Group Frequency="2000">
 			<Collector ID="tx-allqueues.tx_bytes">
 				<Executable>Collectors\RandomVal.py</Executable>

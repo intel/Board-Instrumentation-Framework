@@ -56,9 +56,12 @@
                 <!--<Revert Timeout="4000" Value="0"/>-->
             </Widget>
             <Widget File="Text\GradientPanel.xml" row="2" column="2" Align="W" width="400" height="400" >
-                <Title>Fodddo</Title>
-                <Decimals>0</Decimals>
-                <ValueRange Min="20" Max="125"/>
+                <Title>Bilbo</Title>
+                <Decimals>3</Decimals>
+                <ValueRange Min="2" Max="125"/>
+                <StyleOverride>
+                    <Item> -fx-border-width: 32px; </Item>
+                </StyleOverride>
                 <Colors>
                     <Color>
                         <Hex>#0000ff</Hex> <!-- Blue -->

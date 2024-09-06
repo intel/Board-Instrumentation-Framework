@@ -44,3 +44,22 @@ def GetBoundedRandomList(min,max,listSize):
 def GetScaledBoundedRandomValue(min,max,scale):
     val = float(GetBoundedRandomValue(min,max)) * float(scale)
     return str(round(val,2))
+
+
+def StepValue(id, start, stop, step):
+    start = int(start)
+    stop = int(stop)
+    step = int(step)
+
+    if not hasattr(StepValue, "state"):
+        StepValue.state = {}
+
+    if id not in StepValue.state:
+        StepValue.state[id] = start - step
+
+    StepValue.state[id] += step
+    if StepValue.state[id] >= stop:
+        StepValue.state[id] = start
+
+    return StepValue.state[id]
+

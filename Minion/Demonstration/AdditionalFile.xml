@@ -34,7 +34,7 @@
   <Collector ID="CPU" Frequency="$(Rate1)">
     <Executable>Collectors\RandomVal.py</Executable>
     <Param>GetBoundedRandomValue</Param>
-    <Param>62</Param>
+    <Param>3</Param>
     <Param>99</Param>
   </Collector>
 

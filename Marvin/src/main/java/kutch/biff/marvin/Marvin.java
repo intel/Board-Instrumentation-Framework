@@ -506,13 +506,12 @@ public class Marvin extends Application {
         List<String> parameters = params.getRaw();
         int verboseLevel = 0;
         String AliasFileCompare = "-aliasfile=";
-System.out.println(parameters.toString());
+
         for (int iIndex = 0; iIndex < parameters.size(); iIndex++) {
             String param = parameters.get(iIndex);
             if (param.equalsIgnoreCase("-i")) {
                 if (iIndex + 1 < parameters.size()) {
                     ConfigFilename = parameters.get(++iIndex);
-                    System.out.println(ConfigFilename);
                 } else {
                     LOGGER.severe(
                             "-i command line option given, but no filename provided.  Defaulting to Application.xml");
@@ -567,12 +566,12 @@ System.out.println(parameters.toString());
             {
                 ShowSplash = false;
             } else {
-                LOGGER.severe("Unknown command line parameter: " + param);
+                LOGGER.log(Level.SEVERE, "Unknown command line parameter: {0}", param);
             }
         }
 
         MarvinLogger.setDebugLevel(Level.ALL);
-        LOGGER.config("--- BIFF GUI [Marvin]  " + Version.getVersion());
+        LOGGER.log(Level.CONFIG, "--- BIFF GUI [Marvin]  {0}", Version.getVersion());
         MarvinLogger.setDebugLevel(Level.SEVERE);
 
         if (0 == verboseLevel) {

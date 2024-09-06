@@ -20,6 +20,7 @@
  * ##############################################################################
  */
 package kutch.biff.marvin.widget.widgetbuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -37,11 +38,12 @@ import kutch.biff.marvin.control.GradientColor;
  * @author Patrick Kutch
  */
 public class GradientPanelWidgetBuilder {
+
     private final static Logger LOGGER = Logger.getLogger(MarvinLogger.class.getName());
 
     public static GradientPanelWidget Build(FrameworkNode masterNode, String widgetDefFilename) {
         kutch.biff.marvin.widget.GradientPanelWidget _widget = new kutch.biff.marvin.widget.GradientPanelWidget();
-        
+
         for (FrameworkNode node : masterNode.getChildNodes()) {
             if (BaseWidget.HandleCommonDefinitionFileConfig(_widget, node)) {
             } else if (node.getNodeName().equalsIgnoreCase("MinValue")) {
@@ -60,36 +62,27 @@ public class GradientPanelWidgetBuilder {
                     LOGGER.severe("Invalid MaxValue in GradientPanel Widget Definition File");
                     return null;
                 }
-            } else if (node.getNodeName().equalsIgnoreCase("UnitText")) {
-                String str = node.getTextContent();
-                _widget.setUnitText(str);
-            } 
-            else if (node.getNodeName().equalsIgnoreCase("Colors")) {
+            } else if (node.getNodeName().equalsIgnoreCase("Colors")) {
                 List<GradientColor> gradientColors = GradientPanelWidgetBuilder.readColors(node);
-                if (null == gradientColors){
+                if (null == gradientColors) {
                     return null;
                 }
                 _widget.setGradientColors(gradientColors);
-            }
-            else if (node.getNodeName().equalsIgnoreCase("ShowValue")) {
+            } else if (node.getNodeName().equalsIgnoreCase("ShowValue")) {
                 boolean show = node.getBooleanValue();
                 _widget.setShowValue(show);
-            }
-            else if (node.getNodeName().equalsIgnoreCase("ShowTitle")) {
+            } else if (node.getNodeName().equalsIgnoreCase("ShowTitle")) {
                 boolean show = node.getBooleanValue();
                 _widget.setShowLabel(show);
-            }
-            else if (node.getNodeName().equalsIgnoreCase("Decimals")) {
+            } else if (node.getNodeName().equalsIgnoreCase("Decimals")) {
                 String str = node.getTextContent();
                 try {
                     _widget.setDecimalPlaces(Integer.parseInt(str));
                 } catch (NumberFormatException ex) {
                     LOGGER.severe("Invalid Decimals in GradientPane Widget Definition File");
                     return null;
-                }            
-            }
-            
-            else {
+                }
+            } else {
                 LOGGER.log(Level.SEVERE, "Unknown GradientPanelWidget setting in Widget Definition file: {0}", node.getNodeName());
                 return null;
             }
@@ -97,9 +90,10 @@ public class GradientPanelWidgetBuilder {
 
         return _widget;
     }
-    
+
     public static List<GradientColor> readColors(FrameworkNode node) {
         List<GradientColor> gradientColors = new ArrayList<>();
+        float totalWeight = 0;
         for (FrameworkNode colorNode : node.getChildNodes()) {
             if (!colorNode.hasChild("Hex")) {
                 LOGGER.log(Level.SEVERE, "GradientPanelWidget Color setting requires 'Hex'}");
@@ -110,16 +104,27 @@ public class GradientPanelWidgetBuilder {
                 return null;
             }
             String hex = colorNode.getChild("Hex").getTextContent();
-            Color color = Color.web(hex);
-            float weight = (float) colorNode.getChild("Weight").getDoubleContent();
-            gradientColors.add(new GradientColor(color, weight));
+            try {
+                Color color = Color.web(hex);
+
+                float weight = (float) colorNode.getChild("Weight").getDoubleContent();
+                totalWeight += weight;
+                gradientColors.add(new GradientColor(color, weight));
+            } catch (IllegalArgumentException ex) {
+                LOGGER.log(Level.SEVERE, "Invalid Color value {0} in GradientPanel Widget", hex);
+                return null;
+            }
         }
-        
+
         if (gradientColors.size() < 2) {
             LOGGER.log(Level.SEVERE, "GradientPanelWidget requires at least 2 Color settings}");
             return null;
         }
+        if (totalWeight != 1.0) {
+            LOGGER.log(Level.SEVERE, "GradientPanelWidget weights must add up to 1");
+            return null;
+        }
         return gradientColors;
     }
-    
+
 }

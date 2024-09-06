@@ -86,7 +86,7 @@ public class GradientPanelControl extends Region {
         Pane widgetPanel = new Pane(vbox);
         //widgetPanel.setPrefSize(200, 200);
         //widgetPanel.setStyle("-fx-background-color: " + toHex(getColorForValue(value)) + ";");
-        widgetPanel.getStyleClass().add("gradient-panel");
+        //widgetPanel.getStyleClass().add("gradient-panel");
 
                 // Ensure VBox resizes with the Pane
         vbox.setFillWidth(true);
@@ -112,7 +112,7 @@ public void updateValue(float newValue) {
     public void setLabel(String label) {
         this.label = label;
         labelText.setText(label);
-        refreshPanel();
+        //refreshPanel();
     }
 
     public String getLabel() {
@@ -121,7 +121,7 @@ public void updateValue(float newValue) {
 
     public void setShowLabel(boolean showLabel) {
         this.showLabel = showLabel;
-        refreshPanel();
+        //refreshPanel();
     }
 
     public boolean isShowLabel() {
@@ -130,7 +130,7 @@ public void updateValue(float newValue) {
 
     public void setShowValue(boolean showValue) {
         this.showValue = showValue;
-        refreshPanel();
+        //refreshPanel();
     }
 
     public boolean isShowValue() {
@@ -188,45 +188,51 @@ public void updateValue(float newValue) {
         return String.format("%." + decimalPlaces + "f", value);
     }
 
-    private void refreshPanel() {
-//        getChildren().clear();
-//        this.panel = createPanel();
-//        getChildren().add(panel);
+    private void refreshPanels() {
+        getChildren().clear();
+        this.panel = createPanel();
+        getChildren().add(panel);
     }
 
-    private Color getColorForValue(float value) {
-        float ratio = (value - minValue) / (maxValue - minValue);
-        float accumulatedWeight = 0;
-        Color lowerColor = null;
-        Color upperColor = null;
-        float lowerBound = 0;
-        float upperBound = 0;
+private Color getColorForValue(float value) {
+    // Normalize value to a range between 0 and 1
+    float ratio = (value - minValue) / (maxValue - minValue);
 
-        for (int i = 0; i < gradientColors.size(); i++) {
-            GradientColor gc = gradientColors.get(i);
-            upperBound = accumulatedWeight + gc.getWeight();
+    // Ensure the ratio is within [0, 1] bounds
+    if (ratio < 0) ratio = 0;
+    if (ratio > 1) ratio = 1;
 
-            if (ratio >= lowerBound && ratio <= upperBound) {
-                lowerColor = gc.getColor();
-                if (i == gradientColors.size() - 1) {
-                    upperColor = lowerColor;
-                } else {
-                    upperColor = gradientColors.get(i + 1).getColor();
-                }
-                break;
-            }
-
-            accumulatedWeight = upperBound;
-            lowerBound = upperBound;
-        }
-
-        if (lowerColor == null || upperColor == null) {
-            return gradientColors.get(0).getColor(); // Fallback in case of any issue
-        }
-
-        float sectionRatio = (ratio - lowerBound) / (upperBound - lowerBound);
-        return lowerColor.interpolate(upperColor, sectionRatio);
+    // Normalize the weights to ensure they sum to 1
+    float totalWeight = 0;
+    for (GradientColor gc : gradientColors) {
+        totalWeight += gc.getWeight();
     }
+
+    // Accumulate the weight to find the correct interval
+    float accumulatedWeight = 0;
+    for (int i = 0; i < gradientColors.size() - 1; i++) {
+        GradientColor currentColor = gradientColors.get(i);
+        GradientColor nextColor = gradientColors.get(i + 1);
+
+        // Calculate the weight range for the current and next colors
+        float currentWeight = accumulatedWeight / totalWeight;
+        float nextWeight = (accumulatedWeight + currentColor.getWeight()) / totalWeight;
+
+        // Check if the ratio falls within this color section
+        if (ratio >= currentWeight && ratio <= nextWeight) {
+            // Interpolate between the current and next color
+            float sectionRatio = (ratio - currentWeight) / (nextWeight - currentWeight);
+            return currentColor.getColor().interpolate(nextColor.getColor(), sectionRatio);
+        }
+
+        // Move to the next color section
+        accumulatedWeight += currentColor.getWeight();
+    }
+
+    // If the ratio is exactly 1 or slightly above, return the last color
+    return gradientColors.get(gradientColors.size() - 1).getColor();
+}
+
 
     private String toHex(Color color) {
         int r = (int) (color.getRed() * 255);

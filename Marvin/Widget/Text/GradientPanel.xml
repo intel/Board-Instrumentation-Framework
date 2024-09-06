@@ -22,13 +22,13 @@
 
 
 <Widget Type = "GradientPanel">    
-    <Style>GradientPanel.css</Style>
-    <ShowValue>False</ShowValue>
+    <Style ID="default">GradientPanel.css</Style>
+    <ShowValue>True</ShowValue>
     <ShowTitle>True</ShowTitle>
     <Decimals>2</Decimals>
     <MinValue>0</MinValue>
     <MaxValue>100</MaxValue>
-    <UnitText>Unit Text</UnitText>
+
     <Colors>
         <Color>
             <Hex>#0000FF</Hex> <!-- Blue -->

@@ -14,7 +14,10 @@
  * #  See the License for the specific language governing permissions and
  * #  limitations under the License.
  * ##############################################################################
- */
+ *
+ *  NOTE that Style Override for this widget will take an ID, but other things
+ *  is likely to get 'wonky'
+*/
 .label-text {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
@@ -32,21 +35,27 @@
     -fx-padding: 0 10px; /* Optional: add padding if needed */    
 }
 
-.gradient-panel {
-    -fx-background-radius: 10px; /* Rounded corners */
-    -fx-border-radius: 10px;
+#default {
     -fx-border-color: black;     /* Border color */
     -fx-border-width: 2px;       /* Border width */
     -fx-padding: 10px;           /* Padding inside the panel */
 }
 
-.panel-content {
+#rounded {
+    -fx-background-radius: 10px; /* Rounded corners */
+    -fx-border-radius: 10px;
+    -fx-border-color: yellow;     /* Border color */
+    -fx-border-width: 2px;       /* Border width */
+    -fx-padding: 10px;           /* Padding inside the panel */
+}
+
+.panel-content {  /* for location of title and value */
     -fx-alignment: center;
     -fx-spacing: 10;
 }
 
 /* Gray Theme */
-.gray-theme {
+#gray-theme {
     -fx-background-color: #B0B0B0; /* Light gray background */
     -fx-text-fill: black;          /* Black text */
     -fx-background-radius: 35px;    /* Slightly rounded corners */
@@ -55,7 +64,7 @@
 }
 
 /* Shadowed Theme */
-.shadowed-theme {
+#shadowed-theme {
     -fx-background-color: #FFFFFF; /* White background */
     -fx-text-fill: black;          /* Black text */
     -fx-background-radius: 5px;    /* Slightly rounded corners */
@@ -65,7 +74,7 @@
 }
 
 /* Rounded Corner Red Theme */
-.rounded-red-theme {
+#rounded-red-theme {
     -fx-background-color: #FF0000; /* Red background */
     -fx-text-fill: white;          /* White text */
     -fx-background-radius: 20px;   /* More rounded corners */
