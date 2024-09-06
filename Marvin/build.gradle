@@ -75,6 +75,9 @@ task updateVersionProperties {
                 versionProps['Month_Version'] = new SimpleDateFormat('MM').format(currentDate)
                 versionProps['Day_Version'] = new SimpleDateFormat('dd').format(currentDate)
 
+                // Set DEBUG property based on the build type
+                def isDebugBuild = project.hasProperty('debugBuild')
+                versionProps['DEBUG'] = isDebugBuild ? 'true' : 'false'
                 // Save the updated properties back to the file
                 versionProps.store(new FileOutputStream(versionPropsFile), null)
 

@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -489,7 +490,7 @@ abstract public class BaseWidget implements Widget {
         Region regionNode = getRegionObject();
 
         if (null == regionNode) {
-            LOGGER.severe(getName() + " : Should NOT BE here, NULL Widget pass to Config Dimensions");
+            LOGGER.log(Level.SEVERE, "{0} : Should NOT BE here, NULL Widget pass to Config Dimensions", getName());
             return;
         }
         PreConfigDimensions(regionNode);

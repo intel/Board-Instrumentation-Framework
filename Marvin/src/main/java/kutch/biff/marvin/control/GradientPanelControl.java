@@ -20,6 +20,7 @@
  * ##############################################################################
  */
 package kutch.biff.marvin.control;
+
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -28,15 +29,17 @@ import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
-import javafx.collections.ObservableList;
+import javafx.scene.Node;
 
 public class GradientPanelControl extends Region {
+
     private float minValue;
     private float maxValue;
     private float value;
     private String label;
     private boolean showLabel;
     private boolean showValue;
+    private int decimalPlaces;
     private List<GradientColor> gradientColors;
     private Pane panel;
     private Text labelText;
@@ -49,6 +52,7 @@ public class GradientPanelControl extends Region {
         this.label = "";
         this.showLabel = true;
         this.showValue = true;
+        this.decimalPlaces = 2; // Default to 2 decimal places
         this.gradientColors = new ArrayList<>();
         this.gradientColors.add(new GradientColor(Color.BLUE, 0.5f)); // Default colors with equal weight
         this.gradientColors.add(new GradientColor(Color.RED, 0.5f));
@@ -67,7 +71,7 @@ public class GradientPanelControl extends Region {
         labelText.getStyleClass().add("label-text");
 
         // Current value text
-        valueText = new Text(String.format("Value: %.2f", value));
+        valueText = new Text(formatValue(value));
         valueText.getStyleClass().add("value-text");
 
         // Adding components to VBox based on the flags
@@ -80,8 +84,8 @@ public class GradientPanelControl extends Region {
 
         // Creating panel and applying the gradient background and CSS class
         Pane widgetPanel = new Pane(vbox);
-        widgetPanel.setPrefSize(200, 200);
-        widgetPanel.setStyle("-fx-background-color: " + toHex(getColorForValue(value)) + ";");
+        //widgetPanel.setPrefSize(200, 200);
+        //widgetPanel.setStyle("-fx-background-color: " + toHex(getColorForValue(value)) + ";");
         widgetPanel.getStyleClass().add("gradient-panel");
 
                 // Ensure VBox resizes with the Pane
@@ -92,11 +96,18 @@ public class GradientPanelControl extends Region {
         return widgetPanel;
     }
 
-    public void updateValue(float newValue) {
-        this.value = newValue;
-        valueText.setText(String.format("Value: %.2f", value));
-        panel.setStyle("-fx-background-color: " + toHex(getColorForValue(value)) + ";");
+public void updateValue(float newValue) {
+    // Bound the newValue within minValue and maxValue
+    if (newValue < minValue) {
+        newValue = minValue;
+    } else if (newValue > maxValue) {
+        newValue = maxValue;
     }
+
+    this.value = newValue;
+    valueText.setText(formatValue(value));
+    panel.setStyle("-fx-background-color: " + toHex(getColorForValue(value)) + ";");
+}
 
     public void setLabel(String label) {
         this.label = label;
@@ -151,7 +162,7 @@ public class GradientPanelControl extends Region {
     public float getMaxValue() {
         return this.maxValue;
     }
-    
+
     public void setGradientColors(List<GradientColor> gradientColors) {
         if (gradientColors == null || gradientColors.size() < 2) {
             throw new IllegalArgumentException("At least two colors with weights are required.");
@@ -162,6 +173,19 @@ public class GradientPanelControl extends Region {
 
     public List<GradientColor> getGradientColors() {
         return new ArrayList<>(this.gradientColors);
+    }
+
+    public void setDecimalPlaces(int decimalPlaces) {
+        this.decimalPlaces = decimalPlaces;
+        updateValue(this.value); // Update the display with the new decimal places
+    }
+
+    public int getDecimalPlaces() {
+        return this.decimalPlaces;
+    }
+
+    private String formatValue(float value) {
+        return String.format("%." + decimalPlaces + "f", value);
     }
 
     private void refreshPanel() {
@@ -209,5 +233,9 @@ public class GradientPanelControl extends Region {
         int g = (int) (color.getGreen() * 255);
         int b = (int) (color.getBlue() * 255);
         return String.format("#%02X%02X%02X", r, g, b);
+    }
+    
+   public Node getStylableObject() {
+        return this.panel;
     }
 }

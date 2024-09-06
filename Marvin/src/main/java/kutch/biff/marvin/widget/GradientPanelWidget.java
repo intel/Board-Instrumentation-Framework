@@ -50,6 +50,11 @@ public class GradientPanelWidget extends BaseWidget {
         SetupPeekaboo(dataMgr);
         pane.add(_gradientPanel, getColumn(), getRow(), getColumnSpan(), getRowSpan());
         _gradientPanel.setLabel(getTitle());
+        _gradientPanel.setDecimalPlaces(getDecimalPlaces());
+        setDefaultIsSquare(false);
+        SetParent(pane);
+        ConfigureDimentions();
+        ConfigureAlignment();
 
         dataMgr.AddListener(getMinionID(), getNamespace(), (o, oldVal, newVal) -> {
             if (IsPaused()) {
@@ -65,12 +70,35 @@ public class GradientPanelWidget extends BaseWidget {
             }
         });
 
+        _gradientPanel.updateValue(_gradientPanel.getMinValue());
+
         return ApplyCSS();
     }
+    
+    @Override
+    public boolean HandleValueRange(FrameworkNode rangeNode) {
+        double Min = -1234.5678;
+        double Max = -1234.5678;
+        if (rangeNode.hasAttribute("Min")) {
+            Min = rangeNode.getDoubleAttribute("Min", Min);
+            if (Min == -1234.5678) {
+                return false;
+            }
+            _gradientPanel.setMinValue((float)Min);
+        }
+        if (rangeNode.hasAttribute("Max")) {
+            Max = rangeNode.getDoubleAttribute("Max", Max);
+            if (Max == -1234.5678) {
+                return false;
+            }
+            _gradientPanel.setMaxValue((float)Max);
+        }
+        return true;
+    }    
 
     @Override
     public Node getStylableObject() {
-        return _gradientPanel;
+        return _gradientPanel.getStylableObject();
     }
 
     @Override
@@ -91,8 +119,6 @@ public class GradientPanelWidget extends BaseWidget {
         _gradientPanel.setMaxValue(newVal);
     }
     
-    public void setUnitText(String newVal){
-    }
     
     public void setGradientColors(List<GradientColor> gradientColors) {
         _gradientPanel.setGradientColors(gradientColors);
@@ -115,7 +141,5 @@ public class GradientPanelWidget extends BaseWidget {
             } 
         }
         return false;
-    }
-
-    
+    }   
 }

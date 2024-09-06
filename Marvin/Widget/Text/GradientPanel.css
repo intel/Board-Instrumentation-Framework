@@ -34,6 +34,7 @@
 
 .gradient-panel {
     -fx-background-radius: 10px; /* Rounded corners */
+    -fx-border-radius: 10px;
     -fx-border-color: black;     /* Border color */
     -fx-border-width: 2px;       /* Border width */
     -fx-padding: 10px;           /* Padding inside the panel */
@@ -42,4 +43,32 @@
 .panel-content {
     -fx-alignment: center;
     -fx-spacing: 10;
+}
+
+/* Gray Theme */
+.gray-theme {
+    -fx-background-color: #B0B0B0; /* Light gray background */
+    -fx-text-fill: black;          /* Black text */
+    -fx-background-radius: 35px;    /* Slightly rounded corners */
+    -fx-border-color: #888888;     /* Darker gray border */
+    -fx-border-width: 22px;
+}
+
+/* Shadowed Theme */
+.shadowed-theme {
+    -fx-background-color: #FFFFFF; /* White background */
+    -fx-text-fill: black;          /* Black text */
+    -fx-background-radius: 5px;    /* Slightly rounded corners */
+    -fx-border-color: #AAAAAA;     /* Light gray border */
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 0); /* Shadow effect */
+}
+
+/* Rounded Corner Red Theme */
+.rounded-red-theme {
+    -fx-background-color: #FF0000; /* Red background */
+    -fx-text-fill: white;          /* White text */
+    -fx-background-radius: 20px;   /* More rounded corners */
+    -fx-border-color: darkred;     /* Dark red border */
+    -fx-border-width: 3px;
 }

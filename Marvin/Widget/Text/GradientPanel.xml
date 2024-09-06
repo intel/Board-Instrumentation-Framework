@@ -23,7 +23,7 @@
 
 <Widget Type = "GradientPanel">    
     <Style>GradientPanel.css</Style>
-    <ShowValue>True</ShowValue>
+    <ShowValue>False</ShowValue>
     <ShowTitle>True</ShowTitle>
     <Decimals>2</Decimals>
     <MinValue>0</MinValue>

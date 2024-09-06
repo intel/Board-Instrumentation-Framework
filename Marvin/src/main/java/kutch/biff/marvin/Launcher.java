@@ -21,17 +21,17 @@
  */
 package kutch.biff.marvin;
 
+import java.util.Properties;
+import kutch.biff.marvin.version.Version;
+
 public class Launcher {
 
     public static void main(String[] args) {
-            try {
-                Thread.sleep(2000);  // 2-second delay for debugger
-            } catch (InterruptedException e) {
-            }
-        if (Boolean.getBoolean("debugBuild")) {
+            
+        if (Version.isDebugRelease()) {
             try {
                 System.out.println("Sleeping to allow debugger to activate");
-                Thread.sleep(2000);  // 2-second delay for debugger
+                Thread.sleep(2500);  // 2.5-second delay for debugger
             } catch (InterruptedException e) {
             }
         }           

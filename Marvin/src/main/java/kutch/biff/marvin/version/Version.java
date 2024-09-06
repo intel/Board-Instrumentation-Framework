@@ -90,6 +90,13 @@ public class Version {
         return "[Undefined]";
     }
 
+    public static boolean isDebugRelease() {
+        if (null != Version.getProperties()) {
+            return "true".equalsIgnoreCase(Version.getProperties().getProperty("DEBUG"));
+        }
+        return false;
+    }
+
     public static String getVersion() {
         return Version.getRelease() + " - " + Version.getYearVersion() + "." + Version.getMonthVersion() + "."
                 + Version.getDayVersion() + " build " + Version.getBuildNumber();
