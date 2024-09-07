@@ -37,6 +37,10 @@ import kutch.biff.marvin.configuration.Configuration;
 /**
  * @author Patrick Kutch
  */
+/**
+ * Represents a prompt input box for user input.
+ * Extends the BasePrompt class.
+ */
 public class Prompt_InputBox extends BasePrompt {
 
     private String _PrevVal = null;
@@ -45,6 +49,12 @@ public class Prompt_InputBox extends BasePrompt {
         super(ID);
     }
 
+    /**
+     * Sets up the dialog for prompting user input.
+     * 
+     * @param dialog The stage for the dialog window.
+     * @return The root pane of the dialog.
+     */
     @Override
     protected Pane SetupDialog(Stage dialog) {
         GridPane root = new GridPane();

@@ -30,7 +30,13 @@ import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.Node;
-
+// Copilot: Add Javadoc comments and description blocks for all functions
+/**
+ * Represents a custom control that displays a gradient panel with a value and label.
+ * The gradient panel's color changes based on the current value, which is bounded by a minimum and maximum value.
+ * The control provides options to show or hide the label and value, set the number of decimal places for the value,
+ * and customize the gradient colors.
+ */
 public class GradientPanelControl extends Region {
 
     private float minValue;
@@ -46,6 +52,9 @@ public class GradientPanelControl extends Region {
     private Text valueText;
     private  List<String> _styleOverrides;
 
+    /**
+     * Constructs a new GradientPanelControl with default values.
+     */
     public GradientPanelControl() {
         this.minValue = 0.0f;
         this.maxValue = 100.0f;
@@ -62,6 +71,11 @@ public class GradientPanelControl extends Region {
         this._styleOverrides = new ArrayList<>();
     }
 
+    /**
+     * Creates a panel with a VBox containing various components based on the provided flags.
+     * 
+     * @return The created panel.
+     */
     private Pane createPanel() {
         VBox vbox = new VBox();
 
@@ -95,6 +109,9 @@ public class GradientPanelControl extends Region {
         return widgetPanel;
     }
 
+    public void setValue(float value) {
+        updateValue(value);
+    }
     public void updateValue(float newValue) {
         // Bound the newValue within minValue and maxValue
         if (newValue < minValue) {
@@ -135,34 +152,34 @@ public class GradientPanelControl extends Region {
     public boolean isShowValue() {
         return this.showValue;
     }
-
+// Document this function
     public void setValue(float value, List<String> styleOverrides) {
         _styleOverrides = styleOverrides;
         updateValue(value);
     }
-
+// Document this function
     public float getValue() {
         return this.value;
     }
-
+// Document this function
     public void setMinValue(float minValue) {
         this.minValue = minValue;
         updateValue(this.value); // Recalculate the color based on the new min value
     }
-
+// Document this function
     public float getMinValue() {
         return this.minValue;
     }
-
+// Document this function
     public void setMaxValue(float maxValue) {
         this.maxValue = maxValue;
         updateValue(this.value); // Recalculate the color based on the new max value
     }
-
+// Document this function
     public float getMaxValue() {
         return this.maxValue;
     }
-
+// Document this function
     private void applyNewGradient()
     {
          String newBgStyle = "-fx-background-color: " + toHex(getColorForValue(value)) + ";";
@@ -176,7 +193,7 @@ public class GradientPanelControl extends Region {
         StyleString += newBgStyle;
         panel.setStyle(StyleString);
     }
-    
+    // Document this function
     public void setGradientColors(List<GradientColor> gradientColors) {
         if (gradientColors == null || gradientColors.size() < 2) {
             throw new IllegalArgumentException("At least two colors with weights are required.");
@@ -184,7 +201,7 @@ public class GradientPanelControl extends Region {
         this.gradientColors = new ArrayList<>(gradientColors);
         applyNewGradient();
     }
-
+// Document this function
     public List<GradientColor> getGradientColors() {
         return new ArrayList<>(this.gradientColors);
     }

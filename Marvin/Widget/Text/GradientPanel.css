@@ -15,8 +15,6 @@
  * #  limitations under the License.
  * ##############################################################################
  *
- *  NOTE that Style Override for this widget will take an ID, but other things
- *  is likely to get 'wonky'
 */
 .label-text {
     -fx-font-size: 16px;

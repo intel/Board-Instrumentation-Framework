@@ -65,7 +65,7 @@ public class DataManager {
     private long _UnassignedDataPoints;
 
     private boolean __DynamicTabRegistered = false;
-
+    
     public DataManager() {
         _DataMap = new ConcurrentHashMap<>();
         _WildcardDataMap = new ConcurrentHashMap<>();
