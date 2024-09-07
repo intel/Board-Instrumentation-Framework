@@ -39,11 +39,11 @@ import kutch.biff.marvin.widget.widgetbuilder.GradientPanelWidgetBuilder;
 public class GradientPanelWidget extends BaseWidget {
 
     private final GradientPanelControl _gradientPanel;
-    
+
     public GradientPanelWidget() {
         _gradientPanel = new GradientPanelControl();
     }
-    
+
     @Override
     public boolean Create(GridPane pane, DataManager dataMgr) {
         SetParent(pane);
@@ -65,16 +65,16 @@ public class GradientPanelWidget extends BaseWidget {
             String strVal = newVal.toString();
             try {
                 float newValue = Float.parseFloat(strVal);
-                _gradientPanel.setValue(newValue);
-                ApplyCSS();
+                _gradientPanel.setValue(newValue, getStyleOverride());
             } catch (NumberFormatException ex) {
                 LOGGER.log(Level.SEVERE, "Invalid data for GradientPanel received: {0}", strVal);
             }
         });
-
-        return ApplyCSS();
+        boolean retVal = ApplyCSS();
+        _gradientPanel.setValue(_gradientPanel.getMinValue(), getStyleOverride());
+        return retVal;
     }
-    
+
     @Override
     public boolean HandleValueRange(FrameworkNode rangeNode) {
         double Min = -1234.5678;
@@ -84,17 +84,17 @@ public class GradientPanelWidget extends BaseWidget {
             if (Min == -1234.5678) {
                 return false;
             }
-            _gradientPanel.setMinValue((float)Min);
+            _gradientPanel.setMinValue((float) Min);
         }
         if (rangeNode.hasAttribute("Max")) {
             Max = rangeNode.getDoubleAttribute("Max", Max);
             if (Max == -1234.5678) {
                 return false;
             }
-            _gradientPanel.setMaxValue((float)Max);
+            _gradientPanel.setMaxValue((float) Max);
         }
         return true;
-    }    
+    }
 
     @Override
     public Node getStylableObject() {
@@ -110,27 +110,27 @@ public class GradientPanelWidget extends BaseWidget {
     public void UpdateTitle(String newTitle) {
         _gradientPanel.setLabel(newTitle);
     }
-    
+
     public void setMinValue(float newVal) {
         _gradientPanel.setMinValue(newVal);
     }
-    
+
     public void setMaxValue(float newVal) {
         _gradientPanel.setMaxValue(newVal);
     }
-    
-    
+
     public void setGradientColors(List<GradientColor> gradientColors) {
         _gradientPanel.setGradientColors(gradientColors);
     }
-    public void setShowValue(boolean newVal){
+
+    public void setShowValue(boolean newVal) {
         _gradientPanel.setShowValue(newVal);
     }
-    
-    public void setShowLabel(boolean newVal){
+
+    public void setShowLabel(boolean newVal) {
         _gradientPanel.setShowLabel(newVal);
     }
-    
+
     @Override
     public boolean HandleWidgetSpecificSettings(FrameworkNode widgetNode) {
         if (widgetNode.getNodeName().equalsIgnoreCase("Colors")) {
@@ -138,8 +138,17 @@ public class GradientPanelWidget extends BaseWidget {
             if (colors != null && colors.size() > 1) {
                 _gradientPanel.setGradientColors(colors);
                 return true;
-            } 
+            }
+        } else if (widgetNode.getNodeName().equalsIgnoreCase("ShowValue")) {
+            boolean show = widgetNode.getBooleanValue();
+            _gradientPanel.setShowValue(show);
+            return true;
+        } else if (widgetNode.getNodeName().equalsIgnoreCase("ShowTitle")) {
+            boolean show = widgetNode.getBooleanValue();
+            _gradientPanel.setShowLabel(show);
+            return true;
         }
+
         return false;
-    }   
+    }
 }

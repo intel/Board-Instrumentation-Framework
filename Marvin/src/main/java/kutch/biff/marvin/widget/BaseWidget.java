@@ -429,13 +429,13 @@ abstract public class BaseWidget implements Widget {
                 getStylesheets().clear();
                 fRet = getStylesheets().add(result);
 
-            } catch (Exception e) {
-                LOGGER.severe("Invalid Playback File: " + cssFile);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Invalid Playback File: {0}", cssFile);
             }
             fRet = getStylesheets().setAll(cssFile);
 
             if (false == fRet) {
-                LOGGER.severe("Failed to apply Stylesheet " + cssFile);
+                LOGGER.log(Level.SEVERE, "Failed to apply Stylesheet {0}", cssFile);
                 return false;
             }
         }

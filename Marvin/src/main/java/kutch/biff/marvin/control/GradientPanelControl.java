@@ -44,6 +44,7 @@ public class GradientPanelControl extends Region {
     private Pane panel;
     private Text labelText;
     private Text valueText;
+    private  List<String> _styleOverrides;
 
     public GradientPanelControl() {
         this.minValue = 0.0f;
@@ -58,6 +59,7 @@ public class GradientPanelControl extends Region {
         this.gradientColors.add(new GradientColor(Color.RED, 0.5f));
         this.panel = createPanel();
         getChildren().add(panel); // Add the panel to the region
+        this._styleOverrides = new ArrayList<>();
     }
 
     private Pane createPanel() {
@@ -84,11 +86,8 @@ public class GradientPanelControl extends Region {
 
         // Creating panel and applying the gradient background and CSS class
         Pane widgetPanel = new Pane(vbox);
-        //widgetPanel.setPrefSize(200, 200);
-        //widgetPanel.setStyle("-fx-background-color: " + toHex(getColorForValue(value)) + ";");
-        //widgetPanel.getStyleClass().add("gradient-panel");
 
-                // Ensure VBox resizes with the Pane
+        // Ensure VBox resizes with the Pane
         vbox.setFillWidth(true);
         vbox.prefWidthProperty().bind(widgetPanel.widthProperty());
         vbox.prefHeightProperty().bind(widgetPanel.heightProperty());
@@ -96,18 +95,18 @@ public class GradientPanelControl extends Region {
         return widgetPanel;
     }
 
-public void updateValue(float newValue) {
-    // Bound the newValue within minValue and maxValue
-    if (newValue < minValue) {
-        newValue = minValue;
-    } else if (newValue > maxValue) {
-        newValue = maxValue;
-    }
+    public void updateValue(float newValue) {
+        // Bound the newValue within minValue and maxValue
+        if (newValue < minValue) {
+            newValue = minValue;
+        } else if (newValue > maxValue) {
+            newValue = maxValue;
+        }
 
-    this.value = newValue;
-    valueText.setText(formatValue(value));
-    panel.setStyle("-fx-background-color: " + toHex(getColorForValue(value)) + ";");
-}
+        this.value = newValue;
+        valueText.setText(formatValue(value));
+        applyNewGradient();
+    }
 
     public void setLabel(String label) {
         this.label = label;
@@ -121,7 +120,7 @@ public void updateValue(float newValue) {
 
     public void setShowLabel(boolean showLabel) {
         this.showLabel = showLabel;
-        //refreshPanel();
+        this.refreshPanel();
     }
 
     public boolean isShowLabel() {
@@ -130,14 +129,15 @@ public void updateValue(float newValue) {
 
     public void setShowValue(boolean showValue) {
         this.showValue = showValue;
-        //refreshPanel();
+        refreshPanel();
     }
 
     public boolean isShowValue() {
         return this.showValue;
     }
 
-    public void setValue(float value) {
+    public void setValue(float value, List<String> styleOverrides) {
+        _styleOverrides = styleOverrides;
         updateValue(value);
     }
 
@@ -163,12 +163,26 @@ public void updateValue(float newValue) {
         return this.maxValue;
     }
 
+    private void applyNewGradient()
+    {
+         String newBgStyle = "-fx-background-color: " + toHex(getColorForValue(value)) + ";";
+
+        String StyleString = "";
+        for (String Style : this._styleOverrides) {
+            if (!Style.contains("-fx-background-color")) {
+                StyleString += Style + ";";
+            }
+          }
+        StyleString += newBgStyle;
+        panel.setStyle(StyleString);
+    }
+    
     public void setGradientColors(List<GradientColor> gradientColors) {
         if (gradientColors == null || gradientColors.size() < 2) {
             throw new IllegalArgumentException("At least two colors with weights are required.");
         }
         this.gradientColors = new ArrayList<>(gradientColors);
-        panel.setStyle("-fx-background-color: " + toHex(getColorForValue(value)) + ";");
+        applyNewGradient();
     }
 
     public List<GradientColor> getGradientColors() {
@@ -188,51 +202,54 @@ public void updateValue(float newValue) {
         return String.format("%." + decimalPlaces + "f", value);
     }
 
-    private void refreshPanels() {
+    private void refreshPanel() {
         getChildren().clear();
         this.panel = createPanel();
         getChildren().add(panel);
     }
 
-private Color getColorForValue(float value) {
-    // Normalize value to a range between 0 and 1
-    float ratio = (value - minValue) / (maxValue - minValue);
+    private Color getColorForValue(float value) {
+        // Normalize value to a range between 0 and 1
+        float ratio = (value - minValue) / (maxValue - minValue);
 
-    // Ensure the ratio is within [0, 1] bounds
-    if (ratio < 0) ratio = 0;
-    if (ratio > 1) ratio = 1;
-
-    // Normalize the weights to ensure they sum to 1
-    float totalWeight = 0;
-    for (GradientColor gc : gradientColors) {
-        totalWeight += gc.getWeight();
-    }
-
-    // Accumulate the weight to find the correct interval
-    float accumulatedWeight = 0;
-    for (int i = 0; i < gradientColors.size() - 1; i++) {
-        GradientColor currentColor = gradientColors.get(i);
-        GradientColor nextColor = gradientColors.get(i + 1);
-
-        // Calculate the weight range for the current and next colors
-        float currentWeight = accumulatedWeight / totalWeight;
-        float nextWeight = (accumulatedWeight + currentColor.getWeight()) / totalWeight;
-
-        // Check if the ratio falls within this color section
-        if (ratio >= currentWeight && ratio <= nextWeight) {
-            // Interpolate between the current and next color
-            float sectionRatio = (ratio - currentWeight) / (nextWeight - currentWeight);
-            return currentColor.getColor().interpolate(nextColor.getColor(), sectionRatio);
+        // Ensure the ratio is within [0, 1] bounds
+        if (ratio < 0) {
+            ratio = 0;
+        }
+        if (ratio > 1) {
+            ratio = 1;
         }
 
-        // Move to the next color section
-        accumulatedWeight += currentColor.getWeight();
+        // Normalize the weights to ensure they sum to 1
+        float totalWeight = 0;
+        for (GradientColor gc : gradientColors) {
+            totalWeight += gc.getWeight();
+        }
+
+        // Accumulate the weight to find the correct interval
+        float accumulatedWeight = 0;
+        for (int i = 0; i < gradientColors.size() - 1; i++) {
+            GradientColor currentColor = gradientColors.get(i);
+            GradientColor nextColor = gradientColors.get(i + 1);
+
+            // Calculate the weight range for the current and next colors
+            float currentWeight = accumulatedWeight / totalWeight;
+            float nextWeight = (accumulatedWeight + currentColor.getWeight()) / totalWeight;
+
+            // Check if the ratio falls within this color section
+            if (ratio >= currentWeight && ratio <= nextWeight) {
+                // Interpolate between the current and next color
+                float sectionRatio = (ratio - currentWeight) / (nextWeight - currentWeight);
+                return currentColor.getColor().interpolate(nextColor.getColor(), sectionRatio);
+            }
+
+            // Move to the next color section
+            accumulatedWeight += currentColor.getWeight();
+        }
+
+        // If the ratio is exactly 1 or slightly above, return the last color
+        return gradientColors.get(gradientColors.size() - 1).getColor();
     }
-
-    // If the ratio is exactly 1 or slightly above, return the last color
-    return gradientColors.get(gradientColors.size() - 1).getColor();
-}
-
 
     private String toHex(Color color) {
         int r = (int) (color.getRed() * 255);
@@ -240,8 +257,8 @@ private Color getColorForValue(float value) {
         int b = (int) (color.getBlue() * 255);
         return String.format("#%02X%02X%02X", r, g, b);
     }
-    
-   public Node getStylableObject() {
+
+    public Node getStylableObject() {
         return this.panel;
     }
 }
