@@ -48,7 +48,6 @@ javafx {
 
 dependencies {
     implementation files('Dependencies/Enzo-0.3.6a.jar') // Using the Enzo JAR from the Dependencies folder
-    implementation files('Dependencies/charts-17.1.43.jar')
 }
 mainClassName = 'kutch.biff.marvin.Launcher'
 
