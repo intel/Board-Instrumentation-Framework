@@ -30,50 +30,18 @@
                 </Item>
             </StyleOverride>
             <!-- Add Widgets Here -->
-            <!-- Throw up a simple image, add a task to play the audio when you click on the image -->
-<!--            <Widget File="Image\ImageScale.xml" row="1" column="1" Height="900" Width="1820" Task="PlayAudio">
+<!--             Throw up a simple image, add a task to play the audio when you click on the image -->
+            <Widget File="Image\ImageScale.xml" row="1" column="1" Height="900" Width="1820" Task="PlayAudio">
                 <Source>$(AppDir)\Images/biff.jpg</Source>
-            </Widget>            -->
-            <Widget File="Text\GradientPanel.xml" row="1" column="1" Align="W" width="400" height="200" >
-                <Title>Fodddo</Title>
-                <Decimals>0</Decimals>
-                <ValueRange Min="20" Max="125"/>
-                <Colors>
-                    <Color>
-                        <Hex>#00ff00</Hex> <!-- Blue -->
-                        <Weight>0.5</Weight>
-                    </Color>
-                    <Color>
-                        <Hex>#FF0000</Hex> <!-- Red -->
-                        <Weight>0.5</Weight>
-                    </Color>
-                </Colors>
-            </Widget>
+            </Widget>         
+     
             <!-- Put some text atop the image -->
             <Widget File="Text\Text.xml" row="1" column="1" Align="S" >
                 <StyleOverride ID="Welcome"/>
                 <InitialValue RevertTimeout="4000">Welcome to the World of BIFF</InitialValue>
                 <!--<Revert Timeout="4000" Value="0"/>-->
             </Widget>
-            <Widget File="Text\GradientPanel.xml" row="2" column="2" Align="W" width="400" height="400" >
-                <Title>Bilbo</Title>
-                <Decimals>3</Decimals>
-                <ValueRange Min="2" Max="125"/>
-                <StyleOverride>
-                    <Item> -fx-border-width: 32px; </Item>
-                </StyleOverride>
-                <Colors>
-                    <Color>
-                        <Hex>#0000ff</Hex> <!-- Blue -->
-                        <Weight>0.5</Weight>
-                    </Color>
-                    <Color>
-                        <Hex>#FF0000</Hex> <!-- Red -->
-                        <Weight>0.5</Weight>
-                    </Color>
-                </Colors>
-            </Widget>
-            
+             
             <!-- Let's add some audio -->
             <Widget File="Media\AudioPlayer.xml" row="1" column="1">
                 <Audio Source="$(AppDir)\Media\Biff.mp3" ID="Audio_1"/>
